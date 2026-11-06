@@ -164,7 +164,7 @@ class App:
         s.log = ScrolledText(fr, height=6, font=("Consolas", 10) if os.name == "nt" else ("DejaVu Sans Mono", 9), relief="flat", borderwidth=1)
         s.log.pack(fill="both", expand=True, pady=(10, 0)); s.log.configure(state="disabled")
 
-        s.btn_use = ttk.Button(s.after_box, text="設為監控的圖（取代目前的圖）", command=s.use_scan, state="disabled"); s.btn_use.pack(side="left")
+        s.btn_use = ttk.Button(s.after_box, text="在網頁開啟結果", style="Accent.TButton", command=s.use_scan, state="disabled"); s.btn_use.pack(side="left")
         s.btn_merge = ttk.Button(s.after_box, text="只把 SNMP 對應套到目前的圖", command=s.merge_scan, state="disabled"); s.btn_merge.pack(side="left", padx=(8, 0))
         s.btn_save = ttk.Button(s.after_box, text="另存 JSON…", command=s.save_scan, state="disabled"); s.btn_save.pack(side="left", padx=(8, 0))
         s.btn_try = ttk.Button(s.after_box, text="改用網段探索", command=s.try_discover)
@@ -258,23 +258,60 @@ class App:
     def cancel_scan(s):
         s.stop_scan = True; s.v_scanstat.set("停止中…")
 
-    def use_scan(s):
-        if not s.last_project: return
-        if s.store.project.get("devices") and not messagebox.askyesno(TITLE, "要用這次的掃描結果取代監控服務目前的圖嗎？\n\n你在網頁上手動加的配線架、資訊座、備註都會被取代（舊的圖會自動備份）。\n\n只想讓監控對應到設備、保留目前的圖，請改按「只把 SNMP 對應套到目前的圖」。"):
-            return
-        bk = os.path.join(s.store.dir, "backup"); os.makedirs(bk, exist_ok=True)
-        json.dump(s.store.project, open(os.path.join(bk, f"before-scan-{time.strftime('%Y%m%d-%H%M%S')}.json"), "w", encoding="utf-8"), ensure_ascii=False)
-        s.store.set_project(s.last_project); s.service.poller.poke()
-        messagebox.showinfo(TITLE, f"已設為監控的圖：{len(s.last_project['devices'])} 台設備、{len(s.last_project['cables'])} 條線。\n\n啟動監控服務後打開網頁就能看到。")
+    def choose(s, title, msg, options, default=0):
+        """自訂對話框：按鈕直接寫出要做的事。回傳選到的索引，關掉視窗回傳 None。"""
+        dlg = tk.Toplevel(s.root); dlg.title(title); dlg.transient(s.root); dlg.resizable(False, False)
+        res = [None]
+        fr = ttk.Frame(dlg, padding=18); fr.pack(fill="both", expand=True)
+        ttk.Label(fr, text=msg, wraplength=440, justify="left").pack(anchor="w")
+        row = ttk.Frame(fr); row.pack(fill="x", pady=(16, 0))
+        for i, t in enumerate(options):
+            b = ttk.Button(row, text=t, style="Accent.TButton" if i == default else "TButton", command=lambda i=i: (res.__setitem__(0, i), dlg.destroy()))
+            b.pack(side="left", padx=(0 if i == 0 else 8, 0))
+            if i == default: b.focus_set()
+        dlg.bind("<Escape>", lambda e: dlg.destroy())
+        dlg.update_idletasks()
+        x = s.root.winfo_rootx() + (s.root.winfo_width() - dlg.winfo_width()) // 2; y = s.root.winfo_rooty() + (s.root.winfo_height() - dlg.winfo_height()) // 3
+        dlg.geometry(f"+{max(0, x)}+{max(0, y)}"); dlg.grab_set(); s.root.wait_window(dlg)
+        return res[0]
+
+    def local_url(s):
+        return f"http://127.0.0.1:{int(s.store.settings.get('port', 8080))}/"
+
+    def show_in_web(s, project, how="replace"):
+        """把結果放進監控服務、確定服務在跑，然後用瀏覽器打開。"""
+        if how == "replace":
+            if s.store.project.get("devices"):
+                bk = os.path.join(s.store.dir, "backup"); os.makedirs(bk, exist_ok=True)
+                json.dump(s.store.project, open(os.path.join(bk, f"before-scan-{time.strftime('%Y%m%d-%H%M%S')}.json"), "w", encoding="utf-8"), ensure_ascii=False)
+            s.store.set_project(project); msg = f"已帶入網頁：{len(project['devices'])} 台設備、{len(project['cables'])} 條線"
+        else:
+            proj = json.loads(json.dumps(s.store.project)); nd, npt = srv.merge_snmp(proj, project)
+            s.store.set_project(proj); msg = f"已更新目前的圖：對到 {nd} 台設備、{npt} 個埠"
+        s.service.poller.poke()
+        if not s.service.running: s.start_service()
         s.refresh_service()
+        if s.service.running:
+            webbrowser.open(s.local_url()); s.v_scanstat.set(msg + "，已在瀏覽器開啟"); s.write(f"\n{msg}。網頁：{s.local_url()}（其他電腦用 {s.service.urls()[0]}）")
+
+    def use_scan(s, auto=False):
+        if not s.last_project: return
+        if s.store.project.get("devices"):
+            n = len(s.store.project["devices"])
+            i = s.choose("在網頁開啟結果", f"網頁上已經有一張圖（{n} 台設備）。這次的結果要怎麼處理？\n\n‧ 取代：換成這次的結果（舊的圖會自動備份）\n‧ 保留：保留你手動畫的配線架、備註，只把 SNMP 對應套上去，讓監控對到設備",
+                         ["取代成這次的結果", "保留目前的圖，只更新對應", "先不要"])
+            if i is None or i == 2:
+                if not auto: return
+                s.v_scanstat.set("掃描完成，按「在網頁開啟結果」可帶入網頁"); return
+            s.show_in_web(s.last_project, "replace" if i == 0 else "merge")
+        else:
+            s.show_in_web(s.last_project, "replace")
 
     def merge_scan(s):
         if not s.last_project: return
         if not s.store.project.get("devices"):
-            messagebox.showinfo(TITLE, "監控服務目前沒有圖，請改按「設為監控的圖」。"); return
-        proj = json.loads(json.dumps(s.store.project)); nd, npt = srv.merge_snmp(proj, s.last_project)
-        s.store.set_project(proj); s.service.poller.poke()
-        messagebox.showinfo(TITLE, f"已把 SNMP 對應套到目前的圖：對到 {nd} 台設備、{npt} 個埠。\n\n對不到的設備請確認網頁上設備的 IP 或名稱和掃描結果一致。")
+            s.show_in_web(s.last_project, "replace"); return
+        s.show_in_web(s.last_project, "merge")
 
     def save_scan(s):
         if not s.last_project: return
@@ -454,19 +491,29 @@ class App:
                     else:
                         s.v_scanstat.set(f"完成：{len(proj['devices'])} 台設備、{len(proj['cables'])} 條線（{secs:.1f} 秒）")
                         s.write(f"\n完成：{len(proj['devices'])} 台設備、{len(proj['cables'])} 條線。")
-                        s.write("下一步：按下面的「設為監控的圖」，再到「監控服務」啟動服務；或「另存 JSON」到網頁匯入。")
                         for b in (s.btn_use, s.btn_merge, s.btn_save): b.configure(state="normal")
+                        s.root.after(150, lambda: s.use_scan(auto=True))
         except queue.Empty:
             pass
         s.root.after(120, s.pump)
 
     def on_close(s):
         if s.service.running:
-            r = messagebox.askyesnocancel(TITLE, "監控服務執行中。\n\n「是」：縮到工作列，服務繼續執行\n「否」：停止服務並結束程式")
-            if r is None: return
-            if r: s.root.iconify(); return
-            s.service.stop()
-        s.root.destroy()
+            i = s.choose("關閉程式", "監控服務正在執行，其他電腦可能正在看網頁。\n\n結束程式後網頁就打不開，也不會再記錄流量。",
+                         ["結束程式", "縮到工作列，繼續監控", "取消"], default=0)
+            if i is None or i == 2: return
+            if i == 1: s.root.iconify(); return
+        s.quit_app()
+
+    def quit_app(s):
+        """確實結束：停止掃描與服務，不等背景執行緒（SNMP 逾時中的輪詢）跑完。"""
+        s.stop_scan = True
+        try: s.store.save_settings()
+        except Exception: pass
+        t = threading.Thread(target=s.service.stop, daemon=True); t.start(); t.join(3)
+        try: s.root.destroy()
+        except Exception: pass
+        os._exit(0)
 
 def fmt_bps(v):
     if v is None: return "—"
