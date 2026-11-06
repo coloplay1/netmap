@@ -96,7 +96,7 @@ th{color:var(--ink2);font-weight:600;font-size:13px;white-space:nowrap}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="8 8 240 240" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22C3EE"/><stop offset="1" stop-color="#2563EB"/></linearGradient></defs><rect x="8" y="8" width="240" height="240" rx="58" fill="url(#g)"/><rect x="52" y="52" width="152" height="50" rx="14" fill="#fff"/><rect x="74" y="68" width="22" height="18" rx="4" fill="#2563EB"/><rect x="117" y="68" width="22" height="18" rx="4" fill="#F59E0B"/><rect x="160" y="68" width="22" height="18" rx="4" fill="#2563EB"/><path d="M128 102v34M80 170v-20a14 14 0 0 1 14-14h68a14 14 0 0 1 14 14v20" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/><rect x="56" y="170" width="48" height="36" rx="10" fill="#fff"/><rect x="152" y="170" width="48" height="36" rx="10" fill="#F59E0B"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v2.7 · netmap.exe v1.5.1</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v2.8 · netmap.exe v1.6.0</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -117,7 +117,7 @@ th{color:var(--ink2);font-weight:600;font-size:13px;white-space:nowrap}
 <li><a href="#fault">8. 故障查線</a></li>
 <li><a href="#save">9. 儲存、匯出與分享</a></li>
 <li><a href="#exe">10. netmap.exe（Windows 程式）</a>
-  <ol><li><a href="#e-install">下載與第一次開啟</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-ssh">SSH 流量監控</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
+  <ol><li><a href="#e-install">下載與第一次開啟</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-detect">從線上版切換</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-ssh">SSH 流量監控</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
 <li><a href="#mobile">11. 手機操作</a></li>
 <li><a href="#keys">12. 快捷鍵</a></li>
 <li><a href="#faq">13. 常見問題</a></li>
@@ -132,7 +132,7 @@ th{color:var(--ink2);font-weight:600;font-size:13px;white-space:nowrap}
   <div class="row">
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
-    <a class="btn ghost" href="#changelog">最新更新：v2.7</a>
+    <a class="btn ghost" href="#changelog">最新更新：v2.8</a>
   </div>
 </div>
 
@@ -148,13 +148,18 @@ th{color:var(--ink2);font-weight:600;font-size:13px;white-space:nowrap}
 
 <section id="quick">
 <h2><span class="n">2</span>五分鐘快速開始</h2>
-<figure><img src="manual/welcome.jpg" alt="開始頁：新增、匯入、範例" loading="lazy"><figcaption>開始頁。上方顯示目前版本、更新內容與使用手冊。</figcaption></figure>
+<p>開始頁最上面先選用法，下次打開會記住你上次選的：</p>
+<div class="grid2">
+  <div class="card"><h4>🌐 網頁版</h4><p>在瀏覽器手動畫圖、查線、故障查線，免安裝。下面是「新增」「匯入」「範例」三欄。</p></div>
+  <div class="card"><h4>🖥 本地端 netmap.exe</h4><p>自動掃描與即時監控。這一頁有功能介紹、三步開始與下載；從監控服務打開時，改顯示監控狀態。</p></div>
+</div>
+<figure><img src="manual/welcome.jpg" alt="開始頁：網頁版" loading="lazy"><figcaption>開始頁的「網頁版」：新增、匯入、範例。上方顯示目前版本、更新內容與使用手冊。</figcaption></figure>
 <ol class="steps">
-<li><b>開啟網頁版</b>：<a href="./">coloplay1.github.io/netmap</a>。第一次會看到開始頁。</li>
+<li><b>開啟網頁版</b>：<a href="./">coloplay1.github.io/netmap</a>。第一次會看到開始頁，選「網頁版」。</li>
 <li><b>先看範例</b>：在「範例」選一個產業（例如「中小企業辦公室」），馬上有一張完整的圖可以玩。</li>
 <li><b>點任何一個埠</b>：整條路徑會亮起來，直到網路入口（光世代／ISP）。</li>
 <li><b>自己畫</b>：回首頁（點左上角標誌）選「新增空白圖」，用左邊的「設備」工具列加設備，從一個埠拖到另一個埠就是接線。</li>
-<li><b>想自動畫</b>：下載 <a href="#exe">netmap.exe</a>，輸入核心 Switch 的 IP 與 SNMP community，掃完自動在網頁打開。</li>
+<li><b>想自動畫</b>：在開始頁選「本地端 netmap.exe」，下載 <a href="#exe">netmap.exe</a>，輸入核心 Switch 的 IP 與 SNMP community，掃完自動在網頁打開。</li>
 </ol>
 <div class="tip"><b>💡</b>所有修改都會自動存在這台電腦的瀏覽器。換電腦或要備份，請用「檔案 → 匯出 JSON」。</div>
 </section>
@@ -297,6 +302,7 @@ th{color:var(--ink2);font-weight:600;font-size:13px;white-space:nowrap}
 <p>netmap.exe 用 SNMP 讀取防火牆、網管 Switch 的資料，自動畫出設備與連線，也可以常駐成「監控服務」，顯示每個埠的即時流量。只會<b>讀取</b>，不會修改設備設定。</p>
 
 <h3 id="e-install">下載與第一次開啟</h3>
+<figure><img src="manual/welcome-local.jpg" alt="開始頁：本地端 netmap.exe" loading="lazy"><figcaption>開始頁的「本地端 netmap.exe」：功能介紹、三步開始與下載。</figcaption></figure>
 <ol class="steps">
 <li>在<a href="./">網頁版開始頁</a>或<a href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">這裡</a>下載 <b>netmap.exe</b>，免安裝，直接執行。</li>
 <li>Windows 可能跳出「Windows 已保護您的電腦」（SmartScreen）：按「<b>其他資訊 → 仍要執行</b>」。這是因為程式沒有付費的程式碼簽章。</li>
@@ -337,6 +343,18 @@ th{color:var(--ink2);font-weight:600;font-size:13px;white-space:nowrap}
 <tr><td><span class="dot" style="background:#EF4444"></span>紅（粗）</td><td>使用率高（70% 以上）</td></tr>
 <tr><td><span class="dot" style="background:#DC2626"></span>紅色虛線</td><td>埠離線（線上標示「離線」）</td></tr>
 </table></div>
+
+<h3 id="e-detect">從線上版切換到監控畫面</h3>
+<p>從監控服務的網址打開時，點左上角的標誌回到開始頁，「本地端」分頁會顯示這台服務的狀況：監控中的設備、正常與沒有回應的數量、最後讀取時間，以及「開啟監控中的圖」「流量圖總覽」「故障查線」和有問題的設備，點設備就會打開它的狀態與流量圖。</p>
+<figure><img src="manual/welcome-srv.jpg" alt="從監控服務開啟時的開始頁" loading="lazy"></figure>
+<p>平常習慣打開線上版（coloplay1.github.io）的話，可以讓線上版直接找到這台電腦上的 netmap.exe：</p>
+<ol class="steps">
+<li>在 netmap.exe「監控服務」分頁勾選 <b>讓線上版網頁偵測到這個程式</b>（預設不勾）。</li>
+<li>在同一台電腦打開線上版，開始頁選「本地端 netmap.exe」，按 <b>偵測</b>。</li>
+<li>瀏覽器會詢問是否允許存取「這部裝置上的其他應用程式」，按 <b>允許</b>。</li>
+<li>出現「偵測到 netmap.exe，監控服務執行中」後，按 <b>切換到監控畫面</b>。之後再打開線上版的本地端分頁，會自動偵測。</li>
+</ol>
+<div class="tip"><b>💡</b>偵測只限同一台電腦、只限線上版網址，而且程式只回答版本與網頁埠，不會把圖或流量資料給線上版。偵測不到時，也可以直接用 netmap.exe 顯示的網址開啟。</div>
 
 <h3 id="e-mrtg">MRTG 流量圖</h3>
 <p>監控服務每次輪詢都會把每個埠的流量存起來，整理成和 MRTG 一樣的四張圖。打開方式：</p>
@@ -462,7 +480,8 @@ th{color:var(--ink2);font-weight:600;font-size:13px;white-space:nowrap}
 
 <section id="changelog">
 <h2><span class="n">14</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v2.7　設備流量圖與狀態</b><span class="tag new">最新 · 2026-11-07</span><span class="tag">netmap.exe 1.5.1</span></div><ul><li>點畫布上的設備，右側「即時狀態」卡片新增「這台設備的流量圖與狀態」按鈕</li><li>一次看這台設備的上下線、錯誤封包、最後輪詢時間，以及每個埠的日／週／月／年流量圖</li><li>從設備進入單埠詳細圖後，可以直接返回這台設備</li></ul></div>
+<div class="clog"><div class="v"><b>v2.8　首頁分成網頁版與本地端</b><span class="tag new">最新 · 2026-11-07</span><span class="tag">netmap.exe 1.6.0</span></div><ul><li>開始頁先選用法：「網頁版」手動畫圖，「本地端 netmap.exe」自動掃描與監控，會記住上次的選擇</li><li>本地端分頁：功能介紹、三步開始與下載；從監控服務開啟時改顯示監控狀態、有問題的設備與流量圖入口</li><li>可偵測這台電腦是否開著 netmap.exe，一鍵切換到監控畫面（需在 netmap.exe 勾選允許，預設關閉）</li></ul></div>
+<div class="clog"><div class="v"><b>v2.7　設備流量圖與狀態</b><span class="tag">2026-11-07</span><span class="tag">netmap.exe 1.5.1</span></div><ul><li>點畫布上的設備，右側「即時狀態」卡片新增「這台設備的流量圖與狀態」按鈕</li><li>一次看這台設備的上下線、錯誤封包、最後輪詢時間，以及每個埠的日／週／月／年流量圖</li><li>從設備進入單埠詳細圖後，可以直接返回這台設備</li></ul></div>
 <div class="clog"><div class="v"><b>v2.6　SSH 流量監控</b><span class="tag">2026-11-06</span><span class="tag">netmap.exe 1.5.0</span></div><ul><li>沒有 SNMP 的設備（家用路由器、Linux、NAS、OpenWrt）可以改用 SSH 監控流量，一樣有即時流量與 MRTG 流量圖</li><li>ASUS 路由器自動辨識 WAN、LAN、2.4G、5G Wi-Fi</li><li>設備重開機、計數器歸零時不再出現假的流量尖峰</li><li>流量圖沒有資料時，直接說明原因與下一步</li></ul></div>
 <div class="clog"><div class="v"><b>v2.5　MRTG 流量圖</b><span class="tag">2026-11-06</span><span class="tag">netmap.exe 1.4.0</span></div><ul><li>每個埠都有 MRTG 式的每日（5 分鐘）、每週（30 分鐘）、每月（2 小時）、每年（1 天）流量圖，列出最大／平均／目前值與使用率</li><li>流量圖總覽：所有埠最近 24 小時的小圖，可依最忙排序、篩選</li><li>可切換 bps／使用率 %、顯示尖峰，並匯出 CSV；流量圖資料保存約 2 年</li></ul></div>
 <div class="clog"><div class="v"><b>v2.4　版本資訊與使用手冊</b><span class="tag">2026-11-06</span><span class="tag">netmap.exe 1.3.1</span></div><ul><li>首頁顯示目前版本、更新內容與最新的 netmap.exe 下載</li><li>新增詳細的線上使用手冊（附畫面截圖）</li><li>netmap.exe 會自動檢查是否有新版本</li></ul></div>
@@ -480,7 +499,7 @@ th{color:var(--ink2);font-weight:600;font-size:13px;white-space:nowrap}
 <div class="clog"><div class="v"><b>v1.0　第一版</b><span class="tag">2026-11-06</span></div><ul><li>防火牆、Switch、配線架、資訊座埠對埠接線，點埠追蹤整條路徑</li><li>產業範例與自動排版</li></ul></div>
 </section>
 
-<p class="foot">機房線路對應圖 · 網頁 v2.7 · netmap.exe v1.5.1 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">機房線路對應圖 · 網頁 v2.8 · netmap.exe v1.6.0 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>

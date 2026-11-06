@@ -23,7 +23,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.5.1"
+VERSION = "1.6.0"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -85,7 +85,10 @@ def local_ips():
 ROLLUPS = [(300, 3 * 86400), (1800, 14 * 86400), (7200, 62 * 86400), (86400, 800 * 86400)]
 MRTG_VIEWS = [("day", 33 * 3600), ("week", 8 * 86400), ("month", 35 * 86400), ("year", 400 * 86400)]
 
-DEFAULT_SETTINGS = {"port": 8080, "interval": 60, "retention_days": 7, "lan_edit": False, "autostart": False, "autorun": True,
+# 線上版網頁偵測本機 netmap.exe：只有使用者勾選才開，只回答 /api/ping，只給這台電腦自己的瀏覽器
+DETECT_ORIGINS = {"https://coloplay1.github.io"}
+
+DEFAULT_SETTINGS = {"port": 8080, "interval": 60, "retention_days": 7, "lan_edit": False, "autostart": False, "autorun": True, "web_detect": False,
                     "snmp": {"version": "2c", "community": "", "user": "", "auth_proto": "SHA", "auth_key": "", "priv_proto": "AES", "priv_key": "",
                              "context": "", "port": 161, "timeout": 2.0, "retries": 1}}
 
@@ -452,11 +455,24 @@ class Handler(http.server.BaseHTTPRequestHandler):
         ip = s.client_address[0]
         return ip.startswith("127.") or ip == "::1" or ip in local_ips()
 
-    def _send(s, code, body, ctype="application/json; charset=utf-8"):
+    def _send(s, code, body, ctype="application/json; charset=utf-8", extra=None):
         if isinstance(body, (dict, list)): body = json.dumps(body, ensure_ascii=False).encode("utf-8")
         elif isinstance(body, str): body = body.encode("utf-8")
         s.send_response(code); s.send_header("Content-Type", ctype); s.send_header("Content-Length", str(len(body)))
+        for k, v in (extra or {}).items(): s.send_header(k, v)
         s.send_header("Cache-Control", "no-store"); s.end_headers(); s.wfile.write(body)
+
+    def _detect_origin(s):
+        """允許線上版偵測時，回傳可以放行的 Origin；否則 None。"""
+        o = s.headers.get("Origin") or ""
+        if s.server.store.settings.get("web_detect") and o in DETECT_ORIGINS and s._local(): return o
+        return None
+
+    def do_OPTIONS(s):
+        o = s._detect_origin()
+        if not o or urllib.parse.urlparse(s.path).path != "/api/ping": return s._send(403, {"error": "forbidden"})
+        s._send(204, b"", "text/plain", {"Access-Control-Allow-Origin": o, "Vary": "Origin", "Access-Control-Allow-Methods": "GET",
+                                          "Access-Control-Allow-Private-Network": "true", "Access-Control-Max-Age": "600"})
 
     def can_edit(s): return s._local() or bool(s.server.store.settings.get("lan_edit"))
 
@@ -486,7 +502,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
             return s._send(200, st.mrtg_device((q.get("id") or [""])[0], (q.get("view") or ["day"])[0]))
         if u.path == "/api/mrtg/summary":
             return s._send(200, {"ports": st.mrtg_summary()})
-        if u.path == "/api/ping": return s._send(200, {"ok": True, "version": VERSION})
+        if u.path == "/api/ping":
+            o = s._detect_origin()
+            if o: return s._send(200, {"ok": True, "version": VERSION, "port": st.settings.get("port"), "detect": True},
+                                 extra={"Access-Control-Allow-Origin": o, "Vary": "Origin", "Access-Control-Allow-Private-Network": "true"})
+            return s._send(200, {"ok": True, "version": VERSION})
         s._send(404, {"error": "not found"})
 
     def do_PUT(s):

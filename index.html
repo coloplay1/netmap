@@ -610,6 +610,46 @@ details.card>summary::-webkit-details-marker{display:none}
 }
 @media (prefers-reduced-motion:reduce){#insp{transition:none}}
 
+/* start page: 網頁版 / 本地端 */
+.wpicks{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:2px 0 14px}
+.wpick{display:flex;align-items:center;gap:12px;text-align:left;border:1.5px solid var(--line);background:var(--sunk);border-radius:16px;padding:12px 14px;color:var(--ink);transition:border-color .15s,background .15s;min-width:0}
+.wpick:hover{border-color:var(--line2)}
+.wpick[aria-pressed="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--sunk));box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+.wpick .wtile{width:40px;height:40px}
+.wpick b{display:block;font-size:16px;font-weight:800}
+.wpick small{display:block;font-size:12px;color:var(--muted);line-height:1.45}
+.wpick>span:nth-child(2){flex:1;min-width:0;text-align:left}
+.wpick .chk{margin-left:auto;width:20px;height:20px;border-radius:50%;border:2px solid var(--line2);flex:none;display:grid;place-items:center}
+.wpick[aria-pressed="true"] .chk{border-color:var(--accent);background:var(--accent)}
+.wpick[aria-pressed="true"] .chk::after{content:"";width:7px;height:7px;border-radius:50%;background:#fff}
+.wpane[hidden]{display:none!important}
+.wfoot{font-size:11.5px;color:var(--muted);margin:10px 2px 0;display:flex;gap:6px;align-items:center}
+.wloc{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px}
+.wdet{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--panel);margin-bottom:12px}
+.wdet .st{width:10px;height:10px;border-radius:50%;background:var(--muted);flex:none}
+.wdet.ok{border-color:color-mix(in srgb,#22c55e 55%,var(--line));background:color-mix(in srgb,#22c55e 8%,var(--panel))}.wdet.ok .st{background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.18)}
+.wdet.busy .st{animation:wpulse 1s infinite alternate}
+@keyframes wpulse{to{opacity:.3}}
+.wdet .tx{flex:1;min-width:0;font-size:13px;line-height:1.5}.wdet .tx b{display:block;font-size:14px}.wdet .tx small{color:var(--muted)}
+.wfeat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.wfeat figure{margin:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel)}
+.wfeat img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;object-position:top left;background:var(--sunk)}
+.wfeat figcaption{padding:7px 9px;font-size:12px;line-height:1.45;color:var(--muted)}.wfeat figcaption b{display:block;color:var(--ink);font-size:13px}
+.wsup{font-size:12.5px;color:var(--muted);line-height:1.7;margin:10px 2px 0}.wsup b{color:var(--ink)}
+.wsteps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;counter-reset:w}
+.wsteps li{counter-increment:w;position:relative;padding:2px 0 2px 34px;font-size:13px;line-height:1.5}
+.wsteps li::before{content:counter(w);position:absolute;left:0;top:1px;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;font-size:12px;display:grid;place-items:center}
+.wsteps li small{display:block;color:var(--muted);font-size:12px}
+.wdl{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.wdl a.big{display:flex;align-items:center;justify-content:center;gap:8px;height:46px;border-radius:12px;background:var(--accent);color:#fff;font-weight:800;font-size:15px;text-decoration:none}
+.wdl a.big svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.2}
+.wdl .sub{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;justify-content:center}.wdl .sub a,.wdl .sub button{color:var(--muted);background:none;border:0;padding:0;text-decoration:underline;cursor:pointer;font:inherit}
+.wstat{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.wstat div{border:1px solid var(--line);border-radius:12px;padding:9px 11px;background:var(--panel)}.wstat small{display:block;font-size:11.5px;color:var(--muted)}.wstat b{font-size:20px;font-variant-numeric:tabular-nums}
+.wstat .bad b{color:#ef4444}.wstat .ok b{color:#22c55e}
+.wsrv{font-size:12.5px;color:var(--muted);margin:0 2px 12px;line-height:1.6}.wsrv b{color:var(--ink)}
+.wprob .wrow .tile{background:#ef4444}
+@media (max-width:900px){.wpicks{grid-template-columns:1fr}.wloc{grid-template-columns:minmax(0,1fr)}.wfeat{grid-template-columns:minmax(0,1fr)}.wfeat img{aspect-ratio:16/7}.wstat{grid-template-columns:repeat(2,minmax(0,1fr))}.wpick small{font-size:11.5px}}
 /* start page: 新增 / 匯入 / 範例 */
 .w3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 .wcol{background:var(--sunk);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
@@ -1315,8 +1355,9 @@ const KEY='netmap-v2', OLDKEY='netmap-v1', PREFKEY='netmap-prefs';
 const PUBLIC_URL='https://coloplay1.github.io/netmap/';
 const MANUAL_URL=PUBLIC_URL+'manual.html';
 /* 版本紀錄：最新在最前面。exe = netmap.exe 的版本 */
-const APP_VERSION='2.7',EXE_VERSION='1.5.1';
+const APP_VERSION='2.8',EXE_VERSION='1.6.0';
 const CHANGELOG=[
+ {v:'2.8',exe:'1.6.0',d:'2026-11-07',t:'首頁分成網頁版與本地端',i:['開始頁先選用法：「網頁版」手動畫圖，「本地端 netmap.exe」自動掃描與監控，會記住上次的選擇','本地端分頁：功能介紹、三步開始與下載；從監控服務開啟時改顯示監控狀態、有問題的設備與流量圖入口','可偵測這台電腦是否開著 netmap.exe，一鍵切換到監控畫面（需在 netmap.exe 勾選允許，預設關閉）']},
  {v:'2.7',exe:'1.5.1',d:'2026-11-07',t:'設備流量圖與狀態',i:['點畫布上的設備，右側「即時狀態」卡片新增「這台設備的流量圖與狀態」按鈕','一次看這台設備的上下線、錯誤封包、最後輪詢時間，以及每個埠的日／週／月／年流量圖','從設備進入單埠詳細圖後，可以直接返回這台設備']},
  {v:'2.6',exe:'1.5.0',d:'2026-11-06',t:'SSH 流量監控',i:['沒有 SNMP 的設備（家用路由器、Linux、NAS、OpenWrt）可以改用 SSH 監控流量，一樣有即時流量與 MRTG 流量圖','ASUS 路由器自動辨識 WAN、LAN、2.4G、5G Wi-Fi','設備重開機、計數器歸零時不再出現假的流量尖峰','流量圖沒有資料時，直接說明原因與下一步']},
  {v:'2.5',exe:'1.4.0',d:'2026-11-06',t:'MRTG 流量圖',i:['每個埠都有 MRTG 式的每日（5 分鐘）、每週（30 分鐘）、每月（2 小時）、每年（1 天）流量圖，列出最大／平均／目前值與使用率','流量圖總覽：所有埠最近 24 小時的小圖，可依最忙排序、篩選','可切換 bps／使用率 %、顯示尖峰，並匯出 CSV；流量圖資料保存約 2 年']},
@@ -1533,12 +1574,19 @@ function autoLayout(){I=idx();renderCanvas();
 /* ---------- welcome / template picker ---------- */
 function tplIcon(k){return`<span class="tile" style="--tc:${TICON[k]?tc(k):tc('end')}">${TICON[k]||KICON[k]}</span>`}
 function openWelcome(canContinue){
+  const mode=SRV?(prefs.wModeSrv||'local'):(prefs.wMode||'web');
   const prev=!S.devices.length&&lastSaved?lastSaved:null;const used=prev?prev.devices.length:0;const P=p=>`<svg class="i" viewBox="0 0 24 24">${p}</svg>`;
   const ex=TEMPLATES.map(t=>{const st=tplStats(t);return`<button class="wrow" data-tpl="${t.id}" title="${esc(t.desc)}"><span class="tiles">${t.icons.map(tplIcon).join('')}</span><span class="wt"><b>${esc(t.name)}</b><small>${esc(t.tag)} · ${st.d} 台設備 · ${st.c} 條線</small></span><span class="go">›</span></button>`}).join('');
   $('modalRoot').innerHTML=`<div class="modal welcome" id="mod"><div class="wcard" role="dialog" aria-label="開始">
     <div class="whead"><span class="logo mark"><svg viewBox="8 8 240 240" aria-hidden="true"><defs><linearGradient id="nmg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22C3EE"/><stop offset="1" stop-color="#2563EB"/></linearGradient></defs><rect x="8" y="8" width="240" height="240" rx="58" fill="url(#nmg2)"/><rect x="52" y="52" width="152" height="50" rx="14" fill="#fff"/><rect x="74" y="68" width="22" height="18" rx="4" fill="#2563EB"/><rect x="117" y="68" width="22" height="18" rx="4" fill="#F59E0B"/><rect x="160" y="68" width="22" height="18" rx="4" fill="#2563EB"/><path d="M128 102v34M80 170v-20a14 14 0 0 1 14-14h68a14 14 0 0 1 14 14v20" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/><rect x="56" y="170" width="48" height="36" rx="10" fill="#fff"/><rect x="152" y="170" width="48" height="36" rx="10" fill="#F59E0B"/></svg></span>
-    <div><h2>機房線路對應圖</h2><p class="hint">建立新的網路環境、匯入既有資料，或先看產業範例。之後隨時可以從「檔案 ▸ 範本 / 新環境」回到這裡。</p>${versionStrip()}</div>
+    <div><h2>機房線路對應圖</h2><p class="hint">先選用法：在網頁上手動畫圖，或用本地端的 netmap.exe 自動掃描與監控。之後點左上角的標誌就能回到這裡。</p>${versionStrip()}</div>
     <button class="btn" id="wClose" style="margin-left:auto">略過</button></div>
+
+    <div class="wpicks" role="tablist" aria-label="用法">
+      <button class="wpick" role="tab" data-wm="web" aria-pressed="${mode==='web'}"><span class="wtile" style="--tc:var(--accent)">${P('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>')}</span><span><b>網頁版</b><small>手動畫圖、查線、故障查線，免安裝，資料存在這台電腦的瀏覽器</small></span><span class="chk"></span></button>
+      <button class="wpick" role="tab" data-wm="local" aria-pressed="${mode==='local'}"><span class="wtile" style="--tc:var(--t-fw)">${P('<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>')}</span><span><b>本地端 netmap.exe</b><small>${SRV?'這張圖由 netmap.exe 監控服務提供：即時狀態與流量圖':'Windows 程式：SNMP／SSH 自動畫圖、即時監控、MRTG 流量圖'}</small></span><span class="chk"></span></button>
+    </div>
+    <div class="wpane" data-wp="web"${mode==='web'?'':' hidden'}>
     ${used?`<button class="tcard cont" data-tpl="continue"><span class="tile" style="--tc:var(--accent)"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span><span><b>繼續上次的配置</b><span class="d">${used} 台設備 · ${prev.cables.length} 條線，資料存在這台電腦的瀏覽器</span></span></button>`:''}
     <div class="w3">
       <section class="wcol"><header><span class="wtile" style="--tc:var(--accent)">${P('<path d="M12 5v14M5 12h14"/>')}</span><div><h3>新增</h3><p>從零建立新的網路環境</p></div></header>
@@ -1547,17 +1595,22 @@ function openWelcome(canContinue){
         <p class="wnote">也可以在畫布按右鍵或 A 鍵，在游標位置加入設備。</p></section>
       <section class="wcol"><header><span class="wtile" style="--tc:var(--t-ap)">${P('<path d="M12 15V4M7.5 8.5 12 4l4.5 4.5"/><path d="M5 14v5h14v-5"/>')}</span><div><h3>匯入</h3><p>用手上已有的資料建立</p></div></header>
         <button class="wrow" data-wimp="json"><span class="tiles"><span class="tile" style="--tc:var(--t-router)">${P('<path d="M4 4h10l6 6v10H4z"/><path d="M14 4v6h6"/>').replace('class="i" ','')}</span></span><span class="wt"><b>開啟專案檔</b><small>之前從這個工具下載的 .json</small></span><span class="go">›</span></button>
-        <button class="wrow hot" data-wimp="snmp"><span class="tiles"><span class="tile" style="--tc:var(--t-fw)">${P('<path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/>').replace('class="i" ','')}</span></span><span class="wt"><b>SNMP 掃描與即時監控 <em class="new">新</em></b><small>Windows 程式：自動畫圖、看每個埠的流量</small></span><span class="go">›</span></button>
         <button class="wrow" data-wimp="lldp"><span class="tiles"><span class="tile" style="--tc:var(--t-sw)">${TICON.sw}</span></span><span class="wt"><b>LLDP / CDP 鄰居表</b><small>貼上 show lldp neighbors 自動產生連線</small></span><span class="go">›</span></button>
         <button class="wrow" data-wimp="text"><span class="tiles"><span class="tile" style="--tc:var(--t-end)">${P('<path d="M8 6 3 12l5 6M16 6l5 6-5 6"/>').replace('class="i" ','')}</span></span><span class="wt"><b>貼上 JSON 文字</b><small>同事傳來的配置內容</small></span><span class="go">›</span></button></section>
       <section class="wcol"><header><span class="wtile" style="--tc:var(--t-patch)">${P('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 13h8M8 16h5"/>')}</span><div><h3>範例</h3><p>看各產業的網路怎麼接</p></div></header>${ex}</section>
     </div>
+    <p class="wfoot">🔒 網頁版的資料只存在這台電腦的瀏覽器，不會上傳。要備份或換電腦，請用「檔案 ▸ 匯出 JSON」。</p></div>
+    <div class="wpane" data-wp="local"${mode==='local'?'':' hidden'} id="wLocal">${SRV?'':localIntroHTML()}</div>
   </div></div>`;
   const close=()=>$('modalRoot').innerHTML='';
   $('wClose').onclick=close;$('mod').onclick=e=>{if(e.target.id==='mod')close()};
   $('mod').querySelectorAll('[data-tpl]').forEach(b=>b.onclick=()=>{const id=b.dataset.tpl;close();if(id==='continue'){if(!S.devices.length&&lastSaved){S=lastSaved;lastSaved=null;ui.sel=null;renderAll();requestAnimationFrame(()=>fitTo(devBox(),1));toast('已載入上次的配置')}}else applyTpl(id)});
   $('wLog')&&($('wLog').onclick=()=>{close();openChangelog()});
-  $('mod').querySelectorAll('[data-wimp]').forEach(b=>b.onclick=()=>{const k=b.dataset.wimp;close();if(k==='json')$('fileIn').click();if(k==='lldp')openLLDP();if(k==='text')openJsonText();if(k==='snmp')openSNMP()});
+  const setMode=m=>{$('mod').querySelectorAll('[data-wm]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.wm===m)));$('mod').querySelectorAll('[data-wp]').forEach(p=>p.hidden=p.dataset.wp!==m);
+    if(SRV)prefs.wModeSrv=m;else prefs.wMode=m;savePrefs();if(m==='local')wLocalInit(close)};
+  $('mod').querySelectorAll('[data-wm]').forEach(b=>b.onclick=()=>setMode(b.dataset.wm));
+  if(mode==='local')wLocalInit(close);
+  $('mod').querySelectorAll('[data-wimp]').forEach(b=>b.onclick=()=>{const k=b.dataset.wimp;close();if(k==='json')$('fileIn').click();if(k==='lldp')openLLDP();if(k==='text')openJsonText();if(k==='snmp')openSNMP();if(k==='scan')$('fileIn').click()});
   const first=$('mod').querySelector('[data-tpl],[data-wimp]');first&&first.focus();
 }
 /* keep a margin so the floating device bar and top bar never cover a fresh layout */
@@ -2266,9 +2319,62 @@ function openChangelog(){prefs.seenVersion=APP_VERSION;savePrefs();
   modal(`<h2>更新內容</h2><p class="hint">目前版本：網頁 v${APP_VERSION}　·　netmap.exe v${EXE_VERSION}　·　<a href="${MANUAL_URL}" target="_blank" rel="noopener">使用手冊</a></p>
   <div class="clog">${CHANGELOG.map((c,i)=>`<section class="${i?'':'latest'}"><div class="ch"><b>v${c.v}</b>${c.exe?`<span class="exev">netmap.exe ${c.exe}</span>`:''}<span class="cd">${c.d}</span>${i?'':'<span class="cnew">最新</span>'}</div><h4>${esc(c.t)}</h4><ul>${c.i.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></section>`).join('')}</div>
   <div class="actions"><a class="btn primary" href="${SNMP_EXE}" target="_blank" rel="noopener">下載最新 netmap.exe</a><a class="btn" href="${MANUAL_URL}" target="_blank" rel="noopener">開啟使用手冊</a><button class="btn" data-close style="margin-left:auto">關閉</button></div>`,true)}
+/* ---------- start page: 本地端 netmap.exe ---------- */
+const WIMG=f=>`<img src="${PUBLIC_URL}manual/${f}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`;
+function localIntroHTML(){const DL='<svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>';
+  return`<div class="wdet" id="wDet"><span class="st"></span><span class="tx"><b>這台電腦已經在執行 netmap.exe？</b><small>按「偵測」檢查這台電腦（127.0.0.1）有沒有開著監控服務，找到就能直接切換過去。</small></span><button class="btn sm" id="wDetGo" hidden>切換到監控畫面</button><button class="btn sm" id="wDetRe">偵測</button></div>
+  <div class="wloc">
+    <section class="wcol"><header><span class="wtile" style="--tc:var(--t-fw)"><svg class="i" viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg></span><div><h3>netmap.exe 能做什麼</h3><p>放在內網的 Windows 電腦上執行，只讀取、不改設備設定</p></div></header>
+      <div class="wfeat">
+        <figure>${WIMG('app-g1.jpg')}<figcaption><b>自動畫圖</b>SNMP 掃描防火牆、Switch、AP，沿 LLDP／CDP 畫出連線</figcaption></figure>
+        <figure>${WIMG('live.jpg')}<figcaption><b>即時監控</b>每個埠的流量、使用率與上下線，同事用瀏覽器看同一張圖</figcaption></figure>
+        <figure>${WIMG('mrtg-detail.jpg')}<figcaption><b>MRTG 流量圖</b>日／週／月／年圖，保存約 2 年，可匯出 CSV</figcaption></figure>
+      </div>
+      <p class="wsup"><b>支援的設備：</b>有 SNMP（v1／v2c／v3）的防火牆、網管 Switch、AP、路由器；沒有 SNMP 的家用路由器（ASUS 等）、Linux、NAS、OpenWrt 用 SSH 讀流量。也能用「網段探索」列出網段裡在線的設備。</p></section>
+    <section class="wcol"><header><span class="wtile" style="--tc:var(--accent)"><svg class="i" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></span><div><h3>三步開始</h3><p>免安裝，下載後直接執行</p></div></header>
+      <ol class="wsteps"><li>下載 netmap.exe<small>出現 SmartScreen 時按「其他資訊 ▸ 仍要執行」</small></li><li>掃描<small>輸入核心 Switch 的 IP 與 SNMP community；沒有 SNMP 就按「加入 SSH 設備…」</small></li><li>啟動監控服務<small>瀏覽器會打開監控畫面，把網址給同事就能一起看</small></li></ol>
+      <div class="wdl"><a class="big" href="${SNMP_EXE}" target="_blank" rel="noopener">${DL}下載 netmap.exe v${EXE_VERSION}</a>
+        <div class="sub"><a href="${MANUAL_URL}#exe" target="_blank" rel="noopener">使用手冊</a><button data-wimp="snmp">詳細步驟</button><button data-wimp="scan">匯入掃描結果 .json</button><a href="${SNMP_ZIP}" target="_blank" rel="noopener">Python 版</a></div></div></section>
+  </div>`}
+let wDetSeq=0;
+async function wDetect(){const box=$('wDet');if(!box)return;const seq=++wDetSeq;
+  const tx=box.querySelector('.tx'),go=$('wDetGo'),re=$('wDetRe');box.className='wdet busy';go.hidden=re.hidden=true;
+  tx.innerHTML='<b>正在偵測這台電腦的 netmap.exe…</b><small>瀏覽器如果詢問是否允許存取「這部裝置上的其他應用程式」，請按「允許」。</small>';
+  const ports=[...new Set([prefs.exePort,8080,18090].filter(Boolean))];let hit=null;
+  if(/^https?:$/.test(location.protocol)&&!/^(127\.|localhost$)/.test(location.hostname))
+    await Promise.all(ports.map(async p=>{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),1800);
+      try{const r=await fetch(`http://127.0.0.1:${p}/api/ping`,{signal:ac.signal,cache:'no-store'});const j=await r.json();if(j&&j.ok&&!hit)hit={port:j.port||p,version:j.version}}catch(e){}finally{clearTimeout(t)}}));
+  if(seq!==wDetSeq||!$('wDet'))return;
+  re.hidden=false;re.textContent='重新偵測';
+  if(hit){prefs.exePort=hit.port;savePrefs();box.className='wdet ok';const url=`http://127.0.0.1:${hit.port}/`;
+    const old=hit.version&&EXE_VERSION&&hit.version.localeCompare(EXE_VERSION,undefined,{numeric:true})<0;
+    tx.innerHTML=`<b>偵測到 netmap.exe v${esc(hit.version||'')}，監控服務執行中</b><small>${old?`有新版 v${EXE_VERSION} 可以下載 · `:''}監控畫面：${esc(url)}</small>`;
+    go.hidden=false;go.onclick=()=>{location.href=url}}
+  else{box.className='wdet';tx.innerHTML='<b>沒有偵測到 netmap.exe</b><small>還沒安裝就從下面下載。已經在用：確認監控服務已啟動，並在「監控服務」勾選「讓線上版網頁偵測到這個程式」；如果剛才瀏覽器的詢問按了封鎖，可以點網址列左邊的圖示重新允許。也可以直接用 netmap.exe 提供的網址開啟。</small>'}}
+function wLocalInit(close){if(SRV){wLocalStatus(close);ui.wlRefresh=()=>{if($('wLocal')&&!$('wLocal').hidden)wLocalStatus(close)}}else{const b=$('wDetRe');if(b)b.onclick=wDetect;if(prefs.exePort&&$('wDet')&&!$('wDet').classList.contains('ok'))wDetect()}
+  $('wLocal').querySelectorAll('[data-wimp]').forEach(b=>b.onclick=()=>{close();if(b.dataset.wimp==='snmp')openSNMP();else $('fileIn').click()})}
+function wLocalStatus(close){const el=$('wLocal');if(!el)return;const L=ui.live||{devices:{},ports:{}};
+  const mon=S.devices.filter(d=>L.devices[d.id]),ok=mon.filter(d=>L.devices[d.id].up),bad=mon.filter(d=>!L.devices[d.id].up);
+  const last=Math.max(0,...mon.map(d=>L.devices[d.id].last||0));
+  const ICON=t=>`<span class="tiles">${tplIcon(TYPES[t]?t:'end')}</span>`;
+  el.innerHTML=`<p class="wsrv">監控服務：<b>${esc(location.host)}</b>${SRV.version?` · netmap.exe v${esc(SRV.version)}`:''}${SRV.interval?` · 每 ${SRV.interval} 秒讀取一次`:''} · ${SRV.edit?'可以編輯':'唯讀（在服務主機上才能編輯）'}</p>
+    <div class="wstat"><div><small>監控中的設備</small><b>${mon.length}</b></div><div class="ok"><small>正常</small><b>${ok.length}</b></div><div class="${bad.length?'bad':''}"><small>沒有回應</small><b>${bad.length}</b></div><div><small>最後讀取</small><b style="font-size:16px">${last?new Date(last*1000).toLocaleTimeString('zh-TW',{hour12:false}):'—'}</b></div></div>
+    <div class="w3" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+      <section class="wcol"><header><span class="wtile" style="--tc:var(--accent)"><svg class="i" viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg></span><div><h3>開始</h3><p>看圖、看流量</p></div></header>
+        <button class="wrow" data-wl="map"><span class="tiles">${['fw','sw','ap'].map(tplIcon).join('')}</span><span class="wt"><b>開啟監控中的圖</b><small>${S.devices.length} 台設備 · ${S.cables.length} 條線，線的顏色代表使用率</small></span><span class="go">›</span></button>
+        <button class="wrow" data-wl="mrtg"><span class="tiles"><span class="tile" style="--tc:var(--t-ap)"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg></span></span><span class="wt"><b>流量圖總覽</b><small>每個埠的日／週／月／年 MRTG 流量圖</small></span><span class="go">›</span></button>
+        <button class="wrow" data-wl="fault"><span class="tiles"><span class="tile" style="--tc:var(--t-fw)"><svg viewBox="0 0 24 24"><path d="M12 3 2 20h20zM12 10v4M12 17v.5"/></svg></span></span><span class="wt"><b>故障查線</b><small>從有問題的設備一段段往網路入口檢查</small></span><span class="go">›</span></button></section>
+      <section class="wcol wprob"><header><span class="wtile" style="--tc:${bad.length?'#ef4444':'#22c55e'}"><svg class="i" viewBox="0 0 24 24">${bad.length?'<path d="M12 8v5M12 16v.5"/><circle cx="12" cy="12" r="9"/>':'<path d="M5 12l5 5 9-10"/>'}</svg></span><div><h3>${bad.length?'需要注意':'一切正常'}</h3><p>${bad.length?'點設備看狀態與流量圖':mon.length?'所有設備都有回應':'還沒有監控的設備'}</p></div></header>
+        ${bad.length?bad.slice(0,6).map(d=>`<button class="wrow" data-wdev="${d.id}">${ICON(d.type)}<span class="wt"><b>${esc(d.name)}</b><small>${esc(L.devices[d.id].err||'沒有回應')}</small></span><span class="go">›</span></button>`).join('')+(bad.length>6?`<p class="wnote">還有 ${bad.length-6} 台…</p>`:'')
+        :mon.length?mon.slice(0,4).map(d=>`<button class="wrow" data-wdev="${d.id}">${ICON(d.type)}<span class="wt"><b>${esc(d.name)}</b><small>${esc(d.sshmon?'SSH':'SNMP')} 正常</small></span><span class="go">›</span></button>`).join('')
+        :`<p class="wnote" style="margin:0 2px">在 netmap.exe 用「SNMP 掃描」掃描後設為監控的圖；沒有 SNMP 的家用路由器、Linux、NAS 在「監控服務」按「加入 SSH 設備…」。</p>`}</section>
+    </div>`;
+  el.querySelectorAll('[data-wl]').forEach(b=>b.onclick=()=>{const k=b.dataset.wl;close();ui.wlRefresh=null;
+    if(k==='map'){if(S.devices.length)requestAnimationFrame(()=>fitTo(devBox(),1))}else if(k==='mrtg')openMRTGIndex();else if(k==='fault'){const fb=$('bFault');fb&&fb.click()}});
+  el.querySelectorAll('[data-wdev]').forEach(b=>b.onclick=()=>{const id=b.dataset.wdev;close();ui.wlRefresh=null;ui.sel={dev:id};renderAll();openDevTraffic(id)})}
 function versionStrip(){const fresh=prefs.seenVersion!==APP_VERSION;const L=CHANGELOG[0];
   return`<div class="vstrip"><span class="vtag">v${APP_VERSION}</span><span class="vtxt">${fresh?'<b>新版本：</b>':''}${esc(L.t)}（${L.d}）</span>
-    <button class="vlink" id="wLog">更新內容${fresh?'<i class="vdot"></i>':''}</button><a class="vlink" href="${MANUAL_URL}" target="_blank" rel="noopener">使用手冊</a><a class="vlink" href="${SNMP_EXE}" target="_blank" rel="noopener">下載 netmap.exe v${EXE_VERSION}</a></div>`}
+    <button class="vlink" id="wLog">更新內容${fresh?'<i class="vdot"></i>':''}</button><a class="vlink" href="${MANUAL_URL}" target="_blank" rel="noopener">使用手冊</a></div>`}
 function openSNMP(){modal(`<h2>SNMP 掃描與即時監控</h2><p class="hint">瀏覽器不能直接送 SNMP，所以要在你們內網的 Windows 電腦上執行 <b>netmap.exe</b>。它有兩個功能：<b>掃描</b>防火牆、Switch、AP 自動畫出網路圖；<b>監控服務</b>常駐在這台電腦，定時讀取每個埠的流量與上下線，同事用瀏覽器打開 <code>http://這台電腦IP:8080</code> 就能看到同一張圖和即時狀態。只讀取，不會修改設備設定。</p>
   <ol class="snmpsteps">
    <li><b>下載掃描程式</b><div class="dlrow"><a class="btn primary" href="${SNMP_EXE}" target="_blank" rel="noopener">netmap.exe（視窗版，建議）</a><a class="btn" href="${SNMP_CLI}" target="_blank" rel="noopener">命令列版</a><a class="btn" href="${SNMP_ZIP}" target="_blank" rel="noopener">Python 版 ZIP</a></div><small>免安裝，雙擊就能用。第一次執行若出現 Windows SmartScreen 提示，按「其他資訊 ▸ 仍要執行」；啟動監控服務時 Windows 防火牆詢問請按「允許存取」。</small></li>
@@ -2625,7 +2731,7 @@ async function livePoll(){if(!SRV)return;
   try{const r=await fetch('/api/status',{cache:'no-store'});const j=await r.json();ui.live=j;ui.liveErr=false;
     if(j.rev!==ui.srvRev&&!srvDirty&&!srvSaving&&!busy()){const p=await (await fetch('/api/project',{cache:'no-store'})).json();if(p.rev!==ui.srvRev){S=normalize(p.project);ui.srvRev=p.rev;I=idx();renderAll();placeIfNeeded()}}
     else if(ui.view==='map'&&!busy())renderCanvas();
-    refreshLiveCard();ui.dtRefresh&&ui.dtRefresh()}
+    refreshLiveCard();ui.dtRefresh&&ui.dtRefresh();ui.wlRefresh&&ui.wlRefresh()}
   catch(e){ui.liveErr=true}
   setLiveChip();setTimeout(livePoll,Math.max(5000,Math.min(30000,((ui.live&&ui.live.interval)||60)*500)))}
 function setLiveChip(){const el=$('liveChip');if(!el||!SRV)return;el.hidden=false;const L=ui.live;

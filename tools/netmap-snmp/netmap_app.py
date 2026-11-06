@@ -358,6 +358,7 @@ class App:
         s.v_port = tk.StringVar(value=str(st.get("port", 8080))); s.v_int = tk.StringVar(value=str(st.get("interval", 60)))
         s.v_keep = tk.StringVar(value=str(st.get("retention_days", 7))); s.v_lan = tk.BooleanVar(value=bool(st.get("lan_edit")))
         s.v_boot = tk.BooleanVar(value=bool(st.get("autostart"))); s.v_auto = tk.BooleanVar(value=bool(st.get("autorun", True)))
+        s.v_detect = tk.BooleanVar(value=bool(st.get("web_detect")))
         r1 = ttk.Frame(cfg); r1.pack(fill="x")
         ttk.Label(r1, text="網頁埠").pack(side="left"); ascii_field(ttk.Entry(r1, textvariable=s.v_port, width=7), s.v_port).pack(side="left", padx=(6, 18))
         ttk.Label(r1, text="輪詢間隔（秒）").pack(side="left")
@@ -366,6 +367,8 @@ class App:
         ttk.Label(r1, text="（MRTG 流量圖另外保存約 2 年）", style="Muted.TLabel").pack(side="left", padx=(6, 0))
         r2 = ttk.Frame(cfg); r2.pack(fill="x", pady=(8, 0))
         ttk.Checkbutton(r2, text="允許內網其他電腦編輯圖（不勾＝其他電腦只能看）", variable=s.v_lan, command=s.save_service_cfg).pack(side="left")
+        ttk.Checkbutton(r2, text="讓線上版網頁偵測到這個程式", variable=s.v_detect, command=s.save_service_cfg).pack(side="left", padx=(18, 0))
+        ttk.Label(r2, text="（只回答版本與網頁埠，只限這台電腦）", style="Muted.TLabel").pack(side="left", padx=(4, 0))
         r3 = ttk.Frame(cfg); r3.pack(fill="x", pady=(4, 0))
         ttk.Checkbutton(r3, text="開啟程式時自動啟動服務", variable=s.v_auto, command=s.save_service_cfg).pack(side="left")
         cbb = ttk.Checkbutton(r3, text="Windows 開機時自動執行", variable=s.v_boot, command=s.toggle_boot); cbb.pack(side="left", padx=(18, 0))
@@ -383,7 +386,7 @@ class App:
         s.tree.tag_configure("down", foreground="#b42318"); s.tree.tag_configure("up", foreground="#1a7f37")
 
     def save_service_cfg(s):
-        st = s.store.settings; st["lan_edit"] = s.v_lan.get(); st["autorun"] = s.v_auto.get(); s.store.save_settings()
+        st = s.store.settings; st["lan_edit"] = s.v_lan.get(); st["autorun"] = s.v_auto.get(); st["web_detect"] = s.v_detect.get(); s.store.save_settings()
 
     def apply_service_cfg(s):
         st = s.store.settings
