@@ -718,6 +718,21 @@ svg.wires .cab.dim .vis{opacity:.1}
 .wmode{display:grid;grid-template-columns:repeat(3,1fr);margin-bottom:4px}
 .wmode button{font-size:12.5px}
 .popnote{font-size:11.5px;color:var(--muted);margin:0 0 6px;line-height:1.45}
+
+/* ---- p16 ---- */
+#insp .ibody{flex:1 1 auto;min-height:0;overscroll-behavior:contain}
+#insp .ihd{flex:none}
+.top .brand{cursor:pointer;border-radius:10px;padding:2px 6px 2px 2px;margin-left:-2px;transition:background .15s}
+.top .brand:hover{background:var(--soft)}
+.top .brand:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.themetog{position:relative;display:inline-flex;align-items:center;gap:0;height:34px;padding:3px;border-radius:999px;border:1px solid var(--line2);background:var(--sunk);cursor:pointer;flex:none}
+.themetog .opt{position:relative;z-index:1;display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 10px;border-radius:999px;font-size:12.5px;font-weight:700;color:var(--muted);transition:color .2s}
+.themetog .opt svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.themetog .knob{position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);border-radius:999px;background:var(--panel);box-shadow:0 1px 4px rgba(0,0,0,.35);transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.themetog[aria-checked="true"] .knob{transform:translateX(100%)}
+.themetog[aria-checked="false"] .opt.d,.themetog[aria-checked="true"] .opt.l{color:var(--ink)}
+@media (max-width:1240px){.themetog .opt span{display:none}.themetog .opt{padding:0 8px}}
+@media (min-width:901px){#insp{max-height:calc(100% - var(--tb,84px) - 170px)}}
 </style>
 </head>
 <body>
@@ -777,7 +792,7 @@ svg.wires .cab.dim .vis{opacity:.1}
 </div>
 <header class="top fl">
   <div class="tleft">
-  <div class="brand"><span class="logo"><svg class="i" viewBox="0 0 24 24"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M6 8l5 8.5M18 8l-5 8.5"/></svg></span><h1>機房線路對應圖</h1><span class="stat" id="stat"></span></div>
+  <div class="brand" id="bHome" role="button" tabindex="0" title="回到首頁（新增 / 匯入 / 範例）" aria-label="回到首頁"><span class="logo"><svg class="i" viewBox="0 0 24 24"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M6 8l5 8.5M18 8l-5 8.5"/></svg></span><h1>機房線路對應圖</h1><span class="stat" id="stat"></span></div>
   <div class="seg views" role="group" aria-label="檢視">
     <button id="vMap" aria-pressed="true"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.8 2.6 2.8 15.4 0 18M12 3c-2.8 2.6-2.8 15.4 0 18"/></svg>拓樸視圖</button>
     <button id="vRack" aria-pressed="false"><svg class="i" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h8"/></svg>機櫃視圖</button>
@@ -791,7 +806,7 @@ svg.wires .cab.dim .vis{opacity:.1}
     <div class="seg modeseg" role="group" aria-label="模式"><button id="mEdit" aria-pressed="true" title="可以接線、移動、修改"><i class="dot"></i>編輯</button><button id="mRo" aria-pressed="false" title="只能查線，不會誤觸拔線"><svg class="i" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>唯讀</button></div>
     <div class="popwrap"><button class="ibtn" data-popbtn="popPanels" aria-expanded="false" title="面板：顯示、收合、重設位置" aria-label="面板設定"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 4v16M3 15h5"/></svg></button>
       <div class="pop" id="popPanels" hidden><span class="label">顯示的面板</span><div class="togs" id="panelToggles" style="grid-template-columns:1fr"></div><span class="label">屬性面板</span><label class="tog"><input type="checkbox" id="autoDrawer">點設備時自動開啟</label><p class="hint">拖曳面板上的 ⋮⋮ 可以移動位置，按 – 收合。</p><button class="btn sm" id="panelReset">重設所有面板位置</button></div></div>
-    <button class="ibtn" id="bTheme" title="切換深色 / 淺色" aria-label="切換深色或淺色"><svg class="i" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
+    <button class="themetog" id="bTheme" role="switch" aria-checked="false" title="切換深色 / 淺色模式" aria-label="淺色模式"><span class="knob"></span><span class="opt d"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><span>深色</span></span><span class="opt l"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span>淺色</span></span></button>
     <button class="btn" id="bStart" title="開啟歡迎視窗：新增 / 匯入 / 範例"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M17.5 14v7M14 17.5h7"/></svg>範本</button>
     <div class="popwrap"><button class="btn" data-popbtn="popFile" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><path d="M3 6h7l2 2h9v11H3z"/></svg>檔案<svg class="i" viewBox="0 0 24 24" style="width:13px;height:13px"><path d="m6 9 6 6 6-6"/></svg></button>
       <div class="pop" id="popFile" hidden><div class="menu">
@@ -923,6 +938,112 @@ const BMETA={
   'Mitsubishi Electric':{zh:'三菱電機',kw:['MELSEC','三菱','Mitsubishi'],d:'MELSEC 系列 PLC，亞洲工廠常見。',m:{end:['MELSEC iQ-F','MELSEC iQ-R']}},
   'Delta':{zh:'台達電',kw:['台達','DVP','Delta Electronics'],d:'台灣工控品牌，PLC、HMI、變頻器。',m:{end:['AS300','DVP-ES3']}},
 };
+/* more brands; zh = local name, kw = search keywords */
+Object.assign(BMETA,{
+  'Barracuda':{zh:'梭子魚',kw:['CloudGen','CGF','Barracuda Firewall'],d:'CloudGen Firewall，SD-WAN 與多據點 VPN 常見。',m:{fw:['CloudGen F12','CloudGen F18','CloudGen F80','CloudGen F183']}},
+  'Netgate':{zh:'',kw:['pfSense','pfSense Plus','OPNsense'],d:'pfSense 官方硬體，開源防火牆，IT 自建常見。',m:{fw:['Netgate 1100','Netgate 2100','Netgate 4200','Netgate 6100','Netgate 8200'],router:['Netgate 2100','Netgate 4200']}},
+  'Hillstone':{zh:'山石網科',kw:['StoneOS','SG-6000'],d:'StoneOS 次世代防火牆。',m:{fw:['SG-6000-A200','SG-6000-E1700','SG-6000-E2300']}},
+  'Teltonika':{zh:'',kw:['RUT','RUTX','4G','5G','LTE','RutOS'],d:'RutOS 工業級 4G / 5G 路由器，備援線路與遠端站點常用。',m:{router:['RUT241','RUT906','RUT956','RUTX11','RUTX50']}},
+  'Moxa':{zh:'四零四科技',kw:['MOXA','EDS','EDR','AWK','工業乙太網'],d:'台灣工業網通品牌，寬溫 DIN 軌交換器、工業防火牆與無線，工廠 OT 網路常見。',
+    m:{sw:['EDS-205A','EDS-208A','EDS-308','EDS-408A','EDS-510E','EDS-518E','EDS-G508E','IKS-6728A'],router:['EDR-810','EDR-G902','EDR-G9010'],fw:['EDR-810','EDR-G9010'],ap:['AWK-1137C','AWK-3131A','AWK-4131A']}},
+  'Advantech':{zh:'研華',kw:['研華科技','EKI','工業交換器','IIoT'],d:'台灣工業電腦大廠，EKI 系列工業交換器。',m:{sw:['EKI-2525','EKI-2528','EKI-5525','EKI-5728','EKI-7710E-2CI'],end:['UNO-2271G','UNO-2484G','ARK-1124']}},
+  'Edgecore':{zh:'鈺登科技',kw:['Accton','智邦','ECS','AS4610','SONiC'],d:'台灣智邦旗下，企業與白牌交換器，支援 SONiC。',m:{sw:['ECS2100-10P','ECS4100-28P','ECS4120-28Fv2','AS4610-54P'],ap:['EAP101','EAP104']}},
+  'Allied Telesis':{zh:'',kw:['AlliedWare','AW+','x230','GS980','Vista Manager'],d:'AlliedWare Plus，日系企業與學校常見。',m:{sw:['x230-10GP','x230-28GP','GS980M/28PS','x530-28GPXm'],ap:['TQ5403','TQm6602']}},
+  'Extreme Networks':{zh:'',kw:['Extreme','EXOS','Switch Engine','XIQ','ExtremeCloud','Aerohive'],d:'ExtremeCloud IQ 雲端管理，校園與醫院常見。',m:{sw:['X435-24P-4S','X440-G2-24p-10GE4','5320-24P-8XE','5420F-24P-4XE'],ap:['AP305C','AP410C','AP4000','AP5010']}},
+  'Arista':{zh:'',kw:['EOS','CloudVision','CCS'],d:'EOS 系統，資料中心與園區高階交換器。',m:{sw:['CCS-720XP-24ZY4','CCS-720XP-48ZC2','7050X3 系列','7280R3 系列'],ap:['C-230','C-360']}},
+  'EnGenius':{zh:'',kw:['ECW','ECS','Cloud','EWS'],d:'雲端管理 AP 與交換器，中小企業常見。',m:{ap:['ECW220','ECW230','ECW336','EWS377AP'],sw:['ECS1112FP','ECS2512FP','ECS2528FP']}},
+  'Grandstream Networks':{zh:'潮流網路',kw:['GWN','Grandstream'],d:'GWN 系列 AP 與路由器，GWN.Cloud 免費雲管。',m:{ap:['GWN7660','GWN7662','GWN7664'],router:['GWN7002','GWN7003'],sw:['GWN7803P','GWN7813P']}},
+  'Linksys':{zh:'',kw:['LGS','Business'],d:'',m:{sw:['LGS308P','LGS328PC'],router:['LRT224']}},
+  'ASUS Network':{zh:'華碩',kw:['ASUS','RT-AX','RT-BE','ExpertWiFi','AiMesh'],d:'華碩路由器與 ExpertWiFi 商用系列。',m:{router:['RT-AX88U Pro','RT-BE88U','ExpertWiFi EBR63','ExpertWiFi EBG19P'],ap:['ExpertWiFi EBA63','ExpertWiFi EBP15'],sw:['ExpertWiFi EBP15']}},
+  'Microsoft':{zh:'微軟',kw:['Surface'],d:''},
+  'MSI':{zh:'微星',kw:['Modern','PRO'],d:''},
+  'Supermicro':{zh:'美超微',kw:['SuperServer','SMC'],d:'伺服器與白牌主機板，資料中心常見。'},
+  'HPE':{zh:'慧與',kw:['ProLiant','iLO','Hewlett Packard Enterprise'],d:'ProLiant 伺服器，iLO 遠端管理。'},
+  'ASUSTOR':{zh:'華芸',kw:['ADM','Lockerstor','Nimbustor'],d:'台灣 NAS 品牌，ADM 系統。'},
+  'TrueNAS':{zh:'',kw:['iXsystems','ZFS','FreeNAS'],d:'ZFS 檔案系統的 NAS / 儲存設備。'},
+  'Dahua':{zh:'大華',kw:['大華技術','IPC','DH'],d:'網路攝影機與 NVR 大廠。'},
+  'Axis':{zh:'安訊士',kw:['AXIS','Axis Communications'],d:'瑞典網路攝影機品牌，ONVIF 相容佳。'},
+  'Hanwha Vision':{zh:'韓華',kw:['Samsung Techwin','Wisenet','XNV','QNV'],d:'Wisenet 系列（前身 Samsung Techwin）。'},
+  'Uniview':{zh:'宇視',kw:['UNV','IPC'],d:''},
+  'Reolink':{zh:'',kw:['RLC','RLN'],d:''},
+  'Fanvil':{zh:'方位',kw:['X3U','X4U'],d:''},
+  'Poly':{zh:'',kw:['Polycom','VVX','Edge'],d:''},
+  'FUJIFILM':{zh:'富士軟片',kw:['Fuji Xerox','富士全錄','Apeos','ApeosPort','DocuCentre'],d:'影印機與多功能事務機，前身富士全錄。'},
+  'Ricoh':{zh:'理光',kw:['IM C','MP'],d:''},
+  'Kyocera':{zh:'京瓷',kw:['ECOSYS','TASKalfa'],d:''},
+  'Konica Minolta':{zh:'柯尼卡美能達',kw:['bizhub'],d:''},
+  'Posiflex':{zh:'振樺電',kw:['振樺','POS'],d:'台灣 POS 系統品牌。'},
+  'Sunmi':{zh:'商米',kw:['T2','D3'],d:'Android POS。'},
+  'iMin':{zh:'',kw:['Swan','Falcon'],d:'Android POS。'},
+  'Omron':{zh:'歐姆龍',kw:['OMRON','Sysmac','NX','NJ','CP1'],d:'Sysmac 系列 PLC，EtherNet/IP、EtherCAT。'},
+  'Rockwell Automation':{zh:'羅克韋爾',kw:['Allen-Bradley','AB','CompactLogix','ControlLogix','Micro800'],d:'Allen-Bradley PLC，EtherNet/IP 為主。'},
+  'Schneider Electric':{zh:'施耐德',kw:['Modicon','Schneider','Modbus'],d:'Modicon PLC，Modbus TCP 常見。'},
+  'Keyence':{zh:'基恩斯',kw:['KV'],d:''},
+  'FATEK':{zh:'永宏電機',kw:['永宏','FBs'],d:'台灣 PLC 品牌。'},
+  'Beckhoff':{zh:'倍福',kw:['TwinCAT','CX'],d:'PC-based 控制，EtherCAT 發明者。'},
+  'Weintek':{zh:'威綸通',kw:['威綸','cMT','MT8000','EasyBuilder'],d:'台灣 HMI 品牌，工廠人機介面常見。'},
+  'Pro-face':{zh:'普洛菲斯',kw:['Proface','GP4000','GP-Pro EX'],d:'施耐德旗下 HMI 品牌。'},
+  'Samsung':{zh:'三星',kw:['Galaxy Tab','Smart Signage'],d:''},
+  'BenQ':{zh:'明基',kw:['投影機','InstaShow'],d:''},
+  'Optoma':{zh:'奧圖碼',kw:['投影機'],d:''},
+  'ViewSonic':{zh:'優派',kw:['投影機','ViewBoard'],d:''},
+  'Raspberry Pi':{zh:'樹莓派',kw:['RPi','Pi 5'],d:''},
+  'ZTE':{zh:'中興',kw:['ONT','GPON','光纖數據機'],d:''},
+  'Nokia':{zh:'諾基亞',kw:['ONT','GPON','光纖數據機'],d:''},
+  'Arcadyan':{zh:'智易科技',kw:['光世代','中華電信','數據機'],d:'台灣電信業者常用的光纖 / VDSL 數據機製造商。'},
+});
+/* extra models for existing network brands */
+[['Fortinet','fw',['FortiGate 30G','FortiGate 50G','FortiGate 90G','FortiGate 120G','FortiGate 400F']],['Fortinet','sw',['FortiSwitch 108F-POE','FortiSwitch 124F-POE','FortiSwitch 148F-FPOE','FortiSwitch 424E']],
+ ['Palo Alto Networks','fw',['PA-415','PA-445','PA-5410']],['Check Point','fw',['Quantum Spark 1535','Quantum Spark 1555','Quantum Spark 1800','Quantum 3800']],
+ ['Cisco','fw',['Secure Firewall 1150','Secure Firewall 3105']],['Cisco','sw',['CBS250-24P-4G','CBS350-8P-2G','CBS350-24P-4G','CBS350-48P-4G','Catalyst 9200-24P','Catalyst 9200-48P','Catalyst 1200-24P-4G']],['Cisco','router',['ISR 1100-4G','ISR 4321','ISR 4431','Catalyst 8300']],['Cisco','ap',['Catalyst 9105AXI','Catalyst 9115AXI','CW9162I','CW9166I']],
+ ['Cisco Meraki','fw',['MX68','MX75','MX95']],['Cisco Meraki','sw',['MS120-8LP','MS120-24P','MS130-24P','MS250-48FP']],['Cisco Meraki','ap',['MR28','MR78','MR86','CW9162I']],
+ ['Sophos','fw',['XGS 88','XGS 108','XGS 118','XGS 128','XGS 2300','XGS 3300']],['SonicWall','fw',['TZ80','TZ280','TZ380','TZ570','TZ670','NSa 3700']],
+ ['Juniper','fw',['SRX320','SRX380','SRX1500']],['Juniper','sw',['EX2300-C-12P','EX4100-24P','EX4400-24P']],['Juniper','ap',['Mist AP32','Mist AP43','Mist AP45']],
+ ['WatchGuard','fw',['Firebox T25','Firebox T115-W','Firebox M590','Firebox M690']],['WatchGuard','ap',['AP130','AP330','AP430CR']],
+ ['Zyxel','fw',['USG FLEX 100H','USG FLEX 200H','USG FLEX 500H','ATP500']],['Zyxel','sw',['GS1200-8','GS1900-24E','GS1915-8EP','XGS1930-28HP','GS2220-28HP','XS1930-12HP']],['Zyxel','ap',['NWA110AX','NWA210AX','WAX620D-6E','WBE660S']],
+ ['DrayTek','router',['Vigor2135','Vigor2765','Vigor2865','Vigor2866','Vigor2962','Vigor3912']],['DrayTek','sw',['VigorSwitch G1282','VigorSwitch P2282x','VigorSwitch PQ2200xb']],['DrayTek','ap',['VigorAP 903','VigorAP 962C','VigorAP 1062C']],
+ ['MikroTik','router',['RB4011','RB5009UG+S+IN','CCR2116-12G-4S+','hAP ax3','L009UiGS']],['MikroTik','sw',['CSS610-8G-2S+IN','CRS310-8G+2S+IN','CRS326-24G-2S+RM','CRS354-48G-4S+2Q+']],['MikroTik','ap',['cAP ax','wAP ax']],
+ ['Ubiquiti','router',['UniFi Cloud Gateway Max','UniFi Cloud Gateway Fiber','Dream Machine SE','EdgeRouter X','EdgeRouter 4']],['Ubiquiti','fw',['Dream Machine SE','UniFi Cloud Gateway Max','UniFi Cloud Gateway Fiber']],
+ ['Ubiquiti','sw',['USW-Flex-Mini','USW-Lite-8-PoE','USW-16-PoE','USW-24-PoE','USW-48-PoE','USW-Pro-Max-24-PoE','USW-Enterprise-8-PoE','USW-Aggregation']],['Ubiquiti','ap',['U6-Enterprise','U6-Mesh','U7-Pro-Max','U7-Outdoor','UAP-AC-Lite']],
+ ['Huawei','sw',['S5735-L24P4S-A1','S5735-L48P4S-A1','S6730-H24X6C']],['Huawei','ap',['AirEngine 5760-10','AirEngine 6760-X1']],['Huawei','router',['AR6140','AR720']],['Huawei','end',['OptiXstar HG8145X6']],
+ ['H3C','sw',['S5130S-28P-EI','S5130S-52P-EI','S6520X 系列']],['H3C','ap',['WA6320','WA6638']],
+ ['Aruba (HPE)','sw',['Instant On 1830 8G','Instant On 1930 24G PoE','CX 6100 24G PoE','2930F-24G-PoE+','CX 6300M 系列']],['Aruba (HPE)','ap',['AP-535','AP-635','AP-655','Instant On AP25']],
+ ['Ruckus','ap',['R560','R670','R770','T350']],['Ruckus','sw',['ICX 7150-24P','ICX 7550 系列','ICX 8200-24P']],
+ ['TP-Link','sw',['TL-SG105','TL-SG1008P','TL-SG1016PE','SG2008P','SG2218','SG2428P','SG3210','SG3428','SX3008F']],['TP-Link','ap',['EAP245','EAP610','EAP653','EAP773','EAP610-Outdoor']],['TP-Link','router',['ER605','ER7206','ER707-M2','ER8411']],
+ ['D-Link','sw',['DGS-1005A','DGS-1100-08PV2','DGS-1210-10P','DGS-1210-52MP','DGS-1250-28XMP','DXS-1210-12TC']],['D-Link','ap',['DBA-X1230P','DAP-X2810','DAP-2662']],['D-Link','router',['DSR-250V2','DSR-1000AC']],
+ ['Netgear','sw',['GS305','GS308','GS108PP','GS110TP','GS724TP','M4250-10G2F-PoE+','M4300-28G-PoE+']],['Netgear','ap',['WAX615','WAX620','WAX630']],
+ ['Dell','end',['OptiPlex 7020','OptiPlex 3000','Precision 3660','Latitude 7450','Latitude 3440','PowerEdge R760','PowerEdge R360','PowerEdge T150']],
+ ['HP','end',['EliteDesk 800 G9','ProDesk 400 G9','ProBook 450 G10','EliteBook 840 G11','Z2 Tower G9','LaserJet Pro MFP 4103fdw','LaserJet Enterprise M611dn','Color LaserJet Pro 4203dw']],
+ ['Lenovo','end',['ThinkCentre M90q','ThinkCentre neo 50s','ThinkPad X1 Carbon','ThinkPad E14','ThinkPad L14','ThinkSystem SR650 V3','ThinkSystem ST50 V2']],
+ ['ASUS','end',['ExpertCenter D5','ExpertCenter PN64','ExpertBook B1','ExpertBook B9','Zenbook 14']],['Acer','end',['Veriton X','Veriton N','TravelMate P4','Aspire 5']],['Apple','end',['Mac Studio','iPad','iPad Pro']],
+ ['Synology','end',['DS224+','DS423+','DS923+','DS1522+','DS1823xs+','RS822+','RS1221+','DVA3221']],['QNAP','end',['TS-233','TS-464','TS-873A','TS-873AeU','TS-h886','TS-h1290FX']],
+ ['Yealink','end',['SIP-T31P','SIP-T33G','SIP-T43U','SIP-T46U','SIP-T54W','SIP-T57W','W76P']],['Grandstream','end',['GRP2602P','GRP2612P','GRP2614','GXP1628','GXP2170','WP810']],
+ ['Hikvision','end',['DS-2CD2143G2-I','DS-2CD2347G2-LU','DS-2CD2387G2-LU','DS-2CD2T47G2-L','DS-2DE4425IW-DE','DS-7608NI-K2/8P','DS-7716NI-K4/16P']],
+ ['VIVOTEK','end',['FD9389-HV','IB9389-H','IB9387-EHT-A','FD9387-EHTV-A','MS9321-EHV','ND9326P','ND9541P']],
+ ['Brother','end',['HL-L2375DW','HL-L5210DN','MFC-L2750DW','MFC-L8900CDW']],['Canon','end',['imageCLASS MF455dw','imageRUNNER 2630','imageRUNNER ADVANCE DX C3926','LBP325x']],
+ ['Epson','end',['WorkForce Pro WF-C5890','WorkForce Pro WF-C4810','L15160','TM-m30III','TM-T88VII','EB-FH52']],
+ ['Siemens','end',['SIMATIC S7-1200','SIMATIC S7-1200 G2','SIMATIC S7-1500','LOGO! 8','SIMATIC KTP700 Basic','SIMATIC TP1200 Comfort']],
+ ['Mitsubishi Electric','end',['MELSEC iQ-F FX5U','MELSEC iQ-R','MELSEC Q 系列','GOT2000 GT27']],['Delta','end',['AS228','AS300','DVP-ES3','DVP-SE','DOP-107EV','DOP-110CS']],
+].forEach(([b,t,ms])=>{const m=BMETA[b];if(!m)return;m.m=m.m||{};m.m[t]=[...new Set([...(m.m[t]||[]),...ms])]});
+/* end devices: models per kind, so the brand list follows the chosen kind */
+const END_MODELS={
+  'PC 桌機':{'Dell':['OptiPlex 7010','OptiPlex 7020','OptiPlex 3000','Precision 3660'],'HP':['EliteDesk 800 G9','ProDesk 400 G9','Z2 Tower G9'],'Lenovo':['ThinkCentre M70q','ThinkCentre M90q','ThinkCentre neo 50s'],'ASUS':['ExpertCenter D7','ExpertCenter D5','ExpertCenter PN64'],'Acer':['Veriton M','Veriton X','Veriton N'],'Apple':['iMac','Mac mini','Mac Studio'],'MSI':['PRO DP21','Cubi 5']},
+  '筆電':{'Lenovo':['ThinkPad T14','ThinkPad X1 Carbon','ThinkPad E14','ThinkPad L14'],'Dell':['Latitude 5440','Latitude 7450','Latitude 3440'],'HP':['EliteBook 840','EliteBook 840 G11','ProBook 450 G10'],'ASUS':['ExpertBook B5','ExpertBook B1','ExpertBook B9','Zenbook 14'],'Acer':['TravelMate P2','TravelMate P4','Aspire 5'],'Apple':['MacBook Air','MacBook Pro'],'Microsoft':['Surface Laptop','Surface Pro'],'MSI':['Modern 14','Prestige 14']},
+  'IP Phone':{'Yealink':['SIP-T31P','SIP-T33G','SIP-T43U','SIP-T46U','SIP-T54W','SIP-T57W','W76P'],'Grandstream':['GRP2602P','GRP2612P','GRP2614','GXP1628','GXP2170','WP810'],'Cisco':['IP Phone 8841','IP Phone 8851','IP Phone 6851'],'Fanvil':['X3U','X4U','X6U'],'Poly':['Edge E220','Edge E450','VVX 450']},
+  '印表機':{'HP':['LaserJet Pro M404dn','Color LaserJet M479fdw','LaserJet Pro MFP 4103fdw','LaserJet Enterprise M611dn','Color LaserJet Pro 4203dw'],'Brother':['HL-L2375DW','HL-L5210DN','MFC-L2750DW','MFC-L8900CDW'],'Canon':['imageCLASS MF455dw','imageRUNNER 2630','imageRUNNER ADVANCE DX C3926','LBP325x'],'Epson':['WorkForce Pro WF-C5890','WorkForce Pro WF-C4810','L15160','TM-m30III','TM-T88VII'],'FUJIFILM':['Apeos C2560','Apeos C3060','ApeosPort C3070','Apeos 4570'],'Ricoh':['IM C3010','IM C4510','IM 2702','P 502'],'Kyocera':['ECOSYS M2540dn','ECOSYS P3145dn','TASKalfa 2554ci'],'Konica Minolta':['bizhub C251i','bizhub C301i']},
+  '伺服器':{'Dell':['PowerEdge R660','PowerEdge R760','PowerEdge R360','PowerEdge T150','PowerEdge T360'],'HPE':['ProLiant DL360 Gen11','ProLiant DL380 Gen11','ProLiant ML30 Gen11','ProLiant ML110 Gen11'],'Lenovo':['ThinkSystem SR630','ThinkSystem SR650 V3','ThinkSystem ST50 V2','ThinkSystem ST250 V3'],'Supermicro':['SuperServer 1U','SuperServer 2U','SuperServer Tower'],'ASUS':['RS300-E12','RS700-E11'],'Advantech':['ASR-3100','ASR-4100']},
+  'NAS':{'Synology':['DS224+','DS423+','DS923+','DS1522+','DS1823xs+','RS822+','RS1221+'],'QNAP':['TS-233','TS-464','TS-873A','TS-873AeU','TS-h886','TS-h1290FX'],'ASUSTOR':['AS5404T','AS6704T','AS6804T'],'TrueNAS':['TrueNAS Mini X+','TrueNAS R30'],'Dell':['PowerVault ME5012'],'HPE':['MSA 2060']},
+  'IP Cam':{'Hikvision':['DS-2CD2143G2-I','DS-2CD2347G2-LU','DS-2CD2387G2-LU','DS-2CD2T47G2-L','DS-2DE4425IW-DE'],'VIVOTEK':['FD9389-HV','IB9389-H','IB9387-EHT-A','FD9387-EHTV-A','MS9321-EHV'],'Dahua':['IPC-HDW2441T-S','IPC-HFW2441S-S','IPC-HDBW3441E-AS','SD49425XB-HNR'],'Axis':['M3106-L Mk II','P3265-LVE','P1465-LE','Q6135-LE'],'Hanwha Vision':['XNV-8080R','XNO-8080R','QNV-C8012','PNM-9085RQZ1'],'Uniview':['IPC2124LB-SF28KM-G','IPC3614SB-ADF28KM-I0'],'Reolink':['RLC-810A','RLC-823A'],'Ubiquiti':['G5 Bullet','G5 Dome','G5 Pro','AI Pro']},
+  'NVR 錄影主機':{'Hikvision':['DS-7608NI-K2/8P','DS-7716NI-K4/16P','DS-7732NI-M4'],'Dahua':['NVR4108-8P-4KS2','NVR5216-16P-EI'],'VIVOTEK':['ND9326P','ND9541P','NR9782-v2'],'Synology':['DVA3221','DVA1622'],'Hanwha Vision':['XRN-820S','QRN-830S'],'Uniview':['NVR302-08S2-P8'],'Ubiquiti':['UNVR','UNVR-Pro']},
+  'ISP 數據機':{'Arcadyan':['光世代 ONT','VDSL 數據機'],'ZTE':['F670L','F6600P'],'Nokia':['G-240W-F','XS-2426G-B'],'Huawei':['OptiXstar HG8145X6','HG8245H'],'DrayTek':['Vigor167','Vigor130']},
+  'POS 收銀機':{'Posiflex':['XT3815','XT5915','HT4600 系列'],'Sunmi':['T2s','T3 Pro','D3 Pro'],'iMin':['Swan 1','Falcon 2'],'Epson':['TM-m30III','TM-T88VII'],'HP':['Engage One Pro','Engage Flex Mini']},
+  'PLC 控制器':{'Siemens':['SIMATIC S7-1200','SIMATIC S7-1200 G2','SIMATIC S7-1500','LOGO! 8'],'Mitsubishi Electric':['MELSEC iQ-F','MELSEC iQ-F FX5U','MELSEC iQ-R','MELSEC Q 系列'],'Omron':['NX1P2','NX102','NJ501','CP1E','CP2E'],'Rockwell Automation':['CompactLogix 5380','ControlLogix 5580','Micro850'],'Schneider Electric':['Modicon M221','Modicon M241','Modicon M580'],'Delta':['AS228','AS300','DVP-ES3','DVP-SE'],'Keyence':['KV-8000','KV-X500'],'FATEK':['FBs 系列','FBe 系列'],'Beckhoff':['CX9020','CX5130'],'Advantech':['UNO-2271G','UNO-2484G','ADAM-6050']},
+  '平板 / HMI':{'Weintek':['cMT3072XH','cMT3092X','MT8071iE','MT8102iE'],'Siemens':['SIMATIC KTP700 Basic','SIMATIC TP1200 Comfort','SIMATIC Unified Comfort MTP1000'],'Delta':['DOP-107EV','DOP-110CS'],'Pro-face':['GP4501T','SP5000 系列'],'Mitsubishi Electric':['GOT2000 GT27','GOT2000 GT25'],'Omron':['NB7W','NA5-9W'],'Apple':['iPad','iPad Pro'],'Samsung':['Galaxy Tab Active5','Galaxy Tab S9']},
+  '投影機':{'Epson':['EB-FH52','EB-L630U','EB-L265F'],'BenQ':['LU935','MW560','LH730'],'Optoma':['ZU720T','EH412'],'ViewSonic':['LS740W','PA700W'],'Sony':['VPL-PHZ61']},
+  '其他':{'Raspberry Pi':['Raspberry Pi 5','Raspberry Pi 4 Model B','Compute Module 4'],'Advantech':['ARK-1124','UNO-2271G'],'Samsung':['Smart Signage QB 系列']},
+};
+if(!BMETA['Sony'])BMETA['Sony']={zh:'索尼',kw:['VPL','投影機'],d:''};
+Object.entries(END_MODELS).forEach(([k,bs])=>Object.entries(bs).forEach(([b,ms])=>{const m=BMETA[b];if(!m)return;m.m=m.m||{};m.m.end=[...new Set([...(m.m.end||[]),...ms])]}));
 const BRANDS={
   fw:['Fortinet','Palo Alto Networks','Check Point','Cisco','Sophos','SonicWall','Juniper','WatchGuard','Zyxel','DrayTek','Ubiquiti'],
   router:['Cisco','Juniper','MikroTik','DrayTek','Ubiquiti','Huawei','TP-Link'],
@@ -930,8 +1051,26 @@ const BRANDS={
   ap:['Cisco Meraki','Cisco','Aruba (HPE)','Ruckus','Ubiquiti','Fortinet','TP-Link','Zyxel','Huawei','D-Link'],
   end:['HP','Dell','Lenovo','ASUS','Acer','Apple','Synology','QNAP','Yealink','Grandstream','Hikvision','VIVOTEK','Brother','Canon','Epson','Siemens','Mitsubishi Electric','Delta'],
 };
+BRANDS.fw.push('Barracuda','Netgate','Hillstone','Cisco Meraki','Moxa');
+BRANDS.router.push('Teltonika','Moxa','Netgate','Zyxel','D-Link','ASUS Network','Grandstream Networks','Linksys');
+BRANDS.sw.push('Cisco Meraki','Moxa','Advantech','Edgecore','Allied Telesis','Extreme Networks','Arista','EnGenius','DrayTek','Grandstream Networks','Linksys','ASUS Network');
+BRANDS.ap.push('Juniper','Extreme Networks','EnGenius','Grandstream Networks','Moxa','DrayTek','MikroTik','WatchGuard','Edgecore','Allied Telesis','H3C','Arista','Netgear','ASUS Network');
+BRANDS.hub=['TP-Link','D-Link','Netgear','Zyxel','Ubiquiti','MikroTik'];
+[['TP-Link',['TL-SF1005D','TL-SG105','TL-SG108','TL-SG116']],['D-Link',['DES-1005C','DGS-1005A','DGS-1008A']],['Netgear',['GS305','GS308','GS316']],['Zyxel',['GS-105B v2','GS-108B v3','GS1200-8']],['Ubiquiti',['USW-Flex-Mini']],['MikroTik',['CSS610-8G-2S+IN']]].forEach(([b,ms])=>{const m=BMETA[b];m.m=m.m||{};m.m.hub=ms});
+Object.values(END_MODELS).forEach(bs=>Object.keys(bs).forEach(b=>{if(!BRANDS.end.includes(b))BRANDS.end.push(b)}));
 /* model port layouts (n = RJ45, sfp = SFP/SFP+, poe = 'all' or first N RJ45 ports). From vendor datasheets of common models; verify against official specs. */
 const SPECS={
+  'CBS250-24P-4G':{n:24,sfp:4,poe:'all'},'CBS350-8P-2G':{n:8,sfp:2,poe:'all'},'CBS350-24P-4G':{n:24,sfp:4,poe:'all'},'CBS350-48P-4G':{n:48,sfp:4,poe:'all'},'Catalyst 1200-24P-4G':{n:24,sfp:4,poe:'all'},
+  'Catalyst 9200-24P':{n:24,poe:'all'},'Catalyst 9200-48P':{n:48,poe:'all'},'MS120-8LP':{n:8,sfp:2,poe:4},'MS120-24P':{n:24,sfp:4,poe:'all'},'MS130-24P':{n:24,sfp:4,poe:'all'},
+  'USW-Flex-Mini':{n:5},'USW-Lite-8-PoE':{n:8,poe:4},'USW-16-PoE':{n:16,sfp:2,poe:8},'USW-24-PoE':{n:24,sfp:2,poe:16},'USW-48-PoE':{n:48,sfp:4,poe:32},'USW-Pro-Max-24-PoE':{n:24,sfp:2,poe:'all'},'USW-Enterprise-8-PoE':{n:8,sfp:2,poe:'all'},
+  'TL-SF1005D':{n:5},'TL-SG105':{n:5},'TL-SG1008P':{n:8,poe:4},'TL-SG1016PE':{n:16,poe:8},'SG2008P':{n:8,poe:4},'SG2218':{n:16,sfp:2},'SG3210':{n:8,sfp:2},'SG3428':{n:24,sfp:4},
+  'DES-1005C':{n:5},'DGS-1005A':{n:5},'DGS-1008A':{n:8},'DGS-1100-08PV2':{n:8,poe:'all'},'DGS-1210-10P':{n:8,sfp:2,poe:'all'},'DGS-1210-52MP':{n:48,sfp:4,poe:'all'},
+  'GS305':{n:5},'GS308':{n:8},'GS316':{n:16},'GS108PP':{n:8,poe:'all'},'GS110TP':{n:8,sfp:2,poe:'all'},'GS724TP':{n:24,sfp:2,poe:'all'},
+  'GS-105B v2':{n:5},'GS-108B v3':{n:8},'GS1200-8':{n:8},'GS1900-24E':{n:24},'GS1915-8EP':{n:8,poe:'all'},'XGS1930-28HP':{n:24,sfp:4,poe:'all'},'GS2220-28HP':{n:24,sfp:4,poe:'all'},
+  'Instant On 1830 8G':{n:8},'Instant On 1930 24G PoE':{n:24,sfp:4,poe:'all'},'CX 6100 24G PoE':{n:24,sfp:4,poe:'all'},'2930F-24G-PoE+':{n:24,sfp:4,poe:'all'},
+  'EX2300-C-12P':{n:12,sfp:2,poe:'all'},'CSS610-8G-2S+IN':{n:8,sfp:2},'CRS310-8G+2S+IN':{n:8,sfp:2},'CRS326-24G-2S+RM':{n:24,sfp:2},'S5735-L24P4S-A1':{n:24,sfp:4,poe:'all'},'S5735-L48P4S-A1':{n:48,sfp:4,poe:'all'},
+  'EDS-205A':{n:5},'EDS-208A':{n:8},'EDS-308':{n:8},'ECS4100-28P':{n:24,sfp:4,poe:'all'},'x230-28GP':{n:24,sfp:4,poe:'all'},'LGS308P':{n:8,poe:4},
+  'ER605':{n:5},'ER7206':{n:5,sfp:1},'RB5009UG+S+IN':{n:8,sfp:1},'RB4011':{n:10,sfp:1},'EdgeRouter X':{n:5},'Netgate 1100':{n:3},'Netgate 2100':{n:5},
   'FortiGate 40F':{n:5},'FortiGate 60F':{n:10},'FortiGate 70F':{n:10},
   'PA-440':{n:8},'PA-450':{n:8},'TZ270':{n:8},'TZ370':{n:8},
   'FortiSwitch 108F':{n:8,sfp:2},'FortiSwitch 124F':{n:24,sfp:4},'FortiSwitch 148F':{n:48,sfp:4},
@@ -1603,15 +1742,18 @@ function multiAction(a){if(a==='clear'){ui.multi.clear();renderAll();return}if(!
 function hl(text,q){const nq=norm(q);if(!nq)return esc(text);
   const t=String(text);const map=[];let flat='';for(let i=0;i<t.length;i++){const ch=norm(t[i]);if(ch){flat+=ch;for(let k=0;k<ch.length;k++)map.push(i)}}
   const at=flat.indexOf(nq);if(at<0)return esc(t);const s=map[at],e=map[at+nq.length-1]+1;return esc(t.slice(0,s))+'<mark>'+esc(t.slice(s,e))+'</mark>'+esc(t.slice(e))}
-function brandOptions(d,q){const nq=norm(q);const out=[];
-  (BRANDS[d.type]||[]).forEach((name,order)=>{const m=BMETA[name]||{kw:[]};const sub=[m.zh,(m.kw||[]).slice(0,3).join('、')].filter(Boolean).join(' · ');
+function kindBrands(d){return d.type==='end'?Object.keys(END_MODELS[d.kind]||{}):[]}
+function brandOptions(d,q){const nq=norm(q);const out=[];const kb=kindBrands(d);
+  const list=kb.length?(nq?[...kb,...(BRANDS.end||[]).filter(b=>!kb.includes(b))]:kb):(BRANDS[d.type]||[]);
+  list.forEach((name,order)=>{const m=BMETA[name]||{kw:[]};const sub=[m.zh,(m.kw||[]).slice(0,3).join('、')].filter(Boolean).join(' · ');
     if(!nq){out.push({v:name,sub,score:order});return}
     let best=null;[[name,0],[m.zh,.2],...(m.kw||[]).map(k=>[k,.4]),...Object.values(m.m||{}).flat().map(k=>[k,.8])].forEach(([k,w])=>{const nk=norm(k);if(!nk)return;const i=nk.indexOf(nq);if(i<0)return;const sc=w+(i===0?0:.5);if(!best||sc<best.sc)best={sc,k,self:k===name}});
     if(best)out.push({v:name,sub,score:best.sc*100+order,hit:best.self?null:best.k})});
   return out.sort((a,b)=>a.score-b.score)}
 function modelOptions(d,q){const nq=norm(q);const out=[];
-  const brands=d.brand&&BMETA[d.brand]&&(BMETA[d.brand].m||{})[d.type]?[d.brand]:(BRANDS[d.type]||[]);
-  brands.forEach(bn=>{const ms=((BMETA[bn]||{}).m||{})[d.type]||[];ms.forEach(mo=>{if(!nq||norm(mo).includes(nq)||norm(bn).includes(nq)||(BMETA[bn].zh&&norm(BMETA[bn].zh).includes(nq)))out.push({v:mo,sub:bn+(BMETA[bn].zh?' '+BMETA[bn].zh:'')+(SPECS[mo]?' · '+specText(SPECS[mo]):''),brand:bn})})});
+  const kb=kindBrands(d),km=d.type==='end'?(END_MODELS[d.kind]||{}):{};
+  const brands=d.brand&&BMETA[d.brand]&&(km[d.brand]||(BMETA[d.brand].m||{})[d.type])?[d.brand]:(kb.length?kb:(BRANDS[d.type]||[]));
+  brands.forEach(bn=>{const ms=km[bn]||((BMETA[bn]||{}).m||{})[d.type]||[];ms.forEach(mo=>{if(!nq||norm(mo).includes(nq)||norm(bn).includes(nq)||(BMETA[bn].zh&&norm(BMETA[bn].zh).includes(nq)))out.push({v:mo,sub:bn+(BMETA[bn].zh?' '+BMETA[bn].zh:'')+(SPECS[mo]?' · '+specText(SPECS[mo]):''),brand:bn})})});
   return out.slice(0,40)}
 let combos={};
 function openCombo(n,q){if(n.disabled)return;const d=curObj('d');if(!d)return;const f=n.dataset.f;const pop=$(n.id+'-pop');if(!pop)return;
@@ -1930,9 +2072,12 @@ $('bLayout').onclick=()=>{if(!canEdit()||!S.devices.length)return;snap();if(ui.v
 $('allIcon').onclick=()=>setAllView('icon');$('allPorts').onclick=()=>setAllView('ports');
 $('layAll').onclick=()=>{LAYERS.forEach(([k])=>prefs.layers[k]=1);savePrefs();renderViewPop();renderAll()};
 $('layNone').onclick=()=>{LAYERS.forEach(([k])=>prefs.layers[k]=0);savePrefs();renderViewPop();renderAll()};
-$('bTheme').onclick=()=>{prefs.skin=prefs.skin==='light'?'dark':'light';savePrefs();document.body.classList.toggle('light',prefs.skin==='light');renderAll()};
+function syncTheme(){const l=prefs.skin==='light';document.body.classList.toggle('light',l);$('bTheme').setAttribute('aria-checked',l);const mc=document.querySelector('meta[name="theme-color"]');if(mc)mc.content=l?'#f4f6f9':'#0f1520'}
+$('bTheme').onclick=()=>{prefs.skin=prefs.skin==='light'?'dark':'light';savePrefs();syncTheme();renderAll();toast(prefs.skin==='light'?'已切換為淺色模式':'已切換為深色模式')};
+syncTheme();
 $('eStart').onclick=()=>{if(canEdit())openWelcome(false)};
 $('bStart').onclick=()=>{if(canEdit())openWelcome(true)};
+$('bHome').onclick=()=>openWelcome(true);$('bHome').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openWelcome(true)}};
 let peekDev=null;function setPeek(id){if(id===peekDev)return;peekDev=id;document.querySelectorAll('#wires .cab.peek').forEach(g=>g.classList.remove('peek'));if(id)document.querySelectorAll(`#wires .cab[data-da="${id}"],#wires .cab[data-db="${id}"]`).forEach(g=>g.classList.add('peek'))}
 $('devs').addEventListener('pointerover',e=>{const dv=e.target.closest('.dev');setPeek(dv?dv.dataset.dev:null)});
 $('devs').addEventListener('pointerleave',()=>setPeek(null));
