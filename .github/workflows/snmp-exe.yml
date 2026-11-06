@@ -22,7 +22,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install build tools
-        run: pip install pyinstaller pysnmp
+        run: pip install pyinstaller pysnmp paramiko
       - name: Bundle the web page
         shell: pwsh
         run: |
@@ -36,9 +36,14 @@ jobs:
         working-directory: tools/netmap-snmp
         run: |
           python -c "import os,tempfile,json,urllib.request,time; import netmap_server as S; st=S.Store(tempfile.mkdtemp()); st.settings['port']=18765; sv=S.Service(st,log=print); sv.start(); time.sleep(1); print(json.load(urllib.request.urlopen('http://127.0.0.1:18765/api/ping'))); html=urllib.request.urlopen('http://127.0.0.1:18765/').read().decode('utf-8'); assert 'NETMAP_SERVER' in html; print('protect roundtrip', S.unprotect(S.protect('secret'))=='secret'); sv.stop()"
+      - name: Self-test log collector
+        shell: pwsh
+        working-directory: tools/netmap-snmp
+        run: |
+          python -c "import time,tempfile,netmap_collect as C; ev=[]; lc=C.LogCollector(tempfile.mkdtemp(),on_event=lambda *a:ev.append(a),syslog_port=15514,trap_port=15162); print(lc.start()); C.send_test_syslog('127.0.0.1',15514); C.send_test_trap('127.0.0.1',15162); time.sleep(1.5); lc.stop(); print(ev); assert len(ev)==2; import paramiko; print('paramiko', paramiko.__version__)"
       - name: Build netmap.exe (window app)
         working-directory: tools/netmap-snmp
-        run: pyinstaller --onefile --windowed --name netmap --icon netmap.ico --collect-all pysnmp --add-data "web/index.html;web" --add-data "netmap.ico;." --add-data "netmap.png;." --add-data "oui.json.gz;." netmap_app.py
+        run: pyinstaller --onefile --windowed --name netmap --icon netmap.ico --collect-all pysnmp --add-data "web/index.html;web" --add-data "netmap.ico;." --add-data "netmap.png;." --add-data "oui.json.gz;." --hidden-import paramiko --hidden-import netmap_collect netmap_app.py
       - name: Build netmap-snmp.exe (command line)
         working-directory: tools/netmap-snmp
         run: pyinstaller --onefile --console --name netmap-snmp --icon netmap.ico --collect-all pysnmp --add-data "oui.json.gz;." netmap_snmp.py

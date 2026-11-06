@@ -7,13 +7,14 @@ netmap：機房線路對應圖 Windows 程式
 執行：netmap.exe            開啟視窗
       netmap.exe --start    開啟視窗並啟動監控服務（開機自動啟動用，視窗會縮到工作列）
 """
-import json, os, queue, sys, threading, time, webbrowser
+import json, os, queue, re, sys, threading, time, webbrowser
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from tkinter.scrolledtext import ScrolledText
 
 import netmap_snmp as ns
 import netmap_server as srv
+import netmap_collect as col
 
 TITLE = "機房線路對應圖 netmap"
 WEB = "https://coloplay1.github.io/netmap/"
@@ -93,7 +94,8 @@ class App:
         ttk.Button(head, text="開啟網頁", command=s.open_web).pack(side="right")
 
         nb = ttk.Notebook(root); nb.pack(fill="both", expand=True, padx=12, pady=(4, 12)); s.nb = nb
-        s.build_scan(ttk.Frame(nb, padding=12)); s.build_service(ttk.Frame(nb, padding=12)); s.build_about(ttk.Frame(nb, padding=16))
+        s.collector = None
+        s.build_scan(ttk.Frame(nb, padding=12)); s.build_service(ttk.Frame(nb, padding=12)); s.build_collect(ttk.Frame(nb, padding=12)); s.build_about(ttk.Frame(nb, padding=16))
         root.protocol("WM_DELETE_WINDOW", s.on_close)
         root.after(120, s.pump); root.after(1500, s.refresh_service)
         if autostart or s.store.settings.get("autorun"):
@@ -445,6 +447,111 @@ class App:
         finally:
             s.root.after(4000, s.refresh_service)
 
+    # ───────────── 收集樣本 ─────────────
+    def build_collect(s, fr):
+        s.nb.add(fr, text="  收集樣本  ")
+        s.sample_dir = os.path.join(s.store.dir, "samples")
+        ttk.Label(fr, text="給「log 分析告警」與「設定檔自動備份」開發用：收集你們設備實際的 log 與登入畫面，存成檔案後傳給開發者。只接收與讀取，不會修改設備設定。",
+                  style="Muted.TLabel", wraplength=860).pack(anchor="w")
+        lf = ttk.LabelFrame(fr, text="① 收集 log 樣本（Syslog／SNMP Trap）", padding=10); lf.pack(fill="x", pady=(8, 0))
+        s.v_ips = tk.StringVar(value="、".join(srv.local_ips()))
+        tip = ttk.Frame(lf); tip.pack(fill="x")
+        ttk.Label(tip, text="把設備的 Syslog 伺服器（或 SNMP Trap 目的地）設成這台電腦：").pack(side="left")
+        ttk.Label(tip, textvariable=s.v_ips, foreground="#1d6fd8").pack(side="left")
+        row = ttk.Frame(lf); row.pack(fill="x", pady=(6, 0))
+        s.v_sys = tk.BooleanVar(value=True); s.v_trp = tk.BooleanVar(value=True)
+        ttk.Checkbutton(row, text="Syslog（UDP 514）", variable=s.v_sys).pack(side="left")
+        ttk.Checkbutton(row, text="SNMP Trap（UDP 162）", variable=s.v_trp).pack(side="left", padx=(12, 0))
+        s.btn_col = ttk.Button(row, text="開始收集", style="Accent.TButton", command=s.toggle_collect); s.btn_col.pack(side="left", padx=(18, 0))
+        ttk.Button(row, text="傳送測試訊息", command=s.test_collect).pack(side="left", padx=(8, 0))
+        ttk.Button(row, text="開啟樣本資料夾", command=lambda: (os.makedirs(s.sample_dir, exist_ok=True), open_path(s.sample_dir))).pack(side="left", padx=(8, 0))
+        ttk.Button(row, text="在家怎麼測試？", command=s.home_help).pack(side="left", padx=(8, 0))
+        s.v_colstat = tk.StringVar(value="尚未開始"); ttk.Label(lf, textvariable=s.v_colstat, style="Muted.TLabel").pack(anchor="w", pady=(6, 0))
+        s.colog = ScrolledText(lf, height=5, font=("Consolas", 9) if os.name == "nt" else ("DejaVu Sans Mono", 8), relief="flat")
+        s.colog.pack(fill="x", pady=(6, 0)); s.colog.configure(state="disabled")
+
+        sf = ttk.LabelFrame(fr, text="② 設備登入紀錄（SSH，給設定檔備份用）", padding=10); sf.pack(fill="both", expand=True, pady=(8, 0))
+        g = ttk.Frame(sf); g.pack(fill="x")
+        s.v_sh = tk.StringVar(); s.v_sport = tk.StringVar(value="22"); s.v_su = tk.StringVar(); s.v_sp = tk.StringVar(); s.v_se = tk.StringVar()
+        names = [p["name"] for p in col.PROFILES.values()]; s.prof_keys = list(col.PROFILES)
+        s.v_prof = tk.StringVar(value=names[0]); s.v_cmds = tk.StringVar()
+        cells = [("設備 IP", s.v_sh, 16, ""), ("埠", s.v_sport, 5, ""), ("帳號", s.v_su, 14, ""), ("密碼", s.v_sp, 14, "•"), ("enable 密碼（選填）", s.v_se, 12, "•")]
+        for i, (lab, var, w, show) in enumerate(cells):
+            ttk.Label(g, text=lab).grid(row=0, column=i * 2, sticky="w", padx=(0 if i == 0 else 12, 4))
+            ascii_field(ttk.Entry(g, textvariable=var, width=w, show=show), var).grid(row=0, column=i * 2 + 1, sticky="w")
+        g2 = ttk.Frame(sf); g2.pack(fill="x", pady=(6, 0))
+        ttk.Label(g2, text="設備類型").pack(side="left")
+        cb = ttk.Combobox(g2, textvariable=s.v_prof, values=names, width=28, state="readonly"); cb.pack(side="left", padx=(4, 12))
+        cb.bind("<<ComboboxSelected>>", lambda e: s.v_cmds.set("；".join(col.PROFILES[s.prof_keys[names.index(s.v_prof.get())]]["cmds"])))
+        ttk.Label(g2, text="要執行的指令（；分隔，空白＝依類型預設）").pack(side="left")
+        ttk.Entry(g2, textvariable=s.v_cmds, width=34).pack(side="left", padx=(4, 0), fill="x", expand=True)
+        g3 = ttk.Frame(sf); g3.pack(fill="x", pady=(6, 0))
+        s.btn_ssh = ttk.Button(g3, text="登入並記錄", style="Accent.TButton", command=s.start_ssh); s.btn_ssh.pack(side="left")
+        s.v_sshstat = tk.StringVar(value="密碼不會存檔；紀錄裡的密碼、community、金鑰會自動換成 ***，傳出前仍請自己看過一遍。")
+        ttk.Label(g3, textvariable=s.v_sshstat, style="Muted.TLabel", wraplength=680).pack(side="left", padx=(12, 0))
+        s.sshlog = ScrolledText(sf, height=5, font=("Consolas", 9) if os.name == "nt" else ("DejaVu Sans Mono", 8), relief="flat")
+        s.sshlog.pack(fill="both", expand=True, pady=(6, 0)); s.sshlog.configure(state="disabled")
+
+
+    def home_help(s):
+        messagebox.showinfo("在家怎麼測試", "用家裡的路由器（以華碩為例，實際選單名稱依機種與韌體可能不同）：\n\n"
+            "① log 樣本\n  1. 這裡按「開始收集」，第一次 Windows 防火牆詢問時按「允許存取」。\n"
+            "  2. 登入路由器管理頁（例如 http://192.168.50.1），在「系統記錄」或「系統管理 ▸ 系統設定」找「遠端記錄伺服器（Remote Log Server）」，填這台電腦的 IP 後套用。\n"
+            "  3. 拔插一次接在路由器上的網路線，或在管理頁故意打錯一次密碼登入，這裡就會出現 log。\n\n"
+            "② 登入紀錄\n  1. 在「系統管理 ▸ 系統設定」啟用 SSH（只開區域網路），帳密同路由器管理員。\n"
+            "  2. 這裡填路由器 IP、帳密，設備類型選「Linux / 華碩等家用路由器」，按「登入並記錄」。\n\n"
+            "測完記得把路由器的 SSH 關掉。家用設備的 log 格式和公司設備不同，這次主要是確認工具能用；分析規則還是要用公司設備的樣本。")
+
+    def colwrite(s, box, text):
+        box.configure(state="normal"); box.insert("end", text + "\n"); box.see("end")
+        if int(box.index("end-1c").split(".")[0]) > 600: box.delete("1.0", "100.0")
+        box.configure(state="disabled")
+
+    def toggle_collect(s):
+        if s.collector:
+            paths = s.collector.stop(); s.collector = None; s.btn_col.configure(text="開始收集")
+            s.v_colstat.set("已停止，樣本存在：" + "、".join(os.path.basename(p) for p in paths)); return
+        if not (s.v_sys.get() or s.v_trp.get()): return
+        s.collector = col.LogCollector(s.sample_dir, on_event=lambda k, src, t: s.q.put(("colev", (k, src, t))))
+        errs = s.collector.start(syslog=s.v_sys.get(), trap=s.v_trp.get())
+        for e in errs: s.colwrite(s.colog, "⚠ " + e)
+        if not s.collector.socks:
+            s.collector = None; s.v_colstat.set("無法開始"); return
+        s.btn_col.configure(text="停止並存檔"); s.v_colstat.set("收集中…（第一次會跳出 Windows 防火牆詢問，請按「允許存取」）")
+        s.colwrite(s.colog, f"開始收集：{'、'.join(('Syslog UDP 514' if k == 'syslog' else 'Trap UDP 162') for k in s.collector.socks)}。到設備上把 log 目的地設成 {s.v_ips.get()}，拔插一次網路線或故意打錯一次登入密碼，就會產生事件。")
+
+    def test_collect(s):
+        if not s.collector:
+            s.colwrite(s.colog, "請先按「開始收集」。"); return
+        try:
+            if "syslog" in s.collector.socks: col.send_test_syslog("127.0.0.1", s.collector.ports["syslog"])
+            if "trap" in s.collector.socks: col.send_test_trap("127.0.0.1", s.collector.ports["trap"])
+        except OSError as e: s.colwrite(s.colog, f"測試訊息送不出去：{e}")
+
+    def start_ssh(s):
+        host = s.v_sh.get().strip(); user = s.v_su.get().strip()
+        if not host or not user: s.v_sshstat.set("請填設備 IP 與帳號。"); return
+        try: port = int(s.v_sport.get() or 22)
+        except ValueError: port = 22
+        names = [p["name"] for p in col.PROFILES.values()]; prof = s.prof_keys[names.index(s.v_prof.get())]
+        cmds = [c.strip() for c in re.split(r"[；;\n]", s.v_cmds.get()) if c.strip()] or None
+        pw, en = s.v_sp.get(), s.v_se.get()
+        s.btn_ssh.configure(state="disabled"); s.sshlog.configure(state="normal"); s.sshlog.delete("1.0", "end"); s.sshlog.configure(state="disabled")
+        def work():
+            try:
+                txt, used = col.ssh_capture(host, user, pw, profile=prof, port=port, enable_pw=en, commands=cmds, log=lambda m: s.q.put(("sshlog", m)))
+                os.makedirs(s.sample_dir, exist_ok=True)
+                path = os.path.join(s.sample_dir, f"login-{host.replace(':', '_')}-{time.strftime('%Y%m%d-%H%M%S')}.txt")
+                open(path, "w", encoding="utf-8").write(txt)
+                s.q.put(("sshdone", (path, txt, col.PROFILES[used]["name"])))
+            except Exception as e:
+                msg = str(e) or type(e).__name__
+                if "Authentication" in type(e).__name__: msg = "帳號或密碼錯誤"
+                elif isinstance(e, (TimeoutError, OSError)) and "timed out" in msg: msg = "連線逾時：請確認 IP、埠號，以及設備有開 SSH"
+                elif "Connection refused" in msg or "10061" in msg: msg = "連線被拒絕：設備沒有開 SSH，或埠號不對"
+                s.q.put(("sshdone", (None, msg, "")))
+        threading.Thread(target=work, daemon=True).start()
+
     # ───────────── 關於 ─────────────
     def build_about(s, fr):
         s.nb.add(fr, text="  說明  ")
@@ -472,6 +579,18 @@ class App:
             while True:
                 k, v = s.q.get_nowait()
                 if k == "log": s.write(v)
+                elif k == "colev":
+                    kind, src, t = v; c = s.collector.counts if s.collector else {}
+                    s.colwrite(s.colog, f"{time.strftime('%H:%M:%S')} {'SYSLOG' if kind == 'syslog' else 'TRAP  '} {src:<15} {t}")
+                    s.v_colstat.set(f"收集中：Syslog {c.get('syslog', 0)} 筆、Trap {c.get('trap', 0)} 筆，來自 {len(s.collector.sources) if s.collector else 0} 台設備")
+                elif k == "sshlog": s.colwrite(s.sshlog, v)
+                elif k == "sshdone":
+                    path, txt, pname = v; s.btn_ssh.configure(state="normal")
+                    if path:
+                        s.v_sshstat.set(f"完成（{pname}），已存成 {os.path.basename(path)}，按「開啟樣本資料夾」可找到。")
+                        s.colwrite(s.sshlog, "\n".join(txt.splitlines()[:400]))
+                    else:
+                        s.v_sshstat.set(f"失敗：{txt}"); s.colwrite(s.sshlog, f"失敗：{txt}")
                 elif k == "svclog":
                     s.svclog.configure(state="normal"); s.svclog.insert("end", time.strftime("%H:%M:%S ") + v + "\n"); s.svclog.see("end"); s.svclog.configure(state="disabled")
                 elif k == "prog":
@@ -508,6 +627,9 @@ class App:
     def quit_app(s):
         """確實結束：停止掃描與服務，不等背景執行緒（SNMP 逾時中的輪詢）跑完。"""
         s.stop_scan = True
+        if s.collector:
+            try: s.collector.stop()
+            except Exception: pass
         try: s.store.save_settings()
         except Exception: pass
         t = threading.Thread(target=s.service.stop, daemon=True); t.start(); t.join(3)

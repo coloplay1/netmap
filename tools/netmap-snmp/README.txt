@@ -28,6 +28,14 @@ Windows：雙擊 netmap.exe（或 Python 版的 run-app-windows.bat）開啟視�
 看不出誰接在哪個埠，預設先把設備都接到路由器，之後請在網頁上調整。
 SNMP 掃描沒有回應時，程式也會自動檢查設備是否在線，告訴你是「沒開 SNMP」還是「連不到」。
 
+【收集樣本（給 log 分析與設定檔備份開發用）】
+netmap.exe 的「收集樣本」分頁：
+  ① 收集 log：這台電腦暫時當 Syslog（UDP 514）／SNMP Trap（UDP 162）接收器，把設備的 log 目的地設成這台電腦，
+     收到的內容會即時顯示並存成 %APPDATA%\netmap\samples\syslog-日期.log、trap-日期.log。
+  ② 登入紀錄：輸入設備 IP 與帳密，自動用 SSH 登入並執行 show running-config 等指令（自動處理 --More-- 與 enable），
+     整段畫面存成 login-IP-日期.txt；密碼、community、金鑰會自動換成 ***（傳出前仍請自己看過）。密碼不會存檔。
+  Python 版需要另外安裝：pip install paramiko
+
 【命令列版的用法】
 Windows：雙擊 run-windows.bat，依提示輸入要掃描的 IP 或網段、community。
 macOS / Linux：在終端機執行 ./run-mac-linux.sh
