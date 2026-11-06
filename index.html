@@ -1218,11 +1218,20 @@ function traceSet(){const ports=new Set(),cabs=new Set(),devs=new Set();let star
   if(ui.sel&&ui.sel.port)start=ui.sel.port;else if(ui.sel&&ui.sel.cable){const c=S.cables.find(c=>c.id===ui.sel.cable);if(c)start=c.a}
   const add=s=>{if(s.k==='port'){ports.add(s.p);devs.add(I.owner[s.p].id)}if(s.k==='cable')cabs.add(s.c.id)};
   if(start&&I.ports[start])trace(start).forEach(add);
-  else if(ui.sel&&ui.sel.dev){const d=S.devices.find(x=>x.id===ui.sel.dev);if(d){d.ports.forEach(p=>{if(I.cab[p.id]&&!ports.has(p.id))trace(p.id).forEach(add)});if(cabs.size){devs.add(d.id);return{ports,cabs,devs,active:true,dev:d.id}}}}
+  else if(ui.sel&&ui.sel.dev){const d=S.devices.find(x=>x.id===ui.sel.dev);if(d){d.ports.forEach(p=>{if(I.cab[p.id]&&!ports.has(p.id))trace(p.id).forEach(add)});upstream(d).forEach(add);if(cabs.size){devs.add(d.id);return{ports,cabs,devs,active:true,dev:d.id}}}}
   return{ports,cabs,devs,active:!!start}}
 /* backbone = cables between network gear; a cable to a PC, PLC, printer… is an access cable */
 function isMain(c){const acc=d=>!d||(d.type==='end'&&d.kind!=='ISP 數據機');return!acc(I.owner[c.a])&&!acc(I.owner[c.b])}
 function wireShown(c){return prefs.wireMode==='all'||(prefs.wireMode==='main'&&isMain(c))}
+/* device graph over whole runs (patch panels and wall jacks are pass-through), used to walk from a device up to the network entry */
+function runGraph(){const adj={};S.devices.forEach(d=>{if(TYPES[d.type].pass)return;d.ports.forEach(p=>{if(!I.cab[p.id])return;const t=trace(p.id);const ps=t.filter(x=>x.k==='port');const far=I.owner[ps[ps.length-1].p];
+  if(!far||far.id===d.id||TYPES[far.type].pass)return;(adj[d.id]=adj[d.id]||[]).push({to:far.id,t})})});return adj}
+function rootRank(d){return d.type==='end'&&d.kind==='ISP 數據機'?0:d.type==='fw'?1:d.type==='router'?2:(d.type==='sw'&&d.variant==='l3')?3:d.type==='sw'?4:9}
+function upstream(d){const adj=runGraph();const ds=S.devices.filter(x=>adj[x.id]);if(!ds.length)return[];const best=Math.min(...ds.map(rootRank));if(best===9)return[];
+  const dist={},q=ds.filter(x=>rootRank(x)===best).map(x=>x.id);q.forEach(id=>dist[id]=0);
+  while(q.length){const id=q.shift();(adj[id]||[]).forEach(e=>{if(dist[e.to]==null){dist[e.to]=dist[id]+1;q.push(e.to)}})}
+  let starts=[d.id];if(TYPES[d.type].pass){starts=[];d.ports.forEach(p=>{if(!I.cab[p.id])return;trace(p.id).filter(x=>x.k==='port').forEach(x=>{const o=I.owner[x.p];if(!TYPES[o.type].pass&&!starts.includes(o.id))starts.push(o.id)})})}
+  const out=[];starts.forEach(x=>{let g=0;while(dist[x]>0&&g++<64){const e=(adj[x]||[]).find(e=>dist[e.to]===dist[x]-1);if(!e)break;out.push(...e.t);x=e.to}});return out}
 function runText(t){return t.map(x=>x.k==='port'?`${I.owner[x.p].name} ${pshort(x.p)}`:x.k==='cable'?`[${x.c.label}]`:'⇄').join(' ➔ ').replace(/ ➔ ⇄ ➔ /g,' ⇄ ')}
 
 /* ---------- search ---------- */
