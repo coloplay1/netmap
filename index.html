@@ -631,6 +631,26 @@ details.card>summary::-webkit-details-marker{display:none}
 .emptyc{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);padding:18px 22px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;z-index:12;font-size:13px;color:var(--muted)}
 .emptyc b{font-size:16px;color:var(--ink)}
 @media (max-width:900px){.w3{grid-template-columns:minmax(0,1fr)}}
+
+/* movable HUD panels */
+.grip{cursor:grab;touch-action:none;user-select:none;color:var(--muted);font-size:13px;letter-spacing:-2px;line-height:1;padding:4px 6px;border-radius:7px;font-weight:800}
+.grip:hover{background:var(--soft);color:var(--ink)}
+.hud.moving{opacity:.92;box-shadow:0 0 0 2px var(--accent),var(--shadow)}
+.hud.moving .grip{cursor:grabbing}
+.pcol{border:0;background:transparent;color:var(--muted);width:24px;height:24px;border-radius:7px;font-size:16px;font-weight:800;line-height:1}
+.pcol:hover{background:var(--soft);color:var(--ink)}
+.phide{display:none!important}
+#left .phd{display:flex;align-items:center;justify-content:space-between;margin:-4px -2px 0}
+#left.collapsed .pal,#left.collapsed .plabel{display:none}
+.dock .dhd{display:flex;align-items:center;gap:4px;align-self:flex-end;background:var(--panel-a);border:1px solid var(--line);border-radius:11px;padding:2px 4px;box-shadow:var(--shadow);font-size:12px;font-weight:700;color:var(--muted)}
+.dock .dhd .dname{padding:0 2px}
+.dock.collapsed .drow{display:none}
+.dock.lft{align-items:flex-start}.dock.lft .dhd{align-self:flex-start}.dock.lft .drow{justify-content:flex-start}
+.dock.down{flex-direction:column}
+.dock.down .pop.up{bottom:auto;top:calc(100% + 10px)}
+.dock.lft .pop{right:auto;left:0}
+#legend{display:flex;flex-direction:row;align-items:center;gap:8px}
+#legend .grip{margin-left:-6px}
 </style>
 </head>
 <body>
@@ -639,13 +659,14 @@ details.card>summary::-webkit-details-marker{display:none}
 <div class="main" id="main">
   <div class="stagewrap" id="stagewrap">
     <div class="stage" id="stage"><div class="sizer" id="sizer"><div class="canvas" id="canvas"><svg class="wires" id="wires"></svg><div id="devs"></div><svg class="tmp" id="tmp"></svg></div></div></div>
-    <aside class="left fl" id="left" aria-label="設備"><span class="plabel"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>設備</span><div class="pal" id="types"></div></aside>
-    <div class="legend fl" id="legend" hidden></div>
+    <aside class="left fl hud" id="left" aria-label="設備"><div class="phd"><span class="grip" data-grip="left" title="拖曳移動" aria-label="拖曳移動設備列">⋮⋮</span><button class="pcol" data-pcol="left" title="收合 / 展開" aria-label="收合或展開設備列">–</button></div><span class="plabel"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>設備</span><div class="pal" id="types"></div></aside>
+    <div class="legend fl hud" id="legend" hidden></div>
     <div class="emptyc fl" id="emptyc" hidden><b>畫布是空的</b><span>從左側把設備拖進來，或</span><div class="actions"><button class="btn primary" id="eStart">開始頁：新增 / 匯入 / 範例</button></div></div>
     <div class="hintbar"><div id="hint"></div></div>
     <div class="ctx" id="ctx" hidden></div>
     <div class="addmenu" id="addmenu" hidden role="menu" aria-label="加入設備"></div>
-    <div class="dock" id="dock" role="toolbar" aria-label="畫布工具">
+    <div class="dock hud" id="dock" role="toolbar" aria-label="畫布工具">
+      <div class="dhd"><span class="grip" data-grip="dock" title="拖曳移動" aria-label="拖曳移動畫布工具列">⋮⋮</span><span class="dname">畫布工具</span><button class="pcol" data-pcol="dock" title="收合 / 展開" aria-label="收合或展開畫布工具列">–</button></div>
       <div class="drow">
         <div class="popwrap"><button class="dbtn" data-popbtn="popColor" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="8" cy="10" r="1.3"/><circle cx="12" cy="7.5" r="1.3"/><circle cx="16" cy="10" r="1.3"/><path d="M12 21a3 3 0 0 1 0-6h2"/></svg>線色</button>
           <div class="pop up" id="popColor" hidden><span class="label">線條顏色</span><div id="cableLegend" class="clg"></div><div class="seg" role="group" aria-label="線條顏色"><button data-cmode="custom">自訂</button><button data-cmode="type">依線材</button><button data-cmode="vlan">依 VLAN</button></div><p class="hint">依線材：單模光纖黃、多模水藍、DAC 粗黑、Console 淺藍虛線。依 VLAN：Trunk 為深灰虛線。</p></div></div>
@@ -698,6 +719,8 @@ details.card>summary::-webkit-details-marker{display:none}
   </div>
   <div class="tright">
     <div class="seg modeseg" role="group" aria-label="模式"><button id="mEdit" aria-pressed="true" title="可以接線、移動、修改"><i class="dot"></i>編輯</button><button id="mRo" aria-pressed="false" title="只能查線，不會誤觸拔線"><svg class="i" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>唯讀</button></div>
+    <div class="popwrap"><button class="ibtn" data-popbtn="popPanels" aria-expanded="false" title="面板：顯示、收合、重設位置" aria-label="面板設定"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 4v16M3 15h5"/></svg></button>
+      <div class="pop" id="popPanels" hidden><span class="label">顯示的面板</span><div class="togs" id="panelToggles" style="grid-template-columns:1fr"></div><span class="label">屬性面板</span><label class="tog"><input type="checkbox" id="autoDrawer">點設備時自動開啟</label><p class="hint">拖曳面板上的 ⋮⋮ 可以移動位置，按 – 收合。</p><button class="btn sm" id="panelReset">重設所有面板位置</button></div></div>
     <button class="ibtn" id="bTheme" title="切換深色 / 淺色" aria-label="切換深色或淺色"><svg class="i" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
     <div class="popwrap"><button class="btn" data-popbtn="popFile" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><path d="M3 6h7l2 2h9v11H3z"/></svg>檔案<svg class="i" viewBox="0 0 24 24" style="width:13px;height:13px"><path d="m6 9 6 6 6-6"/></svg></button>
       <div class="pop" id="popFile" hidden><div class="menu">
@@ -1058,13 +1081,13 @@ function autoLayout(){I=idx();renderCanvas();
 /* ---------- welcome / template picker ---------- */
 function tplIcon(k){return`<span class="tile" style="--tc:${TICON[k]?tc(k):tc('end')}">${TICON[k]||KICON[k]}</span>`}
 function openWelcome(canContinue){
-  const used=S.devices.length;const P=p=>`<svg class="i" viewBox="0 0 24 24">${p}</svg>`;
+  const prev=!S.devices.length&&lastSaved?lastSaved:null;const used=prev?prev.devices.length:0;const P=p=>`<svg class="i" viewBox="0 0 24 24">${p}</svg>`;
   const ex=TEMPLATES.map(t=>{const st=tplStats(t);return`<button class="wrow" data-tpl="${t.id}" title="${esc(t.desc)}"><span class="tiles">${t.icons.map(tplIcon).join('')}</span><span class="wt"><b>${esc(t.name)}</b><small>${esc(t.tag)} · ${st.d} 台設備 · ${st.c} 條線</small></span><span class="go">›</span></button>`}).join('');
   $('modalRoot').innerHTML=`<div class="modal welcome" id="mod"><div class="wcard" role="dialog" aria-label="開始">
     <div class="whead"><span class="logo"><svg class="i" viewBox="0 0 24 24"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M6 8l5 8.5M18 8l-5 8.5"/></svg></span>
     <div><h2>機房線路對應圖</h2><p class="hint">建立新的網路環境、匯入既有資料，或先看產業範例。之後隨時可以從「檔案 ▸ 範本 / 新環境」回到這裡。</p></div>
     <button class="btn" id="wClose" style="margin-left:auto">略過</button></div>
-    ${canContinue&&used?`<button class="tcard cont" data-tpl="continue"><span class="tile" style="--tc:var(--accent)"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span><span><b>繼續上次的配置</b><span class="d">${used} 台設備 · ${S.cables.length} 條線，資料存在這台電腦的瀏覽器</span></span></button>`:''}
+    ${used?`<button class="tcard cont" data-tpl="continue"><span class="tile" style="--tc:var(--accent)"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span><span><b>繼續上次的配置</b><span class="d">${used} 台設備 · ${prev.cables.length} 條線，資料存在這台電腦的瀏覽器</span></span></button>`:''}
     <div class="w3">
       <section class="wcol"><header><span class="wtile" style="--tc:var(--accent)">${P('<path d="M12 5v14M5 12h14"/>')}</span><div><h3>新增</h3><p>從零建立新的網路環境</p></div></header>
         <button class="wrow" data-tpl="blank"><span class="tiles"><span class="tile dash"><svg viewBox="0 0 24 24"><path d="M12 6v12M6 12h12"/></svg></span></span><span class="wt"><b>空白畫面</b><small>從左側拖設備到畫布開始</small></span><span class="go">›</span></button>
@@ -1079,7 +1102,7 @@ function openWelcome(canContinue){
   </div></div>`;
   const close=()=>$('modalRoot').innerHTML='';
   $('wClose').onclick=close;$('mod').onclick=e=>{if(e.target.id==='mod')close()};
-  $('mod').querySelectorAll('[data-tpl]').forEach(b=>b.onclick=()=>{const id=b.dataset.tpl;close();if(id!=='continue')applyTpl(id)});
+  $('mod').querySelectorAll('[data-tpl]').forEach(b=>b.onclick=()=>{const id=b.dataset.tpl;close();if(id==='continue'){if(!S.devices.length&&lastSaved){S=lastSaved;lastSaved=null;ui.sel=null;renderAll();requestAnimationFrame(()=>fitTo(devBox(),1));toast('已載入上次的配置')}}else applyTpl(id)});
   $('mod').querySelectorAll('[data-wimp]').forEach(b=>b.onclick=()=>{const k=b.dataset.wimp;close();if(k==='json')$('fileIn').click();if(k==='lldp')openLLDP();if(k==='text')openJsonText()});
   const first=$('mod').querySelector('[data-tpl],[data-wimp]');first&&first.focus();
 }
@@ -1091,10 +1114,10 @@ function applyTpl(id){if(!canEdit())return;const t=[...TEMPLATES,...STARTS].find
   toast(id==='blank'?'已建立空白畫面，從左側點設備開始':`已載入「${t.name}」`,had)}
 
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
-function load(){try{const r=localStorage.getItem(KEY);if(r){S=normalize(JSON.parse(r));return true}}catch(e){}S={devices:[],cables:[],racks:[]};return false}
+let lastSaved=null;
+function load(){S={devices:[],cables:[],racks:[]};try{const r=localStorage.getItem(KEY);if(r){const o=normalize(JSON.parse(r));if(o.devices.length){lastSaved=o;try{localStorage.setItem(KEY+'-backup',r)}catch(e){}return true}}}catch(e){}return false}
 
-function save(){if(ui.shared)return;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
-function load(){try{const r=localStorage.getItem(KEY);if(r){S=normalize(JSON.parse(r));return true}}catch(e){}S={devices:[],cables:[],racks:[]};return false}
+function save(){if(ui.shared)return;if(lastSaved&&!S.devices.length)return;lastSaved=null;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 
 /* ---------- undo ---------- */
 function snap(){ui.autoPending=false;undoS.push(JSON.stringify(S));if(undoS.length>100)undoS.shift();redoS=[];syncUR()}
@@ -1255,7 +1278,7 @@ function drawWires(){const tr=traceSet(),m=ui.match,R=devRects(),lanes={};comput
 function renderLegend(){const el=$('legend');const mode=prefs.colorMode;
   const line=(c,w,dash)=>`<svg viewBox="0 0 26 8" style="width:22px;height:8px;margin-right:5px;vertical-align:0"><path d="M2 4H24" stroke="${c}" stroke-width="${w}" stroke-linecap="round"${dash?` stroke-dasharray="${dash}"`:''}/></svg>`;
   const L=[['L1 實體','patch','配線架、資訊座、Hub'],['L2 交換','sw','Switch、無線 AP'],['L3 路由','router','路由器、L3 Switch'],['L3–L7 防火牆','fw','防火牆'],['L1–L7 終端','end','電腦、伺服器、印表機']];
-  el.innerHTML=`<div class="lrow">${L.map(([n,t,tip])=>`<span title="${tip}"><i class="dotk" style="background:${tc(t)}"></i>${n}</span>`).join('<span class="lsep">|</span>')}</div>`;el.hidden=!S.devices.length;
+  el.innerHTML=`<span class="grip" data-grip="legend" title="拖曳移動" aria-label="拖曳移動圖例">⋮⋮</span><div class="lrow">${L.map(([n,t,tip])=>`<span title="${tip}"><i class="dotk" style="background:${tc(t)}"></i>${n}</span>`).join('<span class="lsep">|</span>')}</div>`;el.hidden=!S.devices.length;
   let h='';if(mode==='type'&&S.cables.length){const used=[...new Set(S.cables.map(c=>c.type||'Cat6'))];h=used.map(t=>{const s=TYPE_STYLE[t]||TYPE_STYLE.Cat6;return`<span>${line(s.c,s.w,s.dash)}${esc(t)}</span>`}).join('')}
   else if(mode==='vlan'&&S.cables.length){const vs=[...new Set(Object.values(runVlans))].sort((a,b)=>(a===''?1:0)-(b===''?1:0)||(a==='T'?1:0)-(b==='T'?1:0)||(+a)-(+b));
     h=vs.map(v=>v==='T'?`<span>${line('#7A8796',3.5,'10 4')}Trunk / LACP</span>`:v?`<span>${line(vlanColor(v),3)}VLAN ${esc(v)}</span>`:`<span>${line('#A9B4BE',3)}未設 VLAN</span>`).join('')}
@@ -1320,7 +1343,7 @@ function renderInsp(){const box=$('insp'),el=$('inspBody');const s=ui.sel;I=I||i
   const close=()=>{box.classList.remove('open');box.inert=true;document.body.classList.remove('insp-open')};
   if(!s)ui.detail=null;
   if(ui.multi.size>1||!s){close();return}
-  if(s.dev){const d=S.devices.find(x=>x.id===s.dev);if(!d){close();return}inspDev(el,d);title=`設備屬性 <small>（${esc(typeName(d))}）</small>`}
+  if(s.dev){const d=S.devices.find(x=>x.id===s.dev);if(!d||(!prefs.autoDrawer&&ui.detail!==s.dev)){close();return}inspDev(el,d);title=`設備屬性 <small>（${esc(typeName(d))}）</small>`}
   else if(ui.detail!==selKey()){close();return}
   else if(s.port){inspPort(el,s.port);title='網路孔詳細'}
   else if(s.cable){inspCable(el,S.cables.find(x=>x.id===s.cable));title='線材詳細'}
@@ -1746,7 +1769,7 @@ function portClick(pid,mod){
 canvas.addEventListener('click',e=>{
   if(ui.suppress){ui.suppress=false;return}
   const act=e.target.closest('[data-act]');
-  if(act){const id=act.dataset.id;if(act.dataset.act==='del')delDev(id);else{ui.sel={dev:id};ui.focus='d.name';renderAll()}return}
+  if(act){const id=act.dataset.id;if(act.dataset.act==='del')delDev(id);else{ui.sel={dev:id};ui.detail=id;ui.focus='d.name';renderAll()}return}
   const wpc=e.target.closest('[data-wp]');if(wpc){if(e.detail>=2)removeWp(wpc.dataset.wp);return}
   if(e.target.closest('.port')||e.target.closest('[data-drag]'))return;
   const kn=e.target.closest('[data-delcable]');if(kn){delCable(kn.dataset.delcable);return}
@@ -1797,12 +1820,13 @@ $('popFile').addEventListener('click',e=>{const b=e.target.closest('[data-file]'
   if(a==='lldp')openLLDP();
   if(a==='share')openShare(null);
   if(a==='jsonText')openJsonText()});
-function openJsonText(){let old=null;try{old=localStorage.getItem(OLDKEY)}catch(e){}
+function openJsonText(){let old=null,bk=null;try{old=localStorage.getItem(OLDKEY);bk=localStorage.getItem(KEY+'-backup')}catch(e){}
   modal(`<h2>JSON 文字匯入 / 匯出</h2><p class="hint">複製下方 JSON 備份或交給同事；要還原，貼上後按「匯入」。也可以用「檔案 ▸ 下載專案檔」存成 .json。</p>
   <textarea id="jd" aria-label="JSON 資料">${esc(projectJSON())}</textarea>
-  <div class="actions"><button class="btn primary" id="jCopy">複製</button><button class="btn" id="jImp">匯入</button>${old?'<button class="btn" id="jOld">載入舊版資料</button>':''}<button class="btn danger" id="jClear">清空全部</button><button class="btn" data-close style="margin-left:auto">關閉</button></div><div id="jMsg" class="hint"></div>`);
+  <div class="actions"><button class="btn primary" id="jCopy">複製</button><button class="btn" id="jImp">匯入</button>${bk?'<button class="btn" id="jBk">載入上次開啟前的配置</button>':''}${old?'<button class="btn" id="jOld">載入舊版資料</button>':''}<button class="btn danger" id="jClear">清空全部</button><button class="btn" data-close style="margin-left:auto">關閉</button></div><div id="jMsg" class="hint"></div>`);
   $('jCopy').onclick=()=>copyText($('jd').value,$('jd'));
   $('jImp').onclick=()=>{if(!canEdit())return;try{loadProject(JSON.parse($('jd').value),'已匯入');closeModal()}catch(e){$('jMsg').textContent='格式不正確：需要包含 devices 和 cables 的 JSON。'}};
+  if(bk)$('jBk').onclick=()=>{try{loadProject(JSON.parse(bk),'已載入上次開啟前的配置');closeModal()}catch(e){$('jMsg').textContent='備份讀取失敗。'}};
   if(old)$('jOld').onclick=()=>{try{loadProject(JSON.parse(old),'已載入舊版資料');closeModal()}catch(e){$('jMsg').textContent='舊版資料讀取失敗。'}};
   $('jClear').onclick=()=>{if(!canEdit())return;loadProject({devices:[],cables:[],racks:[]},'已清空');closeModal()}}
 
@@ -1833,6 +1857,28 @@ let tT;function toast(m,withUndo){let t=document.querySelector('.toast');if(!t){
   t.hidden=false;t.style.animation='none';void t.offsetWidth;t.style.animation='';clearTimeout(tT);tT=setTimeout(()=>t.hidden=true,withUndo?4500:2400)}
 
 window.addEventListener('resize',()=>requestAnimationFrame(drawWires));
+/* ---------- movable, collapsible, hideable HUD panels ---------- */
+const PANELS=[['left','設備列'],['legend','OSI 圖例'],['dock','畫布工具列']];
+prefs.panels=prefs.panels||{};if(prefs.autoDrawer===undefined)prefs.autoDrawer=true;
+function pstate(id){return prefs.panels[id]||(prefs.panels[id]={})}
+function clampPanel(el){const W=$('stagewrap').clientWidth,H=$('stagewrap').clientHeight,top=innerWidth<=900?120:64;
+  let x=el.offsetLeft,y=el.offsetTop;x=Math.max(8,Math.min(W-el.offsetWidth-8,x));y=Math.max(top,Math.min(H-el.offsetHeight-8,y));el.style.left=x+'px';el.style.top=y+'px';return{x,y}}
+function placePanel(id){const el=$(id),p=pstate(id);el.classList.toggle('collapsed',!!p.col);el.classList.toggle('phide',!!p.hide);
+  const b=el.querySelector('[data-pcol]');if(b){b.textContent=p.col?'+':'–';b.setAttribute('aria-expanded',!p.col)}
+  if(p.x!=null){Object.assign(el.style,{left:p.x+'px',top:p.y+'px',right:'auto',bottom:'auto',transform:'none'});clampPanel(el)}else Object.assign(el.style,{left:'',top:'',right:'',bottom:'',transform:''});
+  if(id==='dock'){const r=el.getBoundingClientRect();el.classList.toggle('down',r.top<innerHeight*.45);el.classList.toggle('lft',r.left+r.width/2<innerWidth/2)}}
+function applyPanels(){PANELS.forEach(([id])=>placePanel(id));
+  $('panelToggles').innerHTML=PANELS.map(([id,n])=>`<label class="tog"><input type="checkbox" data-ptog="${id}" ${pstate(id).hide?'':'checked'}>${n}</label>`).join('');$('autoDrawer').checked=!!prefs.autoDrawer}
+let pd=null;
+document.addEventListener('pointerdown',e=>{const g=e.target.closest('[data-grip]');if(!g||e.button!==0)return;e.preventDefault();e.stopPropagation();const el=$(g.dataset.grip);
+  pd={id:g.dataset.grip,el,sx:e.clientX,sy:e.clientY,ox:el.offsetLeft,oy:el.offsetTop};Object.assign(el.style,{left:pd.ox+'px',top:pd.oy+'px',right:'auto',bottom:'auto',transform:'none'});el.classList.add('moving');document.querySelectorAll('.popwrap>.pop').forEach(x=>x.hidden=true)},true);
+document.addEventListener('pointermove',e=>{if(!pd)return;pd.el.style.left=pd.ox+e.clientX-pd.sx+'px';pd.el.style.top=pd.oy+e.clientY-pd.sy+'px';clampPanel(pd.el)});
+document.addEventListener('pointerup',()=>{if(!pd)return;const P=pd;pd=null;P.el.classList.remove('moving');const c=clampPanel(P.el);Object.assign(pstate(P.id),c);savePrefs();placePanel(P.id)});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-pcol]');if(!b)return;const p=pstate(b.dataset.pcol);p.col=!p.col;savePrefs();placePanel(b.dataset.pcol)});
+$('popPanels').addEventListener('change',e=>{const t=e.target;if(t.dataset.ptog){pstate(t.dataset.ptog).hide=!t.checked;savePrefs();placePanel(t.dataset.ptog)}if(t.id==='autoDrawer'){prefs.autoDrawer=t.checked;savePrefs();renderInsp()}});
+$('panelReset').onclick=()=>{PANELS.forEach(([id])=>{const p=pstate(id);delete p.x;delete p.y;p.col=false;p.hide=false});savePrefs();applyPanels();toast('面板已回到預設位置')};
+window.addEventListener('resize',()=>PANELS.forEach(([id])=>{if(pstate(id).x!=null)placePanel(id)}));
+
 $('types').addEventListener('pointerdown',e=>{const b=e.target.closest('[data-type]');if(!b||e.button!==0||b.disabled)return;e.preventDefault();pdrag={type:b.dataset.type,sx:e.clientX,sy:e.clientY,moved:false}});
 
 /* ---------- add-device menu: right click or A ---------- */
@@ -1901,7 +1947,7 @@ function readHash(){const h=location.hash.slice(1);if(!h||!h.includes('='))retur
 document.body.classList.toggle('light',prefs.skin==='light');
 const H=readHash();let hadSaved=false;
 if(H&&H.p&&window.LZString){try{const o=JSON.parse(LZString.decompressFromEncodedURIComponent(H.p));S=normalize({devices:o.devices,cables:o.cables,racks:o.racks||[]});ui.shared=true}catch(e){hadSaved=load()}}else hadSaved=load();
-I=idx();renderLeft();renderViewPop();syncUR();
+I=idx();renderLeft();renderViewPop();syncUR();applyPanels();
 
 if(ui.shared){const bn=$('banner');bn.hidden=false;bn.innerHTML='你正在檢視分享的配置，修改不會存到這台電腦。<button id="bnSave">存成這台電腦的配置</button>';
   $('bnSave').onclick=()=>{ui.shared=false;save();bn.hidden=true;toast('已存到這台電腦')}}
@@ -1910,7 +1956,7 @@ if(H&&H.dev&&S.devices.some(d=>d.id===H.dev))ui.sel={dev:H.dev};
 renderAll();
 if(H&&H.dev&&ui.sel)requestAnimationFrame(()=>fitTo(devBox(new Set([H.dev])),1.1));
 document.fonts&&document.fonts.ready.then(()=>{if(ui.autoPending){autoLayout();renderAll()}else drawWires()});
-if(!H)openWelcome(hadSaved);
+if(!H)openWelcome(true);
 </script>
 
 </body>
