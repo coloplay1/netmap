@@ -653,7 +653,7 @@ details.card>summary::-webkit-details-marker{display:none}
 #legend .grip{margin-left:-6px}
 
 /* ---- p12: port LEDs, label capsules, pair hint, HUD fit ---- */
-:root{--cap:rgba(15,23,42,.85);--led-off:#3a4554}
+:root{--cap:rgba(15,23,42,.85);--led-off:#3a4554;--bad:var(--danger)}
 body.light{--cap:rgba(255,255,255,.9);--led-off:#c3cbd5}
 .jack::before{content:"";position:absolute;top:2.5px;right:2.5px;width:4.5px;height:4.5px;border-radius:50%;background:var(--led-off);box-shadow:none;z-index:1}
 .jack.sfp::before{top:2px;width:4px;height:4px}
@@ -770,6 +770,79 @@ svg.wires .flowarr{pointer-events:none}
   .speek .pkhint{margin-top:10px;font-size:12px;font-weight:700;color:var(--accent);text-align:center;padding:7px;border-radius:10px;background:var(--soft)}
   #insp.open.peek~*{}
 }
+
+/* ---- p22: fault tracing ---- */
+.dock .fbtn{display:inline-flex;align-items:center;gap:6px;padding:0 12px;font-weight:700;font-size:13px}
+.dock .fbtn[aria-pressed="true"]{background:var(--warn);color:#1b1300;border-color:transparent}
+.fpanel{position:absolute;right:16px;top:var(--tb,84px);width:380px;max-width:calc(100% - 32px);max-height:calc(100% - var(--tb,84px) - 170px);display:flex;flex-direction:column;z-index:21;border-radius:16px;overflow:hidden}
+.fpanel .ihd{flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 12px 10px 16px;border-bottom:1px solid var(--line)}
+.fpanel .ihd b{font-size:15px}.fpanel .ihd small{font-size:12px;color:var(--muted);font-weight:600;margin-left:4px}
+.fpanel .ibody{flex:1 1 auto;min-height:0;overflow:auto;padding:12px 14px 16px;overscroll-behavior:contain}
+.canvas.fpick .dev{cursor:crosshair}
+.canvas.fpick .dev:hover .ico,.canvas.fpick .dev:hover .plate{outline:2.5px dashed var(--warn);outline-offset:4px}
+.fp{font-size:12.5px;color:var(--muted);line-height:1.55;margin:4px 0 8px}
+.fpick-tip{padding:12px;border-radius:12px;background:var(--soft);margin-bottom:10px}.fpick-tip p{font-size:12.5px;color:var(--muted);line-height:1.55;margin:6px 0 10px}
+.fh4{font-size:13px;margin:14px 0 6px;display:flex;gap:6px;align-items:baseline}.fh4 small{color:var(--muted);font-weight:600}
+.fiss,.frec,.faff ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.fiss button,.frec button{width:100%;text-align:left;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:7px 10px;display:flex;flex-direction:column;gap:2px;cursor:pointer;color:var(--ink)}
+.fiss button:hover,.frec button:hover{border-color:var(--accent)}
+.fiss em{font-style:normal;font-size:11.5px;color:var(--warn)}.frec small{font-size:11.5px;color:var(--muted)}
+.fsum{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;font-size:12.5px;color:var(--muted)}
+.fbar{height:6px;border-radius:3px;background:var(--soft);overflow:hidden}.fbar i{display:block;height:100%;background:var(--ok);border-radius:3px;transition:width .3s}
+.c-ok{color:var(--ok)}.c-sus{color:var(--warn)}.c-bad{color:var(--bad)}
+.fnext{width:100%;text-align:left;display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:12px;border:1.5px solid var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--panel));color:var(--ink);cursor:pointer;margin-bottom:10px}
+.fnext span{font-size:11px;font-weight:800;color:var(--accent);letter-spacing:.04em}.fnext small{font-size:11.5px;color:var(--muted)}
+.ffound{padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--bad) 14%,var(--panel));border:1px solid color-mix(in srgb,var(--bad) 45%,transparent);font-size:13px;margin-bottom:10px}.ffound small{color:var(--muted)}
+.faff{padding:10px 12px;border-radius:12px;background:var(--soft);margin-bottom:10px;display:flex;flex-direction:column;gap:4px}.faff>small{font-size:11.5px;color:var(--muted)}
+.faff li{display:flex;gap:8px;align-items:baseline}.faff li button{border:0;background:none;color:var(--ink);font-weight:700;padding:0;cursor:pointer;text-decoration:underline;text-decoration-color:var(--line2)}.faff li small{color:var(--muted);font-size:11.5px}
+.fhops{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;counter-reset:none}
+.fhop{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:8px;align-items:start;padding:8px;border-radius:12px;border:1px solid var(--line);background:var(--panel);position:relative}
+.fhop.nextup{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 30%,transparent)}
+.fhop .fi{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800;background:var(--soft);color:var(--muted)}
+.fhop.st-ok .fi{background:var(--ok);color:#06210f}.fhop.st-sus .fi{background:var(--warn);color:#241700}.fhop.st-bad .fi{background:var(--bad);color:#fff}
+.fhop.ic-gap{border-style:dashed;border-color:var(--bad)}.fhop.ic-gap .fi{background:var(--bad);color:#fff}
+.fhop .fm{display:flex;flex-direction:column;gap:2px;min-width:0}
+.fhop .ft{border:0;background:none;padding:0;text-align:left;font-weight:700;font-size:13px;color:var(--ink);cursor:pointer}
+.fhop .ft:hover{color:var(--accent)}
+.fhop.ic-cable .ft::before{content:"〰 ";color:var(--muted)}
+.fhop small{font-size:11.5px;color:var(--muted)}.fhop em{font-style:normal;font-size:11.5px;color:var(--warn);line-height:1.4}
+.fhop .fnote{margin-top:4px;font-size:12px;padding:5px 8px;border-radius:8px;border:1px solid var(--line);background:var(--sunk);color:var(--ink);width:100%}
+.fs{display:flex;gap:3px}
+.fs button{width:30px;height:30px;border-radius:9px;border:1px solid var(--line2);background:var(--sunk);color:var(--muted);font-weight:800;font-size:13px;cursor:pointer}
+.fs button.s-ok[aria-pressed="true"]{background:var(--ok);color:#06210f;border-color:transparent}
+.fs button.s-sus[aria-pressed="true"]{background:var(--warn);color:#241700;border-color:transparent}
+.fs button.s-bad[aria-pressed="true"]{background:var(--bad);color:#fff;border-color:transparent}
+.fs button:disabled{opacity:.5;cursor:default}
+.fclose{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.frow{display:flex;gap:6px}.frow input{flex:1;min-width:0;padding:7px 10px;border-radius:10px;border:1px solid var(--line2);background:var(--sunk);color:var(--ink)}
+.fact{display:flex;flex-wrap:wrap;gap:6px}
+.fbadge{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11.5px;font-weight:700}.fbadge.open{background:color-mix(in srgb,var(--warn) 25%,transparent);color:var(--warn)}.fbadge.done{background:color-mix(in srgb,var(--ok) 22%,transparent);color:var(--ok)}
+/* canvas status colours */
+.port.fst-ok .jack{box-shadow:0 0 0 2.5px var(--ok)}
+.port.fst-sus .jack,.port.fst-auto .jack{box-shadow:0 0 0 2.5px var(--warn)}
+.port.fst-auto .jack{box-shadow:0 0 0 2px color-mix(in srgb,var(--warn) 70%,transparent);outline:1.5px dashed var(--warn);outline-offset:3px}
+.port.fst-bad .jack{box-shadow:0 0 0 3px var(--bad);animation:fblink 1s ease-in-out infinite}
+.dev.fst-ok :is(.plate,.ico){outline:2.5px solid var(--ok);outline-offset:4px}
+.dev.fst-sus :is(.plate,.ico){outline:2.5px solid var(--warn);outline-offset:4px}
+.dev.fst-auto :is(.plate,.ico){outline:2px dashed var(--warn);outline-offset:4px}
+.dev.fst-bad :is(.plate,.ico){outline:3px solid var(--bad);outline-offset:4px;animation:fblink 1s ease-in-out infinite}
+.dev.affected :is(.plate,.ico){background-image:repeating-linear-gradient(45deg,color-mix(in srgb,var(--bad) 32%,transparent) 0 6px,transparent 6px 12px);outline:2px dashed var(--bad);outline-offset:4px}
+.dev.affected .dlabel b{color:var(--bad)}
+svg.wires .cab.fst-ok .vis,svg.wires .cab.fst-ok .halo{stroke:var(--ok)!important}
+svg.wires .cab.fst-sus .vis,svg.wires .cab.fst-sus .halo,svg.wires .cab.fst-auto .halo{stroke:var(--warn)!important}
+svg.wires .cab.fst-bad .vis,svg.wires .cab.fst-bad .halo{stroke:var(--bad)!important;animation:fblink 1s ease-in-out infinite}
+@keyframes fblink{50%{opacity:.45}}
+.dev.fflash :is(.plate,.ico){animation:fflash 1.2s ease-out}
+@keyframes fflash{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 70%,transparent)}100%{box-shadow:0 0 0 22px transparent}}
+@media (max-width:900px){.fpanel{left:8px;right:8px;width:auto;top:auto;bottom:8px;max-height:58%;z-index:26}.dock .fbtn span{display:none}.dock .fbtn{padding:0 10px}}
+@media (prefers-reduced-motion:reduce){.port.fst-bad .jack,.dev.fst-bad :is(.plate,.ico),svg.wires .cab.fst-bad .vis{animation:none}}
+
+/* ---- p23: snmp ---- */
+.wrow .new{font-style:normal;font-size:10.5px;font-weight:800;color:#1b1300;background:var(--warn);border-radius:999px;padding:1px 6px;margin-left:4px;vertical-align:1px}
+.snmpsteps{margin:10px 0 12px;padding-left:22px;display:flex;flex-direction:column;gap:12px}
+.snmpsteps li{display:flex;flex-direction:column;gap:5px}.snmpsteps small{font-size:12.5px;color:var(--muted);line-height:1.55}
+.snmpsteps a{color:var(--accent)}.dlrow{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0}.dlrow .btn{text-decoration:none;color:inherit}.dlrow .btn.primary{color:#fff}
+.snmpget{font-size:12.5px;line-height:1.65;color:var(--muted);background:var(--soft);border-radius:12px;padding:10px 12px;margin-bottom:12px}.snmpget b{color:var(--ink);margin-right:6px}
 </style>
 </head>
 <body>
@@ -807,6 +880,7 @@ svg.wires .flowarr{pointer-events:none}
       <div class="drow">
         <div class="dgrp"><button id="zOut" title="縮小" aria-label="縮小">−</button><button id="zReset" title="回到 100%" class="zr">100%</button><button id="zIn" title="放大" aria-label="放大">+</button><button id="zFit" title="回到預設位置：所有設備置中（快捷鍵 0）" aria-label="回到預設位置"><svg class="i" viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 9.8V20h4.5v-5.5h4V20h4.5V9.8"/></svg></button></div>
         <div class="dgrp"><button id="bUndo" title="復原 (Ctrl+Z)" aria-label="復原"><svg class="i" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button><button id="bRedo" title="重做 (Ctrl+Y)" aria-label="重做"><svg class="i" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button></div>
+        <button class="dgrp fbtn" id="bFault" aria-pressed="false" title="故障查線：點有問題的設備，逐段檢查到網路入口"><svg class="i" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg><span>查線</span></button>
         <button class="dgrp qbtn ctxtog" id="bCtx" aria-pressed="true" title="屬性列：選取埠或線時顯示的快速設定列（點一下開 / 關）" aria-label="屬性列開關"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/><path d="M7 12h4M14.5 12h2.5"/></svg></button>
         <div class="popwrap"><button class="dgrp qbtn" data-popbtn="popHelp" aria-expanded="false" title="操作說明與快捷鍵" aria-label="操作說明">?</button>
           <div class="pop up help" id="popHelp" hidden>
@@ -827,6 +901,7 @@ svg.wires .flowarr{pointer-events:none}
   <div class="rack-view" id="rackView" hidden></div>
   <div class="table-view" id="tableView" hidden></div>
   <aside class="insp fl" id="insp" aria-label="設備屬性"><div class="ihd"><span class="shandle" aria-hidden="true"></span><b id="inspTitle"></b><button class="x" id="inspClose" aria-label="關閉">×</button></div><div class="speek" id="inspPeek"></div><div class="ibody" id="inspBody"></div></aside>
+  <aside class="fpanel fl" id="fpanel" hidden aria-label="故障查線"><div class="ihd"><b id="fTitle"></b><button class="x" id="fClose" aria-label="關閉查線">×</button></div><div class="ibody" id="fBody"></div></aside>
 </div>
 <header class="top fl">
   <div class="tleft">
@@ -1187,7 +1262,7 @@ function brandKw(b){const m=BMETA[b];return m?[m.zh,...m.kw].join(' '):''}
 const RACK_END=['伺服器','NAS','NVR 錄影主機','ISP 數據機'];
 function rackable(d){return['fw','router','sw','hub','patch'].includes(d.type)||(d.type==='end'&&RACK_END.includes(d.kind))}
 function uhOf(d){return +d.uh||((d.type==='end'&&(d.kind==='伺服器'||d.kind==='NAS'))?2:1)}
-function normalize(o){o.racks=Array.isArray(o.racks)?o.racks:[];
+function normalize(o){o.racks=Array.isArray(o.racks)?o.racks:[];o.faults=Array.isArray(o.faults)?o.faults.filter(f=>f&&f.id&&f.start).map(f=>Object.assign({items:{},note:'',closed:null},f,{items:f.items&&typeof f.items==='object'?f.items:{}})):[];
   o.devices.forEach(d=>{d.ports.forEach(p=>{if(!p.kind)p.kind='rj45';p.poe=!!p.poe;if(!p.mode)p.mode='access'});
     ['brand','model','ip','mac','gw','loc','note','rack','u','uh'].forEach(k=>{if(d[k]==null)d[k]=''});if(d.type==='sw'&&!d.variant)d.variant='l2m';if(d.type==='end'&&!d.kind)d.kind='PC 桌機';
     if(!d.rack&&rackable(d)){const m=/\b(R\d+)\s*[-‐ ]?\s*U\s*(\d+)/i.exec(d.loc||'');if(m){d.rack=m[1].toUpperCase();d.u=+m[2]}}
@@ -1349,6 +1424,7 @@ function openWelcome(canContinue){
         <p class="wnote">也可以在畫布按右鍵或 A 鍵，在游標位置加入設備。</p></section>
       <section class="wcol"><header><span class="wtile" style="--tc:var(--t-ap)">${P('<path d="M12 15V4M7.5 8.5 12 4l4.5 4.5"/><path d="M5 14v5h14v-5"/>')}</span><div><h3>匯入</h3><p>用手上已有的資料建立</p></div></header>
         <button class="wrow" data-wimp="json"><span class="tiles"><span class="tile" style="--tc:var(--t-router)">${P('<path d="M4 4h10l6 6v10H4z"/><path d="M14 4v6h6"/>').replace('class="i" ','')}</span></span><span class="wt"><b>開啟專案檔</b><small>之前從這個工具下載的 .json</small></span><span class="go">›</span></button>
+        <button class="wrow hot" data-wimp="snmp"><span class="tiles"><span class="tile" style="--tc:var(--t-fw)">${P('<path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/>').replace('class="i" ','')}</span></span><span class="wt"><b>SNMP 自動掃描 <em class="new">新</em></b><small>下載掃描程式，自動畫出整個網路</small></span><span class="go">›</span></button>
         <button class="wrow" data-wimp="lldp"><span class="tiles"><span class="tile" style="--tc:var(--t-sw)">${TICON.sw}</span></span><span class="wt"><b>LLDP / CDP 鄰居表</b><small>貼上 show lldp neighbors 自動產生連線</small></span><span class="go">›</span></button>
         <button class="wrow" data-wimp="text"><span class="tiles"><span class="tile" style="--tc:var(--t-end)">${P('<path d="M8 6 3 12l5 6M16 6l5 6-5 6"/>').replace('class="i" ','')}</span></span><span class="wt"><b>貼上 JSON 文字</b><small>同事傳來的配置內容</small></span><span class="go">›</span></button></section>
       <section class="wcol"><header><span class="wtile" style="--tc:var(--t-patch)">${P('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 13h8M8 16h5"/>')}</span><div><h3>範例</h3><p>看各產業的網路怎麼接</p></div></header>${ex}</section>
@@ -1357,7 +1433,7 @@ function openWelcome(canContinue){
   const close=()=>$('modalRoot').innerHTML='';
   $('wClose').onclick=close;$('mod').onclick=e=>{if(e.target.id==='mod')close()};
   $('mod').querySelectorAll('[data-tpl]').forEach(b=>b.onclick=()=>{const id=b.dataset.tpl;close();if(id==='continue'){if(!S.devices.length&&lastSaved){S=lastSaved;lastSaved=null;ui.sel=null;renderAll();requestAnimationFrame(()=>fitTo(devBox(),1));toast('已載入上次的配置')}}else applyTpl(id)});
-  $('mod').querySelectorAll('[data-wimp]').forEach(b=>b.onclick=()=>{const k=b.dataset.wimp;close();if(k==='json')$('fileIn').click();if(k==='lldp')openLLDP();if(k==='text')openJsonText()});
+  $('mod').querySelectorAll('[data-wimp]').forEach(b=>b.onclick=()=>{const k=b.dataset.wimp;close();if(k==='json')$('fileIn').click();if(k==='lldp')openLLDP();if(k==='text')openJsonText();if(k==='snmp')openSNMP()});
   const first=$('mod').querySelector('[data-tpl],[data-wimp]');first&&first.focus();
 }
 /* keep a margin so the floating device bar and top bar never cover a fresh layout */
@@ -1371,7 +1447,7 @@ function applyTpl(id){if(!canEdit())return;const t=[...TEMPLATES,...STARTS].find
 
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 let lastSaved=null;
-function load(){S={devices:[],cables:[],racks:[]};try{const r=localStorage.getItem(KEY);if(r){const o=normalize(JSON.parse(r));if(o.devices.length){lastSaved=o;try{localStorage.setItem(KEY+'-backup',r)}catch(e){}return true}}}catch(e){}return false}
+function load(){S={devices:[],cables:[],racks:[],faults:[]};try{const r=localStorage.getItem(KEY);if(r){const o=normalize(JSON.parse(r));if(o.devices.length){lastSaved=o;try{localStorage.setItem(KEY+'-backup',r)}catch(e){}return true}}}catch(e){}return false}
 
 function save(){if(ui.shared)return;if(lastSaved&&!S.devices.length)return;lastSaved=null;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 
@@ -1394,7 +1470,7 @@ function walk(pid,first){const seq=[];let cur=pid,mode=first;const seen=new Set(
     else{const p=I.ports[cur],d=I.owner[cur];if(!TYPES[d.type].pass||!p.pair||seen.has(p.pair))break;seq.push({k:'inner',d},{k:'port',p:p.pair});seen.add(p.pair);cur=p.pair;mode='cable'}
   }return seq}
 function trace(pid){const fwd=walk(pid,'cable'),back=walk(pid,'inner').reverse();return[...back,{k:'port',p:pid,start:true},...fwd]}
-function traceSet(){const ports=new Set(),cabs=new Set(),devs=new Set();let start=null;
+function traceSet(){if(ui.fault&&!ui.sel){const ft=faultTrace();if(ft)return ft}const ports=new Set(),cabs=new Set(),devs=new Set();let start=null;
   if(ui.sel&&ui.sel.port)start=ui.sel.port;else if(ui.sel&&ui.sel.cable){const c=S.cables.find(c=>c.id===ui.sel.cable);if(c)start=c.a}
   const dir={};let lp=null;
   const add=s=>{if(s.k==='port'){ports.add(s.p);devs.add(I.owner[s.p].id);lp=s.p}if(s.k==='cable'){cabs.add(s.c.id);if(dir[s.c.id]==null)dir[s.c.id]=lp}};
@@ -1442,7 +1518,7 @@ function portBtn(p,tr,m){const c=I.cab[p.id];const d=I.owner[p.id];const cls=['p
   if(p.poe)cls.push('haspoe');
   const icons=L.icons?`${p.poe?`<span class="poe" aria-hidden="true">${BOLT}</span>`:''}${p.lag?`<span class="lagbar" style="--g:${lagColor(d.id+p.lag)}"></span>`:''}`:'';
   const pv=L.vlan&&(p.vlan||p.mode==='trunk')?`<span class="pv">${p.mode==='trunk'?'TRK':'v'+esc(p.vlan)}</span>`:'';
-  const hidc=c&&!wireShown(c)&&!tr.cabs.has(c.id);if(hidc)cls.push('hidc');
+  const hidc=c&&!wireShown(c)&&!tr.cabs.has(c.id);if(hidc)cls.push('hidc');{const fc=fClass('port:'+p.id);if(fc)cls.push(fc)}
   const tag=hidc?`<span class="ctag" style="--k:${pairCol(c)}">${esc(c.label||'線')}</span>`:'';
   return`<button class="${cls.join(' ')}" data-port="${p.id}" style="${c?'--c:'+(hidc?pairCol(c):cableStyle(c).color):''}" title="${esc(tip)}" aria-label="${esc(tip)}"><span class="jack ${p.kind}">${icons}</span><span class="pl">${esc(p.label)}</span>${tag||pv}</button>`}
 function portsHTML(d,tr,m){const T=TYPES[d.type];const pb=p=>portBtn(p,tr,m);
@@ -1484,7 +1560,7 @@ function showPair(pb){const p=I.ports[pb.dataset.port];if(!p||!p.pair){clearPair
   const qb=document.querySelector(`#devs [data-port="${p.pair}"]`);if(!qb)return;pairHot=[pb,qb];pb.classList.add('pairhot');qb.classList.add('pairhot');
   const f=center(p.side===0?p.id:p.pair),k=center(p.side===0?p.pair:p.id);if(!f||!k)return;const x=f.x-15;
   $('pairhint').innerHTML=`<path d="M${f.x-12},${f.y} H${x} V${k.y} H${k.x-12}"/><circle cx="${x}" cy="${(f.y+k.y)/2}" r="2.5"/>`}
-function renderCanvas(){I=idx();ui.match=computeMatches();clearPair();ui.pcIdx={};S.cables.forEach((c,i)=>ui.pcIdx[c.id]=i);
+function renderCanvas(){I=idx();prepFault();ui.match=computeMatches();clearPair();ui.pcIdx={};S.cables.forEach((c,i)=>ui.pcIdx[c.id]=i);
   const total=S.devices.reduce((a,d)=>a+d.ports.length,0);
   $('stat').textContent=`${S.devices.length} 台設備 · ${S.cables.length} 條線 · ${total} 埠`;
   const tr=traceSet(),m=ui.match,L=prefs.layers;
@@ -1493,7 +1569,7 @@ function renderCanvas(){I=idx();ui.match=computeMatches();clearPair();ui.pcIdx={
     const cls=['dev'];if(ui.sel&&ui.sel.dev===d.id)cls.push('sel');if(tr.devs.has(d.id)||(m&&m.devs.has(d.id)))cls.push('trace');if(m&&!m.lit.has(d.id))cls.push('faded');if(ui.layer&&!ls.includes(ui.layer))cls.push('dimmed');if(ui.popId===d.id)cls.push('popin');
     const sub=(L.brand&&[d.brand,d.model].filter(Boolean).join(' '))||typeName(d);
     const foot=[L.ip&&d.ip,L.mac&&d.mac&&'MAC '+d.mac,L.gw&&d.gw&&'GW '+d.gw,L.loc&&locText(d)].filter(Boolean).join(' · ');
-    const view=viewOf(d);cls.push(view);
+    const view=viewOf(d);cls.push(view);{const fc=fClass('dev:'+d.id);if(fc)cls.push(fc);if(ui.affected&&ui.affected.has(d.id))cls.push('affected')}
     let tags='';if(view==='icon'){const cs=d.ports.map(p=>I.cab[p.id]).filter(c=>c&&!wireShown(c)&&!tr.cabs.has(c.id));if(cs.length)tags=`<div class="ctags">${cs.slice(0,6).map(c=>`<span class="ctag" style="--k:${pairCol(c)}">${esc(c.label||'線')}</span>`).join('')}${cs.length>6?`<span class="ctag more">+${cs.length-6}</span>`:''}</div>`}
     const lbl=`<div class="dlabel"><b>${esc(d.name)}</b><small>${esc(sub)}</small></div>${foot?`<div class="foot">${esc(foot)}</div>`:''}${tags}`;
     const hact=`<span class="hact"><button data-act="edit" data-id="${d.id}" title="編輯" aria-label="編輯 ${esc(d.name)}">${ICON.edit}</button><button class="del" data-act="del" data-id="${d.id}" title="刪除" aria-label="刪除 ${esc(d.name)}">${ICON.del}</button></span>`;
@@ -1583,7 +1659,7 @@ function fixedRun(c){const pa=I.ports[c.a],pb=I.ports[c.b];if(!pa||!pb)return fa
 function drawWires(){peekDev=null;const tr=traceSet(),m=ui.match,R=devRects(),lanes={};computeRunVlans();let h='';
   S.cables.forEach(c=>{const g=wirePath(c,R,lanes);if(!g)return;const st=cableStyle(c);const cls=['cab'];
     if(tr.active)cls.push(tr.cabs.has(c.id)?'hot':'dim');else if(m&&!(m.cabs.has(c.id)||(m.lit.has(I.owner[c.a].id)&&m.lit.has(I.owner[c.b].id))))cls.push('faded');
-    if(!wireShown(c))cls.push('off');if(tr.dev)cls.push('fromdev');if(tr.dir&&tr.dir[c.id]===c.b)cls.push('rev');
+    if(!wireShown(c))cls.push('off');if(tr.dev)cls.push('fromdev');{const fc=fClass('cable:'+c.id);if(fc)cls.push(fc)}if(tr.dir&&tr.dir[c.id]===c.b)cls.push('rev');
     if(link&&link.cable===c)cls.push('moving');if(ui.sel&&ui.sel.cable===c.id)cls.push('selc');
     h+=`<g class="${cls.join(' ')}" data-cable="${c.id}" data-da="${I.owner[c.a].id}" data-db="${I.owner[c.b].id}" style="--w:${st.w}px">${tr.cabs.has(c.id)?`<path class="halo" d="${g.d}" stroke="${st.color}"/>`:''}<path class="vis" id="w-${c.id}" d="${g.d}" stroke="${st.color}"${st.dash?` stroke-dasharray="${st.dash}"`:''}/><path class="hit" d="${g.d}"/></g>`});
   $('wires').innerHTML=h+'<g id="deco"></g>';
@@ -1722,7 +1798,7 @@ function inspDev(el,d){const T=TYPES[d.type];const ls=layersOf(d);const used=d.p
   <div class="card"><span class="label">網路埠 · 點一下查整條路徑</span><div class="portgrid">${d.ports.map(p=>{const c=I.cab[p.id];return`<button data-gport="${p.id}" data-nav="1" class="${c?'used':''}" style="${c?'--c:'+cableStyle(c).color:''}" title="${esc(pname(p.id)+(c?' · '+c.label:' · 未接線'))}">${esc(p.label)}${TYPES[d.type].pass?(p.side?'後':'前'):''}</button>`}).join('')}</div>
   <div class="actions"><button class="btn sm" data-ia="toggleview" data-nav="1">${viewOf(d)==='icon'?'在畫布展開網路埠':'在畫布收成圖示'}</button></div></div>
   <details class="card"><summary>設備介紹與 OSI 層級（${range(ls)}）</summary><div class="about"><p>${info.intro||T.intro}</p><ul>${(info.points||T.points).map(x=>`<li>${x}</li>`).join('')}</ul></div>${ladder(ls)}</details>
-  <div class="actions"><button class="btn" data-ia="qr" data-nav="1">${ICON.qr} QR / 連結</button><button class="btn" data-ia="dup">${si(ICON.dup)} 複製</button><button class="btn danger" data-ia="deldev">${si(ICON.del)} 刪除</button></div>`;
+  <div class="actions">${ui.ro?'':'<button class="btn" data-ia="fault">從這裡查線</button><button class="btn" data-ia="sim" data-nav="1">如果這台壞了</button>'}<button class="btn" data-ia="qr" data-nav="1">${ICON.qr} QR / 連結</button><button class="btn" data-ia="dup">${si(ICON.dup)} 複製</button><button class="btn danger" data-ia="deldev">${si(ICON.del)} 刪除</button></div>`;
 }
 function inspPort(el,pid){const p=I.ports[pid],d=I.owner[pid],c=I.cab[pid],steps=trace(pid);
   el.style.setProperty('--tc',tc(d.type));
@@ -1792,6 +1868,8 @@ insp.addEventListener('click',e=>{
   if(a==='poeall'){const d=curObj('d');if(!canEdit())return;snap();applyPoe(d,'all');save();renderAll();toast('RJ45 埠已全部設為 PoE',true)}
   if(a==='dup')dupDev(curObj('d'));
   if(a==='qr')openShare(curObj('d'));
+  if(a==='fault'){const d=curObj('d');if(d)startFault(d.id);return}
+  if(a==='sim'){const d=curObj('d');if(d){ui.sim={key:'dev:'+d.id,name:d.name};ui.fault=null;ui.fpick=false;ui.fopen=true;ui.sel=null;renderAll()}return}
   if(a==='deldev')delDev(ui.sel.dev);
   if(a==='gocable'){ui.sel={cable:I.cab[ui.sel.port].id};ui.detail=ui.sel.cable;renderAll()}
   if(a==='unplug')delCable(I.cab[ui.sel.port].id);
@@ -1893,7 +1971,7 @@ function addNew(type,pos,kind){if(!canEdit())return;if(ui.view!=='map')setView('
 function allRuns(){const seen=new Set(),rows=[];
   [...S.devices].sort((a,b)=>(TYPES[a.type].pass?1:0)-(TYPES[b.type].pass?1:0)).forEach(d=>d.ports.forEach(p=>{if(!I.cab[p.id])return;const t=trace(p.id);const key=t.filter(x=>x.k==='cable').map(x=>x.c.id).sort().join('|');if(seen.has(key))return;seen.add(key);rows.push(t)}));return rows}
 function renderTable(){I=idx();computeRunVlans();const q=ui.q.trim().toLowerCase();let body;
-  const tabs=`<div class="seg" role="group" aria-label="表格" style="align-self:flex-start"><button data-tab="runs" aria-pressed="${ui.tab==='runs'}">線路對照</button><button data-tab="devs" aria-pressed="${ui.tab==='devs'}">設備清單</button></div>`;
+  const tabs=`<div class="seg" role="group" aria-label="表格" style="align-self:flex-start"><button data-tab="runs" aria-pressed="${ui.tab==='runs'}">線路對照</button><button data-tab="devs" aria-pressed="${ui.tab==='devs'}">設備清單</button><button data-tab="faults" aria-pressed="${ui.tab==='faults'}">故障紀錄${S.faults.length?` (${S.faults.length})`:''}</button></div>`;
   if(ui.tab==='runs'){
     const html=allRuns().map(t=>{const ps=t.filter(x=>x.k==='port');const a=ps[0].p,b=ps[ps.length-1].p;
       const text=t.map(x=>x.k==='port'?pname(x.p)+' '+portText(I.ports[x.p])+' '+devText(I.owner[x.p]):x.k==='cable'?cabText(x.c):'').join(' ').toLowerCase();if(q&&!text.includes(q))return'';
@@ -1901,18 +1979,23 @@ function renderTable(){I=idx();computeRunVlans();const q=ui.q.trim().toLowerCase
       const vl=[...new Set(ps.map(x=>{const p=I.ports[x.p];return p.mode==='trunk'?'Trunk':p.vlan}).filter(Boolean))];
       return`<tr data-go="${a}"><td>${esc(I.owner[a].name)}<div class="hint">${esc(pshort(a))}</div></td><td>${esc(I.owner[b].name)}<div class="hint">${esc(pshort(b))}</div></td><td class="mono">${t.filter(x=>x.k==='cable').length}</td><td class="mono">${esc(vl.join(', ')||'—')}</td><td><div class="pathcell">${path}</div></td></tr>`}).join('');
     body=`<div class="tw"><table><thead><tr><th>A 端</th><th>B 端</th><th>段數</th><th>VLAN</th><th>完整路徑</th></tr></thead><tbody>${html||'<tr><td colspan="5" class="hint">沒有符合的線路</td></tr>'}</tbody></table></div>`}
+  else if(ui.tab==='faults'){const html=S.faults.filter(f=>!q||String(f.name).toLowerCase().includes(q)).map(f=>{const hops=faultHops(f);const pick=st=>hops.filter(h=>(f.items[hopKey(h)]||{}).st===st).map(h=>hopInfo(h).t).join('、');const n=Object.values(f.items).filter(v=>v.st).length;
+      return`<tr data-fault="${f.id}"><td class="mono">${fdate(f.created)}</td><td>${esc(f.name||'')}</td><td><span class="fbadge ${f.closed?'done':'open'}">${f.closed?'已結案':'處理中'}</span></td><td class="mono">${n} / ${hops.filter(h=>h.k!=='gap').length}</td><td>${esc(pick('bad')||'—')}</td><td>${esc(f.closed?f.closed.note:(f.note||'—'))}</td></tr>`}).join('');
+    body=`<div class="tw"><table><thead><tr><th>開單時間</th><th>起點設備</th><th>狀態</th><th>已檢查</th><th>故障點</th><th>處理方式</th></tr></thead><tbody>${html||'<tr><td colspan="6" class="hint">還沒有查線紀錄。在拓樸圖按右下角「查線」，點有問題的設備就會建立一筆。</td></tr>'}</tbody></table></div><div class="actions" style="margin-top:8px"><button class="btn sm" id="fCsv">匯出故障紀錄 CSV</button></div>`}
   else{const html=S.devices.filter(d=>!q||devText(d).includes(q)).map(d=>{const used=d.ports.filter(p=>I.cab[p.id]).length;
       return`<tr data-dev="${d.id}" style="--tc:${tc(d.type)}"><td><span class="typecell"><span class="tile">${iconOf(d)}</span>${esc(typeName(d))}</span></td><td>${esc(d.name)}</td><td>${esc([d.brand,d.model].filter(Boolean).join(' ')||'—')}</td><td class="mono">${esc(d.ip||'—')}</td><td>${esc(locText(d)||'—')}</td><td class="mono">${range(layersOf(d))}</td><td class="mono">${used} / ${d.ports.length}</td></tr>`}).join('');
     body=`<div class="tw"><table><thead><tr><th>類型</th><th>名稱</th><th>廠牌 / 型號</th><th>IP</th><th>位置</th><th>OSI</th><th>埠位使用</th></tr></thead><tbody>${html||'<tr><td colspan="7" class="hint">沒有符合的設備</td></tr>'}</tbody></table></div>`}
   $('tableView').innerHTML=tabs+body+'<p class="hint">點任一列會回到拓樸圖並標出位置。要給驗收或印紙本，用「檔案 ▸ 匯出配線表 CSV」可直接用 Excel 開。</p>';
   $('tableView').querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{ui.tab=b.dataset.tab;renderTable()});
+  $('tableView').querySelectorAll('tr[data-fault]').forEach(r=>r.onclick=()=>openFault(r.dataset.fault));
+  if($('fCsv'))$('fCsv').onclick=()=>{download(`netmap-faults-${stamp()}.csv`,'text/csv;charset=utf-8',faultCSV());toast('已下載故障紀錄 CSV')};
   $('tableView').querySelectorAll('tr[data-go]').forEach(r=>r.onclick=()=>{ui.sel={port:r.dataset.go};setView('map');fitTo(devBox(new Set([I.owner[r.dataset.go].id])),1)});
   $('tableView').querySelectorAll('tr[data-dev]').forEach(r=>r.onclick=()=>{ui.sel={dev:r.dataset.dev};setView('map');fitTo(devBox(new Set([r.dataset.dev])),1)});
 }
 
 /* ---------- render all ---------- */
 function renderAll(){if(ui.view==='map')renderCanvas();else{I=idx();computeRunVlans();ui.match=computeMatches();$('qcount').hidden=!ui.match;if(ui.match)$('qn').textContent=ui.match.count?`${ui.match.count} 筆`:'沒有結果'}
-  renderInsp();if(ui.view==='table')renderTable();if(ui.view==='rack')renderRack();
+  renderInsp();renderFault();if(ui.view==='table')renderTable();if(ui.view==='rack')renderRack();
   if(ui.focus){const n=$(fid(ui.focus));ui.focus=null;if(n&&!n.disabled&&matchMedia('(pointer:fine)').matches){n.focus();n.select&&n.select()}}}
 
 /* ---------- export ---------- */
@@ -1952,7 +2035,10 @@ function openImage(){if(ui.view!=='map')setView('map');const go=()=>{const r=top
   $('iPng').onclick=()=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=r.W*2;c.height=r.H*2;const x=c.getContext('2d');x.scale(2,2);x.drawImage(img,0,0);c.toBlob(b=>{if(b){download(`netmap-${stamp()}.png`,'image/png',b);toast('已下載 PNG')}else toast('PNG 產生失敗，請改用 SVG')},'image/png')};img.onerror=()=>toast('PNG 產生失敗，請改用 SVG');img.src=url}};
   requestAnimationFrame(()=>requestAnimationFrame(go))}
 function projectJSON(){return JSON.stringify(Object.assign({app:'netmap',version:3,savedAt:new Date().toISOString()},S),null,1)}
-function loadProject(o,msg){if(!o||!Array.isArray(o.devices)||!Array.isArray(o.cables))throw new Error('format');snap();S=normalize({devices:o.devices,cables:o.cables,racks:o.racks||[]});ui.sel=null;ui.pending=null;ui.multi.clear();save();I=idx();renderAll();toast(msg,true)}
+function loadProject(o,msg){if(!o||!Array.isArray(o.devices)||!Array.isArray(o.cables))throw new Error('format');snap();S=normalize({devices:o.devices,cables:o.cables,racks:o.racks||[],faults:o.faults||[]});ui.fault=null;ui.sim=null;ui.fopen=false;ui.sel=null;ui.pending=null;ui.multi.clear();
+  const auto=o.layout==='auto'||(S.devices.length>1&&S.devices.every(d=>!d.x&&!d.y));if(ui.view!=='map'&&auto)setView('map');
+  save();I=idx();renderAll();if(auto){autoLayout();padLayout();save();renderAll();requestAnimationFrame(()=>fitTo(devBox(),1))}
+  toast(o.source&&/snmp/i.test(o.source)?`${msg}：${S.devices.length} 台設備、${S.cables.length} 條線，配線架與資訊座請手動補上`:msg,true)}
 $('fileIn').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{loadProject(JSON.parse(r.result),'已開啟 '+f.name)}catch(err){toast('這個檔案不是有效的專案檔')}e.target.value=''};r.readAsText(f)};
 
 /* ---------- LLDP / CDP import ---------- */
@@ -2024,7 +2110,7 @@ function openLLDP(){if(!canEdit())return;const locals=S.devices.filter(d=>['sw',
 
 /* ---------- share / QR ---------- */
 function shareBase(){return/github\.io$/.test(location.hostname)?location.origin+location.pathname:PUBLIC_URL}
-function shareURL(o){const ps=new URLSearchParams();if(o.dev)ps.set('dev',o.dev);if(o.ro)ps.set('ro','1');if(o.data&&window.LZString)ps.set('p',LZString.compressToEncodedURIComponent(JSON.stringify({devices:S.devices,cables:S.cables,racks:S.racks})));return shareBase()+'#'+ps.toString()}
+function shareURL(o){const ps=new URLSearchParams();if(o.dev)ps.set('dev',o.dev);if(o.ro)ps.set('ro','1');if(o.data&&window.LZString)ps.set('p',LZString.compressToEncodedURIComponent(JSON.stringify({devices:S.devices,cables:S.cables,racks:S.racks,faults:S.faults})));if(ui.fault)ps.set('fault',ui.fault);return shareBase()+'#'+ps.toString()}
 function qrSVG(text){if(!window.qrcode)return null;try{const q=qrcode(0,'L');q.addData(text);q.make();return q.createSvgTag({cellSize:4,margin:2,scalable:true})}catch(e){return null}}
 function openShare(d){const title=d?`設備連結：${d.name}`:'分享整份配置';
   modal(`<h2>${esc(title)}</h2><p class="hint">${d?'貼在實體機櫃或設備上，掃描後直接打開這台設備的接線圖。':'把整份配置做成一個網址，對方不用匯入檔案就能查看。'}</p>
@@ -2043,6 +2129,16 @@ function openShare(d){const title=d?`設備連結：${d.name}`:'分享整份配�
 /* ---------- modal helper ---------- */
 function modal(html,wide){$('modalRoot').innerHTML=`<div class="modal" id="mod"><div class="mcard${wide?' wide':''}" role="dialog">${html}</div></div>`;
   $('mod').onclick=e=>{if(e.target.id==='mod'||e.target.closest('[data-close]'))closeModal()}}
+const SNMP_ZIP=PUBLIC_URL+'tools/netmap-snmp.zip',SNMP_EXE='https://github.com/coloplay1/netmap/releases/latest/download/netmap-snmp.exe';
+function openSNMP(){modal(`<h2>SNMP 自動掃描</h2><p class="hint">瀏覽器不能直接送 SNMP，所以要在你們內網的電腦上跑一支小程式。它會讀取防火牆、Switch、AP 的 SNMP 資料，產生一個 .json 檔，匯入後就會自動畫出整張網路圖。只讀取，不會修改設備設定。</p>
+  <ol class="snmpsteps">
+   <li><b>下載掃描程式</b><div class="dlrow"><a class="btn primary" href="${SNMP_EXE}" target="_blank" rel="noopener">Windows 執行檔（.exe）</a><a class="btn" href="${SNMP_ZIP}" target="_blank" rel="noopener">Python 版 ZIP（Windows / Mac / Linux）</a></div><small>執行檔免安裝，第一次執行若出現 Windows SmartScreen 提示，按「其他資訊 ▸ 仍要執行」。Python 版需先安裝 <a href="https://www.python.org/downloads/" target="_blank" rel="noopener">Python 3</a>，解壓後雙擊 run-windows.bat。</small></li>
+   <li><b>在內網電腦執行</b><small>輸入核心 Switch 的 IP（或整個網段，例如 192.168.1.0/24）和 SNMP community。程式會沿著 LLDP / CDP 自動找到其他設備；SNMPv3 也支援。</small></li>
+   <li><b>匯入產生的檔案</b><small>完成後同一個資料夾會有 netmap-scan-日期時間.json，按下面的按鈕選它。</small></li>
+  </ol>
+  <div class="snmpget"><b>會讀到</b>設備名稱、廠牌型號、序號、每個網路埠、LLDP / CDP 連線、VLAN（PVID / Trunk）、PoE、LACP，以及從 MAC 表 + ARP 推斷的終端設備與 IP。<br><b>需要手動補</b>配線架、資訊座等被動元件（不會回應 SNMP），以及終端設備的名稱。</div>
+  <div class="actions"><button class="btn primary" id="sImp">匯入掃描結果 .json</button><button class="btn" data-close style="margin-left:auto">關閉</button></div>`,true);
+  $('sImp').onclick=()=>{closeModal();$('fileIn').click()}}
 function closeModal(){$('modalRoot').innerHTML=''}
 
 /* ---------- pointer interactions ---------- */
@@ -2116,7 +2212,7 @@ document.addEventListener('pointerup',e=>{
     ui.multi=new Set(sel);ui.sel=sel.length===1?{port:sel[0]}:null;if(sel.length===1)ui.multi.clear();renderAll();if(sel.length>1)toast(`已框選 ${sel.length} 個埠`);return}
   if(link){const L=link;link=null;const t=L.active?portAt(e.clientX,e.clientY,L.from):null;endLinkUI();
     if(!L.active){portClick(L.from,L.mod)}else{if(!t||t===L.from){renderAll();return}connect(L.from,t)}return}
-  if(drag){const D=drag;drag=null;canvas.classList.remove('dragging');if(!D.moved){const now=Date.now();if(lastDev.id===D.d.id&&now-lastDev.t<450){lastDev={};toggleView(D.d);return}lastDev={id:D.d.id,t:now};ui.sel={dev:D.d.id};ui.multi.clear();renderAll()}else{save();renderCanvas()}}
+  if(drag){const D=drag;drag=null;canvas.classList.remove('dragging');if(!D.moved){const now=Date.now();if(lastDev.id===D.d.id&&now-lastDev.t<450){lastDev={};toggleView(D.d);return}lastDev={id:D.d.id,t:now};if(ui.fpick){startFault(D.d.id);return}ui.sel={dev:D.d.id};ui.multi.clear();renderAll()}else{save();renderCanvas()}}
 });
 document.addEventListener('pointercancel',()=>{if(pdrag){if(pdrag.ghost)pdrag.ghost.remove();pdrag=null}if(pan){pan=null;canvas.classList.remove('panning')}if(link){link=null;endLinkUI();renderAll()}if(drag){drag=null;canvas.classList.remove('dragging');save();renderCanvas()}if(mq){mq.box.remove();mq=null}wpd=null;
   if(rdrag){if(rdrag.ghost)rdrag.ghost.remove();rdrag=null;document.querySelectorAll('.rdrop').forEach(x=>x.remove())}});
@@ -2224,7 +2320,8 @@ document.addEventListener('keydown',e=>{const typing=/INPUT|TEXTAREA|SELECT/.tes
     if((e.key==='+'||e.key==='=')){e.preventDefault();setZoom(ui.zoom*1.15);return}
     if(e.key==='-'||e.key==='_'){e.preventDefault();setZoom(ui.zoom/1.15);return}
     if(e.key==='0'&&!e.ctrlKey&&!e.metaKey){e.preventDefault();goHome();return}}
-  if(e.key==='Escape'){if(link){link=null;endLinkUI();renderAll();return}if($('modalRoot').innerHTML){closeModal();return}if(typing){document.activeElement.blur();return}ui.pending=null;ui.sel=null;ui.multi.clear();renderAll();return}
+  if(e.key==='Escape'){if(link){link=null;endLinkUI();renderAll();return}if($('modalRoot').innerHTML){closeModal();return}if(typing){document.activeElement.blur();return}
+    if(ui.fpick||ui.sim||ui.fopen){closeFault();return}ui.pending=null;ui.sel=null;ui.multi.clear();renderAll();return}
   if((e.key==='Delete'||e.key==='Backspace')&&!typing&&ui.sel&&!ui.ro){e.preventDefault();const s=ui.sel;
     if(s.dev)delDev(s.dev);else if(s.cable)delCable(s.cable);else if(s.port&&I.cab[s.port])delCable(I.cab[s.port].id)}
 });
@@ -2356,17 +2453,146 @@ $('ctx').addEventListener('change',e=>{const t=e.target;if(!canEdit())return;
   if(t.dataset.cxp){const p=I.ports[ui.sel.port];if(!p)return;snap();p[t.dataset.cxp]=t.value.trim();if(t.dataset.cxp==='mode'&&t.value!=='trunk')p.tagged='';save();renderAll();toast('已更新 '+pname(ui.sel.port),true)}});
 $('ctx').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset.cxm==='vlan'){e.preventDefault();$('ctx').querySelector('[data-cx="vlan"]').click()}if(e.key==='Escape'){e.stopPropagation();$('ctx').hidden=true;stage.focus&&stage.focus()}});
 
+/* ======================= 故障查線 ======================= */
+const FST={ok:['正常','✓'],sus:['可疑','?'],bad:['故障','✕']};
+function curFault(){return ui.fault?S.faults.find(f=>f.id===ui.fault)||null:null}
+const hopKey=h=>h.k+':'+h.id;
+function graphRoots(){const adj=runGraph();const ds=S.devices.filter(x=>adj[x.id]);return{adj,best:ds.length?Math.min(...ds.map(rootRank)):9}}
+/* ordered hops from the reported device towards the network entry */
+function faultHops(f){I=I||idx();const d=S.devices.find(x=>x.id===f.start);if(!d)return[];
+  const hops=[],seen=new Set();const push=h=>{const k=hopKey(h);if(seen.has(k))return;seen.add(k);hops.push(h)};
+  push({k:'dev',id:d.id});
+  let items=upstream(d);const {best}=graphRoots();
+  if(!items.length){d.ports.forEach(p=>{if(I.cab[p.id])items.push(...trace(p.id))})}
+  let prev=null,last=d.id;
+  items.forEach(it=>{if(it.k==='port'){const o=I.owner[it.p];const pass=TYPES[o.type].pass;
+      if(!pass&&o.id!==last&&prev&&prev.k==='cable'){push({k:'port',id:it.p});push({k:'dev',id:o.id});last=o.id}
+      else{if(!pass&&o.id!==last){push({k:'dev',id:o.id});last=o.id}push({k:'port',id:it.p})}}
+    else if(it.k==='cable')push({k:'cable',id:it.c.id});prev=it});
+  if(!upstream(d).length&&rootRank(d)!==best)push({k:'gap',id:'0'});
+  return hops}
+function hopInfo(h){I=I||idx();
+  if(h.k==='dev'){const d=S.devices.find(x=>x.id===h.id);if(!d)return{t:'（已刪除的設備）',s:''};return{t:d.name,s:[typeName(d),[d.brand,d.model].filter(Boolean).join(' '),d.ip].filter(Boolean).join(' · '),dev:d.id,ic:'dev'}}
+  if(h.k==='port'){const p=I.ports[h.id],d=I.owner[h.id];if(!p)return{t:'（已刪除的埠）',s:''};const pass=TYPES[d.type].pass;
+    return{t:`${d.name} 埠 ${p.label}${pass?(p.side?'（後）':'（前）'):''}`,s:[p.mode==='trunk'?'Trunk':p.vlan?'VLAN '+p.vlan:'',p.poe?'PoE':'',p.lag?'LACP '+p.lag:'',p.kind==='sfp'?'SFP':''].filter(Boolean).join(' · '),dev:d.id,ic:'port'}}
+  if(h.k==='cable'){const c=S.cables.find(x=>x.id===h.id);if(!c)return{t:'（已刪除的線）',s:''};return{t:`線 ${c.label||''}`,s:[c.type,c.speed,c.len?c.len+' m':'',fixedRun(c)?'牆內固定佈線':''].filter(Boolean).join(' · '),dev:I.owner[c.a].id,ic:'cable'}}
+  return{t:'找不到通往網路入口的路徑',s:'線路可能在這裡中斷，或還沒畫到上游設備',ic:'gap'}}
+/* automatic health checks over the whole map: key -> reasons */
+const tagList=p=>String(p.tagged||'').split(/[^0-9]+/).filter(Boolean);
+const needsPoe=d=>d.type==='ap'||(d.type==='end'&&['IP Cam','IP Phone'].includes(d.kind));
+const isNet=d=>['sw','hub','router','fw'].includes(d.type);
+function healthMap(){I=I||idx();const M=new Map();const add=(k,r)=>{if(!M.has(k))M.set(k,[]);if(!M.get(k).includes(r))M.get(k).push(r)};
+  const far={};
+  allRuns().forEach(t=>{const ps=t.filter(x=>x.k==='port');const a=I.ports[ps[0].p],b=I.ports[ps[ps.length-1].p];if(!a||!b||a===b)return;far[a.id]=b.id;far[b.id]=a.id;
+    const da=I.owner[a.id],db=I.owner[b.id];const am=a.mode||'access',bm=b.mode||'access';
+    if(am==='access'&&bm==='access'&&a.vlan&&b.vlan&&String(a.vlan)!==String(b.vlan)&&isNet(da)&&isNet(db)){const r=`兩端 VLAN 不一致（${a.vlan} ↔ ${b.vlan}）`;add('port:'+a.id,r);add('port:'+b.id,r)}
+    const tk=(x,y)=>{if(x.mode==='trunk'&&(y.mode||'access')==='access'&&y.vlan&&isNet(I.owner[y.id])){const tl=tagList(x);if(tl.length&&!tl.includes(String(y.vlan)))add('port:'+x.id,`Trunk 沒有帶 VLAN ${y.vlan}（對端是 access ${y.vlan}）`)}
+      if(x.mode==='trunk'&&(y.mode||'access')==='access'&&isNet(I.owner[x.id])&&isNet(I.owner[y.id]))add('port:'+x.id,'一端 Trunk、一端 Access，請確認兩端模式');};tk(a,b);tk(b,a);
+    const pw=(dev,sp)=>{if(needsPoe(dev)&&['sw','hub'].includes(I.owner[sp.id].type)&&!sp.poe)add('port:'+sp.id,`接 ${typeName(dev)}，但這個埠沒有開 PoE`)};pw(da,b);pw(db,a)});
+  S.devices.forEach(d=>{const g={};d.ports.forEach(p=>{if(p.lag&&far[p.id])(g[p.lag]=g[p.lag]||[]).push(p)});
+    Object.entries(g).forEach(([lag,ps])=>{const ds=new Set(ps.map(p=>I.owner[far[p.id]].id));if(ds.size>1)ps.forEach(p=>add('port:'+p.id,`LACP ${lag} 的成員接到不同設備`));
+      ps.forEach(p=>{const q=I.ports[far[p.id]];if(q&&!q.lag&&isNet(I.owner[q.id]))add('port:'+q.id,`對端是 LACP ${lag}，這個埠沒有設定 LACP`)})})});
+  S.cables.forEach(c=>{const pa=I.ports[c.a],pb=I.ports[c.b];if(!pa||!pb)return;const fiber=/光纖/.test(c.type),cu=/^Cat/.test(c.type);const act=p=>!TYPES[I.owner[p.id].type].pass;
+    if(cu&&+c.len>100)add('cable:'+c.id,`銅線長度 ${c.len} m，超過乙太網路 100 m 上限`);
+    if(fiber&&[pa,pb].some(p=>act(p)&&p.kind==='rj45'))add('cable:'+c.id,'光纖線接到 RJ45 埠');
+    if(cu&&[pa,pb].some(p=>act(p)&&p.kind==='sfp'))add('cable:'+c.id,'銅線接到 SFP 埠，請確認是否裝了電口模組')});
+  const byIp={};S.devices.forEach(d=>{const ip=String(d.ip||'').trim();if(/^\d+\.\d+\.\d+\.\d+$/.test(ip))(byIp[ip]=byIp[ip]||[]).push(d)});
+  Object.entries(byIp).forEach(([ip,ds])=>{if(ds.length>1)ds.forEach(d=>add('dev:'+d.id,`IP ${ip} 重複：${ds.filter(x=>x!==d).map(x=>x.name).join('、')}`))});
+  const gws=new Set(S.devices.filter(d=>['fw','router','sw'].includes(d.type)).map(d=>d.ip).filter(Boolean));
+  if(gws.size)S.devices.forEach(d=>{if(d.gw&&/^\d+\.\d+\.\d+\.\d+$/.test(d.gw)&&!S.devices.some(x=>x.ip===d.gw))add('dev:'+d.id,`Gateway ${d.gw} 不是圖上任何設備的 IP`)});
+  return M}
+/* devices that lose the path to the network entry when the keys in F are down */
+function reachable(F){const {adj,best}=graphRoots();if(best===9)return new Set();
+  const blocked=t=>t.some(x=>(x.k==='port'&&(F.has('port:'+x.p)||(TYPES[I.owner[x.p].type].pass&&F.has('dev:'+I.owner[x.p].id))))||(x.k==='cable'&&F.has('cable:'+x.c.id)));
+  const q=S.devices.filter(x=>adj[x.id]&&rootRank(x)===best&&!F.has('dev:'+x.id)).map(x=>x.id);const R=new Set(q);
+  while(q.length){const id=q.shift();(adj[id]||[]).forEach(e=>{if(R.has(e.to)||F.has('dev:'+e.to)||blocked(e.t))return;R.add(e.to);q.push(e.to)})}return R}
+function impact(F){if(!F||!F.size)return[];I=I||idx();const base=reachable(new Set()),now=reachable(F);return S.devices.filter(d=>base.has(d.id)&&!now.has(d.id))}
+function badKeys(f){return new Set(Object.entries(f.items).filter(([k,v])=>v.st==='bad').map(([k])=>k))}
+function nextCheck(f,hops,H){if(hops.some(h=>(f.items[hopKey(h)]||{}).st==='bad'))return null;
+  const un=hops.filter(h=>h.k!=='gap'&&!(f.items[hopKey(h)]||{}).st);if(!un.length)return null;
+  const s=un.find(h=>H.has(hopKey(h)));if(s)return{h:s,why:'健檢發現這裡可能有問題，先確認'};
+  return{h:un[Math.floor((un.length-1)/2)],why:'二分法：先查中間這段，一次就能排除一半'}}
+/* state for canvas colouring, refreshed on every render */
+function prepFault(){ui.fH=null;ui.affected=null;const f=curFault();
+  if(f){ui.fH=healthMap();ui.affected=new Set(impact(badKeys(f)).map(d=>d.id))}
+  else if(ui.sim){ui.affected=new Set(impact(new Set([ui.sim.key])).map(d=>d.id))}}
+function fClass(k){const f=curFault();if(!f)return'';const it=f.items[k];if(it&&it.st)return'fst-'+it.st;if(ui.fH&&ui.fH.has(k))return'fst-auto';return''}
+function faultTrace(){const f=curFault();if(!f)return null;const hops=faultHops(f);const ports=new Set(),cabs=new Set(),devs=new Set(),dir={};let lp=null;
+  hops.forEach(h=>{if(h.k==='port'){ports.add(h.id);devs.add(I.owner[h.id].id);lp=h.id}else if(h.k==='dev')devs.add(h.id);else if(h.k==='cable'){cabs.add(h.id);const c=S.cables.find(x=>x.id===h.id);if(c)dir[h.id]=lp===c.a||lp===c.b?lp:c.a}});
+  return{ports,cabs,devs,active:true,dir}}
+function startFault(devId){const d=S.devices.find(x=>x.id===devId);if(!d)return;snap();const f={id:uid('f'),start:devId,name:d.name,created:new Date().toISOString(),items:{},note:'',closed:null};
+  S.faults.unshift(f);ui.fault=f.id;ui.fpick=false;ui.fopen=true;ui.sim=null;ui.sel=null;ui.multi.clear();save();renderAll();
+  const ids=new Set(faultHops(f).filter(h=>h.k==='dev').map(h=>h.id));requestAnimationFrame(()=>fitTo(devBox(ids),1));
+  toast(`開始查線：${d.name}，從建議的那一段開始檢查`)}
+function openFault(id){ui.fault=id;ui.fpick=false;ui.fopen=true;ui.sim=null;ui.sel=null;if(ui.view!=='map')setView('map');renderAll();const f=curFault();if(f){const ids=new Set(faultHops(f).filter(h=>h.k==='dev').map(h=>h.id));requestAnimationFrame(()=>fitTo(devBox(ids),1))}}
+function closeFault(){ui.fault=null;ui.fpick=false;ui.fopen=false;ui.sim=null;renderAll()}
+function focusHop(k){const [kind,id]=k.split(':');I=I||idx();let dev=kind==='dev'?id:kind==='port'?(I.owner[id]||{}).id:kind==='cable'?(()=>{const c=S.cables.find(x=>x.id===id);return c&&I.owner[c.a].id})():null;if(!dev)return;
+  if(ui.view!=='map')setView('map');fitTo(devBox(new Set([dev])),Math.max(ui.zoom,.9));const el=document.querySelector(`#devs .dev[data-dev="${dev}"]`);if(el){el.classList.remove('fflash');void el.offsetWidth;el.classList.add('fflash')}}
+const fdate=s=>{try{const d=new Date(s);return`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`}catch(e){return''}};
+function renderFault(){const P=$('fpanel');if(!P)return;$('bFault').setAttribute('aria-pressed',!!(ui.fopen||ui.fpick));
+  if(!ui.fopen||ui.view!=='map'){P.hidden=true;$('canvas').classList.remove('fpick');return}
+  P.hidden=false;$('canvas').classList.toggle('fpick',!!ui.fpick);const B=$('fBody');I=I||idx();const ro=ui.ro;const keep=B.scrollTop;requestAnimationFrame(()=>{B.scrollTop=keep});
+  if(ui.sim){const aff=impact(new Set([ui.sim.key]));$('fTitle').innerHTML=`模擬故障 <small>${esc(ui.sim.name)}</small>`;
+    B.innerHTML=`<p class="fp">假設「<b>${esc(ui.sim.name)}</b>」壞掉，以下設備會失去通往網路入口的連線（畫布上以紅色斜線標示）。這只是模擬，不會寫入紀錄。</p>
+    <div class="faff"><b>影響 ${aff.length} 台設備</b>${aff.length?`<ul>${aff.map(d=>`<li><button data-fgo="dev:${d.id}">${esc(d.name)}</button><small>${esc(typeName(d))}</small></li>`).join('')}</ul>`:'<p class="fp">沒有設備受影響（有備援路徑，或它本身不在主要路徑上）。</p>'}</div>
+    <div class="fact"><button class="btn" data-fa="endsim">結束模擬</button></div>`;return}
+  const f=curFault();
+  if(!f){$('fTitle').innerHTML='故障查線';const H=healthMap();const iss=[...H.entries()];
+    B.innerHTML=`<div class="fpick-tip"><b>${ui.fpick?'請點選有問題的設備':'開始查線'}</b><p>點畫布上回報有狀況的設備（例如不能上網的電腦），會列出它到網路入口的每一段線路，逐段標記檢查結果。</p>${ui.fpick?'':`<button class="btn pri" data-fa="pick">選擇設備</button>`}</div>
+    <h4 class="fh4">自動健檢 <small>${iss.length?iss.length+' 個疑點':'沒有發現問題'}</small></h4>
+    ${iss.length?`<ul class="fiss">${iss.map(([k,rs])=>{const [kind,id]=k.split(':');const hi=hopInfo({k:kind,id});return`<li><button data-fgo="${k}"><b>${esc(hi.t)}</b><em>${esc(rs.join('；'))}</em></button></li>`}).join('')}</ul>`:'<p class="fp">VLAN、PoE、LACP、線長、IP 重複等常見設定都沒有發現衝突。</p>'}
+    <h4 class="fh4">查線紀錄 <small>${S.faults.length} 筆</small></h4>
+    ${S.faults.length?`<ul class="frec">${S.faults.map(x=>{const n=Object.values(x.items).filter(v=>v.st).length;return`<li><button data-fopen="${x.id}"><b>${esc(x.name||'')}</b><small>${fdate(x.created)} · ${x.closed?'已結案':'處理中'} · 已查 ${n} 段</small></button></li>`}).join('')}</ul>`:'<p class="fp">還沒有查線紀錄。</p>'}`;return}
+  const hops=faultHops(f),H=ui.fH||healthMap();const sts=hops.map(h=>(f.items[hopKey(h)]||{}).st||'');const real=hops.filter(h=>h.k!=='gap');
+  const done=sts.filter(Boolean).length,cnt=s=>sts.filter(x=>x===s).length;const nx=f.closed?null:nextCheck(f,hops,H);const bads=hops.filter(h=>(f.items[hopKey(h)]||{}).st==='bad');
+  const aff=impact(badKeys(f));
+  $('fTitle').innerHTML=`查線：${esc(f.name||'')} <small>${f.closed?'已結案':'處理中'}</small>`;
+  B.innerHTML=`<div class="fsum"><div class="fbar"><i style="width:${real.length?Math.round(done/real.length*100):0}%"></i></div><span>已檢查 ${done} / ${real.length} 段 · <b class="c-ok">✓ ${cnt('ok')}</b> <b class="c-sus">? ${cnt('sus')}</b> <b class="c-bad">✕ ${cnt('bad')}</b></span></div>
+  ${nx?`<button class="fnext" data-fgo="${hopKey(nx.h)}"><span>建議下一步</span><b>檢查「${esc(hopInfo(nx.h).t)}」</b><small>${esc(nx.why)}</small></button>`:''}
+  ${bads.length&&!f.closed?`<div class="ffound"><b>故障點：</b>${bads.map(h=>esc(hopInfo(h).t)).join('、')}<br><small>處理完成後，在最下方填寫處理方式並結案。</small></div>`:''}
+  ${aff.length?`<div class="faff"><b>影響 ${aff.length} 台設備</b><small>從網路入口到不了的設備，畫布上以紅色斜線標示</small><ul>${aff.slice(0,30).map(d=>`<li><button data-fgo="dev:${d.id}">${esc(d.name)}</button><small>${esc(typeName(d))}</small></li>`).join('')}</ul></div>`:''}
+  <ol class="fhops">${hops.map((h,i)=>{const k=hopKey(h),it=f.items[k]||{},st=it.st||'',hi=hopInfo(h),rs=H.get(k)||[];
+    return`<li class="fhop st-${st||'none'} ic-${hi.ic}${nx&&hopKey(nx.h)===k?' nextup':''}"><span class="fi">${h.k==='gap'?'!':i+1}</span><div class="fm"><button class="ft" data-fgo="${k}">${esc(hi.t)}</button>${hi.s?`<small>${esc(hi.s)}</small>`:''}${rs.length?`<em>⚠ ${esc(rs.join('；'))}</em>`:''}
+      ${h.k!=='gap'?`<input class="fnote" data-fnote="${k}" value="${esc(it.note||'')}" placeholder="備註：量測結果、處理方式…" ${ro||f.closed?'disabled':''}>`:''}</div>
+      ${h.k!=='gap'?`<div class="fs" role="group" aria-label="檢查結果">${['ok','sus','bad'].map(s=>`<button class="s-${s}" data-fst="${s}" data-k="${k}" aria-pressed="${st===s}" title="${FST[s][0]}" ${ro||f.closed?'disabled':''}>${FST[s][1]}</button>`).join('')}</div>`:''}</li>`}).join('')}</ol>
+  <div class="fclose">${f.closed?`<p class="fp"><b>已結案</b> ${fdate(f.closed.at)}：${esc(f.closed.note||'')}</p>${ro?'':'<button class="btn sm" data-fa="reopen">重新開啟</button>'}`:ro?'':`<label class="label" for="fCloseNote">處理方式</label><div class="frow"><input id="fCloseNote" placeholder="例如：更換跳線 P-01、重新壓接資訊座" value="${esc(f.note||'')}"><button class="btn pri" data-fa="close">結案</button></div>`}
+    <div class="fact">${ro?'':'<button class="btn sm" data-fa="sim1">模擬：如果故障點壞掉</button>'}<button class="btn sm" data-fa="list">所有紀錄</button>${ro?'':'<button class="btn sm danger" data-fa="del">刪除這筆紀錄</button>'}</div></div>`}
+function faultCSV(){const rows=[['開單時間','起點設備','狀態','已檢查段數','故障點','可疑點','處理方式','結案時間']];
+  S.faults.forEach(f=>{const hops=faultHops(f);const pick=s=>hops.filter(h=>(f.items[hopKey(h)]||{}).st===s).map(h=>hopInfo(h).t+((f.items[hopKey(h)]||{}).note?`（${f.items[hopKey(h)].note}）`:'')).join('；');
+    rows.push([f.created,f.name||'',f.closed?'已結案':'處理中',Object.values(f.items).filter(v=>v.st).length,pick('bad'),pick('sus'),f.closed?f.closed.note:f.note||'',f.closed?f.closed.at:''])});
+  return'﻿'+rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\r\n')}
+function initFault(){
+  $('bFault').onclick=()=>{if(ui.fopen||ui.fpick){closeFault();return}ui.fopen=true;ui.sim=null;
+    if(ui.sel&&ui.sel.dev&&!ui.ro){startFault(ui.sel.dev);return}ui.fpick=!ui.ro;renderAll();if(ui.fpick)toast('查線模式：點選有問題的設備')};
+  $('fClose').onclick=closeFault;
+  $('fBody').addEventListener('click',e=>{const g=e.target.closest('[data-fgo]');if(g){focusHop(g.dataset.fgo);return}
+    const o=e.target.closest('[data-fopen]');if(o){openFault(o.dataset.fopen);return}
+    const s=e.target.closest('[data-fst]');if(s&&!ui.ro){const f=curFault();if(!f||f.closed)return;snap();const k=s.dataset.k;const it=f.items[k]||{};it.st=it.st===s.dataset.fst?'':s.dataset.fst;it.at=new Date().toISOString();f.items[k]=it;save();renderAll();return}
+    const a=e.target.closest('[data-fa]');if(!a)return;const f=curFault();const act=a.dataset.fa;
+    if(act==='pick'){if(!canEdit())return;ui.fpick=true;renderAll();toast('點選有問題的設備');return}
+    if(act==='endsim'){ui.sim=null;ui.fopen=!!ui.fault;renderAll();return}
+    if(act==='list'){ui.fault=null;ui.fpick=false;renderAll();return}
+    if(!f||!canEdit())return;
+    if(act==='close'){snap();f.closed={at:new Date().toISOString(),note:$('fCloseNote').value.trim()};f.note=f.closed.note;save();renderAll();toast('已結案，紀錄保留在「線路表 ▸ 故障紀錄」');return}
+    if(act==='reopen'){snap();f.closed=null;save();renderAll();return}
+    if(act==='del'){snap();S.faults=S.faults.filter(x=>x!==f);ui.fault=null;save();renderAll();toast('已刪除查線紀錄',true);return}
+    if(act==='sim1'){const b=[...badKeys(f)];if(!b.length){toast('先把某一段標成「故障」，才能模擬影響範圍');return}const k=b[0];const [kind,id]=k.split(':');ui.sim={key:k,name:hopInfo({k:kind,id}).t};ui.fault=null;renderAll();return}});
+  $('fBody').addEventListener('change',e=>{const n=e.target.closest('[data-fnote]');if(n){const f=curFault();if(!f)return;const it=f.items[n.dataset.fnote]||{};it.note=n.value.trim();f.items[n.dataset.fnote]=it;save()}
+    if(e.target.id==='fCloseNote'){const f=curFault();if(f){f.note=e.target.value.trim();save()}}});
+}
+
 /* ---------- init ---------- */
-function readHash(){const h=location.hash.slice(1);if(!h||!h.includes('='))return null;const ps=new URLSearchParams(h);return{p:ps.get('p'),dev:ps.get('dev'),ro:ps.get('ro')==='1'}}
+function readHash(){const h=location.hash.slice(1);if(!h||!h.includes('='))return null;const ps=new URLSearchParams(h);return{p:ps.get('p'),dev:ps.get('dev'),ro:ps.get('ro')==='1',fault:ps.get('fault')}}
 document.body.classList.toggle('light',prefs.skin==='light');
 const H=readHash();let hadSaved=false;
-if(H&&H.p&&window.LZString){try{const o=JSON.parse(LZString.decompressFromEncodedURIComponent(H.p));S=normalize({devices:o.devices,cables:o.cables,racks:o.racks||[]});ui.shared=true}catch(e){hadSaved=load()}}else hadSaved=load();
+if(H&&H.p&&window.LZString){try{const o=JSON.parse(LZString.decompressFromEncodedURIComponent(H.p));S=normalize({devices:o.devices,cables:o.cables,racks:o.racks||[],faults:o.faults||[]});ui.shared=true}catch(e){hadSaved=load()}}else hadSaved=load();
 I=idx();renderLeft();renderViewPop();syncUR();applyPanels();
 
 if(ui.shared){const bn=$('banner');bn.hidden=false;bn.innerHTML='你正在檢視分享的配置，修改不會存到這台電腦。<button id="bnSave">存成這台電腦的配置</button>';
   $('bnSave').onclick=()=>{ui.shared=false;save();bn.hidden=true;toast('已存到這台電腦')}}
 if(H&&H.ro){ui.ro=true;applyRoUI();syncUR()}
 if(H&&H.dev&&S.devices.some(d=>d.id===H.dev))ui.sel={dev:H.dev};
+initFault();if(H&&H.fault&&S.faults.some(f=>f.id===H.fault)){ui.fault=H.fault;ui.fopen=true}
 renderAll();
 if(H&&H.dev&&ui.sel)requestAnimationFrame(()=>fitTo(devBox(new Set([H.dev])),1.1));
 document.fonts&&document.fonts.ready.then(()=>{if(ui.autoPending){autoLayout();renderAll()}else drawWires()});

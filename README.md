@@ -24,3 +24,27 @@ IT 用的網路線路對應工具：建立防火牆、路由器、Switch、Hub�
 資料存在瀏覽器（localStorage），可用「檔案」選單下載／開啟 JSON 專案檔備份。型號埠位依常見規格整理，實際請以原廠規格為準。
 
 單一 `index.html`，不需建置，開啟 GitHub Pages 即可使用。
+
+## 故障查線
+
+右下角「查線」→ 點回報有問題的設備，會列出它到網路入口的每一段（網卡、跳線、資訊座、牆內線、配線架、Switch 埠、上行線、防火牆、ISP）：
+
+- 每段可標「正常／可疑／故障」並寫備註，畫布同步上色
+- 自動健檢：VLAN 不一致、Trunk 沒帶 VLAN、PoE 設備接到沒開 PoE 的埠、LACP 接錯、銅線超過 100 m、光纖接 RJ45、IP 重複、Gateway 不在圖上
+- 建議下一步：先查健檢發現的疑點，再用二分法挑中間段
+- 影響範圍：標成故障後，列出從網路入口到不了的設備；設備面板的「如果這台壞了」可模擬單點故障
+- 結案後紀錄保留在「線路表 ▸ 故障紀錄」，可匯出 CSV；紀錄會跟著專案 JSON 與分享連結
+
+## SNMP 自動掃描
+
+`tools/netmap-snmp/` 是在內網電腦執行的掃描程式（SNMP v1／v2c 只用 Python 標準函式庫，v3 需 `pip install pysnmp`），
+讀取 LLDP／CDP、IF-MIB、ENTITY-MIB、Q-BRIDGE、PoE、LAG、MAC 表與 ARP，輸出可直接匯入的 JSON。
+
+- Python 版：[tools/netmap-snmp.zip](https://coloplay1.github.io/netmap/tools/netmap-snmp.zip)
+- Windows 執行檔：[Releases](https://github.com/coloplay1/netmap/releases/latest)（由 GitHub Actions 自動建置）
+
+```
+python netmap_snmp.py 192.168.1.1 -c public          # 從核心 Switch 開始，沿 LLDP 自動擴展
+python netmap_snmp.py 192.168.1.0/24 -c public       # 掃整個網段
+python netmap_snmp.py 10.0.0.1 -v 3 -u netmon -a SHA -A 認證密碼 -x AES -X 加密密碼
+```
