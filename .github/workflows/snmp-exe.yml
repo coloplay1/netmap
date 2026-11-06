@@ -1,9 +1,9 @@
-name: Build netmap-snmp.exe
+name: Build netmap Windows programs
 
 on:
   push:
     branches: [main]
-    paths: ['tools/netmap-snmp/**', '.github/workflows/snmp-exe.yml']
+    paths: ['tools/netmap-snmp/**', 'index.html', '.github/workflows/snmp-exe.yml']
   workflow_dispatch:
 
 permissions:
@@ -19,21 +19,39 @@ jobs:
           python-version: '3.12'
       - name: Install build tools
         run: pip install pyinstaller pysnmp
-      - name: Build single-file exe
-        run: pyinstaller --onefile --console --name netmap-snmp --collect-all pysnmp tools/netmap-snmp/netmap_snmp.py
-      - name: Smoke test
+      - name: Bundle the web page
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force tools/netmap-snmp/web | Out-Null
+          Copy-Item index.html tools/netmap-snmp/web/index.html
+      - name: Self-test monitoring service
+        shell: pwsh
+        working-directory: tools/netmap-snmp
+        run: |
+          python -c "import os,tempfile,json,urllib.request,time; import netmap_server as S; st=S.Store(tempfile.mkdtemp()); st.settings['port']=18765; sv=S.Service(st,log=print); sv.start(); time.sleep(1); print(json.load(urllib.request.urlopen('http://127.0.0.1:18765/api/ping'))); html=urllib.request.urlopen('http://127.0.0.1:18765/').read().decode('utf-8'); assert 'NETMAP_SERVER' in html; print('protect roundtrip', S.unprotect(S.protect('secret'))=='secret'); sv.stop()"
+      - name: Build netmap.exe (window app)
+        working-directory: tools/netmap-snmp
+        run: pyinstaller --onefile --windowed --name netmap --icon netmap.ico --collect-all pysnmp --add-data "web/index.html;web" --add-data "netmap.ico;." netmap_app.py
+      - name: Build netmap-snmp.exe (command line)
+        working-directory: tools/netmap-snmp
+        run: pyinstaller --onefile --console --name netmap-snmp --icon netmap.ico --collect-all pysnmp netmap_snmp.py
+      - name: Smoke test command line
+        working-directory: tools/netmap-snmp
         run: dist\netmap-snmp.exe --version-info
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: snmp-latest
-          name: netmap-snmp SNMP 掃描程式
+          name: netmap Windows 程式（SNMP 掃描與監控）
           make_latest: true
           overwrite_files: true
           files: |
-            dist/netmap-snmp.exe
+            tools/netmap-snmp/dist/netmap.exe
+            tools/netmap-snmp/dist/netmap-snmp.exe
             tools/netmap-snmp.zip
           body: |
-            機房線路對應圖的 SNMP 掃描程式。下載 netmap-snmp.exe 後雙擊執行，依提示輸入 IP 與 community，
-            完成後到 https://coloplay1.github.io/netmap/ 匯入產生的 .json。
-            netmap-snmp.zip 是 Python 版（Windows / macOS / Linux）。
+            機房線路對應圖的 Windows 程式。
+            - **netmap.exe**（建議）：視窗版。SNMP 掃描 + 監控服務：在內網提供網頁版線路圖，顯示每個埠的流量、使用率、上下線與 24 小時曲線。
+            - netmap-snmp.exe：命令列版掃描程式。
+            - netmap-snmp.zip：Python 版（Windows / macOS / Linux）。
+            線上版：https://coloplay1.github.io/netmap/

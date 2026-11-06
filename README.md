@@ -48,3 +48,15 @@ python netmap_snmp.py 192.168.1.1 -c public          # 從核心 Switch 開始�
 python netmap_snmp.py 192.168.1.0/24 -c public       # 掃整個網段
 python netmap_snmp.py 10.0.0.1 -v 3 -u netmon -a SHA -A 認證密碼 -x AES -X 加密密碼
 ```
+
+## Windows 程式：netmap.exe（SNMP 掃描＋監控服務）
+
+[下載 netmap.exe](https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe)
+
+- **SNMP 掃描**（視窗介面）：輸入核心 Switch IP 與 community／SNMPv3 帳密，自動找出設備與連線
+- **監控服務**：常駐在內網一台 Windows 電腦，提供 `http://<IP>:8080/` 網頁版（多人共用同一張圖），
+  每 30～300 秒讀取每個埠的流量（IF-MIB HC 計數器）、上下線、錯誤封包，保留歷史（SQLite，預設 7 天）
+  - 線路依使用率變色（綠 < 30%、黃 30–70%、紅 > 70%），離線埠紅燈、沒回應的設備標「離線」
+  - 點埠可看即時流量與 24 小時曲線；離線埠、錯誤封包、壅塞會進入故障查線的自動健檢
+  - 預設只有服務主機能編輯，其他電腦唯讀（可在設定開放）
+  - 帳密以 Windows DPAPI 加密保存；資料在 `%APPDATA%\netmap`

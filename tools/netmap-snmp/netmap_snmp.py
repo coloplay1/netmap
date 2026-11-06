@@ -454,7 +454,7 @@ def build(devs, extra_lldp=True, fdb=True, max_macs_per_port=4):
         ip = dv["host"].split(":")[0]
         dev = {"id": nid("d"), "type": typ, "name": dv["sysName"].split(".")[0][:40] or ip, "brand": brand, "model": model, "ip": ip, "mac": "",
                "gw": "", "loc": dv.get("sysLoc", ""), "note": f"SNMP 掃描 {dt.date.today().isoformat()}" + (f"・序號 {dv['serial']}" if dv.get("serial") else ""),
-               "rack": "", "u": "", "uh": "", "x": 0, "y": 0, "ports": []}
+               "rack": "", "u": "", "uh": "", "x": 0, "y": 0, "ports": [], "snmp": {"host": dv["host"]}}
         if typ == "sw": dev["variant"] = "l3" if "router" in caps or len(dv.get("ips", {})) > 2 else "l2m"
         if typ == "end": dev["kind"] = kind or "其他"
         bif = {v: k for k, v in dv.get("bridge_if", {}).items()}  # ifIndex → bridge port
@@ -471,6 +471,7 @@ def build(devs, extra_lldp=True, fdb=True, max_macs_per_port=4):
                  "mode": "trunk" if tg else "access", "vlan": str(pv) if pv and not tg else "", "tagged": ",".join(sorted(set(tg), key=int)) if tg else "",
                  "lag": lagname.get(ifi, ""), "note": " ".join(x for x in [short_if(i["name"]) if port_label(i["name"]) != short_if(i["name"]) else "", i["alias"], "" if i["up"] else "（離線）", speed_txt(i["speed"])] if x)}
             if dv.get("pvid") and tg and pv: p["vlan"] = str(pv)
+            p["ifIndex"] = int(ifi) if str(ifi).isdigit() else ifi
             dev["ports"].append(p); portmap[(dv["host"], ifi)] = p["id"]
         if not dev["ports"]:
             p = {"id": nid("p"), "label": "LAN", "kind": "rj45", "poe": False, "mode": "access", "vlan": "", "tagged": "", "lag": "", "note": ""}
@@ -622,6 +623,58 @@ def probe(a, t):
     except Exception:
         return None
 
+DEFAULTS = dict(community="public", version="2c", user=None, auth_proto="SHA", auth_key=None, priv_proto="AES", priv_key=None, context="",
+                port=161, timeout=2.0, retries=1, workers=48, max_devices=300, no_follow=False, no_fdb=False, no_neighbors=False)
+
+def opts(**kw):
+    o = argparse.Namespace(**DEFAULTS); o.__dict__.update({k: v for k, v in kw.items() if v is not None}); return o
+
+def run_scan(a, targets, log=print, progress=None, stop=lambda: False, on_device=None):
+    """掃描並建立專案。log(text)、progress(done, total, phase)、stop() 回傳 True 即中止。回傳 (project, devs, failed)。"""
+    targets = expand(targets)
+    log(f"探測 {len(targets)} 個位址…")
+    alive, done = [], 0
+    with cf.ThreadPoolExecutor(max_workers=max(1, min(a.workers, len(targets) or 1))) as ex:
+        futs = {ex.submit(probe, a, t): t for t in targets}
+        for fu in cf.as_completed(futs):
+            done += 1
+            if fu.result(): alive.append(fu.result())
+            if progress: progress(done, len(targets), "probe")
+            if stop():
+                for x in futs: x.cancel()
+                break
+    alive.sort(key=lambda t: [int(x) if x.isdigit() else 0 for x in re.split(r"[.:]", t)])
+    log(f"有回應的設備：{len(alive)} 台")
+    seen, queue, devs, failed = set(), list(alive), [], []
+    while queue and len(devs) < a.max_devices and not stop():
+        t = queue.pop(0)
+        host = t.split(":")[0]
+        if host in seen: continue
+        seen.add(host)
+        if progress: progress(len(devs), len(devs) + len(queue) + 1, "collect")
+        try:
+            c = make_client(a, t)
+            try:
+                dv = collect(c, t, want_fdb=not a.no_fdb)
+            finally:
+                c.close()
+        except Exception as e:
+            failed.append((t, str(e))); log(f"  ✕ {t}：" + ("沒有回應（可能沒開 SNMP，或 community／帳密不同）" if "timeout" in str(e) else str(e))); continue
+        devs.append(dv)
+        if on_device: on_device(dv)
+        for x in dv.get("ips", {}): seen.add(x)
+        log(f"  ✓ {t:<21} {dv['sysName'][:28]:<28} 埠 {sum(1 for i in dv['ifs'].values() if is_phys(i)):>3}  LLDP {len(dv['lldp']):>2}  CDP {len(dv['cdp']):>2}  MAC {len(dv['fdb']):>4}")
+        if not a.no_follow:
+            port = t.partition(":")[2]
+            for n in dv["lldp"] + dv["cdp"]:
+                m = n.get("mgmt")
+                if m and m not in seen: queue.append(m + (f":{port}" if port else ""))
+    if progress: progress(1, 1, "done")
+    proj = build(devs, extra_lldp=not a.no_neighbors, fdb=not a.no_fdb) if devs else None
+    if proj:
+        proj["snmpAuth"] = {"version": a.version, "port": a.port}
+    return proj, devs, failed
+
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="netmap-snmp", description="用 SNMP 掃描網路設備，輸出「機房線路對應圖」可匯入的 JSON。")
     ap.add_argument("targets", nargs="*", help="IP、網段或範圍，例如 192.168.1.1  192.168.1.0/24  10.0.0.1-50  host:1161")
@@ -662,40 +715,12 @@ def main(argv=None):
         else:
             a.community = input("Community [public]：").strip() or "public"
     if a.version == "3" and not a.user: print("SNMPv3 需要 -u 使用者"); return 2
-    targets = expand(a.targets)
-    print(f"\n探測 {len(targets)} 個位址…")
     t0 = time.time()
-    alive = []
-    with cf.ThreadPoolExecutor(max_workers=max(1, min(a.workers, len(targets)))) as ex:
-        for r in ex.map(lambda t: probe(a, t), targets):
-            if r: alive.append(r)
-    print(f"有回應的設備：{len(alive)} 台")
-    seen, queue, devs, failed = set(), list(alive), [], []
-    while queue and len(devs) < a.max_devices:
-        t = queue.pop(0)
-        host = t.split(":")[0]
-        if host in seen: continue
-        seen.add(host)
-        try:
-            c = make_client(a, t)
-            try:
-                dv = collect(c, t, want_fdb=not a.no_fdb)
-            finally:
-                c.close()
-        except Exception as e:
-            failed.append((t, str(e))); print(f"  ✕ {t}：" + ("沒有回應（可能沒開 SNMP，或 community／帳密不同）" if "timeout" in str(e) else str(e))); continue
-        devs.append(dv)
-        for x in dv.get("ips", {}): seen.add(x)
-        print(f"  ✓ {t:<21} {dv['sysName'][:28]:<28} 埠 {sum(1 for i in dv['ifs'].values() if is_phys(i)):>3}  LLDP {len(dv['lldp']):>2}  CDP {len(dv['cdp']):>2}  MAC {len(dv['fdb']):>4}")
-        if not a.no_follow:
-            port = t.partition(":")[2]
-            for n in dv["lldp"] + dv["cdp"]:
-                m = n.get("mgmt")
-                if m and m not in seen: queue.append(m + (f":{port}" if port else ""))
-    if not devs:
+    print()
+    proj, devs, failed = run_scan(a, a.targets)
+    if not proj:
         print("\n沒有收集到任何設備。請確認：IP 正確、設備已開啟 SNMP、community / 帳密正確、防火牆允許 UDP 161。")
         return 3
-    proj = build(devs, extra_lldp=not a.no_neighbors, fdb=not a.no_fdb)
     out = a.output or f"netmap-scan-{dt.datetime.now():%Y%m%d-%H%M}.json"
     with open(out, "w", encoding="utf-8") as f: json.dump(proj, f, ensure_ascii=False, indent=1)
     if a.raw:

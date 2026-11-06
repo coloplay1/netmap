@@ -1,4 +1,4 @@
-﻿netmap-snmp：機房線路對應圖 SNMP 自動掃描程式
+﻿netmap：機房線路對應圖 SNMP 掃描與監控程式
 https://coloplay1.github.io/netmap/
 
 這支程式在你們內網的電腦上執行，用 SNMP 讀取防火牆、Switch、AP 的資料，
@@ -11,7 +11,16 @@ https://coloplay1.github.io/netmap/
 - 執行的電腦可以連到設備的 UDP 161 埠
 - SNMPv1 / v2c 不需要安裝其他套件；SNMPv3 需要先執行：pip install pysnmp
 
-【最簡單的用法】
+【視窗版（建議）】
+Windows：雙擊 netmap.exe（或 Python 版的 run-app-windows.bat）開啟視窗：
+  「SNMP 掃描」分頁：輸入核心 Switch 的 IP 與 community，按「開始掃描」，完成後按「設為監控的圖」。
+  「監控服務」分頁：按「啟動服務」，同一個內網的電腦用瀏覽器打開顯示的網址（例如 http://192.168.1.20:8080/），
+                     就能看到同一張圖，以及每個埠的流量、使用率、上下線狀態與 24 小時曲線。
+  可勾選「Windows 開機時自動執行」。第一次啟動服務時 Windows 防火牆會詢問，請按「允許存取」。
+  預設只有這台電腦可以編輯圖，其他電腦只能看；要讓大家都能改，勾選「允許內網其他電腦編輯圖」。
+  資料（圖、流量紀錄、加密後的帳密）存在 %APPDATA%\netmap。
+
+【命令列版的用法】
 Windows：雙擊 run-windows.bat，依提示輸入要掃描的 IP 或網段、community。
 macOS / Linux：在終端機執行 ./run-mac-linux.sh
 完成後會在同一個資料夾產生 netmap-scan-日期時間.json。
