@@ -1,0 +1,39 @@
+name: Build netmap-snmp.exe
+
+on:
+  push:
+    branches: [main]
+    paths: ['tools/netmap-snmp/**', '.github/workflows/snmp-exe.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install build tools
+        run: pip install pyinstaller pysnmp
+      - name: Build single-file exe
+        run: pyinstaller --onefile --console --name netmap-snmp --collect-all pysnmp tools/netmap-snmp/netmap_snmp.py
+      - name: Smoke test
+        run: dist\netmap-snmp.exe --version-info
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: snmp-latest
+          name: netmap-snmp SNMP 掃描程式
+          make_latest: true
+          overwrite_files: true
+          files: |
+            dist/netmap-snmp.exe
+            tools/netmap-snmp.zip
+          body: |
+            機房線路對應圖的 SNMP 掃描程式。下載 netmap-snmp.exe 後雙擊執行，依提示輸入 IP 與 community，
+            完成後到 https://coloplay1.github.io/netmap/ 匯入產生的 .json。
+            netmap-snmp.zip 是 Python 版（Windows / macOS / Linux）。
