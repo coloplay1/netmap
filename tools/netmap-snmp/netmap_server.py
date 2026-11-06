@@ -14,6 +14,11 @@ from concurrent.futures import ThreadPoolExecutor
 import netmap_snmp as ns
 
 APP = "netmap"
+# 主控台不是 UTF-8 時（英文版 Windows、輸出導到檔案）也不要因為中文訊息當掉
+for _st in (sys.stdout, sys.stderr):
+    try: _st.reconfigure(errors="replace")
+    except Exception: pass
+
 VERSION = "1.1.0"
 
 # ───────────────────────── paths & secrets ─────────────────────────

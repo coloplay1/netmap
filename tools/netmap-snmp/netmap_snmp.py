@@ -20,6 +20,11 @@ SNMP v1 / v2c 只用 Python 標準函式庫；SNMP v3 需要 `pip install pysnmp
 import argparse, concurrent.futures as cf, datetime as dt, ipaddress, json, os, random, re, socket, sys, time
 
 VERSION = "1.0.0"
+# 主控台不是 UTF-8 時（英文版 Windows、輸出導到檔案）也不要因為中文訊息當掉
+for _st in (sys.stdout, sys.stderr):
+    try: _st.reconfigure(errors="replace")
+    except Exception: pass
+
 APP_URL = "https://coloplay1.github.io/netmap/"
 
 # ───────────────────────── BER / SNMP v1, v2c ─────────────────────────
