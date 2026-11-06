@@ -2,6 +2,8 @@
 
 IT 用的網路線路對應工具：建立防火牆、路由器、Switch、Hub、AP、配線架、座位資訊座與終端設備，埠對埠拖曳接線，點任一網路埠即可追蹤「Switch 埠 ➔ 配線架 ➔ 座位 ➔ 電腦」整條路徑。
 
+🌐 **線上使用：<https://coloplay1.github.io/netmap/>**（免安裝，直接用瀏覽器開啟）
+
 📖 **[使用手冊（圖文教學）](https://coloplay1.github.io/netmap/manual.html)** · [版本紀錄](https://coloplay1.github.io/netmap/manual.html#changelog) · [下載 netmap.exe](https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe)
 
 ## 功能

@@ -885,6 +885,18 @@ body:not(.light){--mg-in:#22c55e;--mg-in-a:rgba(34,197,94,.45);--mg-out:#60a5fa;
 .lcmrtg{margin-top:8px;width:100%;justify-content:center}
 .livebtn .lt{display:inline}@media (max-width:1520px){#bMrtg{width:30px;padding:0;justify-content:center}#bMrtg .lt{display:none}.livechip b{display:none}}
 @media (max-width:640px){.mgstat{grid-template-columns:auto 1fr 1fr;font-size:12px}.mgstat .cur{display:none}.mgspark{width:84px}.mglist .hide-s{display:none}.mglist td,.mglist th{padding:6px 8px}.mglist td:first-child{white-space:normal;min-width:84px}}
+.dtbar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:6px 0 12px}
+.dtbar div{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--soft)}
+.dtbar small{display:block;color:var(--muted);font-size:11.5px}.dtbar b{font-size:15px;font-variant-numeric:tabular-nums}
+.dtstate{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;border-radius:999px;padding:2px 10px;border:1px solid var(--line)}
+.dtstate i{width:8px;height:8px;border-radius:50%;background:var(--muted)}.dtstate.ok i{background:#22c55e}.dtstate.bad i{background:#ef4444}.dtstate.bad{color:#ef4444}
+.dtport{border:1px solid var(--line);border-radius:12px;padding:8px 12px 6px;margin:8px 0;background:var(--panel)}
+.dtport h3{font-size:13.5px;margin:0 0 2px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dtport h3 .sp{flex:1}.dtport h3 small{color:var(--muted);font-weight:500;font-variant-numeric:tabular-nums}
+.dtport .dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none}.dtport .dot.up{background:#22c55e}.dtport .dot.down{background:#ef4444}
+.dtrest{font-size:12.5px;color:var(--muted);margin:10px 2px;line-height:1.9}
+.dtrest span{display:inline-block;border:1px solid var(--line);border-radius:6px;padding:0 6px;margin:0 4px 4px 0}.dtrest span.down{color:#ef4444;border-color:rgba(239,68,68,.4)}
+@media (max-width:640px){.dtbar{grid-template-columns:repeat(2,minmax(0,1fr))}.dtbar div:last-child{grid-column:span 2}}
 .livechip{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:700;background:var(--soft);color:var(--muted);white-space:nowrap;cursor:default}
 .livechip i{width:8px;height:8px;border-radius:50%;background:var(--muted)}
 .livechip b{font-family:var(--f-mono);font-weight:600;color:var(--ink)}
@@ -1303,8 +1315,9 @@ const KEY='netmap-v2', OLDKEY='netmap-v1', PREFKEY='netmap-prefs';
 const PUBLIC_URL='https://coloplay1.github.io/netmap/';
 const MANUAL_URL=PUBLIC_URL+'manual.html';
 /* 版本紀錄：最新在最前面。exe = netmap.exe 的版本 */
-const APP_VERSION='2.6',EXE_VERSION='1.5.0';
+const APP_VERSION='2.7',EXE_VERSION='1.5.1';
 const CHANGELOG=[
+ {v:'2.7',exe:'1.5.1',d:'2026-11-07',t:'設備流量圖與狀態',i:['點畫布上的設備，右側「即時狀態」卡片新增「這台設備的流量圖與狀態」按鈕','一次看這台設備的上下線、錯誤封包、最後輪詢時間，以及每個埠的日／週／月／年流量圖','從設備進入單埠詳細圖後，可以直接返回這台設備']},
  {v:'2.6',exe:'1.5.0',d:'2026-11-06',t:'SSH 流量監控',i:['沒有 SNMP 的設備（家用路由器、Linux、NAS、OpenWrt）可以改用 SSH 監控流量，一樣有即時流量與 MRTG 流量圖','ASUS 路由器自動辨識 WAN、LAN、2.4G、5G Wi-Fi','設備重開機、計數器歸零時不再出現假的流量尖峰','流量圖沒有資料時，直接說明原因與下一步']},
  {v:'2.5',exe:'1.4.0',d:'2026-11-06',t:'MRTG 流量圖',i:['每個埠都有 MRTG 式的每日（5 分鐘）、每週（30 分鐘）、每月（2 小時）、每年（1 天）流量圖，列出最大／平均／目前值與使用率','流量圖總覽：所有埠最近 24 小時的小圖，可依最忙排序、篩選','可切換 bps／使用率 %、顯示尖峰，並匯出 CSV；流量圖資料保存約 2 年']},
  {v:'2.4',exe:'1.3.1',d:'2026-11-06',t:'版本資訊與使用手冊',i:['首頁顯示目前版本、更新內容與最新的 netmap.exe 下載','新增詳細的線上使用手冊（附畫面截圖）','netmap.exe 會自動檢查是否有新版本']},
@@ -1888,10 +1901,10 @@ function peekHTML(s){I=I||idx();let a='',b='';
   else if(s.port){const p=I.ports[s.port],d=I.owner[s.port];if(!p)return'';a=`${d.name} · 埠 ${p.label}`;const c=I.cab[p.id];b=c?`線 ${c.label||''} ${c.type||''}`:'未接線'}
   else if(s.cable){const c=S.cables.find(x=>x.id===s.cable);if(!c)return'';a=`線 ${c.label||''}`;b=[c.type,c.speed,c.len?c.len+' m':''].filter(Boolean).join(' · ')}
   return`<div class="pk"><b>${esc(a)}</b><span>${esc(b)}</span></div><div class="pkhint">⌃ 往上拉或點這裡，展開設定</div>`}
-function liveDevHTML(d){if(!SRV)return'';const ld=ui.live&&ui.live.devices[d.id];const ps=d.ports.map(p=>ui.live&&ui.live.ports[p.id]).filter(Boolean);
-  if(!ld&&!ps.length)return`<div class="card"><span class="label">即時狀態</span><p class="hint">${d.ip||(d.snmp&&d.snmp.host)||d.sshmon?'等待監控服務輪詢…':'填上 IP（或用 netmap.exe 掃描）後，監控服務就會讀取這台設備。'}</p></div>`;
+function liveDevHTML(d){if(!SRV)return['fw','router','sw','hub','ap'].includes(d.type)?`<div class="card"><span class="label">即時狀態與流量圖</span><p class="hint">在 netmap.exe 啟動「監控服務」，再用它提供的網址開啟這張圖，就能在這裡看到這台設備的上下線、每個埠的即時流量與 MRTG 流量圖。<a href="${MANUAL_URL}#e-srv" target="_blank" rel="noopener">怎麼設定？</a></p></div>`:'';const ld=ui.live&&ui.live.devices[d.id];const ps=d.ports.map(p=>ui.live&&ui.live.ports[p.id]).filter(Boolean);
+  if(!ld&&!ps.length)return`<div class="card"><span class="label">即時狀態</span><p class="hint">${d.ip||(d.snmp&&d.snmp.host)||d.sshmon?'等待監控服務輪詢…':'填上 IP（或用 netmap.exe 掃描）後，監控服務就會讀取這台設備。'}</p><button class="livebtn lcmrtg" data-devtraffic="${d.id}"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg>這台設備的流量圖與狀態</button></div>`;
   const up=ps.filter(p=>p.up).length,dn=ps.filter(p=>p.up===false).length,busy=ps.filter(p=>p.util!=null).sort((a,b)=>b.util-a.util)[0];
-  return`<div class="card"><span class="label">即時狀態 <small>${ld?(ld.up?`<b class="c-ok">${ld.via==='ssh'?'SSH':'SNMP'} 正常</b>`:`<b class="c-bad">${esc(ld.err||'沒有回應')}</b>`):''}</small></span><div class="lnums"><div><small>上線埠</small><b>${up}</b></div><div><small>離線埠</small><b class="${dn?'c-bad':''}">${dn}</b></div><div><small>最忙</small><b>${busy?Math.round(busy.util*100)+'%':'—'}</b></div><div><small>流量</small><b>${busy?'↓'+fmtBps(busy.in)+' ↑'+fmtBps(busy.out):'—'}</b></div></div></div>`}
+  return`<div class="card"><span class="label">即時狀態 <small>${ld?(ld.up?`<b class="c-ok">${ld.via==='ssh'?'SSH':'SNMP'} 正常</b>`:`<b class="c-bad">${esc(ld.err||'沒有回應')}</b>`):''}</small></span><div class="lnums"><div><small>上線埠</small><b>${up}</b></div><div><small>離線埠</small><b class="${dn?'c-bad':''}">${dn}</b></div><div><small>最忙</small><b>${busy?Math.round(busy.util*100)+'%':'—'}</b></div><div><small>流量</small><b>${busy?'↓'+fmtBps(busy.in)+' ↑'+fmtBps(busy.out):'—'}</b></div></div><button class="livebtn lcmrtg" data-devtraffic="${d.id}"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg>這台設備的流量圖與狀態</button></div>`}
 function inspDev(el,d){const T=TYPES[d.type];const ls=layersOf(d);const used=d.ports.filter(p=>I.cab[p.id]).length;
   el.style.setProperty('--tc',tc(d.type));
   const info=T.variants?T.variants[d.variant]:T;
@@ -2612,7 +2625,7 @@ async function livePoll(){if(!SRV)return;
   try{const r=await fetch('/api/status',{cache:'no-store'});const j=await r.json();ui.live=j;ui.liveErr=false;
     if(j.rev!==ui.srvRev&&!srvDirty&&!srvSaving&&!busy()){const p=await (await fetch('/api/project',{cache:'no-store'})).json();if(p.rev!==ui.srvRev){S=normalize(p.project);ui.srvRev=p.rev;I=idx();renderAll();placeIfNeeded()}}
     else if(ui.view==='map'&&!busy())renderCanvas();
-    refreshLiveCard()}
+    refreshLiveCard();ui.dtRefresh&&ui.dtRefresh()}
   catch(e){ui.liveErr=true}
   setLiveChip();setTimeout(livePoll,Math.max(5000,Math.min(30000,((ui.live&&ui.live.interval)||60)*500)))}
 function setLiveChip(){const el=$('liveChip');if(!el||!SRV)return;el.hidden=false;const L=ui.live;
@@ -2682,7 +2695,9 @@ async function openMRTG(pid){ui.mrtg=pid;setMgHash(pid);
     <div class="actions"><button class="btn" id="mgCsv">匯出 CSV</button><button class="btn" data-close style="margin-left:auto">關閉</button></div>`,true);
   $('mod').querySelector('.mcard').classList.add('mrtgm');
   const close=$('mod').onclick;$('mod').onclick=e=>{if(e.target.id==='mod'||e.target.closest('[data-close]')){ui.mrtg=null;setMgHash(null)}close(e)};
-  $('mgBack').onclick=()=>openMRTGIndex();
+  const from=ui.mgFrom&&S.devices.find(x=>x.id===ui.mgFrom&&x.ports.some(p=>p.id===pid));
+  if(from)$('mgBack').textContent='‹ '+from.name;else ui.mgFrom=null;
+  $('mgBack').onclick=()=>from?openDevTraffic(from.id):openMRTGIndex();
   let j;try{j=await (await fetch('/api/mrtg?port='+encodeURIComponent(pid),{cache:'no-store'})).json()}catch(e){$('mgSub').textContent='讀不到監控服務的紀錄';return}
   if(ui.mrtg!==pid||!$('mgBody'))return;
   const L=livePort(pid),speed=j.speed||(L&&L.speed)||0;
@@ -2698,7 +2713,7 @@ async function openMRTG(pid){ui.mrtg=pid;setMgHash(pid);
 function mgSpark(sp,speed){if(!sp||sp.length<2)return'<span class="sub">—</span>';const W=150,H=30,t0=sp[0][0],t1=sp[sp.length-1][0]||t0+1,mx=Math.max(speed?speed*.02:1,...sp.map(p=>Math.max(p[1],p[2])));
   const X=t=>(t-t0)/(t1-t0)*W,Y=v=>H-1-v/mx*(H-3);
   return`<svg class="mgspark mgsvg" viewBox="0 0 ${W} ${H}"><path class="ain" d="M0,${H}L${sp.map(p=>X(p[0]).toFixed(1)+','+Y(p[1]).toFixed(1)).join('L')}L${W},${H}Z"/><path class="lout" d="M${sp.map(p=>X(p[0]).toFixed(1)+','+Y(p[2]).toFixed(1)).join('L')}"/></svg>`}
-async function openMRTGIndex(){ui.mrtg='all';setMgHash('all');
+async function openMRTGIndex(){ui.mrtg='all';ui.mgFrom=null;setMgHash('all');
   modal(`<div class="mghead"><h2>流量圖</h2><span class="sp"></span><span class="mgsub" style="margin:0">最近 24 小時 · 點一列看日／週／月／年圖</span></div>
     <div class="mgtools"><input id="mgQ" placeholder="篩選設備或埠…" autocomplete="off"><label class="mgtog"><input type="checkbox" id="mgIdle">隱藏沒有流量的埠</label></div>
     <div class="mglist" id="mgList"><div class="mgempty">載入中…</div></div>
@@ -2727,6 +2742,46 @@ async function openMRTGIndex(){ui.mrtg='all';setMgHash('all');
   $('mgQ').oninput=draw;$('mgIdle').onchange=()=>{prefs.mgIdle=$('mgIdle').checked;savePrefs();draw()};draw()}
 function setMgHash(v){try{const h=v?'#mrtg='+encodeURIComponent(v):'';if(location.hash!==h)history.replaceState(null,'',location.pathname+location.search+h)}catch(e){}}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-mrtg]');if(b){e.preventDefault();openMRTG(b.dataset.mrtg)}});
+/* ---- 單一設備的流量圖與狀態 ---- */
+async function openDevTraffic(id,view){const d=S.devices.find(x=>x.id===id);if(!d)return;view=view||prefs.dtView||'day';
+  ui.mrtg='dev:'+id;ui.mgFrom=id;setMgHash('dev:'+id);
+  const via=d.sshmon?'SSH '+d.sshmon.host:(d.snmp&&d.snmp.host)?'SNMP '+d.snmp.host:d.ip?'SNMP '+d.ip:'';
+  modal(`<div class="mghead"><button class="btn sm" id="mgBack">‹ 所有埠</button><h2>${esc(d.name)}</h2><span id="dtState"></span><span class="sp"></span>
+    <div class="seg" role="group" aria-label="時間範圍">${MG_VIEWS.map(([k,t])=>`<button data-dtv="${k}" aria-pressed="${k===view}">${t.replace('圖','')}</button>`).join('')}</div></div>
+    <p class="mgsub">${esc([typeName(d),[d.brand,d.model].filter(Boolean).join(' '),d.ip,via?'監控：'+via:''].filter(Boolean).join(' · '))}</p>
+    <div class="dtbar" id="dtBar"></div>
+    <div class="mgtools"><label class="mgtog"><input type="checkbox" id="mgPeak"${prefs.mgPeak?' checked':''}>顯示尖峰</label><label class="mgtog"><input type="checkbox" id="dtIdle"${prefs.dtIdle!==false?' checked':''}>隱藏沒有流量的埠</label></div>
+    <div id="dtBody"><div class="mgempty">載入中…</div></div>
+    <div class="actions"><button class="btn" data-close style="margin-left:auto">關閉</button></div>`,true);
+  $('mod').querySelector('.mcard').classList.add('mrtgm');
+  $('mgBack').onclick=()=>{ui.mgFrom=null;openMRTGIndex()};
+  const status=()=>{const ld=ui.live&&ui.live.devices[d.id],ps=d.ports.map(p=>ui.live&&ui.live.ports[p.id]).filter(Boolean);
+    const up=ps.filter(p=>p.up).length,dn=ps.filter(p=>p.up===false).length,busy=ps.filter(p=>p.util!=null).sort((a,b)=>b.util-a.util)[0];
+    const errs=ps.reduce((a,p)=>a+(p.ie||0)+(p.oe||0),0);
+    $('dtState').innerHTML=!ld?'<span class="dtstate">尚未輪詢</span>':ld.up?'<span class="dtstate ok"><i></i>正常</span>':`<span class="dtstate bad" title="${esc(ld.err||'')}"><i></i>${esc(ld.err||'沒有回應')}</span>`;
+    $('dtBar').innerHTML=`<div><small>上線埠</small><b>${up}</b></div><div><small>離線埠</small><b class="${dn?'c-bad':''}">${dn}</b></div><div><small>最忙的埠</small><b>${busy?esc(pshort(Object.keys(ui.live.ports).find(k=>ui.live.ports[k]===busy)))+' '+Math.round(busy.util*100)+'%':'—'}</b></div><div><small>錯誤封包（最近一次）</small><b class="${errs?'c-bad':''}">${ps.length?errs:'—'}</b></div><div><small>最後輪詢</small><b>${ld&&ld.last?new Date(ld.last*1000).toLocaleTimeString('zh-TW',{hour12:false}):'—'}</b></div>`};
+  status();
+  let j=null;
+  const draw=()=>{if(!$('dtBody'))return;status();if(!j)return;
+    const pk=!!prefs.mgPeak,idle=$('dtIdle').checked,gw=Math.round(Math.max(330,Math.min(900,($('dtBody').clientWidth||720)-26)));
+    const g0=MG_VIEWS.find(v=>v[0]===j.view);
+    const rows=d.ports.map(p=>({p,g:j.ports[p.id],L:ui.live&&ui.live.ports[p.id]}));
+    const active=rows.filter(r=>r.g&&(!idle||r.g.points.some(x=>(x[1]||0)+(x[2]||0)>=1000)));
+    const rest=rows.filter(r=>!active.includes(r));
+    $('dtBody').innerHTML=(active.length?active.map(({p,g,L})=>{const sp=g.speed||(L&&L.speed)||0;
+      return`<div class="dtport"><h3><span class="dot ${L?(L.up?'up':L.up===false?'down':''):''}"></span>埠 ${esc(p.label)}${p.note?`<small>${esc(p.note)}</small>`:''}<span class="sp"></span><small>${[L&&L.in!=null?`目前 ↓${fmtBps(L.in)} ↑${fmtBps(L.out)}${L.util!=null?' · '+Math.round(L.util*100)+'%':''}`:'',sp?'速率 '+fmtBps(sp)+'b/s':''].filter(Boolean).join(' · ')}</small><button class="btn sm" data-mrtg="${p.id}">日／週／月／年</button></h3>
+      ${mgSVG({points:g.points,span:j.span,res:j.res},j.now,pk,'bps',sp,gw)}${mgStats({points:g.points},sp)}</div>`}).join('')
+      :`<div class="mgempty">${Object.keys(j.ports).length?'這段時間每個埠都幾乎沒有流量（取消「隱藏沒有流量的埠」可以全部顯示）。':(ui.live&&ui.live.devices[d.id])?'還沒有流量紀錄，監控服務開始記錄後大約 10 分鐘就會出現。':'監控服務沒有讀取這台設備。有 SNMP 的設備請用 netmap.exe「SNMP 掃描」；沒有 SNMP 的家用路由器、Linux、NAS 請在「監控服務」按「加入 SSH 設備…」。'}</div>`)
+      +(rest.length&&active.length?`<div class="dtrest">${g0?g0[1].replace('圖',''):''}沒有流量紀錄的埠：${rest.map(({p,L})=>`<span class="${L&&L.up===false?'down':''}">${esc(p.label)}</span>`).join('')}</div>`:'')};
+  const load=async v=>{view=v;prefs.dtView=v;savePrefs();$('mod').querySelectorAll('[data-dtv]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.dtv===v)));
+    try{j=await (await fetch(`/api/mrtg/device?id=${encodeURIComponent(id)}&view=${v}`,{cache:'no-store'})).json()}catch(e){$('dtBody').innerHTML='<div class="mgempty">讀不到監控服務的紀錄</div>';return}
+    if(ui.mrtg==='dev:'+id)draw()};
+  $('mod').querySelectorAll('[data-dtv]').forEach(b=>b.onclick=()=>load(b.dataset.dtv));
+  $('mgPeak').onchange=e=>{prefs.mgPeak=e.target.checked;savePrefs();draw()};
+  $('dtIdle').onchange=e=>{prefs.dtIdle=e.target.checked;savePrefs();draw()};
+  ui.dtRefresh=()=>{if(ui.mrtg==='dev:'+id&&$('dtBar'))status()};
+  load(view)}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-devtraffic]');if(b){e.preventDefault();openDevTraffic(b.dataset.devtraffic)}});
 function refreshLiveCard(){const c=document.querySelector('.livecard[data-livepid]');if(!c)return;const pid=c.dataset.livepid;const tmp=document.createElement('div');tmp.innerHTML=liveCardHTML(pid);c.replaceWith(tmp.firstElementChild);loadChart(pid)}
 
 /* ======================= 故障查線 ======================= */
@@ -2878,7 +2933,7 @@ renderAll();
 if(H&&H.dev&&ui.sel)requestAnimationFrame(()=>fitTo(devBox(new Set([H.dev])),1.1));
 document.fonts&&document.fonts.ready.then(()=>{if(ui.autoPending){autoLayout();renderAll()}else drawWires()});
 if(SRV){if(!SRV.edit){ui.ro=true;applyRoUI();syncUR()}livePoll();$('bMrtg').hidden=false;$('bMrtg').onclick=()=>openMRTGIndex();
-  if(H&&H.mrtg)setTimeout(()=>H.mrtg==='all'||!I.ports[H.mrtg]?openMRTGIndex():openMRTG(H.mrtg),50);
+  if(H&&H.mrtg)setTimeout(()=>H.mrtg.startsWith('dev:')&&S.devices.some(x=>x.id===H.mrtg.slice(4))?openDevTraffic(H.mrtg.slice(4)):H.mrtg==='all'||!I.ports[H.mrtg]?openMRTGIndex():openMRTG(H.mrtg),50);
   if(S.devices.length){if(!placeIfNeeded())requestAnimationFrame(()=>fitTo(devBox(),1))}else if(!H){stage.scrollLeft=PAD;stage.scrollTop=PAD;openWelcome(true)}}
 else if(!H){stage.scrollLeft=PAD;stage.scrollTop=PAD;openWelcome(true)}
 </script>

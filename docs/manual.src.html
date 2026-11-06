@@ -342,10 +342,12 @@ th{color:var(--ink2);font-weight:600;font-size:13px;white-space:nowrap}
 <p>監控服務每次輪詢都會把每個埠的流量存起來，整理成和 MRTG 一樣的四張圖。打開方式：</p>
 <ul>
 <li>監控網頁右上角的 <b>流量圖</b> 按鈕（畫面較窄時只顯示 📈 圖示）。</li>
+<li><b>看一台設備</b>：在畫布點設備，右側「即時狀態」卡片按 <b>這台設備的流量圖與狀態</b>，會列出這台設備的上下線、錯誤封包、最後輪詢時間，以及每個埠的流量圖；上方可切換每日、每週、每月、每年。</li>
 <li>點一個埠，在「即時流量」卡片最下面按 <b>MRTG 流量圖（日／週／月／年）</b>。</li>
 <li>netmap.exe「監控服務」分頁的 <b>流量圖（MRTG）</b> 按鈕。</li>
 <li>直接打開網址 <code>http://服務電腦IP:埠/#mrtg=all</code>，可以加到瀏覽器書籤，或放在大螢幕上。</li>
 </ul>
+<figure><img src="manual/devtraffic.jpg" alt="一台設備的流量圖與狀態" loading="lazy"><figcaption>設備的流量圖與狀態：上方是上下線、錯誤封包與最後輪詢時間，下面是每個埠的流量圖；按「日／週／月／年」看單一埠的四張圖。</figcaption></figure>
 <figure class="mid"><img src="manual/mrtg-index.jpg" alt="流量圖總覽" loading="lazy"><figcaption>流量圖總覽：每個埠最近 24 小時的小圖、最大值、平均進／出與使用率。點「最大」可依最忙的埠排序。</figcaption></figure>
 <p>總覽可以篩選設備或埠，預設隱藏沒有流量的埠。點任一列就會打開那個埠的四張圖：</p>
 <figure><img src="manual/mrtg-detail.jpg" alt="單一埠的 MRTG 流量圖" loading="lazy"><figcaption>單一埠的流量圖：綠色實心是流入，藍線是流出；紅色虛線是每天 0 點（週圖、月圖、年圖則是每天、每週、每月的開始），右下角紅色三角形代表現在。</figcaption></figure>

@@ -9,6 +9,7 @@ netmap 監控服務：在內網提供「機房線路對應圖」網頁，並定�
               GET  /api/history?port=..  埠的歷史流量（預設 24 小時）
               GET  /api/mrtg?port=..     MRTG 式流量圖資料（日／週／月／年）
               GET  /api/mrtg/summary     所有埠最近 24 小時的流量摘要
+              GET  /api/mrtg/device?id=..&view=day|week|month|year  一台設備所有埠的流量圖
 """
 import base64, http.server, json, os, re, socket, sqlite3, sys, threading, time, urllib.parse
 from concurrent.futures import ThreadPoolExecutor
@@ -22,7 +23,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.5.0"
+VERSION = "1.5.1"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -217,6 +218,20 @@ class Store:
                 spd = max([spd] + [r[5] or 0 for r in rows])
                 out[name] = {"res": res, "span": span, "points": [[r[0], r[1], r[2], r[3], r[4]] for r in rows]}
         return {"port": pid, "speed": spd, "now": now, "graphs": out}
+
+    def mrtg_device(s, dev_id, view="day"):
+        """一台設備所有埠的同一張圖（日／週／月／年）。"""
+        views = dict(MRTG_VIEWS); res_of = {n: r for (r, _k), (n, _s) in zip(ROLLUPS, MRTG_VIEWS)}
+        if view not in views: view = "day"
+        d = next((x for x in s.project.get("devices", []) if x.get("id") == dev_id), None)
+        if not d: return {"device": dev_id, "view": view, "ports": {}}
+        now = int(time.time()); res = res_of[view]; pids = [p["id"] for p in d.get("ports", [])]; out = {}
+        with s.lock:
+            for pid in pids:
+                rows = s.db.execute("SELECT ts, sin/n, sout/n, xin, xout, spd FROM rollup WHERE pid=? AND res=? AND ts>=? ORDER BY ts", (pid, res, now - views[view])).fetchall()
+                if rows:
+                    out[pid] = {"speed": max(r[5] or 0 for r in rows), "points": [[r[0], r[1], r[2], r[3], r[4]] for r in rows]}
+        return {"device": dev_id, "view": view, "res": res, "span": views[view], "now": now, "ports": out}
 
     def mrtg_summary(s):
         """所有埠最近 24 小時：平均／最大，以及 30 分鐘一點的小圖。"""
@@ -467,6 +482,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
             return s._send(200, {"port": pid, "points": st.history(pid, min(max(hours, 0.1), 24 * 31))})
         if u.path == "/api/mrtg":
             return s._send(200, st.mrtg((q.get("port") or [""])[0]))
+        if u.path == "/api/mrtg/device":
+            return s._send(200, st.mrtg_device((q.get("id") or [""])[0], (q.get("view") or ["day"])[0]))
         if u.path == "/api/mrtg/summary":
             return s._send(200, {"ports": st.mrtg_summary()})
         if u.path == "/api/ping": return s._send(200, {"ok": True, "version": VERSION})
