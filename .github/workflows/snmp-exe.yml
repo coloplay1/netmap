@@ -43,7 +43,8 @@ jobs:
           python -c "import time,tempfile,netmap_collect as C; ev=[]; lc=C.LogCollector(tempfile.mkdtemp(),on_event=lambda *a:ev.append(a),syslog_port=15514,trap_port=15162); print(lc.start()); C.send_test_syslog('127.0.0.1',15514); C.send_test_trap('127.0.0.1',15162); time.sleep(1.5); lc.stop(); print(ev); assert len(ev)==2; import paramiko; print('paramiko', paramiko.__version__)"
       - name: Self-test SSH monitor parsing
         working-directory: tools/netmap-snmp
-        run: python -c "import netmap_sshmon as m; c,si=m.parse_read('Inter-|\n face |\n  eth0: 100 1 0 0 0 0 0 0 200 2 0 0 0 0 0 0\n    lo: 5 1 0 0 0 0 0 0 5 1 0 0 0 0 0 0\n@@NETMAP@@\neth0 up 1000\nlo unknown\n'); print(c,si); assert c['eth0'][:2]==(100,200) and si['eth0']==(True,10**9); p=m.friendly_ports({'nv_wan0_ifname':'eth0'},c,si); print(p); assert p[0][1]=='WAN'"
+        run: |
+          python -c "import netmap_sshmon as m; c,si=m.parse_read('Inter-|\n face |\n  eth0: 100 1 0 0 0 0 0 0 200 2 0 0 0 0 0 0\n    lo: 5 1 0 0 0 0 0 0 5 1 0 0 0 0 0 0\n@@NETMAP@@\neth0 up 1000\nlo unknown\n'); print(c,si); assert c['eth0'][:2]==(100,200) and si['eth0']==(True,10**9); p=m.friendly_ports({'nv_wan0_ifname':'eth0'},c,si); print(p); assert p[0][1]=='WAN'"
       - name: Build netmap.exe (window app)
         working-directory: tools/netmap-snmp
         run: pyinstaller --onefile --windowed --name netmap --icon netmap.ico --collect-all pysnmp --add-data "web/index.html;web" --add-data "netmap.ico;." --add-data "netmap.png;." --add-data "oui.json.gz;." --hidden-import paramiko --hidden-import netmap_collect --hidden-import netmap_sshmon netmap_app.py
