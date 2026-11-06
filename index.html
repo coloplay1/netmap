@@ -753,6 +753,23 @@ svg.wires .flowarr{pointer-events:none}
 .cpop li .pc{margin-left:auto;flex:none;font-family:var(--f-mono);font-size:10.5px;font-weight:700;color:var(--ink);background:var(--soft);border:1px solid var(--line2);border-radius:999px;padding:1px 8px;white-space:nowrap}
 .cpop li .pc.none{color:var(--muted);font-family:inherit;font-weight:600;border-style:dashed;background:none}
 .cpop li .n>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis}
+
+/* ---- p21: bottom sheet, pinch ---- */
+.shandle,.speek{display:none}
+@media (max-width:900px){
+  #insp{max-height:82%;transition:transform .28s cubic-bezier(.2,.8,.2,1),max-height .28s}
+  #insp.sdrag{transition:none}
+  #insp .ihd{cursor:grab;touch-action:none;position:relative;padding-top:16px}
+  .shandle{display:block;position:absolute;left:50%;top:6px;width:40px;height:5px;margin-left:-20px;border-radius:3px;background:var(--line2)}
+  #insp.peek{max-height:none}
+  #insp.peek .ibody{display:none}
+  #insp.peek .speek{display:block;padding:0 16px 14px;cursor:pointer;touch-action:none}
+  .speek .pk{display:flex;flex-direction:column;gap:3px}
+  .speek .pk b{font-size:16px}
+  .speek .pk span{font-size:12.5px;color:var(--muted);line-height:1.45}
+  .speek .pkhint{margin-top:10px;font-size:12px;font-weight:700;color:var(--accent);text-align:center;padding:7px;border-radius:10px;background:var(--soft)}
+  #insp.open.peek~*{}
+}
 </style>
 </head>
 <body>
@@ -788,7 +805,7 @@ svg.wires .flowarr{pointer-events:none}
           </div></div>
       </div>
       <div class="drow">
-        <div class="dgrp"><button id="zOut" title="縮小" aria-label="縮小">−</button><button id="zReset" title="回到 100%" class="zr">100%</button><button id="zIn" title="放大" aria-label="放大">+</button><button id="zFit" title="全覽：顯示全部設備" aria-label="全覽"><svg class="i" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>
+        <div class="dgrp"><button id="zOut" title="縮小" aria-label="縮小">−</button><button id="zReset" title="回到 100%" class="zr">100%</button><button id="zIn" title="放大" aria-label="放大">+</button><button id="zFit" title="回到預設位置：所有設備置中（快捷鍵 0）" aria-label="回到預設位置"><svg class="i" viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 9.8V20h4.5v-5.5h4V20h4.5V9.8"/></svg></button></div>
         <div class="dgrp"><button id="bUndo" title="復原 (Ctrl+Z)" aria-label="復原"><svg class="i" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button><button id="bRedo" title="重做 (Ctrl+Y)" aria-label="重做"><svg class="i" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button></div>
         <button class="dgrp qbtn ctxtog" id="bCtx" aria-pressed="true" title="屬性列：選取埠或線時顯示的快速設定列（點一下開 / 關）" aria-label="屬性列開關"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/><path d="M7 12h4M14.5 12h2.5"/></svg></button>
         <div class="popwrap"><button class="dgrp qbtn" data-popbtn="popHelp" aria-expanded="false" title="操作說明與快捷鍵" aria-label="操作說明">?</button>
@@ -809,7 +826,7 @@ svg.wires .flowarr{pointer-events:none}
   </div>
   <div class="rack-view" id="rackView" hidden></div>
   <div class="table-view" id="tableView" hidden></div>
-  <aside class="insp fl" id="insp" aria-label="設備屬性"><div class="ihd"><b id="inspTitle"></b><button class="x" id="inspClose" aria-label="關閉">×</button></div><div class="ibody" id="inspBody"></div></aside>
+  <aside class="insp fl" id="insp" aria-label="設備屬性"><div class="ihd"><span class="shandle" aria-hidden="true"></span><b id="inspTitle"></b><button class="x" id="inspClose" aria-label="關閉">×</button></div><div class="speek" id="inspPeek"></div><div class="ibody" id="inspBody"></div></aside>
 </div>
 <header class="top fl">
   <div class="tleft">
@@ -1671,8 +1688,15 @@ function renderInsp(){const box=$('insp'),el=$('inspBody');const s=ui.sel;I=I||i
   else if(s.cable){inspCable(el,S.cables.find(x=>x.id===s.cable));title='線材詳細'}
   box.inert=false;
   $('inspTitle').innerHTML=title;box.classList.add('open');document.body.classList.add('insp-open');
+  if(ui.sheetKey!==selKey()){ui.sheetKey=selKey();ui.sheet=ui.detail===selKey()?'full':'peek'}
+  box.classList.toggle('peek',ui.sheet!=='full');$('inspPeek').innerHTML=peekHTML(s);
   if(ui.ro)el.querySelectorAll('input,select,textarea,button').forEach(x=>{if(!x.hasAttribute('data-nav'))x.disabled=true});
 }
+function peekHTML(s){I=I||idx();let a='',b='';
+  if(s.dev){const d=S.devices.find(x=>x.id===s.dev);if(!d)return'';const used=d.ports.filter(p=>I.cab[p.id]).length;a=d.name;b=[typeName(d),[d.brand,d.model].filter(Boolean).join(' '),d.ip,`已接 ${used}/${d.ports.length} 埠`].filter(Boolean).join(' · ')}
+  else if(s.port){const p=I.ports[s.port],d=I.owner[s.port];if(!p)return'';a=`${d.name} · 埠 ${p.label}`;const c=I.cab[p.id];b=c?`線 ${c.label||''} ${c.type||''}`:'未接線'}
+  else if(s.cable){const c=S.cables.find(x=>x.id===s.cable);if(!c)return'';a=`線 ${c.label||''}`;b=[c.type,c.speed,c.len?c.len+' m':''].filter(Boolean).join(' · ')}
+  return`<div class="pk"><b>${esc(a)}</b><span>${esc(b)}</span></div><div class="pkhint">⌃ 往上拉或點這裡，展開設定</div>`}
 function inspDev(el,d){const T=TYPES[d.type];const ls=layersOf(d);const used=d.ports.filter(p=>I.cab[p.id]).length;
   el.style.setProperty('--tc',tc(d.type));
   const info=T.variants?T.variants[d.variant]:T;
@@ -2122,7 +2146,8 @@ stage.addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDe
 /* ---------- toolbar ---------- */
 function setZoom(z,at){const z0=ui.zoom,nz=Math.min(1.6,Math.max(.35,z));const ax=at?at.x:stage.clientWidth/2,ay=at?at.y:stage.clientHeight/2;const cx=(stage.scrollLeft+ax-PAD)/z0,cy=(stage.scrollTop+ay-PAD)/z0;
   ui.zoom=nz;sizeStage();stage.scrollLeft=PAD+cx*nz-ax;stage.scrollTop=PAD+cy*nz-ay;drawWires()}
-$('zIn').onclick=()=>setZoom(ui.zoom+.1);$('zOut').onclick=()=>setZoom(ui.zoom-.1);$('zReset').onclick=()=>setZoom(1);$('zFit').onclick=()=>{if(ui.view!=='map')setView('map');fitTo(devBox(),1)};
+$('zIn').onclick=()=>setZoom(ui.zoom+.1);$('zOut').onclick=()=>setZoom(ui.zoom-.1);$('zReset').onclick=()=>setZoom(1);function goHome(){if(ui.view!=='map')setView('map');if(S.devices.length)fitTo(devBox(),1);else{setZoom(1);stage.scrollTo({left:PAD,top:PAD,behavior:'smooth'})}}
+$('zFit').onclick=goHome;
 $('bUndo').onclick=undo;$('bRedo').onclick=redo;
 $('bLayout').onclick=()=>{if(!canEdit()||!S.devices.length)return;snap();if(ui.view!=='map')setView('map');autoLayout();padLayout();save();renderAll();fitTo(devBox(),1);toast('已自動排列',true)};
 $('allIcon').onclick=()=>setAllView('icon');$('allPorts').onclick=()=>setAllView('ports');
@@ -2195,6 +2220,10 @@ document.addEventListener('keydown',e=>{const typing=/INPUT|TEXTAREA|SELECT/.tes
   if(e.key==='Escape'&&!$('addmenu').hidden){$('addmenu').hidden=true;return}
   if((e.ctrlKey||e.metaKey)&&!typing&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?redo():undo();return}
   if((e.ctrlKey||e.metaKey)&&!typing&&e.key.toLowerCase()==='y'){e.preventDefault();redo();return}
+  if(!typing&&ui.view==='map'&&!$('modalRoot').innerHTML&&!e.altKey){
+    if((e.key==='+'||e.key==='=')){e.preventDefault();setZoom(ui.zoom*1.15);return}
+    if(e.key==='-'||e.key==='_'){e.preventDefault();setZoom(ui.zoom/1.15);return}
+    if(e.key==='0'&&!e.ctrlKey&&!e.metaKey){e.preventDefault();goHome();return}}
   if(e.key==='Escape'){if(link){link=null;endLinkUI();renderAll();return}if($('modalRoot').innerHTML){closeModal();return}if(typing){document.activeElement.blur();return}ui.pending=null;ui.sel=null;ui.multi.clear();renderAll();return}
   if((e.key==='Delete'||e.key==='Backspace')&&!typing&&ui.sel&&!ui.ro){e.preventDefault();const s=ui.sel;
     if(s.dev)delDev(s.dev);else if(s.cable)delCable(s.cable);else if(s.port&&I.cab[s.port])delCable(I.cab[s.port].id)}
@@ -2224,6 +2253,24 @@ document.addEventListener('pointermove',e=>{if(!pd)return;pd.el.style.left=pd.ox
 document.addEventListener('pointerup',()=>{if(!pd)return;const P=pd;pd=null;P.el.classList.remove('moving');const c=clampPanel(P.el);Object.assign(pstate(P.id),c);savePrefs();placePanel(P.id)});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-pcol]');if(!b)return;const p=pstate(b.dataset.pcol);p.col=!p.col;savePrefs();placePanel(b.dataset.pcol)});
 $('popPanels').addEventListener('change',e=>{const t=e.target;if(t.dataset.ptog){pstate(t.dataset.ptog).hide=!t.checked;savePrefs();placePanel(t.dataset.ptog)}if(t.id==='autoDrawer'){prefs.autoDrawer=t.checked;savePrefs();renderInsp()}});
+/* mobile bottom sheet: peek card, drag the header up to edit, down to shrink / close */
+const isSheet=()=>matchMedia('(max-width:900px)').matches;
+function setSheet(st){if(st==='close'){ui.sel=null;ui.detail=null;ui.multi.clear();renderAll();return}ui.sheet=st;$('insp').classList.toggle('peek',st!=='full')}
+let sh=null;
+['ihd','inspPeek'].forEach(id=>{const el=id==='ihd'?$('insp').querySelector('.ihd'):$(id);
+  el.addEventListener('pointerdown',e=>{if(!isSheet()||e.target.closest('#inspClose'))return;sh={y:e.clientY,dy:0,id:e.pointerId};$('insp').classList.add('sdrag');el.setPointerCapture&&el.setPointerCapture(e.pointerId)});
+  el.addEventListener('pointermove',e=>{if(!sh||e.pointerId!==sh.id)return;sh.dy=e.clientY-sh.y;$('insp').style.transform=`translateY(${Math.max(-40,sh.dy)}px)`});
+  const end=()=>{if(!sh)return;const dy=sh.dy;sh=null;const b=$('insp');b.classList.remove('sdrag');b.style.transform='';
+    if(dy<-30)setSheet('full');else if(dy>50)setSheet(ui.sheet==='full'?'peek':'close');else if(Math.abs(dy)<6)setSheet(ui.sheet==='full'?'peek':'full')};
+  el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end)});
+/* touch: two-finger pinch zoom + pan on the canvas */
+let pinch=null;
+const two=e=>{const r=stage.getBoundingClientRect(),[a,b]=[e.touches[0],e.touches[1]];return{d:Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)||1,m:{x:(a.clientX+b.clientX)/2-r.left,y:(a.clientY+b.clientY)/2-r.top}}};
+stage.addEventListener('touchstart',e=>{if(e.touches.length===2){const t=two(e);pinch={d:t.d,z:ui.zoom,m:t.m};document.dispatchEvent(new Event('pointercancel'))}},{passive:true,capture:true});
+stage.addEventListener('touchmove',e=>{if(!pinch||e.touches.length<2)return;e.preventDefault();const t=two(e);
+  setZoom(pinch.z*t.d/pinch.d,t.m);stage.scrollLeft-=t.m.x-pinch.m.x;stage.scrollTop-=t.m.y-pinch.m.y;pinch.m=t.m},{passive:false,capture:true});
+stage.addEventListener('touchend',e=>{if(e.touches.length<2)pinch=null},{capture:true});stage.addEventListener('touchcancel',()=>{pinch=null},{capture:true});
+document.addEventListener('gesturestart',e=>e.preventDefault());
 function syncCtxBtn(){$('bCtx').setAttribute('aria-pressed',prefs.ctxOn!==false)}
 $('bCtx').onclick=()=>{prefs.ctxOn=prefs.ctxOn===false;savePrefs();syncCtxBtn();renderCtx();toast(prefs.ctxOn?'屬性列已開啟：點埠或線就會出現':'屬性列已關閉，可從右下角再開啟；也能按「詳細」或雙擊開啟屬性面板')};
 syncCtxBtn();
