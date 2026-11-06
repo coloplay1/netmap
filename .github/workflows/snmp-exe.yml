@@ -35,7 +35,7 @@ jobs:
         shell: pwsh
         working-directory: tools/netmap-snmp
         run: |
-          python -c "import os,tempfile,json,urllib.request,time; import netmap_server as S; st=S.Store(tempfile.mkdtemp()); st.settings['port']=18765; sv=S.Service(st,log=print); sv.start(); time.sleep(1); print(json.load(urllib.request.urlopen('http://127.0.0.1:18765/api/ping'))); html=urllib.request.urlopen('http://127.0.0.1:18765/').read().decode('utf-8'); assert 'NETMAP_SERVER' in html; print('protect roundtrip', S.unprotect(S.protect('secret'))=='secret'); sv.stop()"
+          python -c "import os,tempfile,json,urllib.request,time; import netmap_server as S; st=S.Store(tempfile.mkdtemp()); st.settings['port']=18765; sv=S.Service(st,log=print); sv.start(); time.sleep(1); print(json.load(urllib.request.urlopen('http://127.0.0.1:18765/api/ping'))); html=urllib.request.urlopen('http://127.0.0.1:18765/').read().decode('utf-8'); assert 'NETMAP_SERVER' in html; print('protect roundtrip', S.unprotect(S.protect('secret'))=='secret'); t=int(time.time()); st.add_samples([(t-600,'p1',1e6,2e5,1,0,0),(t-300,'p1',3e6,4e5,1,0,0)],{'p1':1e9}); m=json.load(urllib.request.urlopen('http://127.0.0.1:18765/api/mrtg?port=p1')); print('mrtg', {k:len(v['points']) for k,v in m['graphs'].items()}); assert len(m['graphs']['day']['points'])==2 and m['speed']==1e9; print(json.load(urllib.request.urlopen('http://127.0.0.1:18765/api/mrtg/summary'))['ports'].keys()); sv.stop()"
       - name: Self-test log collector
         shell: pwsh
         working-directory: tools/netmap-snmp

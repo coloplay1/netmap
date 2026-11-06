@@ -846,6 +846,45 @@ svg.wires .cab.fst-bad .vis,svg.wires .cab.fst-bad .halo{stroke:var(--bad)!impor
 .snmpget{font-size:12.5px;line-height:1.65;color:var(--muted);background:var(--soft);border-radius:12px;padding:10px 12px;margin-bottom:12px}.snmpget b{color:var(--ink);margin-right:6px}
 
 /* ---- p24: live monitoring ---- */
+/* ---------- MRTG 流量圖 ---------- */
+body:not(.light){--mg-in:#22c55e;--mg-in-a:rgba(34,197,94,.45);--mg-out:#60a5fa;--mg-pin:#bbf7d0;--mg-pout:#f0abfc}
+:root{--mg-in:#16a34a;--mg-in-a:rgba(22,163,74,.55);--mg-out:#2563eb;--mg-pin:#065f46;--mg-pout:#c026d3;--mg-mid:#ef4444}
+.modal .mcard.mrtgm{width:min(1000px,100%)}
+.mghead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.mghead h2{margin:0}.mghead .sp{flex:1}
+.mgsub{color:var(--muted);font-size:13px;margin:0 0 10px}
+.mgtog{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer}
+.mggraph{border:1px solid var(--line);border-radius:12px;padding:10px 12px 8px;margin:10px 0;background:var(--panel)}
+.mggraph h3{font-size:14px;margin:0 0 4px;display:flex;gap:8px;align-items:baseline}.mggraph h3 small{color:var(--muted);font-weight:500}
+.mgsvg{width:100%;height:auto;display:block}
+.mgsvg .grid{stroke:var(--line);stroke-width:1}
+.mgsvg .axis{fill:var(--muted);font:10.5px "JetBrains Mono",Consolas,monospace}
+.mgsvg .ain{fill:var(--mg-in-a);stroke:var(--mg-in);stroke-width:1}
+.mgsvg .lout{fill:none;stroke:var(--mg-out);stroke-width:1.6}
+.mgsvg .pin{fill:none;stroke:var(--mg-pin);stroke-width:1}
+.mgsvg .pout{fill:none;stroke:var(--mg-pout);stroke-width:1}
+.mgsvg .mid{stroke:var(--mg-mid);stroke-width:1;stroke-dasharray:3 3;opacity:.8}
+.mgsvg .now{fill:var(--mg-mid)}
+.mgstat{display:grid;grid-template-columns:auto repeat(3,minmax(0,1fr));gap:2px 14px;font-size:12.5px;margin-top:4px;font-variant-numeric:tabular-nums}
+.mgstat b{font-weight:600}.mgstat .k{color:var(--muted)}
+.mgstat i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.mgstat .ki{background:var(--mg-in)}.mgstat .ko{background:var(--mg-out)}
+.mgempty{padding:18px;text-align:center;color:var(--muted);font-size:13px}
+.mglist{max-height:min(62vh,640px);overflow:auto;border:1px solid var(--line);border-radius:12px}
+.mglist table{width:100%;min-width:0;border-collapse:collapse;font-size:13px}
+.mglist th{position:sticky;top:0;background:var(--panel);text-align:left;color:var(--muted);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;cursor:pointer}
+.mglist td{padding:6px 10px;border-bottom:1px solid var(--line);white-space:nowrap;font-variant-numeric:tabular-nums}
+.mglist tr[data-mgp]{cursor:pointer}.mglist tr[data-mgp]:hover td{background:var(--soft)}
+.mglist .dv{font-weight:700}.mglist .sub{color:var(--muted);font-size:12px}
+.mgspark{width:150px;height:30px;display:block}
+.mgbar{display:inline-block;width:46px;height:6px;border-radius:3px;background:var(--soft);vertical-align:middle;margin-right:6px;overflow:hidden}.mgbar i{display:block;height:100%;background:var(--mg-in)}
+.mgtools{display:flex;gap:8px;align-items:center;margin:4px 0 10px;flex-wrap:wrap}
+.mgtools input[type=text],.mgtools input:not([type]){flex:1;min-width:160px;height:34px;border:1px solid var(--line);background:var(--soft);color:var(--ink);border-radius:10px;padding:0 12px;font:inherit;font-size:13px;outline:none}.mgtools input:not([type]):focus{border-color:var(--accent,#3b82f6)}
+.livebtn{height:30px;padding:0 10px;border-radius:999px;border:1px solid var(--line);background:var(--soft);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.livebtn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.lcmrtg{margin-top:8px;width:100%;justify-content:center}
+.livebtn .lt{display:inline}@media (max-width:1520px){#bMrtg{width:30px;padding:0;justify-content:center}#bMrtg .lt{display:none}.livechip b{display:none}}
+@media (max-width:640px){.mgstat{grid-template-columns:auto 1fr 1fr;font-size:12px}.mgstat .cur{display:none}.mgspark{width:84px}.mglist .hide-s{display:none}.mglist td,.mglist th{padding:6px 8px}.mglist td:first-child{white-space:normal;min-width:84px}}
 .livechip{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:700;background:var(--soft);color:var(--muted);white-space:nowrap;cursor:default}
 .livechip i{width:8px;height:8px;border-radius:50%;background:var(--muted)}
 .livechip b{font-family:var(--f-mono);font-weight:600;color:var(--ink)}
@@ -966,7 +1005,7 @@ svg.wires .cab.lv-down .vis{stroke:var(--danger)!important;stroke-dasharray:3 6!
   <div class="tmid">
     <label class="searchbox"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg><input class="search" id="q" type="search" placeholder="搜尋設備、IP 或線號…" aria-label="搜尋"><span class="qcount" id="qcount" hidden><span id="qn"></span><button type="button" id="qfocus">對焦</button></span></label>
   </div>
-  <div class="tright"><span class="livechip" id="liveChip" hidden></span>
+  <div class="tright"><span class="livechip" id="liveChip" hidden></span><button class="livebtn" id="bMrtg" hidden title="MRTG 流量圖：每個埠的日／週／月／年流量" aria-label="流量圖"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg><span class="lt">流量圖</span></button>
     <div class="seg modeseg" role="group" aria-label="模式"><button id="mEdit" aria-pressed="true" title="可以接線、移動、修改"><i class="dot"></i>編輯</button><button id="mRo" aria-pressed="false" title="只能查線，不會誤觸拔線"><svg class="i" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>唯讀</button></div>
     <div class="popwrap"><button class="ibtn" data-popbtn="popPanels" aria-expanded="false" title="面板：顯示、收合、重設位置" aria-label="面板設定"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 4v16M3 15h5"/></svg></button>
       <div class="pop" id="popPanels" hidden><span class="label">顯示的面板</span><div class="togs" id="panelToggles" style="grid-template-columns:1fr"></div><span class="label">屬性面板</span><label class="tog"><input type="checkbox" id="autoDrawer">點設備時自動開啟</label><p class="hint">拖曳面板上的 ⋮⋮ 可以移動位置，按 – 收合。</p><button class="btn sm" id="panelReset">重設所有面板位置</button></div></div>
@@ -1264,8 +1303,9 @@ const KEY='netmap-v2', OLDKEY='netmap-v1', PREFKEY='netmap-prefs';
 const PUBLIC_URL='https://coloplay1.github.io/netmap/';
 const MANUAL_URL=PUBLIC_URL+'manual.html';
 /* 版本紀錄：最新在最前面。exe = netmap.exe 的版本 */
-const APP_VERSION='2.4',EXE_VERSION='1.3.1';
+const APP_VERSION='2.5',EXE_VERSION='1.4.0';
 const CHANGELOG=[
+ {v:'2.5',exe:'1.4.0',d:'2026-11-06',t:'MRTG 流量圖',i:['每個埠都有 MRTG 式的每日（5 分鐘）、每週（30 分鐘）、每月（2 小時）、每年（1 天）流量圖，列出最大／平均／目前值與使用率','流量圖總覽：所有埠最近 24 小時的小圖，可依最忙排序、篩選','可切換 bps／使用率 %、顯示尖峰，並匯出 CSV；流量圖資料保存約 2 年']},
  {v:'2.4',exe:'1.3.1',d:'2026-11-06',t:'版本資訊與使用手冊',i:['首頁顯示目前版本、更新內容與最新的 netmap.exe 下載','新增詳細的線上使用手冊（附畫面截圖）','netmap.exe 會自動檢查是否有新版本']},
  {v:'2.3',exe:'1.3.0',d:'2026-11-06',t:'收集樣本',i:['netmap.exe 新增「收集樣本」分頁：暫時當 Syslog／SNMP Trap 接收器，存成樣本檔','SSH 登入紀錄：自動處理 --More-- 與 enable，密碼、community、金鑰自動遮蔽']},
  {v:'2.2',exe:'1.2.1',d:'2026-11-06',t:'網段探索、掃完直接開網頁',i:['網段探索：不需要 SNMP，用 ping 與 ARP 列出在線設備、廠牌與種類（家用網路也能用）','SNMP 沒回應時自動診斷是「沒開 SNMP」還是「連不到」','掃描完成自動帶入網頁；關閉程式改為清楚的「結束程式／縮到工作列」']},
@@ -2225,7 +2265,7 @@ function openSNMP(){modal(`<h2>SNMP 掃描與即時監控</h2><p class="hint">�
   <div class="snmpget"><b>會讀到</b>設備名稱、廠牌型號、序號、每個網路埠、LLDP / CDP 連線、VLAN（PVID / Trunk）、PoE、LACP，以及從 MAC 表 + ARP 推斷的終端設備與 IP。<br><b>需要手動補</b>配線架、資訊座等被動元件（不會回應 SNMP），以及終端設備的名稱。</div>
   <div class="actions"><button class="btn primary" id="sImp">匯入掃描結果 .json</button><button class="btn" data-close style="margin-left:auto">關閉</button></div>`,true);
   $('sImp').onclick=()=>{closeModal();$('fileIn').click()}}
-function closeModal(){$('modalRoot').innerHTML=''}
+function closeModal(){$('modalRoot').innerHTML='';if(ui.mrtg){ui.mrtg=null;setMgHash(null)}}
 
 /* ---------- pointer interactions ---------- */
 let lastDev={};
@@ -2586,7 +2626,8 @@ function liveCardHTML(pid){const L=livePort(pid);if(!SRV)return'';
   return`<div class="card livecard" data-livepid="${pid}"><span class="label">即時流量 <small>${L.up===false?'<b class="c-bad">離線</b>':L.up?'<b class="c-ok">上線</b>':''}</small></span>
     <div class="lnums"><div><small>下載（進）</small><b>${fmtBps(L.in)}</b></div><div><small>上傳（出）</small><b>${fmtBps(L.out)}</b></div><div><small>使用率</small><b>${L.util==null?'—':Math.round(L.util*100)+'%'}</b></div><div><small>速率</small><b>${L.speed?fmtBps(L.speed):'—'}</b></div></div>
     ${(L.ie||L.oe)?`<p class="lerr">⚠ 這次輪詢有錯誤封包：進 ${L.ie}、出 ${L.oe}</p>`:''}
-    <div class="lchart" id="lchart-${pid}"><span class="hint">載入 24 小時紀錄…</span></div></div>`}
+    <div class="lchart" id="lchart-${pid}"><span class="hint">載入 24 小時紀錄…</span></div>
+    <button class="livebtn lcmrtg" data-mrtg="${pid}"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg>MRTG 流量圖（日／週／月／年）</button></div>`}
 async function loadChart(pid){const box=document.getElementById('lchart-'+pid);if(!box)return;
   try{const j=await (await fetch('/api/history?port='+encodeURIComponent(pid)+'&hours=24',{cache:'no-store'})).json();const P=j.points||[];
     if(P.length<2){box.innerHTML='<span class="hint">紀錄還不夠，幾次輪詢後就會出現曲線。</span>';return}
@@ -2598,6 +2639,90 @@ async function loadChart(pid){const box=document.getElementById('lchart-'+pid);i
     box.innerHTML=`<svg viewBox="0 0 ${W} ${Hh}" class="lsvg" role="img" aria-label="24 小時流量">${downs}<path d="${line(1)}" class="lin"/><path d="${line(2)}" class="lout"/></svg>
       <div class="laxis"><span>${tl(t0)}</span><span class="lk"><i class="lin"></i>進 <i class="lout"></i>出　最高 ${fmtBps(mx)}bps</span><span>${tl(t1)}</span></div>`}
   catch(e){box.innerHTML='<span class="hint">讀不到紀錄</span>'}}
+/* ======================= MRTG 流量圖 ======================= */
+const MG_VIEWS=[['day','每日圖','5 分鐘平均'],['week','每週圖','30 分鐘平均'],['month','每月圖','2 小時平均'],['year','每年圖','1 天平均']];
+const fmtRate=v=>v==null?'—':fmtBps(v)+'b/s';
+const pctOf=(v,sp)=>sp&&v!=null?` (${(v/sp*100).toFixed(1)}%)`:'';
+function niceMax(v){if(!(v>0))return 1000;const e=Math.pow(10,Math.floor(Math.log10(v))),f=v/e;return(f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*e}
+function mgPortName(pid){const d=I.owner[pid];return d?`${d.name} · 埠 ${pshort(pid)}`:pid}
+function mgSVG(g,now,peak,unit,speed,W=720){
+  const H=W<520?170:190,L=W<520?44:58,R=12,T=10,B=24,pw=W-L-R,ph=H-T-B,P=g.points||[],t1=now,t0=now-g.span;
+  if(P.length<2)return`<div class="mgempty">這段時間還沒有足夠的紀錄${g.res>=7200?'，資料累積幾天後就會出現':''}。</div>`;
+  const pc=unit==='pct'&&speed;const val=v=>v==null?0:pc?v/speed*100:v;
+  let mx=0;P.forEach(p=>{mx=Math.max(mx,val(p[1]),val(p[2]),peak?val(p[3]):0,peak?val(p[4]):0)});
+  const top=pc?Math.max(20,Math.min(100,Math.ceil(mx/20)*20)):niceMax(mx);
+  const X=t=>L+(t-t0)/(t1-t0)*pw,Y=v=>T+ph-Math.min(1,val(v)/top)*ph;
+  /* split into runs where no point is missing */
+  const runs=[];let cur=[];P.forEach((p,i)=>{if(i&&p[0]-P[i-1][0]>g.res*2.5){if(cur.length)runs.push(cur);cur=[]}cur.push(p)});if(cur.length)runs.push(cur);
+  const half=g.res/2;
+  const area=runs.map(r=>{const pts=r.map(p=>`${X(p[0]+half).toFixed(1)},${Y(p[1]).toFixed(1)}`);return`M${X(r[0][0]+half).toFixed(1)},${T+ph}L${pts.join('L')}L${X(r[r.length-1][0]+half).toFixed(1)},${T+ph}Z`}).join('');
+  const line=k=>runs.map(r=>'M'+r.map(p=>`${X(p[0]+half).toFixed(1)},${Y(p[k]).toFixed(1)}`).join('L')).join('');
+  let grid='';for(let i=0;i<=4;i++){const y=T+ph-ph*i/4,v=top*i/4;grid+=`<line class="grid" x1="${L}" x2="${W-R}" y1="${y}" y2="${y}"/><text class="axis" x="${L-6}" y="${y+3.5}" text-anchor="end">${pc?Math.round(v)+'%':fmtBps(v)+(i?'':'')}</text>`}
+  /* time ticks */
+  const d0=new Date(t0*1000);let ticks=[],mids=[];
+  if(g.span<=2*86400){const s=new Date(d0);s.setMinutes(0,0,0);for(let t=s.getTime()/1000;t<=t1;t+=3600){const h=new Date(t*1000).getHours();if(t<t0)continue;if(h%2===0)ticks.push([t,String(h).padStart(2,'0')]);if(h===0)mids.push(t)}}
+  else if(g.span<=10*86400){const s=new Date(d0);s.setHours(0,0,0,0);for(let t=s.getTime()/1000;t<=t1;t+=86400){if(t<t0)continue;const d=new Date(t*1000);ticks.push([t+43200,'日一二三四五六'[d.getDay()]]);mids.push(t)}}
+  else if(g.span<=40*86400){const s=new Date(d0);s.setHours(0,0,0,0);s.setDate(s.getDate()-((s.getDay()+6)%7));for(let t=s.getTime()/1000;t<=t1;t+=7*86400){if(t<t0)continue;const d=new Date(t*1000);ticks.push([t,`${d.getMonth()+1}/${d.getDate()}`]);mids.push(t)}}
+  else{const s=new Date(d0);s.setDate(1);s.setHours(0,0,0,0);while(s.getTime()/1000<=t1){const t=s.getTime()/1000;if(t>=t0){ticks.push([t+15*86400,(s.getMonth()+1)+'月']);mids.push(t)}s.setMonth(s.getMonth()+1)}}
+  const tf=ticks.filter(([t])=>t>=t0&&t<=t1),gap=tf.length>1?(X(tf[1][0])-X(tf[0][0])):99,skip=Math.max(1,Math.ceil(30/gap));
+  const tk=tf.filter((_,i)=>i%skip===0).map(([t,l])=>`<line class="grid" x1="${X(t)}" x2="${X(t)}" y1="${T}" y2="${T+ph}" opacity=".55"/><text class="axis" x="${X(t)}" y="${H-7}" text-anchor="middle">${l}</text>`).join('');
+  const md=mids.map(t=>`<line class="mid" x1="${X(t)}" x2="${X(t)}" y1="${T}" y2="${T+ph}"/>`).join('');
+  return`<svg class="mgsvg" viewBox="0 0 ${W} ${H}" role="img" aria-label="流量圖">${grid}${tk}${md}<path class="ain" d="${area}"/>${peak?`<path class="pin" d="${line(3)}"/><path class="pout" d="${line(4)}"/>`:''}<path class="lout" d="${line(2)}"/><path class="now" d="M${W-R},${T+ph+1}l-5,7h10z"/><line class="grid" x1="${L}" x2="${L}" y1="${T}" y2="${T+ph}"/></svg>`}
+function mgStats(g,speed){const P=(g.points||[]).filter(p=>p[1]!=null);if(!P.length)return'';
+  const st=k=>{const v=P.map(p=>p[k]||0);return{max:Math.max(...v),avg:v.reduce((a,b)=>a+b,0)/v.length,cur:v[v.length-1]}};const a=st(1),b=st(2);
+  const row=(n,c,s)=>`<span><i class="${c}"></i>${n}</span><span><span class="k">最大 </span><b>${fmtRate(s.max)}</b>${pctOf(s.max,speed)}</span><span><span class="k">平均 </span><b>${fmtRate(s.avg)}</b>${pctOf(s.avg,speed)}</span><span class="cur"><span class="k">目前 </span><b>${fmtRate(s.cur)}</b>${pctOf(s.cur,speed)}</span>`;
+  return`<div class="mgstat">${row('流入','ki',a)}${row('流出','ko',b)}</div>`}
+async function openMRTG(pid){ui.mrtg=pid;setMgHash(pid);
+  const peak=!!prefs.mgPeak,unit=prefs.mgUnit||'bps';
+  modal(`<div class="mghead"><button class="btn sm" id="mgBack" title="所有埠">‹ 所有埠</button><h2>${esc(mgPortName(pid))}</h2><span class="sp"></span>
+    <label class="mgtog"><input type="checkbox" id="mgPeak"${peak?' checked':''}>顯示尖峰</label>
+    <div class="seg" role="group" aria-label="單位"><button data-mgu="bps" aria-pressed="${unit==='bps'}">bps</button><button data-mgu="pct" aria-pressed="${unit==='pct'}">使用率 %</button></div></div>
+    <p class="mgsub" id="mgSub">載入中…</p><div id="mgBody"></div>
+    <div class="actions"><button class="btn" id="mgCsv">匯出 CSV</button><button class="btn" data-close style="margin-left:auto">關閉</button></div>`,true);
+  $('mod').querySelector('.mcard').classList.add('mrtgm');
+  const close=$('mod').onclick;$('mod').onclick=e=>{if(e.target.id==='mod'||e.target.closest('[data-close]')){ui.mrtg=null;setMgHash(null)}close(e)};
+  $('mgBack').onclick=()=>openMRTGIndex();
+  let j;try{j=await (await fetch('/api/mrtg?port='+encodeURIComponent(pid),{cache:'no-store'})).json()}catch(e){$('mgSub').textContent='讀不到監控服務的紀錄';return}
+  if(ui.mrtg!==pid||!$('mgBody'))return;
+  const L=livePort(pid),speed=j.speed||(L&&L.speed)||0;
+  const draw=()=>{const pk=!!prefs.mgPeak,un=prefs.mgUnit||'bps',gw=Math.round(Math.max(330,Math.min(900,($('mgBody').clientWidth||720)-26)));
+    $('mgSub').innerHTML=`介面速率 ${speed?fmtRate(speed):'未知'}　·　流入／流出以這個埠為準（流入＝從對端送進這個埠）　·　更新於 ${new Date(j.now*1000).toLocaleTimeString('zh-TW',{hour12:false})}${un==='pct'&&!speed?'　·　<b>不知道速率，改用 bps 顯示</b>':''}`;
+    $('mgBody').innerHTML=MG_VIEWS.map(([k,t,r])=>{const g=j.graphs[k]||{points:[],span:86400,res:300};return`<div class="mggraph"><h3>${t}<small>${r}</small></h3>${mgSVG(g,j.now,pk,un,speed,gw)}${mgStats(g,speed)}</div>`}).join('')};
+  draw();
+  $('mgPeak').onchange=e=>{prefs.mgPeak=e.target.checked;savePrefs();draw()};
+  $('mod').querySelectorAll('[data-mgu]').forEach(b=>b.onclick=()=>{prefs.mgUnit=b.dataset.mgu;savePrefs();$('mod').querySelectorAll('[data-mgu]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));draw()});
+  $('mgCsv').onclick=()=>{const rows=[['圖','時間','平均流入 bps','平均流出 bps','最大流入 bps','最大流出 bps']];
+    MG_VIEWS.forEach(([k,t])=>(j.graphs[k].points||[]).forEach(p=>rows.push([t,new Date(p[0]*1000).toLocaleString('zh-TW',{hour12:false}),...p.slice(1).map(v=>v==null?'':Math.round(v))])));
+    download(`流量-${mgPortName(pid).replace(/[\\/:*?"<>| ·]+/g,'_')}.csv`,'text/csv','﻿'+rows.map(r=>r.map(x=>/[",\n]/.test(String(x))?`"${String(x).replace(/"/g,'""')}"`:x).join(',')).join('\n'))}}
+function mgSpark(sp,speed){if(!sp||sp.length<2)return'<span class="sub">—</span>';const W=150,H=30,t0=sp[0][0],t1=sp[sp.length-1][0]||t0+1,mx=Math.max(speed?speed*.02:1,...sp.map(p=>Math.max(p[1],p[2])));
+  const X=t=>(t-t0)/(t1-t0)*W,Y=v=>H-1-v/mx*(H-3);
+  return`<svg class="mgspark mgsvg" viewBox="0 0 ${W} ${H}"><path class="ain" d="M0,${H}L${sp.map(p=>X(p[0]).toFixed(1)+','+Y(p[1]).toFixed(1)).join('L')}L${W},${H}Z"/><path class="lout" d="M${sp.map(p=>X(p[0]).toFixed(1)+','+Y(p[2]).toFixed(1)).join('L')}"/></svg>`}
+async function openMRTGIndex(){ui.mrtg='all';setMgHash('all');
+  modal(`<div class="mghead"><h2>流量圖</h2><span class="sp"></span><span class="mgsub" style="margin:0">最近 24 小時 · 點一列看日／週／月／年圖</span></div>
+    <div class="mgtools"><input id="mgQ" placeholder="篩選設備或埠…" autocomplete="off"><label class="mgtog"><input type="checkbox" id="mgIdle">隱藏沒有流量的埠</label></div>
+    <div class="mglist" id="mgList"><div class="mgempty">載入中…</div></div>
+    <div class="actions"><button class="btn" data-close style="margin-left:auto">關閉</button></div>`,true);
+  $('mod').querySelector('.mcard').classList.add('mrtgm');
+  const close=$('mod').onclick;$('mod').onclick=e=>{if(e.target.id==='mod'||e.target.closest('[data-close]')){ui.mrtg=null;setMgHash(null)}close(e)};
+  let j;try{j=await (await fetch('/api/mrtg/summary',{cache:'no-store'})).json()}catch(e){$('mgList').innerHTML='<div class="mgempty">讀不到監控服務的紀錄</div>';return}
+  if(ui.mrtg!=='all'||!$('mgList'))return;
+  const all=Object.entries(j.ports||{}).filter(([pid])=>I.ports[pid]).map(([pid,r])=>({pid,r,d:I.owner[pid],peak:Math.max(r.max_in,r.max_out)}));
+  let sortK=prefs.mgSort||'dev';$('mgIdle').checked=prefs.mgIdle!==false;
+  const order=new Map(S.devices.map((d,i)=>[d.id,i]));
+  const draw=()=>{const q=norm($('mgQ').value),idle=$('mgIdle').checked;
+    let rows=all.filter(x=>(!q||norm(x.d.name+' '+pshort(x.pid)+' '+(x.d.ip||'')).includes(q))&&(!idle||x.peak>=1000));
+    rows.sort(sortK==='busy'?(a,b)=>b.peak-a.peak:(a,b)=>(order.get(a.d.id)-order.get(b.d.id))||(a.d.ports.indexOf(I.ports[a.pid])-b.d.ports.indexOf(I.ports[b.pid])));
+    if(!all.length){$('mgList').innerHTML='<div class="mgempty">還沒有流量紀錄。監控服務每次輪詢都會記錄，第一張圖大約 10 分鐘後出現。</div>';return}
+    if(!rows.length){$('mgList').innerHTML='<div class="mgempty">沒有符合的埠</div>';return}
+    let last=null;
+    $('mgList').innerHTML=`<table><thead><tr><th data-sk="dev">設備 · 埠${sortK==='dev'?' ▾':''}</th><th>24 小時</th><th data-sk="busy">最大${sortK==='busy'?' ▾':''}</th><th class="hide-s">平均 進／出</th><th class="hide-s">使用率</th></tr></thead><tbody>${rows.map(x=>{const r=x.r,sp=r.speed,u=sp?x.peak/sp:null;
+      const dv=x.d.id!==last||sortK==='busy';last=x.d.id;
+      return`<tr data-mgp="${x.pid}"><td>${dv?`<span class="dv">${esc(x.d.name)}</span> `:''}<span class="${dv?'sub':''}">埠 ${esc(pshort(x.pid))}</span></td><td>${mgSpark(r.spark,sp)}</td><td>${fmtRate(x.peak)}</td><td class="hide-s">${fmtRate(r.avg_in)} ／ ${fmtRate(r.avg_out)}</td><td class="hide-s">${u==null?'—':`<span class="mgbar"><i style="width:${Math.min(100,u*100).toFixed(0)}%"></i></span>${(u*100).toFixed(u<.1?1:0)}%`}</td></tr>`}).join('')}</tbody></table>`;
+    $('mgList').querySelectorAll('th[data-sk]').forEach(th=>th.onclick=()=>{sortK=prefs.mgSort=th.dataset.sk;savePrefs();draw()});
+    $('mgList').querySelectorAll('tr[data-mgp]').forEach(tr=>tr.onclick=()=>openMRTG(tr.dataset.mgp))};
+  $('mgQ').oninput=draw;$('mgIdle').onchange=()=>{prefs.mgIdle=$('mgIdle').checked;savePrefs();draw()};draw()}
+function setMgHash(v){try{const h=v?'#mrtg='+encodeURIComponent(v):'';if(location.hash!==h)history.replaceState(null,'',location.pathname+location.search+h)}catch(e){}}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-mrtg]');if(b){e.preventDefault();openMRTG(b.dataset.mrtg)}});
 function refreshLiveCard(){const c=document.querySelector('.livecard[data-livepid]');if(!c)return;const pid=c.dataset.livepid;const tmp=document.createElement('div');tmp.innerHTML=liveCardHTML(pid);c.replaceWith(tmp.firstElementChild);loadChart(pid)}
 
 /* ======================= 故障查線 ======================= */
@@ -2734,7 +2859,7 @@ function initFault(){
 }
 
 /* ---------- init ---------- */
-function readHash(){const h=location.hash.slice(1);if(!h||!h.includes('='))return null;const ps=new URLSearchParams(h);return{p:ps.get('p'),dev:ps.get('dev'),ro:ps.get('ro')==='1',fault:ps.get('fault')}}
+function readHash(){const h=location.hash.slice(1);if(!h||!h.includes('='))return null;const ps=new URLSearchParams(h);return{p:ps.get('p'),dev:ps.get('dev'),ro:ps.get('ro')==='1',fault:ps.get('fault'),mrtg:ps.get('mrtg')}}
 document.body.classList.toggle('light',prefs.skin==='light');
 const H=readHash();let hadSaved=false;
 if(H&&H.p&&window.LZString){try{const o=JSON.parse(LZString.decompressFromEncodedURIComponent(H.p));S=normalize({devices:o.devices,cables:o.cables,racks:o.racks||[],faults:o.faults||[]});ui.shared=true}catch(e){hadSaved=load()}}else hadSaved=load();
@@ -2748,7 +2873,8 @@ initFault();if(H&&H.fault&&S.faults.some(f=>f.id===H.fault)){ui.fault=H.fault;ui
 renderAll();
 if(H&&H.dev&&ui.sel)requestAnimationFrame(()=>fitTo(devBox(new Set([H.dev])),1.1));
 document.fonts&&document.fonts.ready.then(()=>{if(ui.autoPending){autoLayout();renderAll()}else drawWires()});
-if(SRV){if(!SRV.edit){ui.ro=true;applyRoUI();syncUR()}livePoll();
+if(SRV){if(!SRV.edit){ui.ro=true;applyRoUI();syncUR()}livePoll();$('bMrtg').hidden=false;$('bMrtg').onclick=()=>openMRTGIndex();
+  if(H&&H.mrtg)setTimeout(()=>H.mrtg==='all'||!I.ports[H.mrtg]?openMRTGIndex():openMRTG(H.mrtg),50);
   if(S.devices.length){if(!placeIfNeeded())requestAnimationFrame(()=>fitTo(devBox(),1))}else if(!H){stage.scrollLeft=PAD;stage.scrollTop=PAD;openWelcome(true)}}
 else if(!H){stage.scrollLeft=PAD;stage.scrollTop=PAD;openWelcome(true)}
 </script>

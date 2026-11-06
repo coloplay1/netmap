@@ -117,7 +117,7 @@ th{color:var(--ink2);font-weight:600;font-size:13px;white-space:nowrap}
 <li><a href="#fault">8. 故障查線</a></li>
 <li><a href="#save">9. 儲存、匯出與分享</a></li>
 <li><a href="#exe">10. netmap.exe（Windows 程式）</a>
-  <ol><li><a href="#e-install">下載與第一次開啟</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
+  <ol><li><a href="#e-install">下載與第一次開啟</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
 <li><a href="#mobile">11. 手機操作</a></li>
 <li><a href="#keys">12. 快捷鍵</a></li>
 <li><a href="#faq">13. 常見問題</a></li>
@@ -337,6 +337,33 @@ th{color:var(--ink2);font-weight:600;font-size:13px;white-space:nowrap}
 <tr><td><span class="dot" style="background:#EF4444"></span>紅（粗）</td><td>使用率高（70% 以上）</td></tr>
 <tr><td><span class="dot" style="background:#DC2626"></span>紅色虛線</td><td>埠離線（線上標示「離線」）</td></tr>
 </table></div>
+
+<h3 id="e-mrtg">MRTG 流量圖</h3>
+<p>監控服務每次輪詢都會把每個埠的流量存起來，整理成和 MRTG 一樣的四張圖。打開方式：</p>
+<ul>
+<li>監控網頁右上角的 <b>流量圖</b> 按鈕（畫面較窄時只顯示 📈 圖示）。</li>
+<li>點一個埠，在「即時流量」卡片最下面按 <b>MRTG 流量圖（日／週／月／年）</b>。</li>
+<li>netmap.exe「監控服務」分頁的 <b>流量圖（MRTG）</b> 按鈕。</li>
+<li>直接打開網址 <code>http://服務電腦IP:埠/#mrtg=all</code>，可以加到瀏覽器書籤，或放在大螢幕上。</li>
+</ul>
+<figure class="mid"><img src="manual/mrtg-index.jpg" alt="流量圖總覽" loading="lazy"><figcaption>流量圖總覽：每個埠最近 24 小時的小圖、最大值、平均進／出與使用率。點「最大」可依最忙的埠排序。</figcaption></figure>
+<p>總覽可以篩選設備或埠，預設隱藏沒有流量的埠。點任一列就會打開那個埠的四張圖：</p>
+<figure><img src="manual/mrtg-detail.jpg" alt="單一埠的 MRTG 流量圖" loading="lazy"><figcaption>單一埠的流量圖：綠色實心是流入，藍線是流出；紅色虛線是每天 0 點（週圖、月圖、年圖則是每天、每週、每月的開始），右下角紅色三角形代表現在。</figcaption></figure>
+<div class="tw"><table>
+<tr><th>圖</th><th>每一點代表</th><th>顯示範圍</th><th>資料保存</th></tr>
+<tr><td>每日圖</td><td>5 分鐘平均</td><td>最近 33 小時</td><td>3 天</td></tr>
+<tr><td>每週圖</td><td>30 分鐘平均</td><td>最近 8 天</td><td>14 天</td></tr>
+<tr><td>每月圖</td><td>2 小時平均</td><td>最近 5 週</td><td>62 天</td></tr>
+<tr><td>每年圖</td><td>1 天平均</td><td>最近 400 天</td><td>約 2 年</td></tr>
+</table></div>
+<ul>
+<li>每張圖下方列出流入、流出的<b>最大</b>、<b>平均</b>、<b>目前</b>值，括號內是佔介面速率的百分比。和 MRTG 一樣，「最大」是那張圖解析度下的平均值中最大的一點，所以每日圖的最大值通常比每年圖高。</li>
+<li><b>顯示尖峰</b>：另外畫出每一點時間內的最高值（深綠線＝流入尖峰、紫線＝流出尖峰），適合找短暫的爆量。</li>
+<li><b>bps／使用率 %</b>：切換縱軸單位。</li>
+<li><b>匯出 CSV</b>：把四張圖的數字匯出成 Excel 可開的檔案，方便寫報告。</li>
+<li>流入、流出是以這個埠為準：Switch 往上接防火牆的埠，「流入」就是從防火牆送進來的流量，也就是使用者的下載。</li>
+</ul>
+<div class="tip"><b>💡</b>剛開始監控時，每日圖大約 10 分鐘後就會出現；週、月、年圖需要累積幾天以上才有意思。從舊版升級時，原本保留的詳細紀錄會自動整理進流量圖。設定裡的「詳細紀錄保留（天）」只影響即時卡片的 24 小時曲線，不影響流量圖。</div>
 
 <h3 id="e-col">收集樣本（給 log 分析與設定檔備份開發用）</h3>
 <figure class="mid"><img src="manual/app-col.jpg" alt="收集樣本分頁" loading="lazy"></figure>

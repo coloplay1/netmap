@@ -359,7 +359,8 @@ class App:
         ttk.Label(r1, text="網頁埠").pack(side="left"); ascii_field(ttk.Entry(r1, textvariable=s.v_port, width=7), s.v_port).pack(side="left", padx=(6, 18))
         ttk.Label(r1, text="輪詢間隔（秒）").pack(side="left")
         ttk.Combobox(r1, textvariable=s.v_int, values=["30", "60", "120", "300"], width=6).pack(side="left", padx=(6, 18))
-        ttk.Label(r1, text="流量紀錄保留（天）").pack(side="left"); ttk.Spinbox(r1, from_=1, to=90, textvariable=s.v_keep, width=5).pack(side="left", padx=(6, 0))
+        ttk.Label(r1, text="詳細紀錄保留（天）").pack(side="left"); ttk.Spinbox(r1, from_=1, to=90, textvariable=s.v_keep, width=5).pack(side="left", padx=(6, 0))
+        ttk.Label(r1, text="（MRTG 流量圖另外保存約 2 年）", style="Muted.TLabel").pack(side="left", padx=(6, 0))
         r2 = ttk.Frame(cfg); r2.pack(fill="x", pady=(8, 0))
         ttk.Checkbutton(r2, text="允許內網其他電腦編輯圖（不勾＝其他電腦只能看）", variable=s.v_lan, command=s.save_service_cfg).pack(side="left")
         r3 = ttk.Frame(cfg); r3.pack(fill="x", pady=(4, 0))
@@ -438,6 +439,7 @@ class App:
                     l = ttk.Label(s.url_box, text=u, foreground="#1d6fd8", cursor="hand2"); l.pack(side="left", padx=(0, 12))
                     l.bind("<Button-1>", lambda e, u=u: webbrowser.open(u))
                 ttk.Button(s.url_box, text="複製", command=lambda: (s.root.clipboard_clear(), s.root.clipboard_append(s.service.urls()[0]))).pack(side="left")
+                ttk.Button(s.url_box, text="流量圖（MRTG）", command=lambda: webbrowser.open(s.local_url() + "#mrtg=all")).pack(side="left", padx=(8, 0))
             else:
                 ttk.Label(s.url_box, text="（服務未啟動）", style="Muted.TLabel").pack(side="left")
             stat = s.service.poller.status; devs = {d["id"]: d for d in s.store.project.get("devices", [])}
@@ -571,7 +573,7 @@ class App:
         s.nb.add(fr, text="  說明  ")
         txt = ("這支程式有兩個功能：\n\n"
                "1. SNMP 掃描：讀取防火牆、Switch、AP 的 SNMP 資料（LLDP／CDP、介面、VLAN、PoE、LACP、MAC 表），自動產生網路圖。\n"
-               "2. 監控服務：在這台電腦上提供網頁版的線路圖，並定時讀取每個埠的流量、使用率與上下線狀態，保留歷史紀錄。\n\n"
+               "2. 監控服務：在這台電腦上提供網頁版的線路圖，並定時讀取每個埠的流量、使用率與上下線狀態，保留歷史紀錄；每個埠都有 MRTG 式的日／週／月／年流量圖。\n\n"
                "只會讀取（SNMP GET），不會修改任何設備設定。帳密以目前的 Windows 帳號加密保存。\n\n"
                "使用步驟：\n"
                "  ① 在「SNMP 掃描」輸入核心 Switch 的 IP 與 community，按「開始掃描」。\n"

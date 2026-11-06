@@ -7,6 +7,8 @@ netmap 監控服務：在內網提供「機房線路對應圖」網頁，並定�
               PUT  /api/project          儲存（rev 不符回 409）
               GET  /api/status           即時狀態：設備可達、每個埠 up/down、流量、使用率、錯誤
               GET  /api/history?port=..  埠的歷史流量（預設 24 小時）
+              GET  /api/mrtg?port=..     MRTG 式流量圖資料（日／週／月／年）
+              GET  /api/mrtg/summary     所有埠最近 24 小時的流量摘要
 """
 import base64, http.server, json, os, re, socket, sqlite3, sys, threading, time, urllib.parse
 from concurrent.futures import ThreadPoolExecutor
@@ -19,7 +21,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.3.1"
+VERSION = "1.4.0"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -77,6 +79,10 @@ def local_ips():
     return sorted(ips) or ["127.0.0.1"]
 
 # ───────────────────────── store ─────────────────────────
+# MRTG 的四種解析度：(每點秒數, 保存秒數) 與 (圖名, 圖上顯示的時間範圍)
+ROLLUPS = [(300, 3 * 86400), (1800, 14 * 86400), (7200, 62 * 86400), (86400, 800 * 86400)]
+MRTG_VIEWS = [("day", 33 * 3600), ("week", 8 * 86400), ("month", 35 * 86400), ("year", 400 * 86400)]
+
 DEFAULT_SETTINGS = {"port": 8080, "interval": 60, "retention_days": 7, "lan_edit": False, "autostart": False, "autorun": True,
                     "snmp": {"version": "2c", "community": "", "user": "", "auth_proto": "SHA", "auth_key": "", "priv_proto": "AES", "priv_key": "",
                              "context": "", "port": 161, "timeout": 2.0, "retries": 1}}
@@ -104,7 +110,14 @@ class Store:
         s.db.execute("PRAGMA journal_mode=WAL")
         s.db.execute("CREATE TABLE IF NOT EXISTS samples(ts INTEGER, pid TEXT, inb REAL, outb REAL, up INTEGER, ierr INTEGER, oerr INTEGER)")
         s.db.execute("CREATE INDEX IF NOT EXISTS ix_samples ON samples(pid, ts)")
+        # MRTG 式彙整：每個埠在 5 分鐘／30 分鐘／2 小時／1 天的平均與最大值，保存期比原始紀錄長
+        s.db.execute("CREATE TABLE IF NOT EXISTS rollup(pid TEXT, res INTEGER, ts INTEGER, n INTEGER, sin REAL, sout REAL, xin REAL, xout REAL, upn INTEGER, spd REAL, PRIMARY KEY(pid, res, ts))")
         s.db.commit()
+        if not s.db.execute("SELECT 1 FROM rollup LIMIT 1").fetchone() and s.db.execute("SELECT 1 FROM samples LIMIT 1").fetchone():
+            for res, _ in ROLLUPS:   # 舊版升級：用現有的原始紀錄補出彙整
+                s.db.execute("INSERT OR REPLACE INTO rollup SELECT pid, ?, (ts/?)*?, COUNT(*), SUM(COALESCE(inb,0)), SUM(COALESCE(outb,0)), MAX(COALESCE(inb,0)), MAX(COALESCE(outb,0)), SUM(up), 0 "
+                             "FROM samples WHERE inb IS NOT NULL GROUP BY pid, (ts/?)", (res, res, res, res))
+            s.db.commit()
 
     def save_settings(s):
         with s.lock:
@@ -131,14 +144,49 @@ class Store:
                 json.dump(project, open(os.path.join(bk, f"project-{time.strftime('%Y%m%d-%H%M%S')}.json"), "w", encoding="utf-8"), ensure_ascii=False)
             return True
 
-    def add_samples(s, rows):
+    def add_samples(s, rows, speeds=None):
         if not rows: return
+        speeds = speeds or {}
+        agg = []
+        for (t, pid, i, o, up, _ie, _oe) in rows:
+            if i is None and o is None: continue
+            for res, _ in ROLLUPS:
+                agg.append((pid, res, t // res * res, i or 0, o or 0, i or 0, o or 0, up or 0, speeds.get(pid) or 0))
         with s.lock:
-            s.db.executemany("INSERT INTO samples VALUES (?,?,?,?,?,?,?)", rows); s.db.commit()
+            s.db.executemany("INSERT INTO samples VALUES (?,?,?,?,?,?,?)", rows)
+            s.db.executemany("INSERT INTO rollup VALUES (?,?,?,1,?,?,?,?,?,?) ON CONFLICT(pid, res, ts) DO UPDATE SET n=n+1, sin=sin+excluded.sin, sout=sout+excluded.sout, "
+                             "xin=MAX(xin, excluded.xin), xout=MAX(xout, excluded.xout), upn=upn+excluded.upn, spd=MAX(spd, excluded.spd)", agg)
+            s.db.commit()
+
+    def mrtg(s, pid):
+        """MRTG 的四張圖：每點 = [時間, 平均進, 平均出, 最大進, 最大出]。"""
+        now = int(time.time()); out = {}; spd = 0
+        with s.lock:
+            for (res, keep), (name, span) in zip(ROLLUPS, MRTG_VIEWS):
+                rows = s.db.execute("SELECT ts, sin/n, sout/n, xin, xout, spd FROM rollup WHERE pid=? AND res=? AND ts>=? ORDER BY ts", (pid, res, now - span)).fetchall()
+                spd = max([spd] + [r[5] or 0 for r in rows])
+                out[name] = {"res": res, "span": span, "points": [[r[0], r[1], r[2], r[3], r[4]] for r in rows]}
+        return {"port": pid, "speed": spd, "now": now, "graphs": out}
+
+    def mrtg_summary(s):
+        """所有埠最近 24 小時：平均／最大，以及 30 分鐘一點的小圖。"""
+        since = int(time.time()) - 86400; res = {}
+        with s.lock:
+            for pid, ts, ai, ao, mi, mo, sp in s.db.execute("SELECT pid, ts, sin/n, sout/n, xin, xout, spd FROM rollup WHERE res=1800 AND ts>=? ORDER BY pid, ts", (since,)):
+                r = res.setdefault(pid, {"spark": [], "max_in": 0, "max_out": 0, "speed": 0, "_si": 0, "_so": 0})
+                r["spark"].append([ts, round(ai or 0), round(ao or 0)])
+                r["max_in"] = max(r["max_in"], ai or 0); r["max_out"] = max(r["max_out"], ao or 0); r["speed"] = max(r["speed"], sp or 0)
+                r["_si"] += ai or 0; r["_so"] += ao or 0
+        for r in res.values():
+            n = max(1, len(r["spark"])); r["avg_in"] = r.pop("_si") / n; r["avg_out"] = r.pop("_so") / n
+        return res
 
     def purge(s):
         with s.lock:
-            s.db.execute("DELETE FROM samples WHERE ts < ?", (int(time.time()) - int(s.settings.get("retention_days", 7)) * 86400,)); s.db.commit()
+            now = int(time.time())
+            s.db.execute("DELETE FROM samples WHERE ts < ?", (now - int(s.settings.get("retention_days", 7)) * 86400,))
+            for res, keep in ROLLUPS: s.db.execute("DELETE FROM rollup WHERE res=? AND ts < ?", (res, now - keep))
+            s.db.commit()
 
     def history(s, pid, hours=24, points=360):
         since = int(time.time() - hours * 3600)
@@ -252,7 +300,7 @@ class Poller:
             with ThreadPoolExecutor(max_workers=min(16, len(tg))) as ex:
                 for (d, host), r in zip(tg, ex.map(lambda x: s.poll_device(x[0], x[1], opts), tg)):
                     devs[d["id"]] = {**r["dev"], "host": host}; ports.update(r["ports"]); rows += r["rows"]
-        s.store.add_samples(rows)
+        s.store.add_samples(rows, {pid: p.get("speed") for pid, p in ports.items()})
         s.status = {"ts": int(time.time()), "devices": devs, "ports": ports}
         s.last_cycle = time.time(); s.cycle_secs = round(time.time() - t0, 2)
         down = [d for d in devs.values() if not d["up"]]
@@ -314,6 +362,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if u.path == "/api/history":
             pid = (q.get("port") or [""])[0]; hours = float((q.get("hours") or ["24"])[0])
             return s._send(200, {"port": pid, "points": st.history(pid, min(max(hours, 0.1), 24 * 31))})
+        if u.path == "/api/mrtg":
+            return s._send(200, st.mrtg((q.get("port") or [""])[0]))
+        if u.path == "/api/mrtg/summary":
+            return s._send(200, {"ports": st.mrtg_summary()})
         if u.path == "/api/ping": return s._send(200, {"ok": True, "version": VERSION})
         s._send(404, {"error": "not found"})
 
