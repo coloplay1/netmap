@@ -705,6 +705,19 @@ svg.pairh circle{fill:var(--accent)}
 .top,#left,#dock,#legend,.stage{-webkit-user-select:none;user-select:none}
 body:has(.canvas.panning){-webkit-user-select:none;user-select:none;cursor:grabbing}
 .stage .dev input,.stage .dev textarea{user-select:text}
+
+/* ---- p14: backbone mode + device trace highlight ---- */
+.nowires svg.wires .cab{opacity:1}
+svg.wires .cab.off:not(.hot):not(.selc):not(.peek):not(.moving){opacity:0;pointer-events:none}
+svg.wires .cab.off:not(.hot):not(.selc):not(.peek) .hit{pointer-events:none}
+svg.wires .cab.off.peek .vis{opacity:.85}
+svg.wires .cab .halo{fill:none;stroke-width:calc(var(--w,3px) + 10px);stroke-linecap:round;stroke-linejoin:round;opacity:.28;pointer-events:none}
+svg.wires .cab.hot .vis{stroke-width:calc(var(--w,3px) + 2px);filter:drop-shadow(0 0 3px rgba(0,0,0,.45))}
+svg.wires .cab.dim .vis{opacity:.1}
+.port.hidc .jack{border-color:var(--c);background:color-mix(in srgb,var(--c) 45%,var(--panel))}
+.wmode{display:grid;grid-template-columns:repeat(3,1fr);margin-bottom:4px}
+.wmode button{font-size:12.5px}
+.popnote{font-size:11.5px;color:var(--muted);margin:0 0 6px;line-height:1.45}
 </style>
 </head>
 <body>
@@ -728,6 +741,9 @@ body:has(.canvas.panning){-webkit-user-select:none;user-select:none;cursor:grabb
           <div class="pop up" id="popRoute" hidden><span class="label">走線方式</span><div class="seg" role="group" aria-label="走線方式"><button data-route="curve">曲線</button><button data-route="ortho">直角（自動分道）</button></div><span class="label">排列</span><button class="btn" id="bLayout"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="6" rx="1.5"/><rect x="14" y="3" width="7" height="6" rx="1.5"/><rect x="8.5" y="15" width="7" height="6" rx="1.5"/><path d="M6.5 9v3h11V9M12 12v3"/></svg>依連線自動排列設備</button></div></div>
         <div class="popwrap"><button class="dbtn" data-popbtn="popView" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>顯示圖層</button>
           <div class="pop up" id="popView" hidden>
+            <span class="label">線路顯示</span>
+            <div class="seg wmode" id="wireMode" role="group" aria-label="線路顯示"><button data-wm="main">主幹</button><button data-wm="all">全部</button><button data-wm="none">隱藏</button></div>
+            <p class="popnote">主幹：只畫設備之間的串接線，接到電腦、PLC 等終端的線以同色線號標示兩端。點設備會亮出經過它的所有線路。</p>
             <span class="label">設備顯示</span>
             <div class="actions"><button class="btn sm" id="allIcon">全部收成圖示</button><button class="btn sm" id="allPorts">全部展開網路孔</button></div>
             <p class="hint">雙擊設備可以單獨切換圖示與網路孔模式。</p>
@@ -940,15 +956,16 @@ const SPEEDS=['','100M','1G','2.5G','5G','10G','25G','40G','100G'];
 const PAL=['#2F7DE1','#E0962A','#3DA35D','#8A5CE6','#E0574B','#13A69C','#D8679A','#7D8F2E','#B5651D','#5B6BD6'];
 const KEY='netmap-v2', OLDKEY='netmap-v1', PREFKEY='netmap-prefs';
 const PUBLIC_URL='https://coloplay1.github.io/netmap/';
-const LAYERS=[['wires','線路（關閉時以色標配對）'],['brand','廠牌型號'],['ip','IP'],['mac','MAC'],['gw','Gateway'],['loc','位置 / 機櫃'],['vlan','孔位 VLAN'],['icons','PoE / LACP 圖示'],['label','所有線號'],['speed','線路速率']];
+const LAYERS=[['brand','廠牌型號'],['ip','IP'],['mac','MAC'],['gw','Gateway'],['loc','位置 / 機櫃'],['vlan','孔位 VLAN'],['icons','PoE / LACP 圖示'],['label','所有線號'],['speed','線路速率']];
 const ICON={edit:'<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg>',del:'<svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',dup:'<svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg>',chev:'<svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="m6 9 6 6 6-6"/></svg>',info:'<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>',qr:'<svg class="i" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><path d="M14 14h2v2h-2zM18 18h2v2h-2zM14 18h2M18 14h2"/></svg>'};
 const BOLT='<svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>';
 const si=s=>s.replace('<svg','<svg class="i"');
 
 let S,I,undoS=[],redoS=[];
 const ui={sel:null,multi:new Set(),pending:null,zoom:1,view:'map',tab:'runs',q:'',match:null,layer:null,lastColor:'#2C6FB7',fieldSnapped:false,focus:null,suppress:false,cw:2000,ch:1400,popId:null,ro:false,shared:false,autoPending:false};
-let prefs={colorMode:'custom',route:'curve',layers:{wires:1,brand:1,ip:1,mac:0,gw:0,loc:1,vlan:0,icons:1,label:0,speed:0}};
+let prefs={colorMode:'custom',route:'curve',wireMode:'main',layers:{wires:1,brand:1,ip:1,mac:0,gw:0,loc:1,vlan:0,icons:1,label:0,speed:0}};
 try{const p=JSON.parse(localStorage.getItem(PREFKEY)||'null');if(p){prefs=Object.assign(prefs,p);prefs.layers=Object.assign({wires:1,brand:1,ip:1,mac:0,gw:0,loc:1,vlan:0,icons:1,label:0,speed:0},p.layers||{})}}catch(e){}
+if(!['main','all','none'].includes(prefs.wireMode))prefs.wireMode='main';
 function savePrefs(){try{localStorage.setItem(PREFKEY,JSON.stringify(prefs))}catch(e){}}
 /* empty margin around the drawing so the canvas can be dragged past its edges in every direction */
 const PAD=900;
@@ -1199,8 +1216,13 @@ function walk(pid,first){const seq=[];let cur=pid,mode=first;const seen=new Set(
 function trace(pid){const fwd=walk(pid,'cable'),back=walk(pid,'inner').reverse();return[...back,{k:'port',p:pid,start:true},...fwd]}
 function traceSet(){const ports=new Set(),cabs=new Set(),devs=new Set();let start=null;
   if(ui.sel&&ui.sel.port)start=ui.sel.port;else if(ui.sel&&ui.sel.cable){const c=S.cables.find(c=>c.id===ui.sel.cable);if(c)start=c.a}
-  if(start&&I.ports[start])trace(start).forEach(s=>{if(s.k==='port'){ports.add(s.p);devs.add(I.owner[s.p].id)}if(s.k==='cable')cabs.add(s.c.id)});
+  const add=s=>{if(s.k==='port'){ports.add(s.p);devs.add(I.owner[s.p].id)}if(s.k==='cable')cabs.add(s.c.id)};
+  if(start&&I.ports[start])trace(start).forEach(add);
+  else if(ui.sel&&ui.sel.dev){const d=S.devices.find(x=>x.id===ui.sel.dev);if(d){d.ports.forEach(p=>{if(I.cab[p.id]&&!ports.has(p.id))trace(p.id).forEach(add)});if(cabs.size){devs.add(d.id);return{ports,cabs,devs,active:true,dev:d.id}}}}
   return{ports,cabs,devs,active:!!start}}
+/* backbone = cables between network gear; a cable to a PC, PLC, printer… is an access cable */
+function isMain(c){const acc=d=>!d||(d.type==='end'&&d.kind!=='ISP 數據機');return!acc(I.owner[c.a])&&!acc(I.owner[c.b])}
+function wireShown(c){return prefs.wireMode==='all'||(prefs.wireMode==='main'&&isMain(c))}
 function runText(t){return t.map(x=>x.k==='port'?`${I.owner[x.p].name} ${pshort(x.p)}`:x.k==='cable'?`[${x.c.label}]`:'⇄').join(' ➔ ').replace(/ ➔ ⇄ ➔ /g,' ⇄ ')}
 
 /* ---------- search ---------- */
@@ -1229,8 +1251,9 @@ function portBtn(p,tr,m){const c=I.cab[p.id];const d=I.owner[p.id];const cls=['p
   if(p.poe)cls.push('haspoe');
   const icons=L.icons?`${p.poe?`<span class="poe" aria-hidden="true">${BOLT}</span>`:''}${p.lag?`<span class="lagbar" style="--g:${lagColor(d.id+p.lag)}"></span>`:''}`:'';
   const pv=L.vlan&&(p.vlan||p.mode==='trunk')?`<span class="pv">${p.mode==='trunk'?'TRK':'v'+esc(p.vlan)}</span>`:'';
-  const tag=c&&!L.wires?`<span class="ctag" style="--k:${pairCol(c)}">${esc(c.label||'線')}</span>`:'';
-  return`<button class="${cls.join(' ')}" data-port="${p.id}" style="${c?'--c:'+(L.wires?cableStyle(c).color:pairCol(c)):''}" title="${esc(tip)}" aria-label="${esc(tip)}"><span class="jack ${p.kind}">${icons}</span><span class="pl">${esc(p.label)}</span>${tag||pv}</button>`}
+  const hidc=c&&!wireShown(c)&&!tr.cabs.has(c.id);if(hidc)cls.push('hidc');
+  const tag=hidc?`<span class="ctag" style="--k:${pairCol(c)}">${esc(c.label||'線')}</span>`:'';
+  return`<button class="${cls.join(' ')}" data-port="${p.id}" style="${c?'--c:'+(hidc?pairCol(c):cableStyle(c).color):''}" title="${esc(tip)}" aria-label="${esc(tip)}"><span class="jack ${p.kind}">${icons}</span><span class="pl">${esc(p.label)}</span>${tag||pv}</button>`}
 function portsHTML(d,tr,m){const T=TYPES[d.type];const pb=p=>portBtn(p,tr,m);
   if(T.pass){const fr=d.ports.filter(p=>p.side===0),bk=d.ports.filter(p=>p.side===1);const cols=Math.min(fr.length,12);
     return`<div class="prow"><span class="side" title="${T.pass&&d.type==='patch'?'正面：機櫃內跳線':'桌面：接電腦'}">${T.sides[0]}</span><div class="ports" style="grid-template-columns:repeat(${cols},28px)">${fr.map(pb).join('')}</div></div><div class="prow"><span class="side" title="${d.type==='patch'?'背面：固定打線，接牆內水平線':'牆內：接回配線架'}">${T.sides[1]}</span><div class="ports" style="grid-template-columns:repeat(${cols},28px)">${bk.map(pb).join('')}</div></div>`}
@@ -1270,7 +1293,7 @@ function showPair(pb){const p=I.ports[pb.dataset.port];if(!p||!p.pair){clearPair
   const qb=document.querySelector(`#devs [data-port="${p.pair}"]`);if(!qb)return;pairHot=[pb,qb];pb.classList.add('pairhot');qb.classList.add('pairhot');
   const f=center(p.side===0?p.id:p.pair),k=center(p.side===0?p.pair:p.id);if(!f||!k)return;const x=f.x-15;
   $('pairhint').innerHTML=`<path d="M${f.x-12},${f.y} H${x} V${k.y} H${k.x-12}"/><circle cx="${x}" cy="${(f.y+k.y)/2}" r="2.5"/>`}
-function renderCanvas(){I=idx();ui.match=computeMatches();clearPair();ui.pcIdx={};S.cables.forEach((c,i)=>ui.pcIdx[c.id]=i);$('canvas').classList.toggle('nowires',!prefs.layers.wires);
+function renderCanvas(){I=idx();ui.match=computeMatches();clearPair();ui.pcIdx={};S.cables.forEach((c,i)=>ui.pcIdx[c.id]=i);
   const total=S.devices.reduce((a,d)=>a+d.ports.length,0);
   $('stat').textContent=`${S.devices.length} 台設備 · ${S.cables.length} 條線 · ${total} 孔`;
   const tr=traceSet(),m=ui.match,L=prefs.layers;
@@ -1280,7 +1303,7 @@ function renderCanvas(){I=idx();ui.match=computeMatches();clearPair();ui.pcIdx={
     const sub=(L.brand&&[d.brand,d.model].filter(Boolean).join(' '))||typeName(d);
     const foot=[L.ip&&d.ip,L.mac&&d.mac&&'MAC '+d.mac,L.gw&&d.gw&&'GW '+d.gw,L.loc&&locText(d)].filter(Boolean).join(' · ');
     const view=viewOf(d);cls.push(view);
-    let tags='';if(!L.wires&&view==='icon'){const cs=d.ports.map(p=>I.cab[p.id]).filter(Boolean);if(cs.length)tags=`<div class="ctags">${cs.slice(0,6).map(c=>`<span class="ctag" style="--k:${pairCol(c)}">${esc(c.label||'線')}</span>`).join('')}${cs.length>6?`<span class="ctag more">+${cs.length-6}</span>`:''}</div>`}
+    let tags='';if(view==='icon'){const cs=d.ports.map(p=>I.cab[p.id]).filter(c=>c&&!wireShown(c)&&!tr.cabs.has(c.id));if(cs.length)tags=`<div class="ctags">${cs.slice(0,6).map(c=>`<span class="ctag" style="--k:${pairCol(c)}">${esc(c.label||'線')}</span>`).join('')}${cs.length>6?`<span class="ctag more">+${cs.length-6}</span>`:''}</div>`}
     const lbl=`<div class="dlabel"><b>${esc(d.name)}</b><small>${esc(sub)}</small></div>${foot?`<div class="foot">${esc(foot)}</div>`:''}${tags}`;
     const hact=`<span class="hact"><button data-act="edit" data-id="${d.id}" title="編輯" aria-label="編輯 ${esc(d.name)}">${ICON.edit}</button><button class="del" data-act="del" data-id="${d.id}" title="刪除" aria-label="刪除 ${esc(d.name)}">${ICON.del}</button></span>`;
     if(view==='icon')return`<div class="${cls.join(' ')}" data-dev="${d.id}" style="left:${d.x}px;top:${d.y}px;--tc:${tc(d.type)}"><div class="ico" data-drag="${d.id}" title="拖曳移動，雙擊展開網路孔">${devArt(d)}</div>${lbl}${hact}</div>`;
@@ -1358,14 +1381,15 @@ function fixedRun(c){const pa=I.ports[c.a],pb=I.ports[c.b];if(!pa||!pb)return fa
 function drawWires(){peekDev=null;const tr=traceSet(),m=ui.match,R=devRects(),lanes={};computeRunVlans();let h='';
   S.cables.forEach(c=>{const g=wirePath(c,R,lanes);if(!g)return;const st=cableStyle(c);const cls=['cab'];
     if(tr.active)cls.push(tr.cabs.has(c.id)?'hot':'dim');else if(m&&!(m.cabs.has(c.id)||(m.lit.has(I.owner[c.a].id)&&m.lit.has(I.owner[c.b].id))))cls.push('faded');
+    if(!wireShown(c))cls.push('off');if(tr.dev)cls.push('fromdev');
     if(link&&link.cable===c)cls.push('moving');if(ui.sel&&ui.sel.cable===c.id)cls.push('selc');
-    h+=`<g class="${cls.join(' ')}" data-cable="${c.id}" data-da="${I.owner[c.a].id}" data-db="${I.owner[c.b].id}" style="--w:${st.w}px"><path class="vis" id="w-${c.id}" d="${g.d}" stroke="${st.color}"${st.dash?` stroke-dasharray="${st.dash}"`:''}/><path class="hit" d="${g.d}"/></g>`});
+    h+=`<g class="${cls.join(' ')}" data-cable="${c.id}" data-da="${I.owner[c.a].id}" data-db="${I.owner[c.b].id}" style="--w:${st.w}px">${tr.cabs.has(c.id)?`<path class="halo" d="${g.d}" stroke="${st.color}"/>`:''}<path class="vis" id="w-${c.id}" d="${g.d}" stroke="${st.color}"${st.dash?` stroke-dasharray="${st.dash}"`:''}/><path class="hit" d="${g.d}"/></g>`});
   $('wires').innerHTML=h+'<g id="deco"></g>';
   const L=prefs.layers;let dh='';
   S.cables.forEach(c=>{const el=document.getElementById('w-'+c.id);if(!el)return;const selected=ui.sel&&ui.sel.cable===c.id;
     const showLabel=L.label||tr.cabs.has(c.id)||selected,showSpeed=L.speed&&c.speed,dir=c.dir&&c.dir!=='none';
     if(!showLabel&&!showSpeed&&!dir&&!selected)return;
-    if(!L.wires&&!selected&&!tr.cabs.has(c.id))return;
+    if(!wireShown(c)&&!selected&&!tr.cabs.has(c.id))return;
     let len=0;try{len=el.getTotalLength()}catch(e){}if(!len)return;const mid=el.getPointAtLength(len/2);const col=cableStyle(c).color;
     const chev=(at,fwd)=>{const p=el.getPointAtLength(Math.max(0,Math.min(len,at))),q=el.getPointAtLength(Math.min(len,at+2));let ang=Math.atan2(q.y-p.y,q.x-p.x)*180/Math.PI+(fwd?0:180);
       return`<g transform="translate(${p.x},${p.y}) rotate(${ang})"><circle class="arrbg" r="7"/><path class="arr" d="M-3.5,-4.5 L2.5,0 L-3.5,4.5" stroke="${col}"/></g>`};
@@ -1900,7 +1924,7 @@ $('layNone').onclick=()=>{LAYERS.forEach(([k])=>prefs.layers[k]=0);savePrefs();r
 $('bTheme').onclick=()=>{prefs.skin=prefs.skin==='light'?'dark':'light';savePrefs();document.body.classList.toggle('light',prefs.skin==='light');renderAll()};
 $('eStart').onclick=()=>{if(canEdit())openWelcome(false)};
 $('bStart').onclick=()=>{if(canEdit())openWelcome(true)};
-let peekDev=null;function setPeek(id){if(id===peekDev)return;peekDev=id;document.querySelectorAll('#wires .cab.peek').forEach(g=>g.classList.remove('peek'));if(id&&!prefs.layers.wires)document.querySelectorAll(`#wires .cab[data-da="${id}"],#wires .cab[data-db="${id}"]`).forEach(g=>g.classList.add('peek'))}
+let peekDev=null;function setPeek(id){if(id===peekDev)return;peekDev=id;document.querySelectorAll('#wires .cab.peek').forEach(g=>g.classList.remove('peek'));if(id)document.querySelectorAll(`#wires .cab[data-da="${id}"],#wires .cab[data-db="${id}"]`).forEach(g=>g.classList.add('peek'))}
 $('devs').addEventListener('pointerover',e=>{const dv=e.target.closest('.dev');setPeek(dv?dv.dataset.dev:null)});
 $('devs').addEventListener('pointerleave',()=>setPeek(null));
 $('devs').addEventListener('pointerover',e=>{if(canvas.classList.contains('dragging'))return;const pb=e.target.closest('.port');if(pb)showPair(pb);else clearPair()});
@@ -1916,9 +1940,12 @@ $('q').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(qT);foc
 $('qfocus').onclick=()=>focusMatches();
 document.querySelectorAll('[data-popbtn]').forEach(b=>b.onclick=e=>{e.stopPropagation();const p=$(b.dataset.popbtn);const open=p.hidden;document.querySelectorAll('.popwrap>.pop').forEach(x=>x.hidden=true);document.querySelectorAll('[data-popbtn]').forEach(x=>x.setAttribute('aria-expanded','false'));p.hidden=!open;b.setAttribute('aria-expanded',open)});
 document.addEventListener('click',e=>{if(!e.target.closest('.popwrap')){document.querySelectorAll('.popwrap>.pop').forEach(x=>x.hidden=true);document.querySelectorAll('[data-popbtn]').forEach(x=>x.setAttribute('aria-expanded','false'))}});
-function renderViewPop(){$('layerToggles').innerHTML=LAYERS.map(([k,n])=>`<label class="tog"><input type="checkbox" data-layer="${k}" ${prefs.layers[k]?'checked':''}>${n}</label>`).join('');
+function renderViewPop(){const wm=$('wireMode');if(wm)wm.querySelectorAll('[data-wm]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.wm===prefs.wireMode));
+  $('layerToggles').innerHTML=LAYERS.map(([k,n])=>`<label class="tog"><input type="checkbox" data-layer="${k}" ${prefs.layers[k]?'checked':''}>${n}</label>`).join('');
   document.querySelectorAll('[data-cmode]').forEach(b=>b.setAttribute('aria-pressed',prefs.colorMode===b.dataset.cmode));document.querySelectorAll('[data-route]').forEach(b=>b.setAttribute('aria-pressed',prefs.route===b.dataset.route))}
 document.addEventListener('click',e=>{const cm=e.target.closest('[data-cmode]'),rt=e.target.closest('[data-route]');if(cm)prefs.colorMode=cm.dataset.cmode;if(rt)prefs.route=rt.dataset.route;if(cm||rt){savePrefs();renderViewPop();renderAll()}});
+$('wireMode').addEventListener('click',e=>{const b=e.target.closest('[data-wm]');if(!b)return;prefs.wireMode=b.dataset.wm;savePrefs();renderViewPop();renderAll();
+  toast({main:'只顯示設備之間的主幹線路，終端線以色標配對',all:'顯示全部線路',none:'隱藏線路，兩端以色標配對'}[prefs.wireMode])});
 $('popView').addEventListener('change',e=>{const k=e.target.dataset.layer;if(!k)return;prefs.layers[k]=e.target.checked?1:0;savePrefs();renderAll()});
 $('popFile').addEventListener('click',e=>{const b=e.target.closest('[data-file]');if(!b)return;$('popFile').hidden=true;const a=b.dataset.file;
   if(a==='tpl'){if(canEdit())openWelcome(false)}
