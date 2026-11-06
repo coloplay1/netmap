@@ -608,6 +608,29 @@ details.card>summary::-webkit-details-marker{display:none}
   .ctx{max-width:calc(100% - 16px)}
 }
 @media (prefers-reduced-motion:reduce){#insp{transition:none}}
+
+/* start page: 新增 / 匯入 / 範例 */
+.w3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.wcol{background:var(--sunk);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.wcol header{display:flex;align-items:center;gap:12px;padding:2px 2px 8px}
+.wcol h3{margin:0;font-size:18px;font-weight:800}
+.wcol header p{margin:0;font-size:12.5px;color:var(--muted)}
+.wtile{width:42px;height:42px;border-radius:13px;background:var(--tc);color:#fff;display:grid;place-items:center;flex:none}
+.wtile svg{width:22px;height:22px}
+.wrow{display:flex;align-items:center;gap:10px;text-align:left;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:9px 10px;transition:border-color .15s,transform .12s;min-width:0}
+.wrow:hover,.wrow:focus-visible{border-color:var(--accent);transform:translateX(2px)}
+.wrow .tiles{display:flex;gap:3px;flex:none}
+.wrow .tile{width:26px;height:26px;border-radius:8px}
+.wrow .tile svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.wrow .tile.dash{background:transparent;border:2px dashed var(--line2);color:var(--muted)}
+.wrow .wt{display:flex;flex-direction:column;min-width:0;flex:1;line-height:1.35}
+.wrow .wt b{font-size:14px;font-weight:800}
+.wrow .wt small{font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wrow .go{color:var(--muted);font-size:20px;flex:none}
+.wnote{font-size:11.5px;color:var(--muted);margin:auto 2px 0;line-height:1.6}
+.emptyc{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);padding:18px 22px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;z-index:12;font-size:13px;color:var(--muted)}
+.emptyc b{font-size:16px;color:var(--ink)}
+@media (max-width:900px){.w3{grid-template-columns:minmax(0,1fr)}}
 </style>
 </head>
 <body>
@@ -618,6 +641,7 @@ details.card>summary::-webkit-details-marker{display:none}
     <div class="stage" id="stage"><div class="sizer" id="sizer"><div class="canvas" id="canvas"><svg class="wires" id="wires"></svg><div id="devs"></div><svg class="tmp" id="tmp"></svg></div></div></div>
     <aside class="left fl" id="left" aria-label="設備"><span class="plabel"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>設備</span><div class="pal" id="types"></div></aside>
     <div class="legend fl" id="legend" hidden></div>
+    <div class="emptyc fl" id="emptyc" hidden><b>畫布是空的</b><span>從左側把設備拖進來，或</span><div class="actions"><button class="btn primary" id="eStart">開始頁：新增 / 匯入 / 範例</button></div></div>
     <div class="hintbar"><div id="hint"></div></div>
     <div class="ctx" id="ctx" hidden></div>
     <div class="addmenu" id="addmenu" hidden role="menu" aria-label="加入設備"></div>
@@ -1034,20 +1058,30 @@ function autoLayout(){I=idx();renderCanvas();
 /* ---------- welcome / template picker ---------- */
 function tplIcon(k){return`<span class="tile" style="--tc:${TICON[k]?tc(k):tc('end')}">${TICON[k]||KICON[k]}</span>`}
 function openWelcome(canContinue){
-  const card=t=>{const st=tplStats(t);return`<button class="tcard" data-tpl="${t.id}"><span class="trow"><span class="tiles">${t.icons.length?t.icons.map(tplIcon).join(''):'<span class="tile dash"><svg viewBox="0 0 24 24"><path d="M12 6v12M6 12h12"/></svg></span>'}</span><span class="pill">${esc(t.tag)}</span></span><b>${esc(t.name)}</b><span class="d">${esc(t.desc)}</span><span class="meta">${st.d?`${st.d} 台設備 · ${st.c} 條線`:'從零開始'}</span></button>`};
-  const used=S.devices.length;
-  $('modalRoot').innerHTML=`<div class="modal welcome" id="mod"><div class="wcard" role="dialog" aria-label="選擇起點">
+  const used=S.devices.length;const P=p=>`<svg class="i" viewBox="0 0 24 24">${p}</svg>`;
+  const ex=TEMPLATES.map(t=>{const st=tplStats(t);return`<button class="wrow" data-tpl="${t.id}" title="${esc(t.desc)}"><span class="tiles">${t.icons.map(tplIcon).join('')}</span><span class="wt"><b>${esc(t.name)}</b><small>${esc(t.tag)} · ${st.d} 台設備 · ${st.c} 條線</small></span><span class="go">›</span></button>`}).join('');
+  $('modalRoot').innerHTML=`<div class="modal welcome" id="mod"><div class="wcard" role="dialog" aria-label="開始">
     <div class="whead"><span class="logo"><svg class="i" viewBox="0 0 24 24"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M6 8l5 8.5M18 8l-5 8.5"/></svg></span>
-    <div><h2>要從哪裡開始？</h2><p class="hint">挑一個最接近的產業範例來改，或建立新的網路環境。換了之後，按「復原」可以回到原本的畫面。</p></div>
-    <button class="btn" id="wClose" style="margin-left:auto">關閉</button></div>
+    <div><h2>機房線路對應圖</h2><p class="hint">建立新的網路環境、匯入既有資料，或先看產業範例。之後隨時可以從「檔案 ▸ 範本 / 新環境」回到這裡。</p></div>
+    <button class="btn" id="wClose" style="margin-left:auto">略過</button></div>
     ${canContinue&&used?`<button class="tcard cont" data-tpl="continue"><span class="tile" style="--tc:var(--accent)"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span><span><b>繼續上次的配置</b><span class="d">${used} 台設備 · ${S.cables.length} 條線，資料存在這台電腦的瀏覽器</span></span></button>`:''}
-    <span class="label">產業範例</span><div class="tgrid">${TEMPLATES.map(card).join('')}</div>
-    <span class="label">新的網路環境</span><div class="tgrid">${STARTS.map(card).join('')}</div>
+    <div class="w3">
+      <section class="wcol"><header><span class="wtile" style="--tc:var(--accent)">${P('<path d="M12 5v14M5 12h14"/>')}</span><div><h3>新增</h3><p>從零建立新的網路環境</p></div></header>
+        <button class="wrow" data-tpl="blank"><span class="tiles"><span class="tile dash"><svg viewBox="0 0 24 24"><path d="M12 6v12M6 12h12"/></svg></span></span><span class="wt"><b>空白畫面</b><small>從左側拖設備到畫布開始</small></span><span class="go">›</span></button>
+        <button class="wrow" data-tpl="skeleton"><span class="tiles">${['fw','sw','patch'].map(tplIcon).join('')}</span><span class="wt"><b>基本骨架</b><small>先放好 ISP、防火牆、Switch、配線架</small></span><span class="go">›</span></button>
+        <p class="wnote">也可以在畫布按右鍵或 A 鍵，在游標位置加入設備。</p></section>
+      <section class="wcol"><header><span class="wtile" style="--tc:var(--t-ap)">${P('<path d="M12 15V4M7.5 8.5 12 4l4.5 4.5"/><path d="M5 14v5h14v-5"/>')}</span><div><h3>匯入</h3><p>用手上已有的資料建立</p></div></header>
+        <button class="wrow" data-wimp="json"><span class="tiles"><span class="tile" style="--tc:var(--t-router)">${P('<path d="M4 4h10l6 6v10H4z"/><path d="M14 4v6h6"/>').replace('class="i" ','')}</span></span><span class="wt"><b>開啟專案檔</b><small>之前從這個工具下載的 .json</small></span><span class="go">›</span></button>
+        <button class="wrow" data-wimp="lldp"><span class="tiles"><span class="tile" style="--tc:var(--t-sw)">${TICON.sw}</span></span><span class="wt"><b>LLDP / CDP 鄰居表</b><small>貼上 show lldp neighbors 自動產生連線</small></span><span class="go">›</span></button>
+        <button class="wrow" data-wimp="text"><span class="tiles"><span class="tile" style="--tc:var(--t-end)">${P('<path d="M8 6 3 12l5 6M16 6l5 6-5 6"/>').replace('class="i" ','')}</span></span><span class="wt"><b>貼上 JSON 文字</b><small>同事傳來的配置內容</small></span><span class="go">›</span></button></section>
+      <section class="wcol"><header><span class="wtile" style="--tc:var(--t-patch)">${P('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 13h8M8 16h5"/>')}</span><div><h3>範例</h3><p>看各產業的網路怎麼接</p></div></header>${ex}</section>
+    </div>
   </div></div>`;
   const close=()=>$('modalRoot').innerHTML='';
   $('wClose').onclick=close;$('mod').onclick=e=>{if(e.target.id==='mod')close()};
   $('mod').querySelectorAll('[data-tpl]').forEach(b=>b.onclick=()=>{const id=b.dataset.tpl;close();if(id!=='continue')applyTpl(id)});
-  const first=$('mod').querySelector('[data-tpl]');first&&first.focus();
+  $('mod').querySelectorAll('[data-wimp]').forEach(b=>b.onclick=()=>{const k=b.dataset.wimp;close();if(k==='json')$('fileIn').click();if(k==='lldp')openLLDP();if(k==='text')openJsonText()});
+  const first=$('mod').querySelector('[data-tpl],[data-wimp]');first&&first.focus();
 }
 function applyTpl(id){if(!canEdit())return;const t=[...TEMPLATES,...STARTS].find(x=>x.id===id);if(!t)return;ui.shared=false;$('banner').hidden=true;ui.multi.clear();
   const had=S.devices.length>0;if(had)snap();
@@ -1057,10 +1091,10 @@ function applyTpl(id){if(!canEdit())return;const t=[...TEMPLATES,...STARTS].find
   toast(id==='blank'?'已建立空白畫面，從左側點設備開始':`已載入「${t.name}」`,had)}
 
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
-function load(){try{const r=localStorage.getItem(KEY);if(r){S=normalize(JSON.parse(r));return true}}catch(e){}sample();return false}
+function load(){try{const r=localStorage.getItem(KEY);if(r){S=normalize(JSON.parse(r));return true}}catch(e){}S={devices:[],cables:[],racks:[]};return false}
 
 function save(){if(ui.shared)return;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
-function load(){try{const r=localStorage.getItem(KEY);if(r){S=normalize(JSON.parse(r));return true}}catch(e){}sample();return false}
+function load(){try{const r=localStorage.getItem(KEY);if(r){S=normalize(JSON.parse(r));return true}}catch(e){}S={devices:[],cables:[],racks:[]};return false}
 
 /* ---------- undo ---------- */
 function snap(){ui.autoPending=false;undoS.push(JSON.stringify(S));if(undoS.length>100)undoS.shift();redoS=[];syncUR()}
@@ -1226,7 +1260,8 @@ function renderLegend(){const el=$('legend');const mode=prefs.colorMode;
   else if(mode==='vlan'&&S.cables.length){const vs=[...new Set(Object.values(runVlans))].sort((a,b)=>(a===''?1:0)-(b===''?1:0)||(a==='T'?1:0)-(b==='T'?1:0)||(+a)-(+b));
     h=vs.map(v=>v==='T'?`<span>${line('#7A8796',3.5,'10 4')}Trunk / LACP</span>`:v?`<span>${line(vlanColor(v),3)}VLAN ${esc(v)}</span>`:`<span>${line('#A9B4BE',3)}未設 VLAN</span>`).join('')}
   $('cableLegend').innerHTML=h}
-function renderHint(){const el=$('hint');el.className='';
+function renderEmpty(){const e=$('emptyc');if(e)e.hidden=S.devices.length>0||ui.view!=='map'}
+function renderHint(){renderEmpty();const el=$('hint');el.className='';
   if(ui.ro){el.className='warnb';el.innerHTML=`唯讀模式：點孔可查整條路徑 <button id="hUnlock">解除</button>`}
   else if(ui.pending){el.className='act';el.innerHTML=`從 <b>${esc(pname(ui.pending))}</b> 出發，點要接過去的孔 <button id="hCancel">取消</button>`}
   else if(link&&link.active){el.className='act';el.innerHTML=`${link.cable?'拖到新的孔放開，就把線改插過去':'拖到另一個空的孔放開，就接上線'} · Esc 取消`}
@@ -1735,6 +1770,7 @@ $('allIcon').onclick=()=>setAllView('icon');$('allPorts').onclick=()=>setAllView
 $('layAll').onclick=()=>{LAYERS.forEach(([k])=>prefs.layers[k]=1);savePrefs();renderViewPop();renderAll()};
 $('layNone').onclick=()=>{LAYERS.forEach(([k])=>prefs.layers[k]=0);savePrefs();renderViewPop();renderAll()};
 $('bTheme').onclick=()=>{prefs.skin=prefs.skin==='light'?'dark':'light';savePrefs();document.body.classList.toggle('light',prefs.skin==='light');renderAll()};
+$('eStart').onclick=()=>{if(canEdit())openWelcome(false)};
 $('mEdit').onclick=()=>setRo(false);$('mRo').onclick=()=>setRo(true);
 function applyRoUI(){document.body.classList.toggle('ro',ui.ro);$('mEdit').setAttribute('aria-pressed',!ui.ro);$('mRo').setAttribute('aria-pressed',ui.ro);$('types').querySelectorAll('button').forEach(b=>b.disabled=ui.ro);$('bLayout').disabled=ui.ro}
 function setRo(v){if(ui.ro===v)return;ui.ro=v;applyRoUI();ui.pending=null;$('addmenu').hidden=true;syncUR();renderAll();toast(v?'已切到唯讀，只能查線':'已切回編輯')}
@@ -1866,7 +1902,7 @@ document.body.classList.toggle('light',prefs.skin==='light');
 const H=readHash();let hadSaved=false;
 if(H&&H.p&&window.LZString){try{const o=JSON.parse(LZString.decompressFromEncodedURIComponent(H.p));S=normalize({devices:o.devices,cables:o.cables,racks:o.racks||[]});ui.shared=true}catch(e){hadSaved=load()}}else hadSaved=load();
 I=idx();renderLeft();renderViewPop();syncUR();
-if(!hadSaved&&!ui.shared){autoLayout();ui.autoPending=true}
+
 if(ui.shared){const bn=$('banner');bn.hidden=false;bn.innerHTML='你正在檢視分享的配置，修改不會存到這台電腦。<button id="bnSave">存成這台電腦的配置</button>';
   $('bnSave').onclick=()=>{ui.shared=false;save();bn.hidden=true;toast('已存到這台電腦')}}
 if(H&&H.ro){ui.ro=true;applyRoUI();syncUR()}
