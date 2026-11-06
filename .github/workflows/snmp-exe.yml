@@ -35,7 +35,7 @@ jobs:
           python -c "import os,tempfile,json,urllib.request,time; import netmap_server as S; st=S.Store(tempfile.mkdtemp()); st.settings['port']=18765; sv=S.Service(st,log=print); sv.start(); time.sleep(1); print(json.load(urllib.request.urlopen('http://127.0.0.1:18765/api/ping'))); html=urllib.request.urlopen('http://127.0.0.1:18765/').read().decode('utf-8'); assert 'NETMAP_SERVER' in html; print('protect roundtrip', S.unprotect(S.protect('secret'))=='secret'); sv.stop()"
       - name: Build netmap.exe (window app)
         working-directory: tools/netmap-snmp
-        run: pyinstaller --onefile --windowed --name netmap --icon netmap.ico --collect-all pysnmp --add-data "web/index.html;web" --add-data "netmap.ico;." netmap_app.py
+        run: pyinstaller --onefile --windowed --name netmap --icon netmap.ico --collect-all pysnmp --add-data "web/index.html;web" --add-data "netmap.ico;." --add-data "netmap.png;." netmap_app.py
       - name: Build netmap-snmp.exe (command line)
         working-directory: tools/netmap-snmp
         run: pyinstaller --onefile --console --name netmap-snmp --icon netmap.ico --collect-all pysnmp netmap_snmp.py

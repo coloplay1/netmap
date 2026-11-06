@@ -18,6 +18,43 @@ import netmap_server as srv
 TITLE = "機房線路對應圖 netmap"
 WEB = "https://coloplay1.github.io/netmap/"
 
+FULLWIDTH = {ord("。"): ".", ord("．"): ".", ord("、"): " ", ord("，"): " ", ord("　"): " ", ord("／"): "/", ord("－"): "-", ord("："): ":", ord("～"): "~"}
+def ascii_text(t):
+    """全形數字與符號轉半形（中文輸入法開著時常打出全形）。"""
+    out = []
+    for ch in t.translate(FULLWIDTH):
+        o = ord(ch)
+        out.append(chr(o - 0xFEE0) if 0xFF01 <= o <= 0xFF5E else ch)
+    return "".join(out)
+
+def ascii_field(widget, var=None):
+    """這個欄位只需要英數符號：關掉中文輸入法，並把全形字自動轉半形。"""
+    if os.name == "nt":
+        def off(_e=None):
+            try:
+                import ctypes
+                ctypes.windll.imm32.ImmAssociateContextEx(widget.winfo_id(), None, 0)
+            except Exception: pass
+        widget.after_idle(off); widget.bind("<FocusIn>", off, add="+")
+    if var is not None:
+        busy = [False]
+        def fix(*_):
+            if busy[0]: return
+            v = var.get(); n = ascii_text(v)
+            if n != v:
+                busy[0] = True
+                try:
+                    pos = widget.index("insert"); var.set(n); widget.icursor(pos)
+                finally: busy[0] = False
+        var.trace_add("write", fix)
+    return widget
+
+def resource(name):
+    for d in ([sys._MEIPASS] if getattr(sys, "_MEIPASS", None) else []) + [os.path.dirname(os.path.abspath(__file__))]:
+        p = os.path.join(d, name)
+        if os.path.exists(p): return p
+    return None
+
 def ui_font():
     return ("Microsoft JhengHei UI", 10) if os.name == "nt" else ("Noto Sans CJK TC", 10)
 
@@ -27,10 +64,17 @@ class App:
         s.store = srv.Store(); s.service = srv.Service(s.store, log=lambda m: s.q.put(("svclog", m)))
         s.scan_thread = None; s.stop_scan = False; s.last_project = None
         root.title(TITLE); root.geometry("920x700"); root.minsize(800, 600)
-        for ico in ([os.path.join(sys._MEIPASS, "netmap.ico")] if getattr(sys, "_MEIPASS", None) else []) + [os.path.join(os.path.dirname(os.path.abspath(__file__)), "netmap.ico")]:
-            if os.name == "nt" and os.path.exists(ico):
-                try: root.iconbitmap(ico); break
-                except tk.TclError: pass
+        s.logo = None
+        png = resource("netmap.png")
+        if png:
+            try:
+                s.logo = tk.PhotoImage(file=png); root.iconphoto(True, s.logo)
+                s.logo_small = s.logo.subsample(2, 2)
+            except tk.TclError: s.logo = None
+        ico = resource("netmap.ico")
+        if os.name == "nt" and ico:
+            try: root.iconbitmap(default=ico)
+            except tk.TclError: pass
         st = ttk.Style()
         try: st.theme_use("vista" if os.name == "nt" else "clam")
         except tk.TclError: pass
@@ -43,6 +87,7 @@ class App:
         st.configure("On.TLabel", foreground="#1a7f37", font=(f[0], 11, "bold")); st.configure("Off.TLabel", foreground="#b42318", font=(f[0], 11, "bold"))
 
         head = ttk.Frame(root, padding=(16, 12, 16, 4)); head.pack(fill="x")
+        if s.logo: ttk.Label(head, image=s.logo_small).pack(side="left", padx=(0, 10))
         ttk.Label(head, text="機房線路對應圖", style="Title.TLabel").pack(side="left")
         ttk.Label(head, text=f"  SNMP 掃描與監控服務  v{srv.VERSION}", style="Muted.TLabel").pack(side="left", pady=(6, 0))
         ttk.Button(head, text="開啟網頁", command=s.open_web).pack(side="right")
@@ -62,7 +107,7 @@ class App:
         c = s.store.settings["snmp"]
         top = ttk.LabelFrame(fr, text="掃描目標", padding=10); top.pack(fill="x")
         s.v_targets = tk.StringVar(value=s.store.settings.get("last_targets", ""))
-        e = ttk.Entry(top, textvariable=s.v_targets); e.pack(fill="x"); e.focus_set()
+        e = ttk.Entry(top, textvariable=s.v_targets); e.pack(fill="x"); e.focus_set(); ascii_field(e, s.v_targets)
         ttk.Label(top, text="核心 Switch 的 IP 就夠了，程式會沿著 LLDP／CDP 找到其他設備。也可以輸入網段或範圍，用空白分隔：192.168.1.0/24  10.0.0.1-50",
                   style="Muted.TLabel", wraplength=820).pack(anchor="w", pady=(6, 0))
 
@@ -78,14 +123,15 @@ class App:
         cb = ttk.Combobox(g, textvariable=s.v_ver, values=["v2c", "v3", "v1"], width=6, state="readonly"); cb.grid(row=0, column=1, sticky="w")
         cb.bind("<<ComboboxSelected>>", lambda e: s.sync_auth())
         s.lbl_comm = ttk.Label(g, text="Community"); s.lbl_comm.grid(row=0, column=2, sticky="w", padx=(18, 6))
-        s.ent_comm = ttk.Entry(g, textvariable=s.v_comm, width=22, show="•"); s.ent_comm.grid(row=0, column=3, sticky="w")
+        s.ent_comm = ttk.Entry(g, textvariable=s.v_comm, width=22, show="•"); s.ent_comm.grid(row=0, column=3, sticky="w"); ascii_field(s.ent_comm, s.v_comm)
         s.v3 = ttk.Frame(auth)
         for i, (lab, var, w, opts, show) in enumerate([("使用者", s.v_user, 16, None, ""), ("認證", s.v_aproto, 8, ["SHA", "SHA256", "SHA512", "MD5"], ""),
                                                         ("認證密碼", s.v_akey, 16, None, "•"), ("加密", s.v_pproto, 8, ["AES", "AES256", "DES"], ""),
                                                         ("加密密碼", s.v_pkey, 16, None, "•"), ("Context", s.v_ctx, 10, None, "")]):
             r, col = divmod(i, 3)
             ttk.Label(s.v3, text=lab).grid(row=r, column=col * 2, sticky="w", padx=(0 if col == 0 else 18, 6), pady=3)
-            (ttk.Combobox(s.v3, textvariable=var, values=opts, width=w, state="readonly") if opts else ttk.Entry(s.v3, textvariable=var, width=w, show=show)).grid(row=r, column=col * 2 + 1, sticky="w", pady=3)
+            wdg = ttk.Combobox(s.v3, textvariable=var, values=opts, width=w, state="readonly") if opts else ascii_field(ttk.Entry(s.v3, textvariable=var, width=w, show=show), var)
+            wdg.grid(row=r, column=col * 2 + 1, sticky="w", pady=3)
         ttk.Checkbutton(auth, text="記住帳密（以 Windows 帳號加密保存，監控服務也會用這組）", variable=s.v_remember).pack(anchor="w", pady=(8, 0))
 
         opt = ttk.Frame(fr); opt.pack(fill="x", pady=(8, 0))
@@ -141,7 +187,7 @@ class App:
         s.log.configure(state="normal"); s.log.insert("end", text + "\n"); s.log.see("end"); s.log.configure(state="disabled")
 
     def start_scan(s):
-        targets = s.v_targets.get().split()
+        targets = ascii_text(s.v_targets.get()).replace(",", " ").replace(";", " ").split()
         if not targets: messagebox.showinfo(TITLE, "請先輸入要掃描的 IP 或網段。"); return
         if s.v_ver.get() == "v3" and not s.v_user.get().strip(): messagebox.showinfo(TITLE, "SNMPv3 需要填使用者。"); return
         s.remember(); a = s.scan_opts(); s.stop_scan = False
@@ -206,7 +252,7 @@ class App:
         s.v_keep = tk.StringVar(value=str(st.get("retention_days", 7))); s.v_lan = tk.BooleanVar(value=bool(st.get("lan_edit")))
         s.v_boot = tk.BooleanVar(value=bool(st.get("autostart"))); s.v_auto = tk.BooleanVar(value=bool(st.get("autorun", True)))
         r1 = ttk.Frame(cfg); r1.pack(fill="x")
-        ttk.Label(r1, text="網頁埠").pack(side="left"); ttk.Entry(r1, textvariable=s.v_port, width=7).pack(side="left", padx=(6, 18))
+        ttk.Label(r1, text="網頁埠").pack(side="left"); ascii_field(ttk.Entry(r1, textvariable=s.v_port, width=7), s.v_port).pack(side="left", padx=(6, 18))
         ttk.Label(r1, text="輪詢間隔（秒）").pack(side="left")
         ttk.Combobox(r1, textvariable=s.v_int, values=["30", "60", "120", "300"], width=6).pack(side="left", padx=(6, 18))
         ttk.Label(r1, text="流量紀錄保留（天）").pack(side="left"); ttk.Spinbox(r1, from_=1, to=90, textvariable=s.v_keep, width=5).pack(side="left", padx=(6, 0))
