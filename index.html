@@ -875,6 +875,24 @@ svg.wires .cab.lv-down .vis{stroke:var(--danger)!important;stroke-dasharray:3 6!
 
 .logo.mark{background:none;padding:0;overflow:hidden;box-shadow:0 4px 12px rgba(37,99,235,.35)}
 .logo.mark svg{width:100%;height:100%;display:block}
+
+/* ---- p25: version + manual ---- */
+.vstrip{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:8px;font-size:12.5px}
+.vtag{font-family:var(--f-mono);font-weight:800;font-size:11.5px;color:#fff;background:linear-gradient(135deg,#22C3EE,#2563EB);border-radius:999px;padding:2px 9px}
+.vtxt{color:var(--muted)}.vtxt b{color:var(--warn)}
+.vlink{border:0;background:none;padding:0;color:var(--accent);font:inherit;font-weight:700;cursor:pointer;text-decoration:none;position:relative}
+.vlink:hover{text-decoration:underline}
+.vdot{position:absolute;top:-2px;right:-8px;width:7px;height:7px;border-radius:50%;background:var(--warn)}
+.clog{display:flex;flex-direction:column;gap:10px;max-height:min(60vh,520px);overflow:auto;margin:6px 0 12px;padding-right:4px}
+.clog section{border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:var(--panel)}
+.clog section.latest{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 25%,transparent)}
+.clog .ch{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.clog .ch b{font-family:var(--f-mono);font-size:14px}
+.clog .exev{font-size:11px;font-weight:700;color:var(--muted);background:var(--soft);border-radius:999px;padding:1px 8px}
+.clog .cd{font-size:11.5px;color:var(--muted);margin-left:auto}.clog .cnew{font-size:10.5px;font-weight:800;color:#1b1300;background:var(--warn);border-radius:999px;padding:1px 7px}
+.clog h4{margin:6px 0 4px;font-size:14px}.clog ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--ink)}
+.helplinks{display:flex;gap:8px;margin-top:10px}.helplinks a{text-decoration:none;color:inherit}
+
+.actions a.btn,.dlrow a.btn{text-decoration:none;color:var(--ink)}.actions a.btn.primary,.dlrow a.btn.primary{color:#fff}
 </style>
 </head>
 <body>
@@ -926,6 +944,7 @@ svg.wires .cab.lv-down .vis{stroke:var(--danger)!important;stroke-dasharray:3 6!
             <span class="label">依 OSI 層標示設備</span>
             <div class="lchips" id="lchips"></div>
             <p class="hint">廠牌欄可打中文、縮寫或產品線，例如「飛塔」「ubnt」「Catalyst」。</p>
+            <div class="helplinks"><a class="btn sm" href="#" id="hManual" target="_blank" rel="noopener">📖 使用手冊</a><button class="btn sm" id="hLog">更新內容 v<span id="hVer"></span></button></div>
           </div></div>
       </div>
     </div>
@@ -1243,6 +1262,24 @@ const SPEEDS=['','100M','1G','2.5G','5G','10G','25G','40G','100G'];
 const PAL=['#2F7DE1','#E0962A','#3DA35D','#8A5CE6','#E0574B','#13A69C','#D8679A','#7D8F2E','#B5651D','#5B6BD6'];
 const KEY='netmap-v2', OLDKEY='netmap-v1', PREFKEY='netmap-prefs';
 const PUBLIC_URL='https://coloplay1.github.io/netmap/';
+const MANUAL_URL=PUBLIC_URL+'manual.html';
+/* 版本紀錄：最新在最前面。exe = netmap.exe 的版本 */
+const APP_VERSION='2.4',EXE_VERSION='1.3.1';
+const CHANGELOG=[
+ {v:'2.4',exe:'1.3.1',d:'2026-11-06',t:'版本資訊與使用手冊',i:['首頁顯示目前版本、更新內容與最新的 netmap.exe 下載','新增詳細的線上使用手冊（附畫面截圖）','netmap.exe 會自動檢查是否有新版本']},
+ {v:'2.3',exe:'1.3.0',d:'2026-11-06',t:'收集樣本',i:['netmap.exe 新增「收集樣本」分頁：暫時當 Syslog／SNMP Trap 接收器，存成樣本檔','SSH 登入紀錄：自動處理 --More-- 與 enable，密碼、community、金鑰自動遮蔽']},
+ {v:'2.2',exe:'1.2.1',d:'2026-11-06',t:'網段探索、掃完直接開網頁',i:['網段探索：不需要 SNMP，用 ping 與 ARP 列出在線設備、廠牌與種類（家用網路也能用）','SNMP 沒回應時自動診斷是「沒開 SNMP」還是「連不到」','掃描完成自動帶入網頁；關閉程式改為清楚的「結束程式／縮到工作列」']},
+ {v:'2.1',exe:'1.1.1',d:'2026-11-06',t:'新標誌',i:['新的標誌與程式圖示','netmap.exe 的輸入框在注音輸入法下也能打 . / - 等符號']},
+ {v:'2.0',exe:'1.1.0',d:'2026-11-06',t:'netmap.exe 視窗版與即時監控',i:['圖形化 SNMP 掃描','監控服務：在內網提供網頁，多人共用同一張圖','每個埠的流量、使用率、上下線燈號與 24 小時曲線，線路依使用率變色']},
+ {v:'1.9',exe:'1.0.0',d:'2026-11-06',t:'故障查線與 SNMP 掃描',i:['故障查線：逐段標記、自動健檢、建議下一步、影響範圍、故障紀錄','SNMP 自動掃描程式（LLDP／CDP、VLAN、PoE、LACP、MAC 表）']},
+ {v:'1.8',d:'2026-11-06',t:'手機與縮放',i:['回到預設位置按鈕（鍵盤 0）、鍵盤 +／− 縮放','手機點設備改為底部提示卡，往上拉才展開設定；支援雙指縮放']},
+ {v:'1.7',d:'2026-11-06',t:'型號與走線',i:['型號清單標出埠數，新增 SonicWall NSa 2800／3800','用語統一為「埠」','線路、線號與箭頭互相避開不重疊']},
+ {v:'1.6',d:'2026-11-06',t:'路徑追蹤',i:['預設只顯示主幹線路，終端線以色標配對','點設備亮出整條到網路入口的路徑，並加方向箭頭','屬性列可移動、收合，廠牌型號擴充到 90 多家，深色／淺色切換']},
+ {v:'1.5',d:'2026-11-06',t:'畫布體驗',i:['面板可拖曳、收合、開關；畫布可自由平移','埠燈號改為小燈，配線架背面到資訊座顯示為牆內虛線','可隱藏線路並以色標配對兩端']},
+ {v:'1.4',d:'2026-11-06',t:'新介面',i:['深色浮動介面、設備插圖，雙擊切換圖示／網路埠模式','開始頁分成新增／匯入／範例']},
+ {v:'1.3',d:'2026-11-06',t:'機櫃與匯出',i:['機櫃視圖、直角走線、LACP／PoE／VLAN','CSV／SVG／PNG／JSON 匯出、LLDP 匯入、分享連結與 QR Code']},
+ {v:'1.0',d:'2026-11-06',t:'第一版',i:['防火牆、Switch、配線架、資訊座埠對埠接線，點埠追蹤整條路徑','產業範例與自動排版']},
+];
 const LAYERS=[['brand','廠牌型號'],['ip','IP'],['mac','MAC'],['gw','Gateway'],['loc','位置 / 機櫃'],['vlan','埠位 VLAN'],['icons','PoE / LACP 圖示'],['label','所有線號'],['speed','線路速率']];
 const ICON={edit:'<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg>',del:'<svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',dup:'<svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg>',chev:'<svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="m6 9 6 6 6-6"/></svg>',info:'<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>',qr:'<svg class="i" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><path d="M14 14h2v2h-2zM18 18h2v2h-2zM14 18h2M18 14h2"/></svg>'};
 const BOLT='<svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>';
@@ -1446,7 +1483,7 @@ function openWelcome(canContinue){
   const ex=TEMPLATES.map(t=>{const st=tplStats(t);return`<button class="wrow" data-tpl="${t.id}" title="${esc(t.desc)}"><span class="tiles">${t.icons.map(tplIcon).join('')}</span><span class="wt"><b>${esc(t.name)}</b><small>${esc(t.tag)} · ${st.d} 台設備 · ${st.c} 條線</small></span><span class="go">›</span></button>`}).join('');
   $('modalRoot').innerHTML=`<div class="modal welcome" id="mod"><div class="wcard" role="dialog" aria-label="開始">
     <div class="whead"><span class="logo mark"><svg viewBox="8 8 240 240" aria-hidden="true"><defs><linearGradient id="nmg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22C3EE"/><stop offset="1" stop-color="#2563EB"/></linearGradient></defs><rect x="8" y="8" width="240" height="240" rx="58" fill="url(#nmg2)"/><rect x="52" y="52" width="152" height="50" rx="14" fill="#fff"/><rect x="74" y="68" width="22" height="18" rx="4" fill="#2563EB"/><rect x="117" y="68" width="22" height="18" rx="4" fill="#F59E0B"/><rect x="160" y="68" width="22" height="18" rx="4" fill="#2563EB"/><path d="M128 102v34M80 170v-20a14 14 0 0 1 14-14h68a14 14 0 0 1 14 14v20" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/><rect x="56" y="170" width="48" height="36" rx="10" fill="#fff"/><rect x="152" y="170" width="48" height="36" rx="10" fill="#F59E0B"/></svg></span>
-    <div><h2>機房線路對應圖</h2><p class="hint">建立新的網路環境、匯入既有資料，或先看產業範例。之後隨時可以從「檔案 ▸ 範本 / 新環境」回到這裡。</p></div>
+    <div><h2>機房線路對應圖</h2><p class="hint">建立新的網路環境、匯入既有資料，或先看產業範例。之後隨時可以從「檔案 ▸ 範本 / 新環境」回到這裡。</p>${versionStrip()}</div>
     <button class="btn" id="wClose" style="margin-left:auto">略過</button></div>
     ${used?`<button class="tcard cont" data-tpl="continue"><span class="tile" style="--tc:var(--accent)"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span><span><b>繼續上次的配置</b><span class="d">${used} 台設備 · ${prev.cables.length} 條線，資料存在這台電腦的瀏覽器</span></span></button>`:''}
     <div class="w3">
@@ -1465,6 +1502,7 @@ function openWelcome(canContinue){
   const close=()=>$('modalRoot').innerHTML='';
   $('wClose').onclick=close;$('mod').onclick=e=>{if(e.target.id==='mod')close()};
   $('mod').querySelectorAll('[data-tpl]').forEach(b=>b.onclick=()=>{const id=b.dataset.tpl;close();if(id==='continue'){if(!S.devices.length&&lastSaved){S=lastSaved;lastSaved=null;ui.sel=null;renderAll();requestAnimationFrame(()=>fitTo(devBox(),1));toast('已載入上次的配置')}}else applyTpl(id)});
+  $('wLog')&&($('wLog').onclick=()=>{close();openChangelog()});
   $('mod').querySelectorAll('[data-wimp]').forEach(b=>b.onclick=()=>{const k=b.dataset.wimp;close();if(k==='json')$('fileIn').click();if(k==='lldp')openLLDP();if(k==='text')openJsonText();if(k==='snmp')openSNMP()});
   const first=$('mod').querySelector('[data-tpl],[data-wimp]');first&&first.focus();
 }
@@ -2170,6 +2208,13 @@ function openShare(d){const title=d?`設備連結：${d.name}`:'分享整份配�
 function modal(html,wide){$('modalRoot').innerHTML=`<div class="modal" id="mod"><div class="mcard${wide?' wide':''}" role="dialog">${html}</div></div>`;
   $('mod').onclick=e=>{if(e.target.id==='mod'||e.target.closest('[data-close]'))closeModal()}}
 const SNMP_ZIP=PUBLIC_URL+'tools/netmap-snmp.zip',SNMP_EXE='https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe',SNMP_CLI='https://github.com/coloplay1/netmap/releases/latest/download/netmap-snmp.exe';
+function openChangelog(){prefs.seenVersion=APP_VERSION;savePrefs();
+  modal(`<h2>更新內容</h2><p class="hint">目前版本：網頁 v${APP_VERSION}　·　netmap.exe v${EXE_VERSION}　·　<a href="${MANUAL_URL}" target="_blank" rel="noopener">使用手冊</a></p>
+  <div class="clog">${CHANGELOG.map((c,i)=>`<section class="${i?'':'latest'}"><div class="ch"><b>v${c.v}</b>${c.exe?`<span class="exev">netmap.exe ${c.exe}</span>`:''}<span class="cd">${c.d}</span>${i?'':'<span class="cnew">最新</span>'}</div><h4>${esc(c.t)}</h4><ul>${c.i.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></section>`).join('')}</div>
+  <div class="actions"><a class="btn primary" href="${SNMP_EXE}" target="_blank" rel="noopener">下載最新 netmap.exe</a><a class="btn" href="${MANUAL_URL}" target="_blank" rel="noopener">開啟使用手冊</a><button class="btn" data-close style="margin-left:auto">關閉</button></div>`,true)}
+function versionStrip(){const fresh=prefs.seenVersion!==APP_VERSION;const L=CHANGELOG[0];
+  return`<div class="vstrip"><span class="vtag">v${APP_VERSION}</span><span class="vtxt">${fresh?'<b>新版本：</b>':''}${esc(L.t)}（${L.d}）</span>
+    <button class="vlink" id="wLog">更新內容${fresh?'<i class="vdot"></i>':''}</button><a class="vlink" href="${MANUAL_URL}" target="_blank" rel="noopener">使用手冊</a><a class="vlink" href="${SNMP_EXE}" target="_blank" rel="noopener">下載 netmap.exe v${EXE_VERSION}</a></div>`}
 function openSNMP(){modal(`<h2>SNMP 掃描與即時監控</h2><p class="hint">瀏覽器不能直接送 SNMP，所以要在你們內網的 Windows 電腦上執行 <b>netmap.exe</b>。它有兩個功能：<b>掃描</b>防火牆、Switch、AP 自動畫出網路圖；<b>監控服務</b>常駐在這台電腦，定時讀取每個埠的流量與上下線，同事用瀏覽器打開 <code>http://這台電腦IP:8080</code> 就能看到同一張圖和即時狀態。只讀取，不會修改設備設定。</p>
   <ol class="snmpsteps">
    <li><b>下載掃描程式</b><div class="dlrow"><a class="btn primary" href="${SNMP_EXE}" target="_blank" rel="noopener">netmap.exe（視窗版，建議）</a><a class="btn" href="${SNMP_CLI}" target="_blank" rel="noopener">命令列版</a><a class="btn" href="${SNMP_ZIP}" target="_blank" rel="noopener">Python 版 ZIP</a></div><small>免安裝，雙擊就能用。第一次執行若出現 Windows SmartScreen 提示，按「其他資訊 ▸ 仍要執行」；啟動監控服務時 Windows 防火牆詢問請按「允許存取」。</small></li>
@@ -2295,7 +2340,8 @@ $('bTheme').onclick=()=>{prefs.skin=prefs.skin==='light'?'dark':'light';savePref
 syncTheme();
 $('eStart').onclick=()=>{if(canEdit())openWelcome(false)};
 $('bStart').onclick=()=>{if(canEdit())openWelcome(true)};
-$('bHome').onclick=()=>openWelcome(true);$('bHome').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openWelcome(true)}};
+$('bHome').onclick=()=>openWelcome(true);
+$('hManual').href=MANUAL_URL;$('hVer').textContent=APP_VERSION;$('hLog').onclick=()=>{document.querySelectorAll('.popwrap>.pop').forEach(p=>p.hidden=true);openChangelog()};$('bHome').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openWelcome(true)}};
 let peekDev=null;function setPeek(id){if(id===peekDev)return;peekDev=id;document.querySelectorAll('#wires .cab.peek').forEach(g=>g.classList.remove('peek'));if(id)document.querySelectorAll(`#wires .cab[data-da="${id}"],#wires .cab[data-db="${id}"]`).forEach(g=>g.classList.add('peek'))}
 $('devs').addEventListener('pointerover',e=>{const dv=e.target.closest('.dev');setPeek(dv?dv.dataset.dev:null)});
 $('devs').addEventListener('pointerleave',()=>setPeek(null));

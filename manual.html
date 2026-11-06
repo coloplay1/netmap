@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>機房線路對應圖 使用手冊</title>
+<meta name="description" content="機房線路對應圖（netmap）網頁版與 netmap.exe 的完整使用教學。">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2Ij4gIDxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzIyQzNFRSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzI1NjNFQiIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPiAgPHJlY3QgeD0iOCIgeT0iOCIgd2lkdGg9IjI0MCIgaGVpZ2h0PSIyNDAiIHJ4PSI1OCIgZmlsbD0idXJsKCNnKSIvPiAgPHJlY3QgeD0iNTIiIHk9IjUyIiB3aWR0aD0iMTUyIiBoZWlnaHQ9IjUwIiByeD0iMTQiIGZpbGw9IiNmZmYiLz4gIDxyZWN0IHg9Ijc0IiB5PSI2OCIgd2lkdGg9IjIyIiBoZWlnaHQ9IjE4IiByeD0iNCIgZmlsbD0iIzI1NjNFQiIvPiAgPHJlY3QgeD0iMTE3IiB5PSI2OCIgd2lkdGg9IjIyIiBoZWlnaHQ9IjE4IiByeD0iNCIgZmlsbD0iI0Y1OUUwQiIvPiAgPHJlY3QgeD0iMTYwIiB5PSI2OCIgd2lkdGg9IjIyIiBoZWlnaHQ9IjE4IiByeD0iNCIgZmlsbD0iIzI1NjNFQiIvPiAgPHBhdGggZD0iTTEyOCAxMDJ2MzRNODAgMTcwdi0yMGExNCAxNCAwIDAgMSAxNC0xNGg2OGExNCAxNCAwIDAgMSAxNCAxNHYyMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjE0IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4gIDxyZWN0IHg9IjU2IiB5PSIxNzAiIHdpZHRoPSI0OCIgaGVpZ2h0PSIzNiIgcng9IjEwIiBmaWxsPSIjZmZmIi8+ICA8cmVjdCB4PSIxNTIiIHk9IjE3MCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjM2IiByeD0iMTAiIGZpbGw9IiNGNTlFMEIiLz48L3N2Zz4=">
+<style>
+:root{--bg:#F6F7FB;--panel:#FFFFFF;--ink:#0F172A;--ink2:#475569;--line:#E2E8F0;--acc:#2563EB;--acc2:#0EA5E9;--warn:#F59E0B;--ok:#16A34A;--bad:#DC2626;--code:#EEF2F7;--tip:#EFF6FF;--tipb:#BFDBFE;--note:#FFFBEB;--noteb:#FDE68A;--shadow:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(15,23,42,.06)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B1120;--panel:#111827;--ink:#E5E7EB;--ink2:#9CA3AF;--line:#1F2937;--acc:#60A5FA;--acc2:#38BDF8;--code:#1E293B;--tip:#0C1E3A;--tipb:#1E3A8A;--note:#2A1F05;--noteb:#78350F;--shadow:0 1px 2px rgba(0,0,0,.3)}}
+:root[data-theme="dark"]{--bg:#0B1120;--panel:#111827;--ink:#E5E7EB;--ink2:#9CA3AF;--line:#1F2937;--acc:#60A5FA;--acc2:#38BDF8;--code:#1E293B;--tip:#0C1E3A;--tipb:#1E3A8A;--note:#2A1F05;--noteb:#78350F;--shadow:0 1px 2px rgba(0,0,0,.3)}
+*{box-sizing:border-box}
+html{scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.75 "Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;-webkit-text-size-adjust:100%}
+a{color:var(--acc)}
+header.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:10px 20px;background:color-mix(in srgb,var(--panel) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header.top .mark{width:32px;height:32px;flex:none}
+header.top b{font-size:17px;white-space:nowrap}
+header.top .ver{font-size:12px;color:var(--ink2);border:1px solid var(--line);border-radius:999px;padding:1px 9px;white-space:nowrap}
+header.top .sp{flex:1}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);text-decoration:none;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn:hover{filter:brightness(1.05)}
+#tocBtn{display:none}
+.wrap{display:grid;grid-template-columns:260px minmax(0,1fr);max-width:1240px;margin:0 auto;gap:32px;padding:0 20px}
+nav.toc{position:sticky;top:64px;align-self:start;max-height:calc(100vh - 64px);overflow:auto;padding:20px 0 40px;font-size:14px}
+nav.toc ol{list-style:none;margin:0;padding:0}
+nav.toc>ol>li{margin:2px 0}
+nav.toc a{display:block;padding:4px 10px;border-radius:8px;color:var(--ink2);text-decoration:none;line-height:1.5}
+nav.toc a:hover{background:var(--code);color:var(--ink)}
+nav.toc a.on{background:var(--tip);color:var(--acc);font-weight:600}
+nav.toc ol ol a{padding-left:24px;font-size:13px}
+main{min-width:0;padding:28px 0 80px}
+.hero{background:linear-gradient(135deg,#22C3EE 0%,#2563EB 100%);color:#fff;border-radius:20px;padding:30px 32px;margin-bottom:28px;box-shadow:var(--shadow)}
+.hero h1{margin:0 0 6px;font-size:30px;line-height:1.3}
+.hero p{margin:0 0 16px;opacity:.95}
+.hero .btn{background:#fff;color:#1E3A8A;border-color:#fff}
+.hero .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.6)}
+.hero .row{display:flex;flex-wrap:wrap;gap:10px}
+section{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:8px 32px 24px;margin:0 0 24px;box-shadow:var(--shadow)}
+h2{font-size:23px;margin:22px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+h2 .n{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--acc);color:#fff;font-size:15px;flex:none}
+h3{font-size:18px;margin:26px 0 6px}
+p,li{color:var(--ink)}
+ul,ol{padding-left:1.4em}
+li{margin:3px 0}
+figure{margin:16px 0 20px}
+figure img{display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--line);background:#0b1120;cursor:zoom-in}
+figure.narrow img{max-width:460px}
+figure.mid img{max-width:720px}
+figcaption{font-size:13px;color:var(--ink2);margin-top:6px}
+kbd{font:600 12.5px/1 ui-monospace,Consolas,monospace;background:var(--code);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:3px 6px;white-space:nowrap}
+code{font:14px ui-monospace,Consolas,monospace;background:var(--code);border-radius:5px;padding:1px 5px}
+pre{background:var(--code);border-radius:10px;padding:12px 14px;overflow:auto;font:13.5px/1.6 ui-monospace,Consolas,monospace}
+.tip,.note,.warn{border-radius:12px;padding:12px 16px;margin:14px 0;border:1px solid}
+.tip{background:var(--tip);border-color:var(--tipb)}
+.note{background:var(--note);border-color:var(--noteb)}
+.tip b:first-child,.note b:first-child{margin-right:6px}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:15px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--ink2);font-weight:600;font-size:13px;white-space:nowrap}
+.tw{overflow-x:auto}
+.steps{counter-reset:s;list-style:none;padding:0}
+.steps>li{counter-increment:s;position:relative;padding-left:40px;margin:12px 0}
+.steps>li::before{content:counter(s);position:absolute;left:0;top:2px;width:26px;height:26px;border-radius:50%;background:var(--acc);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card{border:1px solid var(--line);border-radius:12px;padding:12px 16px}
+.card h4{margin:2px 0 4px;font-size:16px}
+.card p{margin:0;color:var(--ink2);font-size:14.5px}
+.clog{border-left:3px solid var(--line);padding-left:18px;margin:16px 0}
+.clog .v{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.clog .v b{font-size:17px}
+.clog .tag{font-size:12px;border-radius:999px;padding:1px 8px;background:var(--code);color:var(--ink2)}
+.clog .tag.new{background:var(--acc);color:#fff}
+.clog ul{margin:4px 0 0}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:middle;margin-right:4px}
+#lb{position:fixed;inset:0;background:rgba(2,6,23,.85);display:none;align-items:center;justify-content:center;z-index:50;padding:20px;cursor:zoom-out}
+#lb.on{display:flex}#lb img{max-width:100%;max-height:100%;border-radius:10px}
+.foot{color:var(--ink2);font-size:13px;text-align:center;margin-top:30px}
+@media (max-width:900px){
+  .wrap{grid-template-columns:1fr;padding:0 16px}
+  nav.toc{position:fixed;top:56px;left:0;right:0;bottom:0;z-index:30;background:var(--panel);padding:16px;display:none;max-height:none}
+  nav.toc.open{display:block}
+  #tocBtn{display:inline-flex}
+  section{padding:4px 18px 18px}
+  .hero{padding:22px 20px}.hero h1{font-size:24px}
+  .grid2{grid-template-columns:1fr}
+  header.top{padding:8px 16px}
+  header.top .hide-s{display:none}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+</head>
+<body>
+<header class="top">
+  <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
+  <svg class="mark" viewBox="8 8 240 240" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22C3EE"/><stop offset="1" stop-color="#2563EB"/></linearGradient></defs><rect x="8" y="8" width="240" height="240" rx="58" fill="url(#g)"/><rect x="52" y="52" width="152" height="50" rx="14" fill="#fff"/><rect x="74" y="68" width="22" height="18" rx="4" fill="#2563EB"/><rect x="117" y="68" width="22" height="18" rx="4" fill="#F59E0B"/><rect x="160" y="68" width="22" height="18" rx="4" fill="#2563EB"/><path d="M128 102v34M80 170v-20a14 14 0 0 1 14-14h68a14 14 0 0 1 14 14v20" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/><rect x="56" y="170" width="48" height="36" rx="10" fill="#fff"/><rect x="152" y="170" width="48" height="36" rx="10" fill="#F59E0B"/></svg>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v2.4 · netmap.exe v1.3.1</span>
+  <span class="sp"></span>
+  <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
+  <a class="btn pri" href="./">開啟工具</a>
+</header>
+
+<div class="wrap">
+<nav class="toc" id="toc" aria-label="目錄">
+<ol>
+<li><a href="#intro">1. 這是什麼</a></li>
+<li><a href="#quick">2. 五分鐘快速開始</a></li>
+<li><a href="#ui">3. 介面導覽</a></li>
+<li><a href="#build">4. 建立網路圖</a>
+  <ol><li><a href="#b-dev">新增設備與型號</a></li><li><a href="#b-cable">接線</a></li><li><a href="#b-patch">配線架與資訊座</a></li><li><a href="#b-layout">排列與走線</a></li></ol></li>
+<li><a href="#trace">5. 查線路</a></li>
+<li><a href="#port">6. 埠設定（VLAN／PoE／LACP）</a></li>
+<li><a href="#view">7. 檢視與顯示</a>
+  <ol><li><a href="#v-rack">機櫃視圖</a></li><li><a href="#v-table">線路表</a></li><li><a href="#v-layer">圖層與線色</a></li><li><a href="#v-panel">面板與主題</a></li></ol></li>
+<li><a href="#fault">8. 故障查線</a></li>
+<li><a href="#save">9. 儲存、匯出與分享</a></li>
+<li><a href="#exe">10. netmap.exe（Windows 程式）</a>
+  <ol><li><a href="#e-install">下載與第一次開啟</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
+<li><a href="#mobile">11. 手機操作</a></li>
+<li><a href="#keys">12. 快捷鍵</a></li>
+<li><a href="#faq">13. 常見問題</a></li>
+<li><a href="#changelog">14. 版本紀錄</a></li>
+</ol>
+</nav>
+
+<main>
+<div class="hero">
+  <h1>機房線路對應圖 使用手冊</h1>
+  <p>從畫第一台設備、接線、查線，到用 netmap.exe 自動掃描與即時監控流量，一步一步說明。</p>
+  <div class="row">
+    <a class="btn" href="./">開啟網頁版</a>
+    <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
+    <a class="btn ghost" href="#changelog">最新更新：v2.4</a>
+  </div>
+</div>
+
+<section id="intro">
+<h2><span class="n">1</span>這是什麼</h2>
+<p>「機房線路對應圖」把機房裡的防火牆、Switch、配線架、牆上資訊座和電腦，畫成一張可以<b>點埠就看到整條路徑</b>的圖。它有兩個部分：</p>
+<div class="grid2">
+  <div class="card"><h4>🌐 網頁版</h4><p>直接在瀏覽器使用，免安裝。手動畫圖、查線、故障查線、匯出報表。資料存在你自己的瀏覽器裡，不會上傳。</p></div>
+  <div class="card"><h4>🪟 netmap.exe</h4><p>Windows 程式。用 SNMP 自動掃出設備與連線，並可當「監控服務」，讓內網的人用瀏覽器看同一張圖和每個埠的即時流量。</p></div>
+</div>
+<p>適合：公司 IT、機房管理員、弱電／網路工程商，需要回答「這條線接到哪」「這台電腦斷線是哪一段出問題」的時候。</p>
+</section>
+
+<section id="quick">
+<h2><span class="n">2</span>五分鐘快速開始</h2>
+<figure><img src="manual/welcome.jpg" alt="開始頁：新增、匯入、範例" loading="lazy"><figcaption>開始頁。上方顯示目前版本、更新內容與使用手冊。</figcaption></figure>
+<ol class="steps">
+<li><b>開啟網頁版</b>：<a href="./">coloplay1.github.io/netmap</a>。第一次會看到開始頁。</li>
+<li><b>先看範例</b>：在「範例」選一個產業（例如「中小企業辦公室」），馬上有一張完整的圖可以玩。</li>
+<li><b>點任何一個埠</b>：整條路徑會亮起來，直到網路入口（光世代／ISP）。</li>
+<li><b>自己畫</b>：回首頁（點左上角標誌）選「新增空白圖」，用左邊的「設備」工具列加設備，從一個埠拖到另一個埠就是接線。</li>
+<li><b>想自動畫</b>：下載 <a href="#exe">netmap.exe</a>，輸入核心 Switch 的 IP 與 SNMP community，掃完自動在網頁打開。</li>
+</ol>
+<div class="tip"><b>💡</b>所有修改都會自動存在這台電腦的瀏覽器。換電腦或要備份，請用「檔案 → 匯出 JSON」。</div>
+</section>
+
+<section id="ui">
+<h2><span class="n">3</span>介面導覽</h2>
+<figure><img src="manual/map.jpg" alt="主畫面" loading="lazy"><figcaption>主畫面（拓樸視圖）</figcaption></figure>
+<div class="tw"><table>
+<tr><th>位置</th><th>內容</th></tr>
+<tr><td>左上標誌</td><td>點一下回到開始頁（新增／匯入／範例）。</td></tr>
+<tr><td>上方分頁</td><td><b>拓樸視圖</b>（連線圖）、<b>機櫃視圖</b>（依 U 位排列）、<b>線路表</b>（所有線一覽）。</td></tr>
+<tr><td>搜尋列</td><td>打設備名稱、IP、MAC 或線號，按 <kbd>Enter</kbd> 跳到符合的設備。</td></tr>
+<tr><td>編輯／唯讀</td><td>唯讀模式下不會誤改，適合拿給別人看或現場查線。</td></tr>
+<tr><td>深色／淺色</td><td>切換畫面主題。</td></tr>
+<tr><td>範本、檔案</td><td>載入產業範例；匯入匯出、分享連結、列印。</td></tr>
+<tr><td>左側「設備」工具列</td><td>點圖示加入設備；按「⋯」看更多種類。</td></tr>
+<tr><td>右下角工具</td><td>縮放（<b>−／＋</b>）、<b>⌂</b> 回到預設位置、復原／重做、<b>查線</b>（故障查線）、屬性列開關、<b>?</b> 說明。</td></tr>
+<tr><td>右下「畫布工具」</td><td><b>線色</b>、<b>走線</b>、<b>顯示圖層</b>。</td></tr>
+<tr><td>下方圖例</td><td>依 OSI 層標示設備顏色：L1 實體、L2 交換、L3 路由、L3–L7 防火牆、L1–L7 終端。</td></tr>
+</table></div>
+<p>每個面板左上角都有 <b>⋮⋮</b> 可以拖曳移動，按 <b>–</b> 收合。不見了可以從右上「面板」按鈕重設位置。</p>
+</section>
+
+<section id="build">
+<h2><span class="n">4</span>建立網路圖</h2>
+<h3 id="b-dev">新增設備與選型號</h3>
+<ul>
+<li>點左側工具列的圖示，或在畫布空白處<b>按右鍵</b>／按 <kbd>A</kbd>，就會在游標位置加一台設備。</li>
+<li>點設備後右邊會打開「設備屬性」，可以設定名稱、<b>廠牌</b>、<b>型號</b>、IP、Gateway、MAC、位置、機櫃與 U 位。</li>
+<li>廠牌欄可以打中文、縮寫或產品線，例如「飛塔」「ubnt」「Catalyst」都找得到。</li>
+<li>型號清單旁會標示<b>埠數</b>（例如「24 埠 + 4 SFP」），選了型號後埠的數量與名稱會自動套用。</li>
+<li><b>雙擊設備</b>切換「圖示模式」與「網路埠模式」：圖示模式較精簡，網路埠模式可看到每個埠。</li>
+</ul>
+<figure class="mid"><img src="manual/drawer.jpg" alt="設備屬性面板" loading="lazy"><figcaption>設備屬性：選廠牌、型號後會顯示產品說明與 OSI 層。</figcaption></figure>
+
+<h3 id="b-cable">接線</h3>
+<ol class="steps">
+<li>把設備切到網路埠模式（雙擊設備）。</li>
+<li>從一個埠<b>按住拖曳</b>到另一個埠，放開就接好了。拖到收起來（圖示模式）的設備上，會自動接到它的第一個空埠。</li>
+<li>要改插到別的埠：直接拖曳已經接線的埠到新的埠。</li>
+<li>點線可以設定線號、線材（Cat6、單模／多模光纖、DAC、Console）、長度與顏色。</li>
+</ol>
+<p>埠的小燈號：<span class="dot" style="background:#94A3B8"></span>灰色＝空埠、<span class="dot" style="background:#22C55E"></span>綠色＝已接線，小閃電＝PoE 供電。</p>
+
+<h3 id="b-patch">配線架與資訊座</h3>
+<p>配線架有「前」「後」兩排。前面的埠用跳線接到 Switch，後面的埠用牆內線接到各樓層的資訊座（座位 A-01 之類）。</p>
+<ul>
+<li>後排到資訊座的牆內線會畫成<b>虛線</b>，和機櫃內的跳線區分。</li>
+<li>滑鼠移到配線架的埠上，會同時標出同一號的前後兩個埠。</li>
+</ul>
+
+<h3 id="b-layout">排列與走線</h3>
+<ul>
+<li><b>走線 → 依連線自動排列設備</b>：依照上下游關係自動排成由上（網路入口）到下（終端）的樹狀。</li>
+<li><b>走線方式</b>：「曲線」或「直角（自動分道）」。直角模式下平行的線會自動錯開，不會疊在一起。</li>
+<li>點一條線，再<b>雙擊線</b>可以加錨點，拖錨點調整走向；雙擊錨點刪除。</li>
+<li>上排的埠會先往上出線、再沿機身繞出，避免線穿過設備。</li>
+</ul>
+</section>
+
+<section id="trace">
+<h2><span class="n">5</span>查線路</h2>
+<figure><img src="manual/trace.jpg" alt="點設備顯示到網路入口的完整路徑" loading="lazy"><figcaption>點一台設備，整條到網路入口的線路都會亮起，並有流動箭頭標示方向。</figcaption></figure>
+<ul>
+<li><b>點埠</b>：顯示這個埠經過的整條實體路徑（Switch → 配線架 → 資訊座 → 電腦），埠的上方出現設定列。</li>
+<li><b>點設備</b>：亮出這台設備一路往上到網路入口的所有線路，線上有箭頭表示流向。</li>
+<li><b>沒有選任何東西時</b>：預設只顯示設備之間的<b>主幹線路</b>；接電腦、電話、印表機等的終端線會收起，兩端用相同顏色的小標籤配對。</li>
+<li>線路顯示模式在「顯示圖層」裡切換：<b>主幹</b>／<b>全部</b>／<b>隱藏</b>。隱藏時兩端仍保留色標，方便對照。</li>
+<li>搜尋列打線號（例如 <code>H-3F-001</code>）可以直接找到那條線。</li>
+</ul>
+</section>
+
+<section id="port">
+<h2><span class="n">6</span>埠設定（VLAN／PoE／LACP）</h2>
+<figure><img src="manual/ctx.jpg" alt="埠上方的設定列" loading="lazy"><figcaption>點埠後出現的設定列：Access／Trunk、VLAN、PoE、拔線、詳細。</figcaption></figure>
+<ul>
+<li><b>Access／Trunk</b>：Access 填一個 VLAN；Trunk 可填允許的 VLAN 清單。</li>
+<li><b>PoE</b>：標記這個埠供電，埠上會出現閃電圖示。</li>
+<li><b>LACP</b>：按住 <kbd>Shift</kbd> 點多個埠（或 <kbd>Shift</kbd>+拖曳空白處框選），一次設成同一個 LACP 群組。</li>
+<li><b>拔線</b>：刪除這個埠上的線。</li>
+<li>設定列可以拖曳 <b>⋮⋮</b> 移到別處，或按 <b>–</b> 收合；右下角的屬性列按鈕可以整個開關。</li>
+</ul>
+</section>
+
+<section id="view">
+<h2><span class="n">7</span>檢視與顯示</h2>
+<h3 id="v-rack">機櫃視圖</h3>
+<figure><img src="manual/rack.jpg" alt="機櫃視圖" loading="lazy"><figcaption>依設備屬性裡的「機櫃」與「U 位」排列。</figcaption></figure>
+<p>在設備屬性填好機櫃名稱與 U 位、高度，就會出現在對應的機櫃位置。適合列印貼在機櫃門上。</p>
+
+<h3 id="v-table">線路表</h3>
+<figure><img src="manual/table.jpg" alt="線路表" loading="lazy"></figure>
+<p>列出所有線：線號、兩端設備與埠、線材、VLAN、長度。可以排序、搜尋，並匯出 CSV 給 Excel 使用。</p>
+
+<h3 id="v-layer">顯示圖層與線色</h3>
+<figure class="mid"><img src="manual/layers.jpg" alt="顯示圖層" loading="lazy"></figure>
+<ul>
+<li><b>顯示圖層</b>：勾選要顯示在設備下方的資訊：廠牌型號、IP、MAC、Gateway、位置／機櫃、埠位 VLAN、PoE／LACP 圖示、所有線號、線路速率。</li>
+<li><b>全部收成圖示／全部展開網路埠</b>：一次切換所有設備的顯示模式。</li>
+<li><b>線色</b>：自訂、依線材（單模光纖黃、多模水藍、DAC 粗黑、Console 淺藍虛線）、依 VLAN（Trunk 為深灰虛線）。</li>
+</ul>
+
+<h3 id="v-panel">面板、縮放與主題</h3>
+<ul>
+<li>拖曳空白處平移畫布；滑鼠滾輪或 <kbd>+</kbd>／<kbd>−</kbd> 縮放；<kbd>0</kbd> 或右下 <b>⌂</b> 回到預設位置。</li>
+<li>右上「深色／淺色」切換主題，設定會記住。</li>
+</ul>
+</section>
+
+<section id="fault">
+<h2><span class="n">8</span>故障查線</h2>
+<p>使用者回報「不能上網」時，從他的電腦開始，<b>一段一段往網路入口檢查</b>，並記錄每一段的結果。</p>
+<figure><img src="manual/fault.jpg" alt="故障查線面板" loading="lazy"><figcaption>故障查線：左邊是路徑，右邊是逐段檢查清單、故障點與影響範圍。</figcaption></figure>
+<ol class="steps">
+<li>按右下角的 <b>查線</b>，再點有問題的設備（例如「王小明」的電腦）。</li>
+<li>右邊列出從這台電腦到網路入口的每一段：設備、埠、線。程式會先做<b>自動健檢</b>，把 VLAN 不一致、PoE、LACP、線長超過 100 m、IP 重複等可疑處排在前面。</li>
+<li>每一段按 <b>✓ 正常</b>、<b>? 不確定</b> 或 <b>✕ 有問題</b>，可以在備註寫量測結果。上方會提示<b>建議下一個要查的段</b>（用對半法，最快縮小範圍）。</li>
+<li>標記有問題後，會顯示<b>故障點</b>與<b>影響範圍</b>：從網路入口到不了的設備會用紅色斜線標示。</li>
+<li>處理完在最下方填處理方式並<b>結案</b>。所有紀錄可在線路表查看並匯出 CSV。</li>
+</ol>
+<div class="tip"><b>💡</b>不確定從哪裡開始？直接按查線而不選設備，面板會列出整張圖目前的健檢問題。</div>
+</section>
+
+<section id="save">
+<h2><span class="n">9</span>儲存、匯出與分享</h2>
+<div class="tw"><table>
+<tr><th>功能</th><th>說明</th></tr>
+<tr><td>自動儲存</td><td>每次修改都存在這台電腦的瀏覽器（清除瀏覽器資料會不見）。</td></tr>
+<tr><td>匯出／匯入 JSON</td><td>完整備份，換電腦或交給同事時使用。</td></tr>
+<tr><td>匯出 CSV</td><td>線路表給 Excel。</td></tr>
+<tr><td>匯出 SVG／PNG</td><td>圖片，貼到報告或列印。</td></tr>
+<tr><td>匯入 LLDP</td><td>貼上 Switch 的 <code>show lldp neighbors</code> 結果，自動建立連線。</td></tr>
+<tr><td>分享連結、QR Code</td><td>把整張圖壓縮進網址，對方打開就是唯讀版，可貼在機櫃上用手機掃。</td></tr>
+</table></div>
+<div class="note"><b>⚠️</b>分享連結包含圖上的 IP、MAC 等資訊，請只給需要的人。</div>
+</section>
+
+<section id="exe">
+<h2><span class="n">10</span>netmap.exe（Windows 程式）</h2>
+<p>netmap.exe 用 SNMP 讀取防火牆、網管 Switch 的資料，自動畫出設備與連線，也可以常駐成「監控服務」，顯示每個埠的即時流量。只會<b>讀取</b>，不會修改設備設定。</p>
+
+<h3 id="e-install">下載與第一次開啟</h3>
+<ol class="steps">
+<li>在<a href="./">網頁版開始頁</a>或<a href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">這裡</a>下載 <b>netmap.exe</b>，免安裝，直接執行。</li>
+<li>Windows 可能跳出「Windows 已保護您的電腦」（SmartScreen）：按「<b>其他資訊 → 仍要執行</b>」。這是因為程式沒有付費的程式碼簽章。</li>
+<li>第一次啟動監控服務時，Windows 防火牆會詢問，請按「<b>允許存取</b>」，其他電腦才能連進來看圖。</li>
+<li>關閉視窗時會問要「結束程式」或「縮到工作列」。監控服務需要程式保持開著。</li>
+</ol>
+
+<h3 id="e-scan">SNMP 掃描</h3>
+<figure class="mid"><img src="manual/app-g1.jpg" alt="netmap.exe 掃描分頁" loading="lazy"><figcaption>掃描分頁（畫面中的位址為測試環境）。</figcaption></figure>
+<ol class="steps">
+<li><b>掃描目標</b>：填核心 Switch 的 IP 就夠了，程式會沿著 LLDP／CDP 找到其他設備。也可以輸入網段或範圍，用空白分隔，例如 <code>192.168.1.0/24 10.0.0.1-50</code>。</li>
+<li><b>SNMP 帳密</b>：選版本（v1／v2c／v3）。v2c 填唯讀的 community；v3 填使用者、驗證與加密密碼。勾「記住帳密」會用 Windows 帳號加密保存。</li>
+<li>選項：<b>沿著 LLDP／CDP 自動找鄰居</b>、<b>從 MAC 表推斷終端設備</b>、<b>建立沒掃到的鄰居</b>（AP、電話等沒開 SNMP 的設備）。</li>
+<li>按 <b>開始掃描</b>。完成後會<b>自動在瀏覽器打開結果</b>。</li>
+<li>下方按鈕：<b>在網頁開啟結果</b>、<b>只把 SNMP 對應套到目前的圖</b>（保留你手動畫的位置，只補上 SNMP 資訊）、<b>另存 JSON</b>。</li>
+</ol>
+<p>沒有回應的設備會顯示原因，例如「可能沒開 SNMP，或 community／帳密不同」或「連不到這個 IP」。</p>
+<div class="note"><b>⚠️</b>設備端要先開啟 SNMP（唯讀即可），並允許這台電腦的 IP 查詢。家用路由器多半沒有 SNMP，請改用下面的「網段探索」。</div>
+
+<h3 id="e-disc">網段探索（不需要 SNMP）</h3>
+<figure class="mid"><img src="manual/app-d2.jpg" alt="網段探索" loading="lazy"></figure>
+<p>在掃描分頁選「<b>網段探索</b>」，輸入網段（例如 <code>192.168.1.0/24</code>），程式用 ping 與 ARP 列出在線的設備，並依 MAC 判斷廠牌、依開啟的連接埠猜種類（印表機、NAS、攝影機…）。結果一樣可以帶入網頁，但因為沒有 SNMP，<b>不會有埠對埠的連線</b>，需要自己接線。</p>
+
+<h3 id="e-srv">監控服務與即時流量</h3>
+<figure class="mid"><img src="manual/app-g2.jpg" alt="監控服務分頁" loading="lazy"></figure>
+<ol class="steps">
+<li>先完成一次 SNMP 掃描，再到「<b>監控服務</b>」分頁按 <b>啟動服務</b>。</li>
+<li>把畫面上的<b>網頁網址</b>（例如 <code>http://192.168.1.20:18090/</code>）給同一個內網的同事，用瀏覽器打開就能看到同一張圖。</li>
+<li>設定：網頁埠、輪詢間隔（秒）、流量紀錄保留天數；可勾選「允許內網其他電腦編輯圖」與「開啟程式時自動啟動服務」。</li>
+<li>下方表格列出每台設備的狀態、上線／離線的埠數與最忙的埠。</li>
+</ol>
+<figure><img src="manual/live.jpg" alt="網頁上的即時流量" loading="lazy"><figcaption>監控模式下的網頁：線依使用率變色，線上顯示 ↓下載 ↑上傳。</figcaption></figure>
+<figure class="mid"><img src="manual/livechart.jpg" alt="埠的 24 小時流量曲線" loading="lazy"><figcaption>點埠可看到即時流量、使用率、錯誤數與 24 小時曲線。</figcaption></figure>
+<div class="tw"><table>
+<tr><th>線的顏色</th><th>意思</th></tr>
+<tr><td><span class="dot" style="background:#22C55E"></span>綠</td><td>使用率低（30% 以下）</td></tr>
+<tr><td><span class="dot" style="background:#F59E0B"></span>橘</td><td>使用率中等（30%–70%），線稍粗</td></tr>
+<tr><td><span class="dot" style="background:#EF4444"></span>紅（粗）</td><td>使用率高（70% 以上）</td></tr>
+<tr><td><span class="dot" style="background:#DC2626"></span>紅色虛線</td><td>埠離線（線上標示「離線」）</td></tr>
+</table></div>
+
+<h3 id="e-col">收集樣本（給 log 分析與設定檔備份開發用）</h3>
+<figure class="mid"><img src="manual/app-col.jpg" alt="收集樣本分頁" loading="lazy"></figure>
+<p>這個分頁是為了開發「log 分析告警」與「設定檔自動備份」而收集真實資料。只接收與讀取，不會修改設備設定。</p>
+<ul>
+<li><b>① 收集 log 樣本</b>：勾 Syslog（UDP 514）與／或 SNMP Trap（UDP 162），按開始。把設備的 Syslog 伺服器（或 Trap 目的地）設成畫面上顯示的這台電腦 IP。收集一段時間後按「停止並存檔」，按「開啟樣本資料夾」找到檔案。</li>
+<li><b>② 設備登入紀錄</b>：填設備 IP、SSH 埠、帳號、密碼（需要時加 enable 密碼），選設備類型，按「登入並記錄」。程式會執行唯讀指令（例如 <code>show running-config</code>），自動處理 <code>--More--</code>，並<b>自動遮蔽密碼、community 與金鑰</b>。密碼不會被儲存。</li>
+</ul>
+<div class="note"><b>⚠️</b>樣本檔傳給開發者前，請再看一次內容，把不想公開的 IP、名稱改掉。<b>不要把真實密碼傳給任何人</b>。</div>
+
+<h3 id="e-home">在家測試（例如 ASUS 路由器）</h3>
+<ol class="steps">
+<li><b>網段探索</b>：輸入家裡的網段（例如 <code>192.168.50.0/24</code>），可以看到手機、電視、NAS 等。</li>
+<li><b>Syslog</b>：在 ASUS 路由器管理頁「系統記錄 → 遠端記錄伺服器」填這台電腦的 IP，回到 netmap.exe 開始收集，重開 Wi-Fi 或拔插網路線就會有 log 進來。也可以按「傳送測試訊息」確認接收正常。</li>
+<li><b>SSH</b>：在「系統管理 → 系統設定」把 SSH 設為<b>只限 LAN</b> 開啟，用路由器帳號登入並記錄。<b>測完請記得關閉 SSH</b>。</li>
+</ol>
+
+<h3 id="e-update">更新程式</h3>
+<p>netmap.exe 啟動時會檢查是否有新版本，有的話標題列會出現「<b>有新版本</b>」，點一下即可下載。下載新的 netmap.exe 取代舊檔即可，設定與流量紀錄都會保留（存在 <code>%APPDATA%\netmap</code>）。</p>
+</section>
+
+<section id="mobile">
+<h2><span class="n">11</span>手機操作</h2>
+<div class="grid2" style="align-items:start">
+<figure class="narrow" style="margin:6px 0"><img src="manual/mobile.jpg" alt="手機畫面" loading="lazy"></figure>
+<ul>
+<li><b>單指拖曳</b>平移，<b>雙指</b>縮放。</li>
+<li>點設備時，下方出現<b>提示卡</b>顯示名稱與 IP，不會擋住畫面；<b>往上拉</b>才展開完整的設定。</li>
+<li>適合現場查線：把分享連結或 QR Code 貼在機櫃上，手機掃了就能看（唯讀）。</li>
+</ul>
+</div>
+</section>
+
+<section id="keys">
+<h2><span class="n">12</span>快捷鍵</h2>
+<div class="tw"><table>
+<tr><th>按鍵／動作</th><th>功能</th></tr>
+<tr><td>拖曳埠 → 埠</td><td>接線</td></tr>
+<tr><td>拖曳已接線的埠</td><td>改插到別的埠</td></tr>
+<tr><td>點埠</td><td>查整條路徑、開設定列</td></tr>
+<tr><td>雙擊設備</td><td>切換圖示／網路埠模式</td></tr>
+<tr><td><kbd>Shift</kbd> + 點埠</td><td>多選埠（設 LACP、PoE、VLAN）</td></tr>
+<tr><td><kbd>Shift</kbd> + 拖曳空白處</td><td>框選埠</td></tr>
+<tr><td>拖曳空白處</td><td>平移畫布</td></tr>
+<tr><td>點線，再雙擊線</td><td>加錨點（雙擊錨點刪除）</td></tr>
+<tr><td>右鍵／<kbd>A</kbd></td><td>在游標位置加設備</td></tr>
+<tr><td><kbd>+</kbd>／<kbd>−</kbd></td><td>放大／縮小</td></tr>
+<tr><td><kbd>0</kbd></td><td>回到預設位置</td></tr>
+<tr><td><kbd>Delete</kbd></td><td>刪除選取的設備或線</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd>／<kbd>Ctrl</kbd>+<kbd>Y</kbd></td><td>復原／重做</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>F</kbd></td><td>搜尋</td></tr>
+<tr><td><kbd>Esc</kbd></td><td>取消選取、關閉視窗</td></tr>
+</table></div>
+</section>
+
+<section id="faq">
+<h2><span class="n">13</span>常見問題</h2>
+<h3>掃描家裡的網段，為什麼什麼都掃不到？</h3>
+<p>家用路由器與一般電腦預設都沒有開 SNMP。請改用「網段探索」，或在公司的網管 Switch、防火牆上使用 SNMP 掃描。</p>
+<h3>掃描顯示「沒有回應」？</h3>
+<p>程式會自動診斷：如果 ping 得到但 SNMP 沒回應，通常是設備沒開 SNMP、community 打錯，或設備的 SNMP 存取清單沒有允許這台電腦。如果連 ping 都不通，請確認網段與路由。</p>
+<h3>輸入框打不出「.」或「/」？</h3>
+<p>v1.1.1 起，netmap.exe 的輸入框會自動切到英數模式，並把全形符號轉成半形。請更新到最新版。</p>
+<h3>資料存在哪裡？會上傳嗎？</h3>
+<p>網頁版存在你的瀏覽器（localStorage），不會上傳。netmap.exe 的設定、掃描結果與流量紀錄存在 <code>%APPDATA%\netmap</code>，SNMP 帳密以 Windows 帳號加密（DPAPI），只有同一個 Windows 帳號能解開。</p>
+<h3>畫面上的面板不見了？</h3>
+<p>按右上的「面板」按鈕，勾選要顯示的面板，或按「重設所有面板位置」。</p>
+<h3>圖跑到看不到的地方？</h3>
+<p>按右下的 <b>⌂</b> 或鍵盤 <kbd>0</kbd> 回到預設位置。</p>
+<h3>防毒軟體說 netmap.exe 可疑？</h3>
+<p>程式以 PyInstaller 打包且沒有付費簽章，部分防毒會誤判。程式碼公開在 <a href="https://github.com/coloplay1/netmap">GitHub</a>，由 GitHub Actions 自動建置。也可以下載 netmap-snmp.zip 用 Python 直接執行。</p>
+</section>
+
+<section id="changelog">
+<h2><span class="n">14</span>版本紀錄</h2>
+<div class="clog"><div class="v"><b>v2.4　版本資訊與使用手冊</b><span class="tag new">最新 · 2026-11-06</span><span class="tag">netmap.exe 1.3.1</span></div><ul><li>首頁顯示目前版本、更新內容與最新的 netmap.exe 下載</li><li>新增詳細的線上使用手冊（附畫面截圖）</li><li>netmap.exe 會自動檢查是否有新版本</li></ul></div>
+<div class="clog"><div class="v"><b>v2.3　收集樣本</b><span class="tag">2026-11-06</span><span class="tag">netmap.exe 1.3.0</span></div><ul><li>netmap.exe 新增「收集樣本」分頁：暫時當 Syslog／SNMP Trap 接收器，存成樣本檔</li><li>SSH 登入紀錄：自動處理 --More-- 與 enable，密碼、community、金鑰自動遮蔽</li></ul></div>
+<div class="clog"><div class="v"><b>v2.2　網段探索、掃完直接開網頁</b><span class="tag">2026-11-06</span><span class="tag">netmap.exe 1.2.1</span></div><ul><li>網段探索：不需要 SNMP，用 ping 與 ARP 列出在線設備、廠牌與種類（家用網路也能用）</li><li>SNMP 沒回應時自動診斷是「沒開 SNMP」還是「連不到」</li><li>掃描完成自動帶入網頁；關閉程式改為清楚的「結束程式／縮到工作列」</li></ul></div>
+<div class="clog"><div class="v"><b>v2.1　新標誌</b><span class="tag">2026-11-06</span><span class="tag">netmap.exe 1.1.1</span></div><ul><li>新的標誌與程式圖示</li><li>netmap.exe 的輸入框在注音輸入法下也能打 . / - 等符號</li></ul></div>
+<div class="clog"><div class="v"><b>v2.0　netmap.exe 視窗版與即時監控</b><span class="tag">2026-11-06</span><span class="tag">netmap.exe 1.1.0</span></div><ul><li>圖形化 SNMP 掃描</li><li>監控服務：在內網提供網頁，多人共用同一張圖</li><li>每個埠的流量、使用率、上下線燈號與 24 小時曲線，線路依使用率變色</li></ul></div>
+<div class="clog"><div class="v"><b>v1.9　故障查線與 SNMP 掃描</b><span class="tag">2026-11-06</span><span class="tag">netmap.exe 1.0.0</span></div><ul><li>故障查線：逐段標記、自動健檢、建議下一步、影響範圍、故障紀錄</li><li>SNMP 自動掃描程式（LLDP／CDP、VLAN、PoE、LACP、MAC 表）</li></ul></div>
+<div class="clog"><div class="v"><b>v1.8　手機與縮放</b><span class="tag">2026-11-06</span></div><ul><li>回到預設位置按鈕（鍵盤 0）、鍵盤 +／− 縮放</li><li>手機點設備改為底部提示卡，往上拉才展開設定；支援雙指縮放</li></ul></div>
+<div class="clog"><div class="v"><b>v1.7　型號與走線</b><span class="tag">2026-11-06</span></div><ul><li>型號清單標出埠數，新增 SonicWall NSa 2800／3800</li><li>用語統一為「埠」</li><li>線路、線號與箭頭互相避開不重疊</li></ul></div>
+<div class="clog"><div class="v"><b>v1.6　路徑追蹤</b><span class="tag">2026-11-06</span></div><ul><li>預設只顯示主幹線路，終端線以色標配對</li><li>點設備亮出整條到網路入口的路徑，並加方向箭頭</li><li>屬性列可移動、收合，廠牌型號擴充到 90 多家，深色／淺色切換</li></ul></div>
+<div class="clog"><div class="v"><b>v1.5　畫布體驗</b><span class="tag">2026-11-06</span></div><ul><li>面板可拖曳、收合、開關；畫布可自由平移</li><li>埠燈號改為小燈，配線架背面到資訊座顯示為牆內虛線</li><li>可隱藏線路並以色標配對兩端</li></ul></div>
+<div class="clog"><div class="v"><b>v1.4　新介面</b><span class="tag">2026-11-06</span></div><ul><li>深色浮動介面、設備插圖，雙擊切換圖示／網路埠模式</li><li>開始頁分成新增／匯入／範例</li></ul></div>
+<div class="clog"><div class="v"><b>v1.3　機櫃與匯出</b><span class="tag">2026-11-06</span></div><ul><li>機櫃視圖、直角走線、LACP／PoE／VLAN</li><li>CSV／SVG／PNG／JSON 匯出、LLDP 匯入、分享連結與 QR Code</li></ul></div>
+<div class="clog"><div class="v"><b>v1.0　第一版</b><span class="tag">2026-11-06</span></div><ul><li>防火牆、Switch、配線架、資訊座埠對埠接線，點埠追蹤整條路徑</li><li>產業範例與自動排版</li></ul></div>
+</section>
+
+<p class="foot">機房線路對應圖 · 網頁 v2.4 · netmap.exe v1.3.1 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+</main>
+</div>
+<div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>
+<script>
+(function(){
+  var r=document.documentElement,k='netmap-manual-theme';
+  try{var t=localStorage.getItem(k);if(t)r.dataset.theme=t}catch(e){}
+  document.getElementById('theme').onclick=function(){
+    var dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;
+    r.dataset.theme=dark?'light':'dark';try{localStorage.setItem(k,r.dataset.theme)}catch(e){}};
+  var toc=document.getElementById('toc');
+  document.getElementById('tocBtn').onclick=function(){toc.classList.toggle('open')};
+  toc.addEventListener('click',function(e){if(e.target.tagName==='A')toc.classList.remove('open')});
+  var lb=document.getElementById('lb'),li=lb.querySelector('img');
+  document.querySelectorAll('figure img').forEach(function(i){i.onclick=function(){li.src=i.src;li.alt=i.alt;lb.classList.add('on')}});
+  lb.onclick=function(){lb.classList.remove('on')};
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')lb.classList.remove('on')});
+  var links=[].slice.call(toc.querySelectorAll('a')),map={};
+  links.forEach(function(a){map[a.getAttribute('href').slice(1)]=a});
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting&&map[en.target.id]){links.forEach(function(a){a.classList.remove('on')});map[en.target.id].classList.add('on')}})},{rootMargin:'-70px 0px -70% 0px'});
+    Object.keys(map).forEach(function(id){var el=document.getElementById(id);if(el)io.observe(el)});
+  }
+})();
+</script>
+</body>
+</html>

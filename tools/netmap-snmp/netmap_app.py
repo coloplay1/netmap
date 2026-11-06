@@ -16,6 +16,16 @@ import netmap_snmp as ns
 import netmap_server as srv
 import netmap_collect as col
 
+VERSION_URL = os.environ.get("NETMAP_VERSION_URL") or "https://coloplay1.github.io/netmap/version.json"
+DOWNLOAD_URL = "https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe"
+
+
+def newer(a, b):
+    """True when version string a is newer than b (1.10.0 > 1.9.2)."""
+    def parts(v): return [int(x) for x in re.findall(r"\d+", v)[:4]] or [0]
+    try: return parts(a) > parts(b)
+    except Exception: return False
+
 TITLE = "機房線路對應圖 netmap"
 WEB = "https://coloplay1.github.io/netmap/"
 
@@ -92,12 +102,16 @@ class App:
         ttk.Label(head, text="機房線路對應圖", style="Title.TLabel").pack(side="left")
         ttk.Label(head, text=f"  SNMP 掃描與監控服務  v{srv.VERSION}", style="Muted.TLabel").pack(side="left", pady=(6, 0))
         ttk.Button(head, text="開啟網頁", command=s.open_web).pack(side="right")
+        s.upd = ttk.Label(head, text="", foreground="#ffffff", background="#2563EB", cursor="hand2", padding=(8, 2))
+        s.upd.bind("<Button-1>", lambda e: s.open_update())
 
         nb = ttk.Notebook(root); nb.pack(fill="both", expand=True, padx=12, pady=(4, 12)); s.nb = nb
         s.collector = None
         s.build_scan(ttk.Frame(nb, padding=12)); s.build_service(ttk.Frame(nb, padding=12)); s.build_collect(ttk.Frame(nb, padding=12)); s.build_about(ttk.Frame(nb, padding=16))
         root.protocol("WM_DELETE_WINDOW", s.on_close)
         root.after(120, s.pump); root.after(1500, s.refresh_service)
+        s.update_info = None
+        threading.Thread(target=s.check_update, daemon=True).start()
         if autostart or s.store.settings.get("autorun"):
             root.after(300, s.start_service)
         if autostart:
@@ -615,6 +629,33 @@ class App:
         except queue.Empty:
             pass
         s.root.after(120, s.pump)
+
+    # ---------- update check ----------
+    def check_update(s):
+        """Read version.json from the website; never blocks or bothers the user when offline."""
+        if os.environ.get("NETMAP_NO_UPDATE_CHECK"): return
+        try:
+            import urllib.request
+            req = urllib.request.Request(VERSION_URL, headers={"User-Agent": f"netmap/{srv.VERSION}"})
+            info = json.loads(urllib.request.urlopen(req, timeout=6).read().decode("utf-8"))
+            if newer(str(info.get("exe", "")), srv.VERSION):
+                s.update_info = info
+                s.root.after(0, s.show_update)
+        except Exception:
+            pass
+
+    def show_update(s):
+        i = s.update_info or {}
+        s.upd.configure(text=f"有新版本 v{i.get('exe')}，點此下載")
+        s.upd.pack(side="right", padx=(0, 10))
+
+    def open_update(s):
+        i = s.update_info or {}
+        msg = f"有新版本 netmap.exe v{i.get('exe')}（目前 v{srv.VERSION}）。\n\n{i.get('title', '')}\n\n下載後把新的 netmap.exe 取代舊檔即可，設定與流量紀錄會保留。\n要現在下載嗎？"
+        if messagebox.askyesno(TITLE, msg):
+            webbrowser.open(i.get("download") or DOWNLOAD_URL)
+        if i.get("notes") and messagebox.askyesno(TITLE, "要順便看更新內容嗎？"):
+            webbrowser.open(i["notes"])
 
     def on_close(s):
         if s.service.running:
