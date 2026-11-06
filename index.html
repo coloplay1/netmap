@@ -733,6 +733,11 @@ svg.wires .cab.dim .vis{opacity:.1}
 .themetog[aria-checked="false"] .opt.d,.themetog[aria-checked="true"] .opt.l{color:var(--ink)}
 @media (max-width:1240px){.themetog .opt span{display:none}.themetog .opt{padding:0 8px}}
 @media (min-width:901px){#insp{max-height:calc(100% - var(--tb,84px) - 170px)}}
+
+/* ---- p17: flow arrows ---- */
+svg.wires .cab.hot.rev .vis{animation-direction:reverse}
+svg.wires .flowarr path{stroke:var(--bg);stroke-width:1.6;stroke-linejoin:round;paint-order:stroke;pointer-events:none}
+svg.wires .flowarr{pointer-events:none}
 </style>
 </head>
 <body>
@@ -1355,9 +1360,11 @@ function walk(pid,first){const seq=[];let cur=pid,mode=first;const seen=new Set(
 function trace(pid){const fwd=walk(pid,'cable'),back=walk(pid,'inner').reverse();return[...back,{k:'port',p:pid,start:true},...fwd]}
 function traceSet(){const ports=new Set(),cabs=new Set(),devs=new Set();let start=null;
   if(ui.sel&&ui.sel.port)start=ui.sel.port;else if(ui.sel&&ui.sel.cable){const c=S.cables.find(c=>c.id===ui.sel.cable);if(c)start=c.a}
-  const add=s=>{if(s.k==='port'){ports.add(s.p);devs.add(I.owner[s.p].id)}if(s.k==='cable')cabs.add(s.c.id)};
-  if(start&&I.ports[start])trace(start).forEach(add);
-  else if(ui.sel&&ui.sel.dev){const d=S.devices.find(x=>x.id===ui.sel.dev);if(d){d.ports.forEach(p=>{if(I.cab[p.id]&&!ports.has(p.id))trace(p.id).forEach(add)});upstream(d).forEach(add);if(cabs.size){devs.add(d.id);return{ports,cabs,devs,active:true,dev:d.id}}}}
+  const dir={};let lp=null;
+  const add=s=>{if(s.k==='port'){ports.add(s.p);devs.add(I.owner[s.p].id);lp=s.p}if(s.k==='cable'){cabs.add(s.c.id);if(dir[s.c.id]==null)dir[s.c.id]=lp}};
+  const seq=t=>{lp=null;t.forEach(add)};
+  if(start&&I.ports[start]){seq(trace(start));return{ports,cabs,devs,active:true,dir}}
+  else if(ui.sel&&ui.sel.dev){const d=S.devices.find(x=>x.id===ui.sel.dev);if(d){d.ports.forEach(p=>{if(I.cab[p.id]&&!ports.has(p.id))seq(trace(p.id))});seq(upstream(d));if(cabs.size){devs.add(d.id);return{ports,cabs,devs,active:true,dev:d.id,dir}}}}
   return{ports,cabs,devs,active:!!start}}
 /* backbone = cables between network gear; a cable to a PC, PLC, printer… is an access cable */
 function isMain(c){const acc=d=>!d||(d.type==='end'&&d.kind!=='ISP 數據機');return!acc(I.owner[c.a])&&!acc(I.owner[c.b])}
@@ -1529,7 +1536,7 @@ function fixedRun(c){const pa=I.ports[c.a],pb=I.ports[c.b];if(!pa||!pb)return fa
 function drawWires(){peekDev=null;const tr=traceSet(),m=ui.match,R=devRects(),lanes={};computeRunVlans();let h='';
   S.cables.forEach(c=>{const g=wirePath(c,R,lanes);if(!g)return;const st=cableStyle(c);const cls=['cab'];
     if(tr.active)cls.push(tr.cabs.has(c.id)?'hot':'dim');else if(m&&!(m.cabs.has(c.id)||(m.lit.has(I.owner[c.a].id)&&m.lit.has(I.owner[c.b].id))))cls.push('faded');
-    if(!wireShown(c))cls.push('off');if(tr.dev)cls.push('fromdev');
+    if(!wireShown(c))cls.push('off');if(tr.dev)cls.push('fromdev');if(tr.dir&&tr.dir[c.id]===c.b)cls.push('rev');
     if(link&&link.cable===c)cls.push('moving');if(ui.sel&&ui.sel.cable===c.id)cls.push('selc');
     h+=`<g class="${cls.join(' ')}" data-cable="${c.id}" data-da="${I.owner[c.a].id}" data-db="${I.owner[c.b].id}" style="--w:${st.w}px">${tr.cabs.has(c.id)?`<path class="halo" d="${g.d}" stroke="${st.color}"/>`:''}<path class="vis" id="w-${c.id}" d="${g.d}" stroke="${st.color}"${st.dash?` stroke-dasharray="${st.dash}"`:''}/><path class="hit" d="${g.d}"/></g>`});
   $('wires').innerHTML=h+'<g id="deco"></g>';
@@ -1548,6 +1555,10 @@ function drawWires(){peekDev=null;const tr=traceSet(),m=ui.match,R=devRects(),la
     if(selected&&!ui.ro){const kp=el.getPointAtLength(len*.22);dh+=`<g class="knob" data-delcable="${c.id}" transform="translate(${kp.x},${kp.y})"><title>拔除這條線</title><circle r="10"/><path d="M-3.5,-3.5L3.5,3.5M3.5,-3.5L-3.5,3.5"/></g>`;
       (c.wps||[]).forEach((w,i)=>{dh+=`<circle class="wp" data-wp="${c.id}:${i}" cx="${w.x}" cy="${w.y}" r="6.5"><title>拖曳移動錨點，雙擊刪除</title></circle>`})}
   });
+  if(tr.active&&tr.dir){S.cables.forEach(c=>{if(!tr.cabs.has(c.id))return;const el=document.getElementById('w-'+c.id);if(!el)return;let len=0;try{len=el.getTotalLength()}catch(e){}if(len<40)return;
+    const fwd=tr.dir[c.id]!==c.b,col=cableStyle(c).color,n=Math.max(1,Math.min(6,Math.floor(len/110))),step=len/(n+1);
+    for(let i=1;i<=n;i++){const at=step*i;const p=el.getPointAtLength(at),q=el.getPointAtLength(Math.min(len,at+2));const ang=Math.atan2(q.y-p.y,q.x-p.x)*180/Math.PI+(fwd?0:180);
+      dh+=`<g class="flowarr" transform="translate(${p.x},${p.y}) rotate(${ang})"><path d="M-7,-8 L7,0 L-7,8 L-3.5,0 Z" fill="${col}"/></g>`}})}
   $('deco').innerHTML=dh;renderLegend();renderCtx()}
 function renderLegend(){const el=$('legend');const mode=prefs.colorMode;
   const line=(c,w,dash)=>`<svg viewBox="0 0 26 8" style="width:22px;height:8px;margin-right:5px;vertical-align:0"><path d="M2 4H24" stroke="${c}" stroke-width="${w}" stroke-linecap="round"${dash?` stroke-dasharray="${dash}"`:''}/></svg>`;
@@ -1976,8 +1987,17 @@ function closeModal(){$('modalRoot').innerHTML=''}
 
 /* ---------- pointer interactions ---------- */
 let lastDev={};
-function toggleView(d){d.view=viewOf(d)==='icon'?'ports':'icon';save();ui.sel={dev:d.id};renderAll();toast(d.view==='icon'?`${d.name} 收成圖示`:`${d.name} 展開網路孔`)}
-function setAllView(v){if(!S.devices.length)return;snap();S.devices.forEach(d=>d.view=v);if(ui.view!=='map')setView('map');autoLayout();save();renderAll();toast((v==='icon'?'已全部收成圖示':'已全部展開網路孔')+'，並重新排列',true)}
+function toggleView(d){snap();d.view=viewOf(d)==='icon'?'ports':'icon';ui.sel={dev:d.id};renderAll();relaxLayout();save()}
+function setAllView(v){if(!S.devices.length)return;if(S.devices.every(d=>viewOf(d)===v))return;snap();S.devices.forEach(d=>d.view=v);if(ui.view!=='map')setView('map');renderAll();relaxLayout();save()}
+/* keep the user's arrangement: only push devices apart where the new sizes overlap (rows left to right, then rows downwards) */
+function relaxLayout(){const R=devRects();const ds=S.devices.filter(d=>R[d.id]).sort((a,b)=>a.y-b.y||a.x-b.x);if(!ds.length)return;
+  const rows=[];ds.forEach(d=>{const row=rows.find(r=>Math.abs(r.y-d.y)<70);if(row)row.ds.push(d);else rows.push({y:d.y,ds:[d]})});
+  let moved=false,prevBottom=-1e9;
+  rows.sort((a,b)=>a.y-b.y).forEach(row=>{row.ds.sort((a,b)=>a.x-b.x);let cur=-1e9;
+    row.ds.forEach(d=>{const w=R[d.id].r-R[d.id].l;if(d.x<cur){d.x=Math.round(cur);moved=true}cur=d.x+w+36});
+    const top=Math.min(...row.ds.map(d=>d.y));if(top<prevBottom){const dy=Math.round(prevBottom-top);row.ds.forEach(d=>d.y+=dy);moved=true}
+    prevBottom=Math.max(...row.ds.map(d=>d.y+(R[d.id].b-R[d.id].t)))+48});
+  if(moved)renderAll()}
 let link=null,drag=null,wpd=null,mq=null,pan=null,pdrag=null,hoverEl=null,rafW=0,rafD=0;
 const canvas=$('canvas'),stage=$('stage');
 function toCanvas(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)/ui.zoom,y:(e.clientY-r.top)/ui.zoom}}
