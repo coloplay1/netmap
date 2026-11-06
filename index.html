@@ -77,7 +77,7 @@ svg.i{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke
 .menu hr{border:0;border-top:1px solid var(--line);margin:4px 0;width:100%}
 
 /* layout */
-.main{flex:1;display:grid;grid-template-columns:236px minmax(0,1fr) 340px;min-height:0}
+.main{flex:1;display:grid;grid-template-columns:88px minmax(0,1fr) 340px;min-height:0}
 aside{background:var(--panel);overflow:auto;padding:16px 14px 28px;display:flex;flex-direction:column;gap:14px}
 aside>*{flex-shrink:0}
 aside.left{box-shadow:1px 0 0 var(--line)}
@@ -130,7 +130,7 @@ svg.tmp circle{fill:var(--accent)}
 .dev.sel{border-color:var(--tc);box-shadow:0 0 0 3px color-mix(in srgb,var(--tc) 30%,transparent),var(--shadow)}
 .dev.trace{border-color:var(--warn);box-shadow:0 0 0 3px color-mix(in srgb,var(--warn) 25%,transparent),var(--shadow)}
 .dev.dimmed,.dev.faded{opacity:.22}
-.dev.pop{animation:pop .35s cubic-bezier(.3,1.5,.6,1)}
+.dev.popin{animation:pop .35s cubic-bezier(.3,1.5,.6,1)}
 @keyframes pop{from{transform:scale(.85);opacity:0}}
 .dev header{display:flex;align-items:center;gap:9px;padding:9px 8px 6px 10px;cursor:grab;touch-action:none;border-radius:14px 14px 0 0}
 .dev header:active{cursor:grabbing}
@@ -152,6 +152,7 @@ svg.tmp circle{fill:var(--accent)}
 .ports{display:grid;gap:5px 4px}
 .ports.two{grid-template-rows:repeat(2,auto);grid-auto-flow:column}
 .port{width:28px;display:flex;flex-direction:column;align-items:center;gap:1px;border:0;background:none;padding:0;touch-action:none;cursor:crosshair;position:relative}
+.port::after{content:"";position:absolute;inset:-5px -2px -3px;border-radius:8px}
 .jack{width:23px;height:19px;border:1.5px solid var(--line2);border-radius:5px;background:var(--soft);position:relative;transition:box-shadow .15s,transform .12s,border-color .15s}
 .jack::after{content:"";position:absolute;left:6.5px;right:6.5px;bottom:-1.5px;height:5px;border:1.5px solid var(--line2);border-bottom:0;border-radius:2px 2px 0 0;background:var(--panel)}
 .jack.sfp{height:13px;margin-block:3px;border-radius:3px}
@@ -163,7 +164,7 @@ svg.tmp circle{fill:var(--accent)}
 .lagbar{position:absolute;left:-3px;right:-3px;bottom:-6px;height:3px;border-radius:2px;background:var(--g)}
 .port .pl{font-family:var(--f-mono);font-size:9px;color:var(--muted);max-width:30px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px}
 .port .pv{font-family:var(--f-mono);font-size:8.5px;font-weight:700;color:var(--accent);line-height:1}
-.port:hover .jack{border-color:var(--accent);transform:translateY(-1px)}
+.port:hover .jack{border-color:var(--accent);transform:scale(1.14);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 22%,transparent)}
 .port.used .jack{border-color:var(--c,var(--accent));background:color-mix(in srgb,var(--c,var(--accent)) 30%,var(--panel))}
 .port.used .jack::after{border-color:var(--c,var(--accent))}
 .port.used .jack::before{content:"";position:absolute;top:3px;left:3px;width:5px;height:5px;border-radius:50%;background:var(--ok);box-shadow:0 0 4px var(--ok)}
@@ -338,8 +339,8 @@ tbody tr:hover td{background:var(--accent-soft);cursor:pointer}
 .prevtbl{max-height:260px;overflow:auto;border-radius:10px}
 .prevtbl table{min-width:0;font-size:12px}
 .prevtbl td,.prevtbl th{padding:6px 8px}
-.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--panel);padding:8px 8px 8px 16px;border-radius:999px;font-size:13px;z-index:60;display:flex;gap:12px;align-items:center;max-width:calc(100% - 32px);box-shadow:var(--shadow);animation:tin .25s ease-out}
-@keyframes tin{from{transform:translate(-50%,10px);opacity:0}}
+.toast{position:fixed;left:50%;top:calc(64px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--ink);color:var(--panel);padding:8px 8px 8px 16px;border-radius:999px;font-size:13px;z-index:60;display:flex;gap:12px;align-items:center;max-width:calc(100% - 32px);box-shadow:var(--shadow);animation:tin .25s ease-out}
+@keyframes tin{from{transform:translate(-50%,-10px);opacity:0}}
 .toast button{border:0;background:var(--accent);color:var(--on-accent);border-radius:999px;padding:4px 12px;font-size:12px;font-weight:700}
 .toast:not(:has(button)){padding-right:16px}
 .banner{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;background:var(--warn);color:#fff;font-size:13px;font-weight:700;padding-block:6px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
@@ -364,7 +365,64 @@ tbody tr:hover td{background:var(--accent-soft);cursor:pointer}
 .tcard.cont{flex-direction:row;align-items:center;gap:12px;background:var(--accent-soft);border-color:transparent}
 .tcard.cont>span:last-child{display:flex;flex-direction:column;gap:2px}
 
+/* left icon dock */
+aside.left{padding:12px 8px 20px;gap:8px;align-items:stretch}
+.plabel{font-size:11px;font-weight:700;color:var(--muted);text-align:center;letter-spacing:.06em}
+.pal{display:flex;flex-direction:column;gap:6px}
+.pal button{border:1px solid transparent;background:transparent;border-radius:12px;padding:7px 2px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--ink);cursor:grab;touch-action:none;transition:background .12s,border-color .12s,transform .12s;line-height:1.2;text-align:center}
+.pal button:hover:not(:disabled){background:var(--soft);border-color:var(--line)}
+.pal button:active:not(:disabled){transform:scale(.95)}
+.pal .tile{width:34px;height:34px;border-radius:10px}
+.palhint{font-size:10.5px;color:var(--muted);line-height:1.5;text-align:center;margin:4px 0 0}
+.pghost{position:fixed;z-index:50;pointer-events:none;display:flex;align-items:center;gap:8px;background:var(--panel);border-radius:12px;padding:6px 12px 6px 6px;box-shadow:var(--shadow);font-size:12.5px;font-weight:700;border:2px dashed var(--accent);transform:translate(-50%,-50%)}
+.pghost .tile{width:28px;height:28px;border-radius:8px}
+/* floating canvas dock */
+.dock{position:absolute;right:14px;bottom:14px;display:flex;gap:6px;align-items:center;background:var(--panel);border-radius:999px;padding:5px;box-shadow:var(--shadow);z-index:8;flex-wrap:wrap;justify-content:flex-end;max-width:calc(100% - 28px)}
+.dock button{border:0;background:transparent;height:32px;min-width:32px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:13px;font-weight:700;color:var(--ink);padding:0 8px}
+.dock button:hover:not(:disabled){background:var(--soft)}
+.dock button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent)}
+.dock .dgrp{display:flex;gap:1px;padding-right:6px;border-right:1px solid var(--line)}
+.dock .zr{min-width:50px;font-variant-numeric:tabular-nums;font-size:12px}
+.dock .qbtn{width:32px;padding:0;background:var(--soft);font-weight:800}
+.pop.up{top:auto;bottom:calc(100% + 10px);right:0}
+.pop.help{min-width:300px;max-width:min(360px,calc(100vw - 32px))}
+.keys{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;margin:0;font-size:12.5px}
+.keys dt{font-weight:700;white-space:nowrap}
+.keys dd{margin:0;color:var(--muted)}
+.legend{position:absolute;right:14px;top:14px;z-index:7}
+.hintbar{right:auto;max-width:calc(100% - 460px)}
+.modeseg button[aria-pressed="true"]#mRo{background:var(--warn);color:#fff}
+/* context popover over the canvas */
+.ctx{position:absolute;z-index:9;background:var(--panel);border-radius:14px;box-shadow:0 0 0 1px var(--line),var(--shadow);padding:10px;display:flex;flex-direction:column;gap:8px;min-width:240px;max-width:min(340px,calc(100% - 24px));transform:translate(-50%,calc(-100% - 16px))}
+.ctx.below{transform:translate(-50%,18px)}
+.ctx::after{content:"";position:absolute;left:var(--ax,50%);bottom:-6px;width:12px;height:12px;background:var(--panel);transform:translateX(-50%) rotate(45deg);box-shadow:1px 1px 0 var(--line)}
+.ctx.below::after{bottom:auto;top:-6px;box-shadow:-1px -1px 0 var(--line)}
+.ctx .ct{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:800}
+.ctx .ct small{font-weight:600;color:var(--muted)}
+.ctx .ct .x{margin-left:auto;border:0;background:transparent;color:var(--muted);width:24px;height:24px;border-radius:6px;font-size:15px}
+.ctx .ct .x:hover{background:var(--soft)}
+.ctx .cr{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.ctx select,.ctx input{border:1px solid var(--line);background:var(--soft);border-radius:8px;padding:4px 7px;font-size:12.5px;min-width:0}
+.ctx input{width:78px}
+.ctx .tg{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;display:inline-flex;gap:5px;align-items:center}
+.ctx .tg[aria-pressed="true"]{background:var(--warn);border-color:var(--warn);color:#fff}
+.ctx .tg.go{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.ctx .tg.danger{color:var(--danger)}
+.ctx .sw{width:20px;height:20px;border-radius:50%;border:2px solid var(--panel);box-shadow:0 0 0 1px var(--line2)}
+.ctx .sw[aria-pressed="true"]{box-shadow:0 0 0 2px var(--ink)}
+.dragging #deco,.dragging ~ .ctx{display:none}
+.panning,.panning *{cursor:grabbing!important}
+.addmenu{position:absolute;z-index:11;background:var(--panel);border-radius:14px;box-shadow:0 0 0 1px var(--line),var(--shadow);padding:6px;display:grid;grid-template-columns:1fr 1fr;gap:2px;min-width:240px}
+.addmenu .amt{grid-column:1/-1;font-size:11px;font-weight:700;color:var(--muted);padding:4px 8px}
+.addmenu button{border:0;background:transparent;display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:9px;font-size:12.5px;font-weight:700;text-align:left}
+.addmenu button:hover,.addmenu button:focus-visible{background:var(--soft)}
+.addmenu .tile{width:24px;height:24px;border-radius:7px}
+.addmenu .tile svg{width:14px;height:14px}
 @media (max-width:900px){
+  .hintbar{display:none}
+  aside.left{flex-direction:row;overflow-x:auto;align-items:center}
+  .pal{flex-direction:row}
+  .plabel,.palhint{display:none}
   body{overflow:auto;height:auto}
   .main{grid-template-columns:1fr!important}
   aside.left,aside.right{box-shadow:0 1px 0 var(--line)}
@@ -388,25 +446,11 @@ tbody tr:hover td{background:var(--accent-soft);cursor:pointer}
     <button id="vTable" aria-pressed="false">線路表</button>
   </div>
   <label class="searchbox"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg><input class="search" id="q" type="search" placeholder="搜尋線號、IP、設備、廠牌…" aria-label="搜尋"><span class="qcount" id="qcount" hidden><span id="qn"></span><button type="button" id="qfocus">對焦</button></span></label>
-  <div class="seg" role="group" aria-label="復原">
-    <button id="bUndo" title="復原 (Ctrl+Z)"><svg class="i" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>復原</button>
-    <button id="bRedo" title="重做 (Ctrl+Y)">重做<svg class="i" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button>
-  </div>
-  <div class="seg" role="group" aria-label="縮放"><button id="zOut" aria-label="縮小">−</button><button id="zReset" title="回到 100%">100%</button><button id="zIn" aria-label="放大">+</button><button id="zFit" title="顯示全部設備">全覽</button></div>
-  <div class="popwrap"><button class="btn" data-popbtn="popView" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>顯示</button>
-    <div class="pop" id="popView" hidden>
-      <span class="label">線條顏色</span>
-      <div class="seg" role="group" aria-label="線條顏色"><button data-cmode="custom">自訂</button><button data-cmode="type">依線材</button><button data-cmode="vlan">依 VLAN</button></div>
-      <span class="label">走線方式</span>
-      <div class="seg" role="group" aria-label="走線方式"><button data-route="curve">曲線</button><button data-route="ortho">直角（自動分道）</button></div>
-      <span class="label">資訊圖層</span>
-      <div class="togs" id="layerToggles"></div>
-    </div></div>
-  <button class="btn" id="bRo" aria-pressed="false" title="鎖定後只能查線，不會誤觸拔線"><svg class="i" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>唯讀</button>
-  <button class="btn" id="bLayout" title="依連線關係重新排列設備">自動排列</button>
-  <button class="btn primary" id="bTpl">範本 / 新環境</button>
+  <div class="seg modeseg" role="group" aria-label="模式"><button id="mEdit" aria-pressed="true" title="可以接線、移動、修改"><svg class="i" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>編輯</button><button id="mRo" aria-pressed="false" title="只能查線，不會誤觸拔線"><svg class="i" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>唯讀</button></div>
   <div class="popwrap"><button class="btn" data-popbtn="popFile" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><path d="M4 4h10l6 6v10H4z"/><path d="M14 4v6h6"/></svg>檔案</button>
     <div class="pop" id="popFile" hidden><div class="menu">
+      <button data-file="tpl">範本 / 新環境…</button>
+      <hr>
       <button data-file="saveJson">下載專案檔（JSON）</button>
       <button data-file="openJson">開啟專案檔…</button>
       <hr>
@@ -423,25 +467,44 @@ tbody tr:hover td{background:var(--accent-soft);cursor:pointer}
 </div>
 
 <div class="main" id="main">
-  <aside class="left" id="left">
-    <div id="roNote" class="ronote" hidden>唯讀模式：可以點孔查整條路徑，不能新增、拔線或修改。按上方「唯讀」解除。</div>
-    <span class="label">點一下加入設備</span>
-    <div class="typegrid" id="types"></div>
-    <span class="label">依 OSI 層標示設備</span>
-    <div class="lchips" id="lchips"></div>
-    <ul class="tips">
-      <li>從一個孔<b>拖曳</b>到另一個孔就接上線</li>
-      <li>拖曳已接線的孔，可以改插到別的孔</li>
-      <li>在線上<b>雙擊</b>加錨點，拖曳錨點整理走線</li>
-      <li><b>Shift + 點孔</b>或 Shift + 拖曳框選多個孔，可設 LACP、PoE、VLAN</li>
-      <li>廠牌欄可打中文、縮寫或產品線，例如「飛塔」「ubnt」「Catalyst」</li>
-      <li>Delete 刪除選取項目，Ctrl+Z 復原</li>
-    </ul>
+  <aside class="left" id="left" aria-label="設備">
+    <span class="plabel">設備</span>
+    <div class="pal" id="types"></div>
+    <p class="palhint">拖到畫布放下，或點一下加入。也可以在畫布按右鍵或 A 鍵</p>
   </aside>
 
   <div class="stagewrap" id="stagewrap">
     <div class="stage" id="stage"><div class="sizer" id="sizer"><div class="canvas" id="canvas"><svg class="wires" id="wires"></svg><div id="devs"></div><svg class="tmp" id="tmp"></svg></div></div></div>
-    <div class="hintbar"><div id="hint"></div><div class="legend" id="legend" hidden></div></div>
+    <div class="legend" id="legend" hidden></div>
+    <div class="hintbar"><div id="hint"></div></div>
+    <div class="ctx" id="ctx" hidden></div>
+    <div class="addmenu" id="addmenu" hidden role="menu" aria-label="加入設備"></div>
+    <div class="dock" id="dock" role="toolbar" aria-label="畫布工具">
+      <div class="dgrp"><button id="bUndo" title="復原 (Ctrl+Z)" aria-label="復原"><svg class="i" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button><button id="bRedo" title="重做 (Ctrl+Y)" aria-label="重做"><svg class="i" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button></div>
+      <div class="dgrp"><button id="zOut" title="縮小" aria-label="縮小">−</button><button id="zReset" title="回到 100%" class="zr">100%</button><button id="zIn" title="放大" aria-label="放大">+</button><button id="zFit" title="全覽：顯示全部設備" aria-label="全覽"><svg class="i" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>
+      <div class="dgrp" role="group" aria-label="走線方式"><button data-route="curve" title="曲線走線" aria-label="曲線走線"><svg class="i" viewBox="0 0 24 24"><path d="M4 18C10 18 8 6 20 6"/></svg></button><button data-route="ortho" title="直角走線（自動分道、避開設備）" aria-label="直角走線"><svg class="i" viewBox="0 0 24 24"><path d="M4 18h7V6h9"/></svg></button></div>
+      <div class="popwrap"><button data-popbtn="popView" aria-expanded="false" title="線色與資訊圖層" class="dtxt"><svg class="i" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/></svg>圖層</button>
+        <div class="pop up" id="popView" hidden>
+          <span class="label">線條顏色</span>
+          <div class="seg" role="group" aria-label="線條顏色"><button data-cmode="custom">自訂</button><button data-cmode="type">依線材</button><button data-cmode="vlan">依 VLAN</button></div>
+          <span class="label">資訊圖層</span>
+          <div class="togs" id="layerToggles"></div>
+        </div></div>
+      <button id="bLayout" title="依連線關係重新排列設備" class="dtxt"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="6" rx="1.5"/><rect x="14" y="3" width="7" height="6" rx="1.5"/><rect x="8.5" y="15" width="7" height="6" rx="1.5"/><path d="M6.5 9v3h11V9M12 12v3"/></svg>排列</button>
+      <div class="popwrap"><button data-popbtn="popHelp" aria-expanded="false" title="操作說明與快捷鍵" aria-label="操作說明" class="qbtn">?</button>
+        <div class="pop up help" id="popHelp" hidden>
+          <span class="label">操作</span>
+          <dl class="keys">
+            <dt>拖曳孔 → 孔</dt><dd>接線</dd><dt>拖曳已接線的孔</dt><dd>改插到別的孔</dd><dt>點孔</dt><dd>查整條路徑，孔上方出現設定列</dd>
+            <dt>Shift + 點孔</dt><dd>多選孔，設 LACP、PoE、VLAN</dd><dt>Shift + 拖曳空白處</dt><dd>框選孔</dd><dt>拖曳空白處</dt><dd>平移畫布</dd>
+            <dt>點線，再雙擊線</dt><dd>加錨點；雙擊錨點刪除</dd><dt>右鍵 / A</dt><dd>在游標位置加設備</dd>
+            <dt>Delete</dt><dd>刪除選取</dd><dt>Ctrl+Z / Ctrl+Y</dt><dd>復原 / 重做</dd><dt>Ctrl+F</dt><dd>搜尋</dd><dt>Esc</dt><dd>取消、關閉</dd>
+          </dl>
+          <span class="label">依 OSI 層標示設備</span>
+          <div class="lchips" id="lchips"></div>
+          <p class="hint">廠牌欄可打中文、縮寫或產品線，例如「飛塔」「ubnt」「Catalyst」。</p>
+        </div></div>
+    </div>
   </div>
   <div class="rack-view" id="rackView" hidden></div>
   <div class="table-view" id="tableView" hidden></div>
@@ -877,7 +940,7 @@ function renderCanvas(){I=idx();ui.match=computeMatches();
   const tr=traceSet(),m=ui.match,L=prefs.layers;
   $('qcount').hidden=!m;if(m)$('qn').textContent=m.count?`${m.count} 筆`:'沒有結果';
   $('devs').innerHTML=S.devices.map(d=>{const ls=layersOf(d);
-    const cls=['dev'];if(ui.sel&&ui.sel.dev===d.id)cls.push('sel');if(tr.devs.has(d.id)||(m&&m.devs.has(d.id)))cls.push('trace');if(m&&!m.lit.has(d.id))cls.push('faded');if(ui.layer&&!ls.includes(ui.layer))cls.push('dimmed');if(ui.popId===d.id)cls.push('pop');
+    const cls=['dev'];if(ui.sel&&ui.sel.dev===d.id)cls.push('sel');if(tr.devs.has(d.id)||(m&&m.devs.has(d.id)))cls.push('trace');if(m&&!m.lit.has(d.id))cls.push('faded');if(ui.layer&&!ls.includes(ui.layer))cls.push('dimmed');if(ui.popId===d.id)cls.push('popin');
     const sub=(L.brand&&[d.brand,d.model].filter(Boolean).join(' '))||typeName(d);
     const foot=[L.ip&&d.ip,L.mac&&d.mac&&'MAC '+d.mac,L.gw&&d.gw&&'GW '+d.gw,L.loc&&locText(d)].filter(Boolean).join(' · ');
     return`<div class="${cls.join(' ')}" data-dev="${d.id}" style="left:${d.x}px;top:${d.y}px;--tc:${tc(d.type)}">
@@ -941,7 +1004,7 @@ function drawWires(){const tr=traceSet(),m=ui.match,R=devRects(),lanes={};comput
     if(selected&&!ui.ro){const kp=el.getPointAtLength(len*.22);dh+=`<g class="knob" data-delcable="${c.id}" transform="translate(${kp.x},${kp.y})"><title>拔除這條線</title><circle r="10"/><path d="M-3.5,-3.5L3.5,3.5M3.5,-3.5L-3.5,3.5"/></g>`;
       (c.wps||[]).forEach((w,i)=>{dh+=`<circle class="wp" data-wp="${c.id}:${i}" cx="${w.x}" cy="${w.y}" r="6.5"><title>拖曳移動錨點，雙擊刪除</title></circle>`})}
   });
-  $('deco').innerHTML=dh;renderLegend()}
+  $('deco').innerHTML=dh;renderLegend();renderCtx()}
 function renderLegend(){const el=$('legend');const mode=prefs.colorMode;if(mode==='custom'||!S.cables.length){el.hidden=true;return}
   const line=(c,w,dash)=>`<svg viewBox="0 0 26 8"><path d="M2 4H24" stroke="${c}" stroke-width="${w}" stroke-linecap="round"${dash?` stroke-dasharray="${dash}"`:''}/></svg>`;let h='';
   if(mode==='type'){const used=[...new Set(S.cables.map(c=>c.type||'Cat6'))];h=used.map(t=>{const s=TYPE_STYLE[t]||TYPE_STYLE.Cat6;return`<span class="lg">${line(s.c,s.w,s.dash)}${esc(t)}</span>`}).join('')}
@@ -953,7 +1016,7 @@ function renderHint(){const el=$('hint');el.className='';
   else if(ui.pending){el.className='act';el.innerHTML=`從 <b>${esc(pname(ui.pending))}</b> 出發，點要接過去的孔 <button id="hCancel">取消</button>`}
   else if(link&&link.active){el.className='act';el.innerHTML=`${link.cable?'拖到新的孔放開，就把線改插過去':'拖到另一個空的孔放開，就接上線'} · Esc 取消`}
   else if(ui.multi.size>1)el.innerHTML=`已選 ${ui.multi.size} 個孔，可在右側設定 LACP、PoE、VLAN`;
-  else el.innerHTML=`從網路孔<b>拖曳</b>到另一個孔即可接線 · 線上雙擊加錨點`;
+  else el.innerHTML=`<b>拖曳</b>孔到孔接線 · 右鍵或 A 加設備 · 右下角 <b>?</b> 看全部操作`;
   const b=$('hCancel');if(b)b.onclick=()=>{ui.pending=null;renderAll()};const u=$('hUnlock');if(u)u.onclick=()=>setRo(false)}
 
 /* ---------- rack view ---------- */
@@ -1007,7 +1070,7 @@ function renderInsp(){const el=$('insp');const s=ui.sel;I=I||idx();el.style.remo
   else if(!s){
     const who={7:['防火牆 NGFW','終端'],6:['防火牆','終端'],5:['防火牆','終端'],4:['防火牆','終端'],3:['防火牆','路由器','L3 Switch','終端'],2:['Switch','AP','終端'],1:['Hub','配線架','資訊座','AP','網路線']};
     el.innerHTML=`<div><span class="label">開始使用</span><h2 style="margin-top:4px">點選設備、網路孔或線</h2></div>
-    <div class="card"><ol class="steps"><li>左側點一下設備類型加入畫面</li><li>從一個孔拖曳到另一個孔接線</li><li>點孔看它一路接到哪裡</li><li>點設備看介紹、選廠牌、改設定</li></ol></div>
+    <div class="card"><ol class="steps"><li>從左側把設備拖到畫布，或在畫布按右鍵</li><li>從一個孔拖曳到另一個孔接線</li><li>點孔看它一路接到哪裡</li><li>點設備看介紹、選廠牌、改設定</li></ol></div>
     <div class="card"><span class="label">設備對應 OSI 七層</span>
     <div class="osi">${OSI.map(([n,zh])=>`<div class="osi-row on" style="grid-template-columns:30px 76px 1fr"><span class="ln">L${n}</span><span class="zh">${zh}</span><span class="who">${who[n].map(w=>`<span>${w}</span>`).join('')}</span></div>`).join('')}</div>
     <p class="hint">越往上層，設備看懂的資訊越多：Hub 只轉送電訊號，Switch 認得 MAC，路由器看 IP，次世代防火牆能辨識是哪個應用程式。</p></div>`}
@@ -1190,13 +1253,15 @@ function setCounts(d,n,sf,poe,msg){snap();const T=TYPES[d.type];let removed=[];
     d.ports=[...main,...sfp];if(poe!=null)applyPoe(d,poe)}
   const ids=new Set(removed.map(p=>p.id));const lost=S.cables.filter(c=>ids.has(c.a)||ids.has(c.b)).length;S.cables=S.cables.filter(c=>!ids.has(c.a)&&!ids.has(c.b));
   save();toast(`${msg||'孔數已更新'}${lost?`，移除 ${lost} 條線`:''}`,true);renderAll()}
-function addNew(type){if(!canEdit())return;const T=TYPES[type];snap();
-  const k=S.devices.length%5;
-  const x=Math.round(((stage.scrollLeft+stage.clientWidth/2)/ui.zoom-120+k*24)/10)*10,y=Math.round(((stage.scrollTop+60)/ui.zoom+k*24)/10)*10;
+function freeSpot(){const R=Object.values(devRects()),z=ui.zoom;const vx=stage.scrollLeft/z,vy=stage.scrollTop/z,vw=stage.clientWidth/z,vh=stage.clientHeight/z;const W=280,H=150,M=24;
+  for(let y=vy+30;y<vy+Math.max(vh-80,60);y+=30)for(let x=vx+30;x<vx+Math.max(vw-W*.6,60);x+=30){if(!R.some(r=>x<r.r+M&&x+W>r.l-M&&y<r.b+M&&y+H>r.t-M))return{x,y}}
+  for(let y=vy+30;y<vy+vh+1600;y+=40)for(let x=vx+30;x<vx+Math.max(vw-W*.6,60);x+=40){if(!R.some(r=>x<r.r+M&&x+W>r.l-M&&y<r.b+M&&y+H>r.t-M))return{x,y,off:true}}
+  return{x:vx+30,y:Math.max(vy,...R.map(r=>r.b))+40,off:true}}
+function addNew(type,pos){if(!canEdit())return;if(ui.view!=='map')setView('map');const T=TYPES[type];const p=pos||freeSpot();snap();
   const count=S.devices.filter(d=>d.type===type).length+1;const nn=String(count).padStart(2,'0');
   const name=type==='seat'?`座位 ${nn}`:type==='end'?`PC-${nn}`:`${T.t}-${nn}`;
-  const d=addDev(type,{name,x:Math.max(10,x),y:Math.max(10,y)});normalize(S);ui.sel={dev:d.id};ui.focus='d.name';ui.layer=null;ui.popId=d.id;save();toast('已加入 '+name+'，可在右側改名稱與廠牌',true);
-  renderLayerChips();if(ui.view!=='map')setView('map');renderAll()}
+  const d=addDev(type,{name,x:Math.max(10,Math.round(p.x/10)*10),y:Math.max(10,Math.round(p.y/10)*10)});normalize(S);ui.sel={dev:d.id};ui.multi.clear();ui.focus='d.name';ui.layer=null;ui.popId=d.id;save();toast('已加入 '+name+'，可在右側改名稱與廠牌',true);
+  renderLayerChips();renderAll();if(p.off)stage.scrollTo({top:Math.max(0,d.y*ui.zoom-120),behavior:'smooth'})}
 
 /* ---------- table ---------- */
 function allRuns(){const seen=new Set(),rows=[];
@@ -1355,7 +1420,7 @@ function modal(html,wide){$('modalRoot').innerHTML=`<div class="modal" id="mod">
 function closeModal(){$('modalRoot').innerHTML=''}
 
 /* ---------- pointer interactions ---------- */
-let link=null,drag=null,wpd=null,mq=null,hoverEl=null;
+let link=null,drag=null,wpd=null,mq=null,pan=null,pdrag=null,hoverEl=null,rafW=0,rafD=0;
 const canvas=$('canvas'),stage=$('stage');
 function toCanvas(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)/ui.zoom,y:(e.clientY-r.top)/ui.zoom}}
 function portAt(x,y){const el=document.elementFromPoint(x,y);const p=el&&el.closest&&el.closest('#devs .port');return p?p.dataset.port:null}
@@ -1366,10 +1431,14 @@ canvas.addEventListener('pointerdown',e=>{if(e.button!==0)return;
   if(pb){if(!ui.ro)e.preventDefault();link={from:pb.dataset.port,sx:e.clientX,sy:e.clientY,active:false,mod:e.shiftKey||e.ctrlKey||e.metaKey};return}
   const h=e.target.closest('[data-drag]');
   if(h){if(!ui.ro)e.preventDefault();const d=S.devices.find(x=>x.id===h.dataset.drag);drag={d,sx:e.clientX,sy:e.clientY,ox:d.x,oy:d.y,moved:false,el:h.closest('.dev')};return}
-  if(e.shiftKey&&!e.target.closest('.dev')){e.preventDefault();const p=toCanvas(e);const box=document.createElement('div');box.className='mq';canvas.appendChild(box);mq={x0:p.x,y0:p.y,box}}
+  if(e.shiftKey&&!e.target.closest('.dev')){e.preventDefault();const p=toCanvas(e);const box=document.createElement('div');box.className='mq';canvas.appendChild(box);mq={x0:p.x,y0:p.y,box};return}
+  if(e.pointerType==='mouse'&&!e.target.closest('.dev')&&!e.target.closest('[data-cable],[data-delcable]')){pan={sx:e.clientX,sy:e.clientY,sl:stage.scrollLeft,st:stage.scrollTop,moved:false}}
 });
 document.addEventListener('pointermove',e=>{
-  if(wpd){if(!wpd.moved){wpd.moved=true;snap()}const p=toCanvas(e);wpd.c.wps[wpd.i]={x:Math.round(p.x/10)*10,y:Math.round(p.y/10)*10};drawWires();autoScroll(e);return}
+  if(pdrag){if(!pdrag.moved){if(Math.hypot(e.clientX-pdrag.sx,e.clientY-pdrag.sy)<5)return;pdrag.moved=true;const T=TYPES[pdrag.type];const g=document.createElement('div');g.className='pghost';g.style.setProperty('--tc',tc(pdrag.type));g.innerHTML=`<span class="tile">${pdrag.type==='end'?KICON['PC 桌機']:TICON[pdrag.type]}</span>${T.n}`;document.body.appendChild(g);pdrag.ghost=g}
+    pdrag.ghost.style.left=e.clientX+'px';pdrag.ghost.style.top=e.clientY+'px';return}
+  if(pan){const dx=e.clientX-pan.sx,dy=e.clientY-pan.sy;if(!pan.moved){if(Math.hypot(dx,dy)<4)return;pan.moved=true;canvas.classList.add('panning');$('ctx').hidden=true}stage.scrollLeft=pan.sl-dx;stage.scrollTop=pan.st-dy;return}
+  if(wpd){if(!wpd.moved){wpd.moved=true;snap()}const p=toCanvas(e);wpd.c.wps[wpd.i]={x:Math.round(p.x/10)*10,y:Math.round(p.y/10)*10};if(!rafW)rafW=requestAnimationFrame(()=>{rafW=0;drawWires()});autoScroll(e);return}
   if(mq){const p=toCanvas(e);const l=Math.min(p.x,mq.x0),t=Math.min(p.y,mq.y0);Object.assign(mq.box.style,{left:l+'px',top:t+'px',width:Math.abs(p.x-mq.x0)+'px',height:Math.abs(p.y-mq.y0)+'px'});mq.x1=p.x;mq.y1=p.y;return}
   if(link){if(ui.ro||link.mod)return;
     if(!link.active){if(Math.hypot(e.clientX-link.sx,e.clientY-link.sy)<6)return;
@@ -1381,12 +1450,21 @@ document.addEventListener('pointermove',e=>{
     if(te&&t!==link.from){const bad=badTarget(link.from,t);te.classList.toggle('tgt-ok',!bad);te.classList.toggle('tgt-bad',!!bad);hoverEl=te}else hoverEl=null;
     autoScroll(e);return}
   if(drag){if(ui.ro)return;const dx=(e.clientX-drag.sx)/ui.zoom,dy=(e.clientY-drag.sy)/ui.zoom;
-    if(!drag.moved){if(Math.abs(dx)+Math.abs(dy)<4)return;drag.moved=true;snap()}
-    drag.d.x=Math.max(0,Math.round((drag.ox+dx)/10)*10);drag.d.y=Math.max(0,Math.round((drag.oy+dy)/10)*10);drag.el.style.left=drag.d.x+'px';drag.el.style.top=drag.d.y+'px';drawWires();autoScroll(e)}
+    if(!drag.moved){if(Math.abs(dx)+Math.abs(dy)<4)return;drag.moved=true;snap();prepDrag(drag)}
+    drag.d.x=Math.max(0,Math.round((drag.ox+dx)/10)*10);drag.d.y=Math.max(0,Math.round((drag.oy+dy)/10)*10);drag.el.style.left=drag.d.x+'px';drag.el.style.top=drag.d.y+'px';
+    if(!rafD)rafD=requestAnimationFrame(()=>{rafD=0;if(drag)fastWires(drag)});autoScroll(e)}
 });
+/* while a device is dragged, only its own cables are redrawn, as plain curves, and labels are hidden; the full routing runs on drop */
+function prepDrag(D){const d=D.d;canvas.classList.add('dragging');$('ctx').hidden=true;
+  D.prep=S.cables.filter(c=>I.owner[c.a].id===d.id||I.owner[c.b].id===d.id).map(c=>{const ca=center(c.a),cb=center(c.b);const g=document.querySelector(`#wires [data-cable="${c.id}"]`);
+    const ma=I.owner[c.a].id===d.id,mb=I.owner[c.b].id===d.id;return{a:ca,b:cb,ma,mb,paths:g?[...g.querySelectorAll('path')]:[]}}).filter(x=>x.a&&x.b);D.x0=d.x;D.y0=d.y}
+function fastWires(D){const dx=D.d.x-D.x0,dy=D.d.y-D.y0;(D.prep||[]).forEach(p=>{const a=p.ma?{x:p.a.x+dx,y:p.a.y+dy}:p.a,b=p.mb?{x:p.b.x+dx,y:p.b.y+dy}:p.b;const dd=curve(a,b);p.paths.forEach(el=>el.setAttribute('d',dd))})}
 function autoScroll(e){const r=stage.getBoundingClientRect(),m=36,v=14;if(e.clientX>r.right-m)stage.scrollLeft+=v;else if(e.clientX<r.left+m)stage.scrollLeft-=v;if(e.clientY>r.bottom-m)stage.scrollTop+=v;else if(e.clientY<r.top+m)stage.scrollTop-=v}
 function endLinkUI(){canvas.classList.remove('linking');$('tmp').innerHTML='';document.querySelectorAll('.port.from,.tgt-ok,.tgt-bad').forEach(x=>x.classList.remove('from','tgt-ok','tgt-bad'));hoverEl=null}
 document.addEventListener('pointerup',e=>{
+  if(pdrag){const P=pdrag;pdrag=null;if(P.ghost)P.ghost.remove();if(!P.moved){addNew(P.type);return}
+    const el=document.elementFromPoint(e.clientX,e.clientY);if(el&&el.closest('#stage')){const p=toCanvas(e);addNew(P.type,{x:p.x-110,y:p.y-24})}else toast('拖到畫布上放開就會加入');return}
+  if(pan){const P=pan;pan=null;canvas.classList.remove('panning');if(P.moved){ui.suppress=true;setTimeout(()=>ui.suppress=false,50);renderCtx()}return}
   if((link&&link.active)||(drag&&drag.moved)||(wpd&&wpd.moved)||(mq&&mq.x1!=null)){ui.suppress=true;setTimeout(()=>ui.suppress=false,50)}
   if(wpd){const W=wpd;wpd=null;if(W.moved){save();renderAll()}return}
   if(mq){const M=mq;mq=null;M.box.remove();if(M.x1==null)return;const l=Math.min(M.x0,M.x1),r=Math.max(M.x0,M.x1),t=Math.min(M.y0,M.y1),b=Math.max(M.y0,M.y1);
@@ -1394,9 +1472,9 @@ document.addEventListener('pointerup',e=>{
     ui.multi=new Set(sel);ui.sel=sel.length===1?{port:sel[0]}:null;if(sel.length===1)ui.multi.clear();renderAll();if(sel.length>1)toast(`已框選 ${sel.length} 個孔`);return}
   if(link){const L=link;link=null;const t=L.active?portAt(e.clientX,e.clientY):null;endLinkUI();
     if(!L.active){portClick(L.from,L.mod)}else{if(!t||t===L.from){renderAll();return}connect(L.from,t)}return}
-  if(drag){const D=drag;drag=null;if(!D.moved){ui.sel={dev:D.d.id};ui.multi.clear();renderAll()}else{save();renderCanvas()}}
+  if(drag){const D=drag;drag=null;canvas.classList.remove('dragging');if(!D.moved){ui.sel={dev:D.d.id};ui.multi.clear();renderAll()}else{save();renderCanvas()}}
 });
-document.addEventListener('pointercancel',()=>{if(link){link=null;endLinkUI();renderAll()}if(drag){drag=null;save()}if(mq){mq.box.remove();mq=null}wpd=null;
+document.addEventListener('pointercancel',()=>{if(pdrag){if(pdrag.ghost)pdrag.ghost.remove();pdrag=null}if(pan){pan=null;canvas.classList.remove('panning')}if(link){link=null;endLinkUI();renderAll()}if(drag){drag=null;canvas.classList.remove('dragging');save();renderCanvas()}if(mq){mq.box.remove();mq=null}wpd=null;
   if(rdrag){if(rdrag.ghost)rdrag.ghost.remove();rdrag=null;document.querySelectorAll('.rdrop').forEach(x=>x.remove())}});
 function portClick(pid,mod){
   if(mod){const owner=I.owner[pid].id;if(ui.sel&&ui.sel.port&&!ui.multi.size)ui.multi.add(ui.sel.port);if(ui.multi.has(pid))ui.multi.delete(pid);else ui.multi.add(pid);
@@ -1425,24 +1503,24 @@ stage.addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDe
 function setZoom(z){ui.zoom=Math.min(1.6,Math.max(.35,z));sizeStage();drawWires()}
 $('zIn').onclick=()=>setZoom(ui.zoom+.1);$('zOut').onclick=()=>setZoom(ui.zoom-.1);$('zReset').onclick=()=>setZoom(1);$('zFit').onclick=()=>{if(ui.view!=='map')setView('map');fitTo(devBox(),1)};
 $('bUndo').onclick=undo;$('bRedo').onclick=redo;
-$('bTpl').onclick=()=>{if(canEdit())openWelcome(false)};
 $('bLayout').onclick=()=>{if(!canEdit()||!S.devices.length)return;snap();if(ui.view!=='map')setView('map');autoLayout();save();renderAll();stage.scrollTo({left:0,top:0,behavior:'smooth'});toast('已自動排列',true)};
-$('bRo').onclick=()=>setRo(!ui.ro);
-function setRo(v){ui.ro=v;document.body.classList.toggle('ro',v);$('bRo').setAttribute('aria-pressed',v);$('roNote').hidden=!v;
-  $('types').querySelectorAll('button').forEach(b=>b.disabled=v);$('bLayout').disabled=v;$('bTpl').disabled=v;ui.pending=null;syncUR();renderAll();toast(v?'已鎖定，只能查線':'已解除唯讀')}
+$('mEdit').onclick=()=>setRo(false);$('mRo').onclick=()=>setRo(true);
+function applyRoUI(){document.body.classList.toggle('ro',ui.ro);$('mEdit').setAttribute('aria-pressed',!ui.ro);$('mRo').setAttribute('aria-pressed',ui.ro);$('types').querySelectorAll('button').forEach(b=>b.disabled=ui.ro);$('bLayout').disabled=ui.ro}
+function setRo(v){if(ui.ro===v)return;ui.ro=v;applyRoUI();ui.pending=null;$('addmenu').hidden=true;syncUR();renderAll();toast(v?'已切到唯讀，只能查線':'已切回編輯')}
 function setView(v){ui.view=v;['Map','Rack','Table'].forEach(k=>$('v'+k).setAttribute('aria-pressed',v===k.toLowerCase()));
   $('stagewrap').hidden=v!=='map';$('tableView').hidden=v!=='table';$('rackView').hidden=v!=='rack';$('left').hidden=v!=='map';$('main').style.gridTemplateColumns=v==='map'?'':'minmax(0,1fr) 340px';renderAll()}
 $('vMap').onclick=()=>setView('map');$('vRack').onclick=()=>setView('rack');$('vTable').onclick=()=>setView('table');
 let qT;$('q').oninput=()=>{ui.q=$('q').value;renderCanvas();if(ui.view==='table')renderTable();clearTimeout(qT);if(ui.q.trim())qT=setTimeout(()=>{if(ui.view==='map'&&ui.match&&ui.match.lit.size)focusMatches()},600)};
 $('q').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(qT);focusMatches()}if(e.key==='Escape'){$('q').value='';ui.q='';renderAll()}};
 $('qfocus').onclick=()=>focusMatches();
-document.querySelectorAll('[data-popbtn]').forEach(b=>b.onclick=e=>{e.stopPropagation();const p=$(b.dataset.popbtn);const open=p.hidden;document.querySelectorAll('.pop').forEach(x=>x.hidden=true);document.querySelectorAll('[data-popbtn]').forEach(x=>x.setAttribute('aria-expanded','false'));p.hidden=!open;b.setAttribute('aria-expanded',open)});
-document.addEventListener('click',e=>{if(!e.target.closest('.popwrap')){document.querySelectorAll('.pop').forEach(x=>x.hidden=true);document.querySelectorAll('[data-popbtn]').forEach(x=>x.setAttribute('aria-expanded','false'))}});
+document.querySelectorAll('[data-popbtn]').forEach(b=>b.onclick=e=>{e.stopPropagation();const p=$(b.dataset.popbtn);const open=p.hidden;document.querySelectorAll('.popwrap>.pop').forEach(x=>x.hidden=true);document.querySelectorAll('[data-popbtn]').forEach(x=>x.setAttribute('aria-expanded','false'));p.hidden=!open;b.setAttribute('aria-expanded',open)});
+document.addEventListener('click',e=>{if(!e.target.closest('.popwrap')){document.querySelectorAll('.popwrap>.pop').forEach(x=>x.hidden=true);document.querySelectorAll('[data-popbtn]').forEach(x=>x.setAttribute('aria-expanded','false'))}});
 function renderViewPop(){$('layerToggles').innerHTML=LAYERS.map(([k,n])=>`<label class="tog"><input type="checkbox" data-layer="${k}" ${prefs.layers[k]?'checked':''}>${n}</label>`).join('');
   document.querySelectorAll('[data-cmode]').forEach(b=>b.setAttribute('aria-pressed',prefs.colorMode===b.dataset.cmode));document.querySelectorAll('[data-route]').forEach(b=>b.setAttribute('aria-pressed',prefs.route===b.dataset.route))}
-$('popView').addEventListener('click',e=>{const cm=e.target.closest('[data-cmode]'),rt=e.target.closest('[data-route]');if(cm)prefs.colorMode=cm.dataset.cmode;if(rt)prefs.route=rt.dataset.route;if(cm||rt){savePrefs();renderViewPop();renderAll()}});
+document.addEventListener('click',e=>{const cm=e.target.closest('[data-cmode]'),rt=e.target.closest('[data-route]');if(cm)prefs.colorMode=cm.dataset.cmode;if(rt)prefs.route=rt.dataset.route;if(cm||rt){savePrefs();renderViewPop();renderAll()}});
 $('popView').addEventListener('change',e=>{const k=e.target.dataset.layer;if(!k)return;prefs.layers[k]=e.target.checked?1:0;savePrefs();renderAll()});
 $('popFile').addEventListener('click',e=>{const b=e.target.closest('[data-file]');if(!b)return;$('popFile').hidden=true;const a=b.dataset.file;
+  if(a==='tpl'){if(canEdit())openWelcome(false)}
   if(a==='saveJson'){download(`netmap-${stamp()}.json`,'application/json',projectJSON());toast('已下載專案檔')}
   if(a==='openJson'){if(canEdit())$('fileIn').click()}
   if(a==='csvCables')openText('配線表（每條線）',`配線表-${stamp()}.csv`,cablesCSV(),'text/csv');
@@ -1462,8 +1540,8 @@ function openJsonText(){let old=null;try{old=localStorage.getItem(OLDKEY)}catch(
   $('jClear').onclick=()=>{if(!canEdit())return;loadProject({devices:[],cables:[],racks:[]},'已清空');closeModal()}}
 
 function renderLeft(){
-  $('types').innerHTML=Object.entries(TYPES).map(([k,T])=>`<button data-type="${k}" title="加入${T.n}" style="--tc:${tc(k)}"><span class="tile">${k==='end'?KICON['PC 桌機']:TICON[k]}</span>${T.n}</button>`).join('');
-  $('types').querySelectorAll('[data-type]').forEach(b=>b.onclick=()=>addNew(b.dataset.type));
+  $('types').innerHTML=Object.entries(TYPES).map(([k,T])=>`<button data-type="${k}" title="拖到畫布，或點一下加入${T.n}" style="--tc:${tc(k)}"><span class="tile">${k==='end'?KICON['PC 桌機']:TICON[k]}</span>${T.n.replace('座位資訊座','資訊座').replace('終端設備','終端')}</button>`).join('');
+  $('types').querySelectorAll('[data-type]').forEach(b=>b.onclick=e=>{if(e.detail===0)addNew(b.dataset.type)});
   renderLayerChips()}
 function renderLayerChips(){$('lchips').innerHTML=OSI.map(([n,zh])=>`<button data-l="${n}" aria-pressed="${ui.layer===n}"><span class="ln">L${n}</span>${zh}</button>`).join('');
   $('lchips').querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{const n=+b.dataset.l;ui.layer=ui.layer===n?null:n;renderLayerChips();renderCanvas()})}
@@ -1471,6 +1549,8 @@ function renderLayerChips(){$('lchips').innerHTML=OSI.map(([n,zh])=>`<button dat
 /* ---------- keyboard ---------- */
 document.addEventListener('keydown',e=>{const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='f'&&!typing){e.preventDefault();$('q').focus();return}
+  if(!typing&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&e.key.toLowerCase()==='a'&&ui.view==='map'&&!$('modalRoot').innerHTML){e.preventDefault();openAddMenu(lastPtr);return}
+  if(e.key==='Escape'&&!$('addmenu').hidden){$('addmenu').hidden=true;return}
   if((e.ctrlKey||e.metaKey)&&!typing&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?redo():undo();return}
   if((e.ctrlKey||e.metaKey)&&!typing&&e.key.toLowerCase()==='y'){e.preventDefault();redo();return}
   if(e.key==='Escape'){if(link){link=null;endLinkUI();renderAll();return}if($('modalRoot').innerHTML){closeModal();return}if(typing){document.activeElement.blur();return}ui.pending=null;ui.sel=null;ui.multi.clear();renderAll();return}
@@ -1483,6 +1563,65 @@ let tT;function toast(m,withUndo){let t=document.querySelector('.toast');if(!t){
   t.hidden=false;t.style.animation='none';void t.offsetWidth;t.style.animation='';clearTimeout(tT);tT=setTimeout(()=>t.hidden=true,withUndo?4500:2400)}
 
 window.addEventListener('resize',()=>requestAnimationFrame(drawWires));
+$('types').addEventListener('pointerdown',e=>{const b=e.target.closest('[data-type]');if(!b||e.button!==0||b.disabled)return;e.preventDefault();pdrag={type:b.dataset.type,sx:e.clientX,sy:e.clientY,moved:false}});
+
+/* ---------- add-device menu: right click or A ---------- */
+let lastPtr=null;
+stage.addEventListener('pointermove',e=>{lastPtr={clientX:e.clientX,clientY:e.clientY}},{passive:true});
+function openAddMenu(pt){if(!canEdit()||ui.view!=='map')return;const m=$('addmenu'),wr=$('stagewrap').getBoundingClientRect();
+  if(!pt||pt.clientX<wr.left||pt.clientX>wr.right||pt.clientY<wr.top||pt.clientY>wr.bottom)pt={clientX:wr.left+wr.width/2,clientY:wr.top+wr.height/3};
+  const cp=toCanvas(pt);m.dataset.x=cp.x;m.dataset.y=cp.y;
+  m.innerHTML=`<span class="amt">在這裡加入設備</span>`+Object.entries(TYPES).map(([k,T])=>`<button role="menuitem" data-add="${k}" style="--tc:${tc(k)}"><span class="tile">${k==='end'?KICON['PC 桌機']:TICON[k]}</span>${T.n}</button>`).join('');
+  m.hidden=false;const x=Math.max(8,Math.min(wr.width-m.offsetWidth-8,pt.clientX-wr.left)),y=Math.max(8,Math.min(wr.height-m.offsetHeight-8,pt.clientY-wr.top));m.style.left=x+'px';m.style.top=y+'px';m.querySelector('button').focus()}
+$('addmenu').addEventListener('click',e=>{const b=e.target.closest('[data-add]');if(!b)return;const m=$('addmenu');m.hidden=true;addNew(b.dataset.add,{x:+m.dataset.x-20,y:+m.dataset.y-20})});
+$('addmenu').addEventListener('keydown',e=>{const bs=[...$('addmenu').querySelectorAll('button')];const i=bs.indexOf(document.activeElement);if(e.key==='ArrowDown'||e.key==='ArrowRight'){e.preventDefault();bs[(i+1)%bs.length].focus()}if(e.key==='ArrowUp'||e.key==='ArrowLeft'){e.preventDefault();bs[(i-1+bs.length)%bs.length].focus()}});
+canvas.addEventListener('contextmenu',e=>{if(ui.ro)return;e.preventDefault();openAddMenu(e)});
+document.addEventListener('pointerdown',e=>{if(!$('addmenu').hidden&&!e.target.closest('#addmenu'))$('addmenu').hidden=true},true);
+stage.addEventListener('scroll',()=>{$('addmenu').hidden=true;if(!$('ctx').hidden&&ui.ctxA)positionCtx(ui.ctxA)},{passive:true});
+
+/* ---------- context popover above the selected port, ports or cable ---------- */
+function renderCtx(){const el=$('ctx');if(ui.view!=='map'||ui.ro||(link&&link.active)||(drag&&drag.moved)||pan&&pan.moved){el.hidden=true;return}
+  let html='',anchor=null;const opt=(arr,v)=>arr.map(([k,t])=>`<option value="${esc(k)}"${String(k)===String(v)?' selected':''}>${esc(t)}</option>`).join('');
+  if(ui.multi.size>1){const ids=[...ui.multi].filter(i=>I.ports[i]);anchor=center(ids[ids.length-1]);const devs=new Set(ids.map(i=>I.owner[i].id));let next='';
+    if(devs.size===1){const d=I.owner[ids[0]];let n=1;while(d.ports.some(p=>p.lag==='Po'+n))n++;next='Po'+n}
+    html=`<div class="ct">已選 ${ids.length} 個孔<small>${devs.size===1?esc(I.owner[ids[0]].name):devs.size+' 台設備'}</small><button class="x" data-cx="close" aria-label="取消選取">×</button></div>
+    <div class="cr">${next?`<button class="tg" data-cx="lag" data-g="${next}">設為 LACP ${next}</button>`:''}<button class="tg" data-cx="unlag">解除群組</button><button class="tg" data-cx="poe1">PoE 開</button><button class="tg" data-cx="poe0">PoE 關</button></div>
+    <div class="cr"><select data-cxm="mode" aria-label="模式">${opt([['access','Access'],['trunk','Trunk']],'access')}</select><input data-cxm="vlan" placeholder="VLAN" aria-label="VLAN"><button class="tg go" data-cx="vlan">套用</button></div>`}
+  else if(ui.sel&&ui.sel.cable){const c=S.cables.find(x=>x.id===ui.sel.cable);const p=c&&document.getElementById('w-'+c.id);if(c&&p){let L=0;try{L=p.getTotalLength()}catch(e){}if(L)anchor=p.getPointAtLength(L/2);
+    html=`<div class="ct"><span class="wire" style="--c:${cableStyle(c).color}"></span>${esc(c.label)}<small>${esc(I.owner[c.a].name)} ↔ ${esc(I.owner[c.b].name)}</small><button class="x" data-cx="close" aria-label="關閉">×</button></div>
+    <div class="cr"><select data-cxc="type" aria-label="線材">${opt(CABLE_TYPES.map(t=>[t,t]),c.type)}</select><select data-cxc="speed" aria-label="速率">${opt(SPEEDS.map(t=>[t,t||'速率']),c.speed)}</select><select data-cxc="dir" aria-label="方向">${opt([['none','不標方向'],['ab','A → B'],['ba','B → A'],['both','雙向 ⇄']],c.dir)}</select></div>
+    ${prefs.colorMode==='custom'?`<div class="cr">${COLORS.map(([n,v])=>`<button class="sw" data-cxcol="${v}" title="${n}" aria-label="${n}色" aria-pressed="${c.color===v}" style="background:${v}"></button>`).join('')}</div>`:''}
+    <div class="cr">${(c.wps||[]).length?'<button class="tg" data-cx="clearwp">清除錨點</button>':'<span class="hint" style="font-size:11.5px">再雙擊線可加錨點</span>'}<button class="tg danger" data-cx="unplug" style="margin-left:auto">拔除</button></div>`}}
+  else if(ui.sel&&ui.sel.port&&I.ports[ui.sel.port]){const pid=ui.sel.port,p=I.ports[pid],d=I.owner[pid],c=I.cab[pid];anchor=center(pid);const poeOK=p.kind==='rj45'&&!TYPES[d.type].pass&&!['end','ap','hub'].includes(d.type);
+    html=`<div class="ct">${esc(d.name)} · ${esc(pshort(pid))}<small>${c?'線號 '+esc(c.label):'未接線'}</small><button class="x" data-cx="close" aria-label="關閉">×</button></div>
+    <div class="cr"><select data-cxp="mode" aria-label="模式">${opt([['access','Access'],['trunk','Trunk']],p.mode||'access')}</select><input data-cxp="vlan" value="${esc(p.vlan||'')}" placeholder="VLAN" aria-label="VLAN">${p.mode==='trunk'?`<input data-cxp="tagged" value="${esc(p.tagged||'')}" placeholder="Tagged 10,20" aria-label="Tagged VLAN" style="width:110px">`:''}${poeOK?`<button class="tg" data-cx="poe" aria-pressed="${!!p.poe}">${BOLT.replace('<svg','<svg width="11" height="11" fill="currentColor"')} PoE</button>`:''}</div>
+    <div class="cr">${c?'<button class="tg danger" data-cx="unplugp">拔除線</button>':'<button class="tg go" data-cx="pend">接到…</button>'}<button class="tg" data-cx="more" style="margin-left:auto">更多設定</button></div>`}
+  if(!html||!anchor){el.hidden=true;ui.ctxA=null;return}
+  el.innerHTML=html;el.hidden=false;positionCtx(anchor)}
+function positionCtx(a){const el=$('ctx');ui.ctxA=a;const sx=a.x*ui.zoom-stage.scrollLeft,sy=a.y*ui.zoom-stage.scrollTop;
+  if(sx<0||sy<0||sx>stage.clientWidth||sy>stage.clientHeight){el.style.visibility='hidden';return}el.style.visibility='';
+  const w=el.offsetWidth,h=el.offsetHeight,W=stage.clientWidth;const left=Math.max(w/2+8,Math.min(W-w/2-8,sx));
+  el.classList.toggle('below',sy-h-24<8);el.style.left=left+'px';el.style.top=sy+'px';el.style.setProperty('--ax',Math.max(16,Math.min(w-16,sx-left+w/2))+'px')}
+$('ctx').addEventListener('click',e=>{const b=e.target.closest('[data-cx],[data-cxcol]');if(!b)return;const a=b.dataset.cx;
+  if(a==='close'){ui.sel=null;ui.multi.clear();renderAll();return}
+  if(a==='more'){const n=$('f-p-vlan')||$('insp');$('insp').scrollTop=0;n.focus&&n.focus();return}
+  if(!canEdit())return;
+  if(ui.multi.size>1){const ps=[...ui.multi].map(i=>I.ports[i]).filter(Boolean);snap();
+    if(a==='lag')ps.forEach(p=>p.lag=b.dataset.g);if(a==='unlag')ps.forEach(p=>p.lag='');if(a==='poe1'||a==='poe0')ps.forEach(p=>{if(p.kind==='rj45')p.poe=a==='poe1'});
+    if(a==='vlan'){const m=$('ctx').querySelector('[data-cxm="mode"]').value,v=$('ctx').querySelector('[data-cxm="vlan"]').value.trim();ps.forEach(p=>{p.mode=m;p.vlan=v;if(m!=='trunk')p.tagged=''})}
+    save();renderAll();toast({lag:`已設為 LACP ${b.dataset.g}`,unlag:'已解除群組',poe1:'已開啟 PoE',poe0:'已關閉 PoE',vlan:'VLAN 已套用'}[a]||'已更新',true);return}
+  const c=ui.sel&&ui.sel.cable&&S.cables.find(x=>x.id===ui.sel.cable);
+  if(b.dataset.cxcol&&c){snap();c.color=b.dataset.cxcol;ui.lastColor=c.color;save();renderAll();return}
+  if(a==='clearwp'&&c){snap();c.wps=[];save();renderAll();return}
+  if(a==='unplug'&&c){delCable(c.id);return}
+  const pid=ui.sel&&ui.sel.port;if(!pid)return;
+  if(a==='poe'){snap();I.ports[pid].poe=!I.ports[pid].poe;save();renderAll()}
+  if(a==='unplugp'&&I.cab[pid])delCable(I.cab[pid].id);
+  if(a==='pend'){ui.pending=pid;renderAll()}});
+$('ctx').addEventListener('change',e=>{const t=e.target;if(!canEdit())return;
+  if(t.dataset.cxc){const c=S.cables.find(x=>x.id===ui.sel.cable);if(!c)return;snap();c[t.dataset.cxc]=t.value;save();renderAll()}
+  if(t.dataset.cxp){const p=I.ports[ui.sel.port];if(!p)return;snap();p[t.dataset.cxp]=t.value.trim();if(t.dataset.cxp==='mode'&&t.value!=='trunk')p.tagged='';save();renderAll();toast('已更新 '+pname(ui.sel.port),true)}});
+$('ctx').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset.cxm==='vlan'){e.preventDefault();$('ctx').querySelector('[data-cx="vlan"]').click()}if(e.key==='Escape'){e.stopPropagation();$('ctx').hidden=true;stage.focus&&stage.focus()}});
 
 /* ---------- init ---------- */
 function readHash(){const h=location.hash.slice(1);if(!h||!h.includes('='))return null;const ps=new URLSearchParams(h);return{p:ps.get('p'),dev:ps.get('dev'),ro:ps.get('ro')==='1'}}
@@ -1492,7 +1631,7 @@ I=idx();renderLeft();renderViewPop();syncUR();
 if(!hadSaved&&!ui.shared){autoLayout();ui.autoPending=true}
 if(ui.shared){const bn=$('banner');bn.hidden=false;bn.innerHTML='你正在檢視分享的配置，修改不會存到這台電腦。<button id="bnSave">存成這台電腦的配置</button>';
   $('bnSave').onclick=()=>{ui.shared=false;save();bn.hidden=true;toast('已存到這台電腦')}}
-if(H&&H.ro){ui.ro=true;document.body.classList.add('ro');$('bRo').setAttribute('aria-pressed',true);$('roNote').hidden=false;$('types').querySelectorAll('button').forEach(b=>b.disabled=true);$('bLayout').disabled=true;$('bTpl').disabled=true;syncUR()}
+if(H&&H.ro){ui.ro=true;applyRoUI();syncUR()}
 if(H&&H.dev&&S.devices.some(d=>d.id===H.dev))ui.sel={dev:H.dev};
 renderAll();
 if(H&&H.dev&&ui.sel)requestAnimationFrame(()=>fitTo(devBox(new Set([H.dev])),1.1));
