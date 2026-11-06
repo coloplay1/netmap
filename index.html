@@ -749,6 +749,10 @@ svg.wires .flowarr{pointer-events:none}
 .dock .ctxtog[aria-pressed="true"]{color:var(--accent)}
 .dock .ctxtog[aria-pressed="false"]{opacity:.55}
 .dock.hud,#dock{z-index:22}
+
+.cpop li .pc{margin-left:auto;flex:none;font-family:var(--f-mono);font-size:10.5px;font-weight:700;color:var(--ink);background:var(--soft);border:1px solid var(--line2);border-radius:999px;padding:1px 8px;white-space:nowrap}
+.cpop li .pc.none{color:var(--muted);font-family:inherit;font-weight:600;border-style:dashed;background:none}
+.cpop li .n>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis}
 </style>
 </head>
 <body>
@@ -1014,7 +1018,7 @@ Object.assign(BMETA,{
  ['Palo Alto Networks','fw',['PA-415','PA-445','PA-5410']],['Check Point','fw',['Quantum Spark 1535','Quantum Spark 1555','Quantum Spark 1800','Quantum 3800']],
  ['Cisco','fw',['Secure Firewall 1150','Secure Firewall 3105']],['Cisco','sw',['CBS250-24P-4G','CBS350-8P-2G','CBS350-24P-4G','CBS350-48P-4G','Catalyst 9200-24P','Catalyst 9200-48P','Catalyst 1200-24P-4G']],['Cisco','router',['ISR 1100-4G','ISR 4321','ISR 4431','Catalyst 8300']],['Cisco','ap',['Catalyst 9105AXI','Catalyst 9115AXI','CW9162I','CW9166I']],
  ['Cisco Meraki','fw',['MX68','MX75','MX95']],['Cisco Meraki','sw',['MS120-8LP','MS120-24P','MS130-24P','MS250-48FP']],['Cisco Meraki','ap',['MR28','MR78','MR86','CW9162I']],
- ['Sophos','fw',['XGS 88','XGS 108','XGS 118','XGS 128','XGS 2300','XGS 3300']],['SonicWall','fw',['TZ80','TZ280','TZ380','TZ570','TZ670','NSa 3700']],
+ ['Sophos','fw',['XGS 88','XGS 108','XGS 118','XGS 128','XGS 2300','XGS 3300']],['SonicWall','fw',['TZ80','TZ280','TZ380','TZ570','TZ670','NSa 2800','NSa 3700','NSa 3800','NSa 4700']],
  ['Juniper','fw',['SRX320','SRX380','SRX1500']],['Juniper','sw',['EX2300-C-12P','EX4100-24P','EX4400-24P']],['Juniper','ap',['Mist AP32','Mist AP43','Mist AP45']],
  ['WatchGuard','fw',['Firebox T25','Firebox T115-W','Firebox M590','Firebox M690']],['WatchGuard','ap',['AP130','AP330','AP430CR']],
  ['Zyxel','fw',['USG FLEX 100H','USG FLEX 200H','USG FLEX 500H','ATP500']],['Zyxel','sw',['GS1200-8','GS1900-24E','GS1915-8EP','XGS1930-28HP','GS2220-28HP','XS1930-12HP']],['Zyxel','ap',['NWA110AX','NWA210AX','WAX620D-6E','WBE660S']],
@@ -1077,6 +1081,8 @@ BRANDS.hub=['TP-Link','D-Link','Netgear','Zyxel','Ubiquiti','MikroTik'];
 Object.values(END_MODELS).forEach(bs=>Object.keys(bs).forEach(b=>{if(!BRANDS.end.includes(b))BRANDS.end.push(b)}));
 /* model port layouts (n = RJ45, sfp = SFP/SFP+, poe = 'all' or first N RJ45 ports). From vendor datasheets of common models; verify against official specs. */
 const SPECS={
+  'NSa 2700':{n:16,sfp:3},'NSa 2800':{n:16,sfp:3},'NSa 3800':{n:24,sfp:10},'TZ470':{n:8,sfp:2},'TZ570':{n:8,sfp:2},'TZ670':{n:8,sfp:2},
+  'Meraki MX67':{n:5},'MX68':{n:12},'Firebox T45':{n:5},'Firebox T85':{n:8},
   'CBS250-24P-4G':{n:24,sfp:4,poe:'all'},'CBS350-8P-2G':{n:8,sfp:2,poe:'all'},'CBS350-24P-4G':{n:24,sfp:4,poe:'all'},'CBS350-48P-4G':{n:48,sfp:4,poe:'all'},'Catalyst 1200-24P-4G':{n:24,sfp:4,poe:'all'},
   'Catalyst 9200-24P':{n:24,poe:'all'},'Catalyst 9200-48P':{n:48,poe:'all'},'MS120-8LP':{n:8,sfp:2,poe:4},'MS120-24P':{n:24,sfp:4,poe:'all'},'MS130-24P':{n:24,sfp:4,poe:'all'},
   'USW-Flex-Mini':{n:5},'USW-Lite-8-PoE':{n:8,poe:4},'USW-16-PoE':{n:16,sfp:2,poe:8},'USW-24-PoE':{n:24,sfp:2,poe:16},'USW-48-PoE':{n:48,sfp:4,poe:32},'USW-Pro-Max-24-PoE':{n:24,sfp:2,poe:'all'},'USW-Enterprise-8-PoE':{n:8,sfp:2,poe:'all'},
@@ -1103,6 +1109,7 @@ const PRESETS={
   fw:[{n:5},{n:8},{n:10},{n:8,sfp:2}],router:[{n:4},{n:5},{n:8}],hub:[{n:5},{n:8}],ap:[{n:1},{n:2}],
   patch:[{n:12},{n:24},{n:48}],seat:[{n:1},{n:2},{n:4}],end:[{n:1},{n:2}],
 };
+function specLabel(s){return`${s.n} 孔${s.poe?(s.poe==='all'?' PoE':`（${s.poe} 孔 PoE）`):''}${s.sfp?` + ${s.sfp} SFP`:''}`}
 function specText(s){return`${s.n}P${s.poe?(s.poe==='all'?' PoE':` (${s.poe} PoE)`):''}${s.sfp?` + ${s.sfp} SFP`:''}`}
 const COLORS=[['藍','#2C6FB7'],['黃','#D4A017'],['綠','#3E9B5C'],['紅','#C8463D'],['灰','#7D8794'],['橘','#D9772B'],['紫','#7A55B5'],['粉','#D8679A']];
 const CABLE_TYPES=['Cat5e','Cat6','Cat6A','Cat7','光纖 單模','光纖 多模','DAC','Console'];
@@ -1735,7 +1742,7 @@ insp.addEventListener('click',e=>{
   const li=e.target.closest('.cpop li[data-i]');if(li){chooseCombo(li.closest('.combo').querySelector('input'),+li.dataset.i);return}
   const sw=e.target.closest('[data-color]');if(sw){const c=curObj('c');if(c&&canEdit()){snap();c.color=sw.dataset.color;ui.lastColor=c.color;save();renderAll()}return}
   const pr=e.target.closest('[data-preset]');if(pr){const d=curObj('d');if(!d||!canEdit())return;const sp=pr.dataset.preset==='spec'?SPECS[d.model]:PRESETS[d.type][+pr.dataset.preset];
-    setCounts(d,sp.n,TYPES[d.type].pass||d.type==='end'||d.type==='hub'?null:(sp.sfp||0),sp.poe||0,`已套用 ${specText(sp)}`);return}
+    setCounts(d,sp.n,TYPES[d.type].pass||d.type==='end'||d.type==='hub'?null:(sp.sfp||0),sp.poe||0,`已套用 ${specLabel(sp)}`);return}
   const ma=e.target.closest('[data-ma]');if(ma){multiAction(ma.dataset.ma);return}
   const gp=e.target.closest('[data-gport]');if(gp){ui.sel={port:gp.dataset.gport};ui.detail=gp.dataset.gport;ui.multi.clear();renderAll();return}
   const b=e.target.closest('[data-ia]');if(!b)return;const a=b.dataset.ia;
@@ -1776,13 +1783,13 @@ function brandOptions(d,q){const nq=norm(q);const out=[];const kb=kindBrands(d);
 function modelOptions(d,q){const nq=norm(q);const out=[];
   const kb=kindBrands(d),km=d.type==='end'?(END_MODELS[d.kind]||{}):{};
   const brands=d.brand&&BMETA[d.brand]&&(km[d.brand]||(BMETA[d.brand].m||{})[d.type])?[d.brand]:(kb.length?kb:(BRANDS[d.type]||[]));
-  brands.forEach(bn=>{const ms=km[bn]||((BMETA[bn]||{}).m||{})[d.type]||[];ms.forEach(mo=>{if(!nq||norm(mo).includes(nq)||norm(bn).includes(nq)||(BMETA[bn].zh&&norm(BMETA[bn].zh).includes(nq)))out.push({v:mo,sub:bn+(BMETA[bn].zh?' '+BMETA[bn].zh:'')+(SPECS[mo]?' · '+specText(SPECS[mo]):''),brand:bn})})});
+  brands.forEach(bn=>{const ms=km[bn]||((BMETA[bn]||{}).m||{})[d.type]||[];ms.forEach(mo=>{if(!nq||norm(mo).includes(nq)||norm(bn).includes(nq)||(BMETA[bn].zh&&norm(BMETA[bn].zh).includes(nq)))out.push({v:mo,sub:bn+(BMETA[bn].zh?' '+BMETA[bn].zh:''),brand:bn,pc:SPECS[mo]?specLabel(SPECS[mo]):(d.type==='end'?'':null)})})});
   return out.slice(0,40)}
 let combos={};
 function openCombo(n,q){if(n.disabled)return;const d=curObj('d');if(!d)return;const f=n.dataset.f;const pop=$(n.id+'-pop');if(!pop)return;
   const opts=f==='d.brand'?brandOptions(d,q):modelOptions(d,q);combos[n.id]={opts,active:q?0:-1};
   const cur=f==='d.brand'?d.brand:d.model;
-  pop.innerHTML=opts.length?opts.map((o,i)=>`<li role="option" id="${n.id}-o${i}" data-i="${i}" aria-selected="${i===combos[n.id].active}" class="${o.v===cur?'cur':''}"><span class="n"><span>${hl(o.v,q)}</span>${o.hit?`<span class="kw">符合「${esc(o.hit)}」</span>`:''}</span>${o.sub?`<span class="s">${hl(o.sub,q)}</span>`:''}</li>`).join('')
+  pop.innerHTML=opts.length?opts.map((o,i)=>`<li role="option" id="${n.id}-o${i}" data-i="${i}" aria-selected="${i===combos[n.id].active}" class="${o.v===cur?'cur':''}"><span class="n"><span>${hl(o.v,q)}</span>${o.hit?`<span class="kw">符合「${esc(o.hit)}」</span>`:''}${o.pc?`<span class="pc">${esc(o.pc)}</span>`:o.pc===null?'<span class="pc none" title="這個型號還沒有收錄孔數，選了不會自動改孔數">孔數未收錄</span>':''}</span>${o.sub?`<span class="s">${hl(o.sub,q)}</span>`:''}</li>`).join('')
     :`<li class="empty">${q?`沒有符合「${esc(q)}」的${f==='d.brand'?'廠牌':'型號'}，會直接存成你輸入的內容`:'這個廠牌暫無型號建議，可直接輸入'}</li>`;
   pop.hidden=false;n.setAttribute('aria-expanded','true')}
 function closeCombo(n){const pop=$(n.id+'-pop');if(pop)pop.hidden=true;n.setAttribute('aria-expanded','false');n.removeAttribute('aria-activedescendant')}
@@ -1795,7 +1802,7 @@ function chooseCombo(n,i){const c=combos[n.id];const o=c&&c.opts[i];if(!o)return
   if(f==='d.brand'&&d.model){const owner=Object.keys(BMETA).find(b=>Object.values(BMETA[b].m||{}).flat().includes(d.model));if(owner&&owner!==d.brand)d.model=''}
   save();closeCombo(n);
   const sp=f==='d.model'&&SPECS[o.v];
-  if(sp){setCounts(d,sp.n,TYPES[d.type].pass||d.type==='end'||d.type==='hub'?null:(sp.sfp||0),sp.poe||0,`型號設為 ${o.v}，已依規格建立 ${specText(sp)}`);return}
+  if(sp){setCounts(d,sp.n,TYPES[d.type].pass||d.type==='end'||d.type==='hub'?null:(sp.sfp||0),sp.poe||0,`型號設為 ${o.v}，已依規格建立 ${specLabel(sp)}`);return}
   renderInsp();renderCanvas();
   toast(f==='d.brand'?`廠牌設為 ${o.v}`:`型號設為 ${o.v}${o.brand?'（'+o.brand+'）':''}`);
   if(f==='d.brand'&&matchMedia('(pointer:fine)').matches){const m=$('f-d-model');if(m)m.focus()}}
@@ -1829,7 +1836,7 @@ function setCounts(d,n,sf,poe,msg){snap();const T=TYPES[d.type];let removed=[];
     if(sf!=null){while(sfp.length<sf)sfp.push({id:uid('p'),label:'SFP'+(sfp.length+1),kind:'sfp',mode:'access'});while(sfp.length>sf)removed.push(sfp.pop())}
     d.ports=[...main,...sfp];if(poe!=null)applyPoe(d,poe)}
   const ids=new Set(removed.map(p=>p.id));const lost=S.cables.filter(c=>ids.has(c.a)||ids.has(c.b)).length;S.cables=S.cables.filter(c=>!ids.has(c.a)&&!ids.has(c.b));
-  save();toast(`${msg||'孔數已更新'}${lost?`，移除 ${lost} 條線`:''}`,true);renderAll()}
+  renderAll();relaxLayout();save();toast(`${msg||'孔數已更新'}${lost?`，移除 ${lost} 條線`:''}`,true)}
 function freeSpot(){const R=Object.values(devRects()),z=ui.zoom;const vx=(stage.scrollLeft-PAD)/z,vy=(stage.scrollTop-PAD)/z,vw=stage.clientWidth/z,vh=stage.clientHeight/z;const W=240,H=140,M=24;
   const cx=vx+vw/2-W/2,cy=vy+vh/2-H/2,free=(x,y)=>!R.some(r=>x<r.r+M&&x+W>r.l-M&&y<r.b+M&&y+H>r.t-M);
   for(let ring=0;ring<30;ring++){const pts=ring?[]:[[0,0]];for(let i=-ring;i<=ring;i++)pts.push([i,-ring],[i,ring],[-ring,i],[ring,i]);
