@@ -250,6 +250,25 @@ tbody tr:hover td{background:var(--accent-soft);cursor:pointer}
 .toast button{border:0;background:var(--accent);color:var(--on-accent);border-radius:999px;padding:4px 12px;font-size:12px;font-weight:700}
 .toast:not(:has(button)){padding-right:16px}
 
+/* welcome */
+.modal.welcome{align-items:flex-start;overflow:auto}
+.wcard{background:var(--panel);border-radius:22px;padding:24px;width:min(1000px,100%);display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow);margin:auto;animation:pop .3s ease-out}
+.whead{display:flex;gap:14px;align-items:flex-start}
+.whead .logo{width:42px;height:42px;border-radius:13px;flex:none}
+.whead .logo svg{width:22px;height:22px}
+.whead h2{margin:0 0 4px;font-size:22px;font-weight:800}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.tcard{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:14px;text-align:left;display:flex;flex-direction:column;gap:8px;transition:transform .15s,box-shadow .15s,border-color .15s;min-width:0}
+.tcard:hover,.tcard:focus-visible{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--shadow)}
+.tcard .trow{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tcard .tiles{display:flex;gap:5px}
+.tcard .tile.dash{background:transparent;border:2px dashed var(--line2);color:var(--muted)}
+.tcard b{font-size:15.5px;font-weight:800}
+.tcard .d{font-size:12.5px;color:var(--muted);line-height:1.6}
+.tcard .meta{margin-top:auto;font-size:11.5px;font-weight:700;color:var(--accent)}
+.tcard.cont{flex-direction:row;align-items:center;gap:12px;background:var(--accent-soft);border-color:transparent}
+.tcard.cont>span:last-child{display:flex;flex-direction:column;gap:2px}
+
 @media (max-width:900px){
   body{overflow:auto;height:auto}
   .main{grid-template-columns:1fr!important}
@@ -275,6 +294,8 @@ tbody tr:hover td{background:var(--accent-soft);cursor:pointer}
     <button id="bRedo" title="重做 (Ctrl+Y)">重做<svg class="i" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button>
   </div>
   <div class="seg" role="group" aria-label="縮放"><button id="zOut" aria-label="縮小">−</button><button id="zReset">100%</button><button id="zIn" aria-label="放大">+</button></div>
+  <button class="btn" id="bLayout" title="依連線關係重新排列設備">自動排列</button>
+  <button class="btn primary" id="bTpl">範本 / 新環境</button>
   <button class="btn" id="bData">匯入 / 匯出</button>
 </div>
 
@@ -324,6 +345,11 @@ const KICON={
   'NAS':SV('<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 11h6M9 15h6"/>'),
   'IP Cam':SV('<rect x="3" y="7" width="13" height="8" rx="2"/><path d="m16 10 5-2v6l-5-2M7 15v3h4"/>'),
   'ISP 數據機':SV('<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.6 2.4 2.6 14.6 0 17M12 3.5c-2.6 2.4-2.6 14.6 0 17"/>'),
+  'POS 收銀機':SV('<rect x="4" y="11" width="16" height="9" rx="2"/><path d="M7 11V5h10v6M9 8h6M8 15h2M12 15h2M16 15h.01"/>'),
+  'NVR 錄影主機':SV('<rect x="3" y="7" width="18" height="10" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M13 11h5M13 13.5h3"/>'),
+  'PLC 控制器':SV('<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h3v3H8zM14 8h2M14 11h2M8 15h8"/>'),
+  '平板 / HMI':SV('<rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M11 18h2"/>'),
+  '投影機':SV('<rect x="3" y="8" width="18" height="9" rx="2"/><circle cx="15" cy="12.5" r="2.5"/><path d="M6 11h4"/>'),
   '其他':SV('<rect x="5" y="5" width="14" height="14" rx="3.5"/><path d="M9 12h6"/>'),
 };
 const TYPES={
@@ -367,7 +393,7 @@ const BMETA={
   'Check Point':{zh:'',kw:['CheckPoint','Gaia','Quantum','SmartConsole','CP'],d:'Gaia OS，用 SmartConsole 集中管理政策，大型企業常見。',
     m:{fw:['Quantum Spark 1600','Quantum 3600','Quantum 6200']}},
   'Cisco':{zh:'思科',kw:['IOS','IOS-XE','Catalyst','Meraki','Firepower','Secure Firewall','ISR','Nexus'],d:'IOS / IOS-XE 指令列，企業網路最常見的參考標準。',
-    m:{fw:['Secure Firewall 1010','Secure Firewall 1120','Meraki MX67','Meraki MX85'],sw:['Catalyst 1000-24P','Catalyst 9200L-24P-4G','Catalyst 9300-48P','Catalyst 2960X-24PS-L'],router:['ISR 1111','ISR 4331','Catalyst 8200'],ap:['Catalyst 9120AX','Catalyst 9130AX','Catalyst 9136']}},
+    m:{fw:['Secure Firewall 1010','Secure Firewall 1120','Meraki MX67','Meraki MX85'],sw:['Catalyst 1000-8P-2G','Catalyst 1000-24P','Catalyst 9200L-24P-4G','Catalyst 9300-48P','Catalyst 2960X-24PS-L'],router:['ISR 1111','ISR 4331','Catalyst 8200'],ap:['Catalyst 9120AX','Catalyst 9130AX','Catalyst 9136']}},
   'Cisco Meraki':{zh:'思科 Meraki',kw:['Meraki','MR','雲端管理','Cisco'],d:'雲端管理，介面直覺。',m:{ap:['MR36','MR44','MR46','MR57']}},
   'Sophos':{zh:'',kw:['XGS','XG','SFOS','Sophos Firewall'],d:'Sophos Firewall OS，可以和 Sophos 端點防護連動。',m:{fw:['XGS 87','XGS 107','XGS 116','XGS 126','XGS 2100']}},
   'SonicWall':{zh:'',kw:['SonicOS','TZ','NSa','Sonic'],d:'SonicOS，中小企業 UTM 常見。',m:{fw:['TZ270','TZ370','TZ470','NSa 2700']}},
@@ -385,7 +411,7 @@ const BMETA={
   'Aruba (HPE)':{zh:'',kw:['Aruba','HPE','HP','ProCurve','AOS-CX','AOS-S','Instant On','Central'],d:'AOS-CX 或 AOS-S，可用 Aruba Central 雲端管理。',
     m:{sw:['CX 6100','CX 6200F','2930F','Instant On 1930'],ap:['AP-505','AP-515','AP-635','Instant On AP22']}},
   'Ruckus':{zh:'',kw:['CommScope','SmartZone','Unleashed','ICX','BeamFlex'],d:'BeamFlex 智慧天線，高密度環境表現好。',m:{ap:['R350','R550','R650','R750'],sw:['ICX 7150','ICX 7650']}},
-  'TP-Link':{zh:'普聯',kw:['TPLink','Omada','EAP','JetStream','TL'],d:'Omada SDN 控制器統一管理交換器與 AP。',m:{sw:['SG2210MP','SG3428MP','TL-SG108'],ap:['EAP225','EAP650','EAP670'],router:['ER605','ER7206']}},
+  'TP-Link':{zh:'普聯',kw:['TPLink','Omada','EAP','JetStream','TL'],d:'Omada SDN 控制器統一管理交換器與 AP。',m:{sw:['SG2210MP','SG3428MP','TL-SG108','TL-SG116'],ap:['EAP225','EAP650','EAP670'],router:['ER605','ER7206']}},
   'D-Link':{zh:'友訊',kw:['DLink','DGS','DES','Nuclias'],d:'台灣品牌，入門到中階管理型交換器。',m:{sw:['DGS-1100-08PV2','DGS-1210-28P','DGS-1510-28X'],ap:['DBA-X1230P']}},
   'Netgear':{zh:'網件',kw:['ProSAFE','Insight','M4250','GS'],d:'中小企業與影音網路常見。',m:{sw:['GS108T','GS728TP','M4250-26G4F-PoE+']}},
   'HP':{zh:'惠普',kw:['HPE','LaserJet','ProDesk','EliteBook'],d:'',m:{end:['LaserJet Pro M404dn','Color LaserJet M479fdw','ProDesk 400','EliteBook 840']}},
@@ -402,14 +428,17 @@ const BMETA={
   'VIVOTEK':{zh:'晶睿',kw:['晶睿通訊'],d:'台灣網路攝影機品牌。',m:{end:['FD9389-HV','IB9389-H']}},
   'Brother':{zh:'兄弟',kw:['HL','MFC'],d:'',m:{end:['HL-L5210DN','MFC-L8900CDW']}},
   'Canon':{zh:'佳能',kw:['imageRUNNER','LBP'],d:'',m:{end:['imageRUNNER ADVANCE DX','LBP325x']}},
-  'Epson':{zh:'愛普生',kw:['WorkForce'],d:'',m:{end:['WorkForce Pro WF-C5890']}},
+  'Epson':{zh:'愛普生',kw:['WorkForce'],d:'',m:{end:['WorkForce Pro WF-C5890','TM-m30III']}},
+  'Siemens':{zh:'西門子',kw:['SIMATIC','S7','TIA'],d:'工業自動化大廠，SIMATIC S7 系列 PLC。',m:{end:['SIMATIC S7-1200','SIMATIC S7-1500']}},
+  'Mitsubishi Electric':{zh:'三菱電機',kw:['MELSEC','三菱','Mitsubishi'],d:'MELSEC 系列 PLC，亞洲工廠常見。',m:{end:['MELSEC iQ-F','MELSEC iQ-R']}},
+  'Delta':{zh:'台達電',kw:['台達','DVP','Delta Electronics'],d:'台灣工控品牌，PLC、HMI、變頻器。',m:{end:['AS300','DVP-ES3']}},
 };
 const BRANDS={
   fw:['Fortinet','Palo Alto Networks','Check Point','Cisco','Sophos','SonicWall','Juniper','WatchGuard','Zyxel','DrayTek','Ubiquiti'],
   router:['Cisco','Juniper','MikroTik','DrayTek','Ubiquiti','Huawei','TP-Link'],
   sw:['Cisco','Aruba (HPE)','Juniper','Huawei','H3C','Fortinet','Ubiquiti','MikroTik','Zyxel','TP-Link','D-Link','Netgear','Ruckus'],
   ap:['Cisco Meraki','Cisco','Aruba (HPE)','Ruckus','Ubiquiti','Fortinet','TP-Link','Zyxel','Huawei','D-Link'],
-  end:['HP','Dell','Lenovo','ASUS','Acer','Apple','Synology','QNAP','Yealink','Grandstream','Hikvision','VIVOTEK','Brother','Canon','Epson'],
+  end:['HP','Dell','Lenovo','ASUS','Acer','Apple','Synology','QNAP','Yealink','Grandstream','Hikvision','VIVOTEK','Brother','Canon','Epson','Siemens','Mitsubishi Electric','Delta'],
 };
 const COLORS=[['藍','#2C6FB7'],['黃','#D4A017'],['綠','#3E9B5C'],['紅','#C8463D'],['灰','#7D8794'],['橘','#D9772B'],['紫','#7A55B5'],['粉','#D8679A']];
 const CABLE_TYPES=['Cat5e','Cat6','Cat6A','Cat7','光纖 單模','光纖 多模','DAC'];
@@ -448,49 +477,174 @@ function brandKw(b){const m=BMETA[b];return m?[m.zh,...m.kw].join(' '):''}
 function normalize(o){o.devices.forEach(d=>{d.ports.forEach(p=>{if(!p.kind)p.kind='rj45'});['brand','model','ip','loc','note'].forEach(k=>{if(d[k]==null)d[k]=''});if(d.type==='sw'&&!d.variant)d.variant='l2m';if(d.type==='end'&&!d.kind)d.kind='PC 桌機'});
   o.cables.forEach(c=>{if(!c.color)c.color='#2C6FB7';if(c.type==null)c.type='Cat6';if(c.len==null)c.len=''});return o}
 
-function sample(){
-  S={devices:[],cables:[]};
-  const isp=addDev('end',{name:'中華電信 光世代',kind:'ISP 數據機',n:1,loc:'機房入口',x:40,y:30});
-  const fw=addDev('fw',{name:'FW-01',brand:'Fortinet',model:'FortiGate 60F',ip:'192.168.1.1',loc:'機櫃 R1-U40',x:40,y:160});
-  const sw=addDev('sw',{name:'SW-CORE-01',brand:'Cisco',model:'Catalyst 9200L-24P-4G',variant:'l3',ip:'192.168.1.2',n:24,sfp:2,loc:'機櫃 R1-U38',x:40,y:320});
-  const pp=addDev('patch',{name:'PP-A',model:'Cat6 12 孔',n:12,loc:'機櫃 R1-U36',x:40,y:530});
-  const hub=addDev('hub',{name:'HUB-會議室',n:5,loc:'3F 會議室',x:40,y:760});
-  const prn=addDev('end',{name:'影印區印表機',kind:'印表機',brand:'HP',model:'Color LaserJet M479fdw',ip:'192.168.10.50',n:1,loc:'3F 影印區',x:40,y:910});
-  const ap=addDev('ap',{name:'AP-3F-01',brand:'Ubiquiti',model:'U6-Pro',ip:'192.168.1.21',loc:'3F 走廊天花板',x:340,y:760});
-  const sA=addDev('seat',{name:'座位 A-01',n:2,loc:'3F 業務部',x:660,y:40});
-  const sB=addDev('seat',{name:'座位 A-02',n:2,loc:'3F 業務部',x:660,y:220});
-  const sC=addDev('seat',{name:'座位 A-03',n:2,loc:'3F 業務部',x:660,y:400});
-  const pc1=addDev('end',{name:'王小明',kind:'PC 桌機',brand:'Lenovo',model:'ThinkCentre M70q',ip:'DHCP',loc:'A-01',x:930,y:30});
-  const ph1=addDev('end',{name:'分機 301',kind:'IP Phone',brand:'Yealink',model:'SIP-T31P',loc:'A-01',x:930,y:140});
-  const pc2=addDev('end',{name:'陳怡君',kind:'筆電',brand:'ASUS',model:'ExpertBook B5',ip:'DHCP',loc:'A-02',x:930,y:250});
-  const pc3=addDev('end',{name:'林志豪',kind:'PC 桌機',brand:'Dell',model:'OptiPlex 7010',ip:'DHCP',loc:'A-03',x:930,y:410});
-  const P=(d,label,side)=>d.ports.find(p=>p.label===label&&(side===undefined||p.side===side)).id;
-  const C=(a,b,label,color,type)=>S.cables.push({id:uid('c'),a,b,label,color,type:type||'Cat6',len:''});
-  const sp=l=>sw.ports.find(p=>p.label===l);
-  ['2','3','5'].forEach(l=>sp(l).vlan='10');sp('4').vlan='20';sp('10').vlan='10';sp('24').vlan='30';sp('24').note='PoE+';
-  C(P(isp,'LAN'),P(fw,'WAN1'),'WAN-01','#7D8794','Cat5e');
-  C(P(fw,'LAN1'),P(sw,'1'),'UP-01','#C8463D');
-  C(P(sw,'2'),P(pp,'1',0),'P-01','#2C6FB7');
-  C(P(sw,'3'),P(pp,'2',0),'P-02','#2C6FB7');
-  C(P(sw,'4'),P(pp,'3',0),'P-03','#D4A017');
-  C(P(sw,'5'),P(pp,'4',0),'P-04','#2C6FB7');
-  C(P(pp,'1',1),P(sA,'1',1),'H-3F-001','#7D8794');
-  C(P(pp,'2',1),P(sA,'2',1),'H-3F-002','#7D8794');
-  C(P(pp,'3',1),P(sB,'1',1),'H-3F-003','#7D8794');
-  C(P(pp,'4',1),P(sC,'1',1),'H-3F-005','#7D8794');
-  C(P(sA,'1',0),P(pc1,'LAN'),'A01-1','#2C6FB7');
-  C(P(sA,'2',0),P(ph1,'LAN'),'A01-2','#D4A017');
-  C(P(sB,'1',0),P(pc2,'LAN'),'A02-1','#2C6FB7');
-  C(P(sC,'1',0),P(pc3,'LAN'),'A03-1','#2C6FB7');
-  C(P(sw,'10'),P(hub,'1'),'P-10','#3E9B5C');
-  C(P(hub,'2'),P(prn,'LAN'),'HUB-02','#3E9B5C');
-  C(P(sw,'24'),P(ap,'PoE'),'POE-24','#D9772B','Cat6A');
+/* ---------- templates ---------- */
+function P(d,label,side){const p=d.ports.find(p=>p.label===label&&(side===undefined||p.side===side));if(!p)throw new Error('找不到孔 '+d.name+' '+label);return p.id}
+function C(a,b,label,color,type){S.cables.push({id:uid('c'),a,b,label,color:color||'#2C6FB7',type:type||'Cat6',len:''})}
+function V(d,labels,vlan,note){String(labels).split(',').forEach(l=>{const p=d.ports.find(p=>p.label===l);if(p){if(vlan)p.vlan=vlan;if(note)p.note=note}})}
+const D=(type,o)=>addDev(type,Object.assign({x:0,y:0},o));
+const ISP=n=>D('end',{name:n||'中華電信 光世代',kind:'ISP 數據機',loc:'機房入口'});
+const GRAY='#7D8794',RED='#C8463D',BLUE='#2C6FB7',YEL='#D4A017',GRN='#3E9B5C',ORG='#D9772B',PUR='#7A55B5';
+const TEMPLATES=[
+ {id:'office',name:'中小企業辦公室',tag:'辦公室',icons:['fw','sw','seat'],desc:'光世代進防火牆，核心 Switch 經配線架拉到各座位，含 IP 電話、會議室 Hub 與 AP。',build(){
+  const isp=ISP();
+  const fw=D('fw',{name:'FW-01',brand:'Fortinet',model:'FortiGate 60F',ip:'192.168.1.1',loc:'機櫃 R1-U40'});
+  const sw=D('sw',{name:'SW-CORE-01',brand:'Cisco',model:'Catalyst 9200L-24P-4G',variant:'l3',ip:'192.168.1.2',n:24,sfp:2,loc:'機櫃 R1-U38'});
+  const pp=D('patch',{name:'PP-A',model:'Cat6 12 孔',n:12,loc:'機櫃 R1-U36'});
+  const hub=D('hub',{name:'HUB-會議室',n:5,loc:'3F 會議室'});
+  const prn=D('end',{name:'影印區印表機',kind:'印表機',brand:'HP',model:'Color LaserJet M479fdw',ip:'192.168.10.50',loc:'3F 影印區'});
+  const ap=D('ap',{name:'AP-3F-01',brand:'Ubiquiti',model:'U6-Pro',ip:'192.168.1.21',loc:'3F 走廊天花板'});
+  const sA=D('seat',{name:'座位 A-01',loc:'3F 業務部'}),sB=D('seat',{name:'座位 A-02',loc:'3F 業務部'}),sC=D('seat',{name:'座位 A-03',loc:'3F 業務部'});
+  const pc1=D('end',{name:'王小明',kind:'PC 桌機',brand:'Lenovo',model:'ThinkCentre M70q',ip:'DHCP',loc:'A-01'});
+  const ph1=D('end',{name:'分機 301',kind:'IP Phone',brand:'Yealink',model:'SIP-T31P',loc:'A-01'});
+  const pc2=D('end',{name:'陳怡君',kind:'筆電',brand:'ASUS',model:'ExpertBook B5',ip:'DHCP',loc:'A-02'});
+  const pc3=D('end',{name:'林志豪',kind:'PC 桌機',brand:'Dell',model:'OptiPlex 7010',ip:'DHCP',loc:'A-03'});
+  V(sw,'2,3,5,10','10');V(sw,'4','20','語音');V(sw,'24','30','PoE+');
+  C(P(isp,'LAN'),P(fw,'WAN1'),'WAN-01',GRAY,'Cat5e');C(P(fw,'LAN1'),P(sw,'1'),'UP-01',RED);
+  C(P(sw,'2'),P(pp,'1',0),'P-01');C(P(sw,'3'),P(pp,'2',0),'P-02');C(P(sw,'4'),P(pp,'3',0),'P-03',YEL);C(P(sw,'5'),P(pp,'4',0),'P-04');
+  C(P(pp,'1',1),P(sA,'1',1),'H-3F-001',GRAY);C(P(pp,'2',1),P(sA,'2',1),'H-3F-002',GRAY);C(P(pp,'3',1),P(sB,'1',1),'H-3F-003',GRAY);C(P(pp,'4',1),P(sC,'1',1),'H-3F-005',GRAY);
+  C(P(sA,'1',0),P(pc1,'LAN'),'A01-1');C(P(sA,'2',0),P(ph1,'LAN'),'A01-2',YEL);C(P(sB,'1',0),P(pc2,'LAN'),'A02-1');C(P(sC,'1',0),P(pc3,'LAN'),'A03-1');
+  C(P(sw,'10'),P(hub,'1'),'P-10',GRN);C(P(hub,'2'),P(prn,'LAN'),'HUB-02',GRN);C(P(sw,'24'),P(ap,'PoE'),'POE-24',ORG,'Cat6A');}},
+ {id:'retail',name:'餐飲門市',tag:'餐飲 / 零售',icons:['router','POS 收銀機','IP Cam'],desc:'路由器加一台 PoE Switch，接收銀 POS、廚房出單機、KDS、監視器與員工／訪客 Wi-Fi。',build(){
+  const isp=ISP();
+  const rt=D('router',{name:'RT-01',brand:'DrayTek',model:'Vigor2927',ip:'192.168.1.1',n:5,loc:'櫃台下方機櫃'});
+  const sw=D('sw',{name:'SW-POE-01',brand:'TP-Link',model:'SG2210MP',ip:'192.168.1.2',n:8,sfp:2,loc:'櫃台下方機櫃'});
+  const pos1=D('end',{name:'POS 櫃台 1',kind:'POS 收銀機',ip:'192.168.10.11',loc:'結帳櫃台'});
+  const pos2=D('end',{name:'POS 櫃台 2',kind:'POS 收銀機',ip:'192.168.10.12',loc:'結帳櫃台'});
+  const prn=D('end',{name:'廚房出單機',kind:'印表機',brand:'Epson',model:'TM-m30III',ip:'192.168.10.21',loc:'廚房出餐口'});
+  const kds=D('end',{name:'廚房顯示 KDS',kind:'平板 / HMI',ip:'192.168.10.31',loc:'廚房'});
+  const cam1=D('end',{name:'監視器 收銀台',kind:'IP Cam',brand:'VIVOTEK',model:'FD9389-HV',loc:'結帳櫃台上方'});
+  const cam2=D('end',{name:'監視器 門口',kind:'IP Cam',brand:'VIVOTEK',model:'IB9389-H',loc:'店門口'});
+  const nvr=D('end',{name:'NVR 錄影主機',kind:'NVR 錄影主機',brand:'VIVOTEK',ip:'192.168.30.10',loc:'櫃台下方機櫃'});
+  const ap1=D('ap',{name:'AP-用餐區',brand:'TP-Link',model:'EAP650',ip:'192.168.1.21',loc:'用餐區天花板'});
+  const ap2=D('ap',{name:'AP-廚房',brand:'TP-Link',model:'EAP225',ip:'192.168.1.22',loc:'廚房',note:'路由器沒有 PoE，用 PoE 供電器'});
+  V(sw,'2,3,4,5','10','POS');V(sw,'6,7','30','監視器');V(sw,'8','','Trunk：員工 VLAN 10／訪客 VLAN 20');
+  C(P(isp,'LAN'),P(rt,'WAN'),'WAN-01',GRAY,'Cat5e');C(P(rt,'LAN1'),P(sw,'1'),'UP-01',RED);
+  C(P(sw,'2'),P(pos1,'LAN'),'POS-1');C(P(sw,'3'),P(pos2,'LAN'),'POS-2');C(P(sw,'4'),P(prn,'LAN'),'PRN-K',YEL);C(P(sw,'5'),P(kds,'LAN'),'KDS-1',YEL);
+  C(P(sw,'6'),P(cam1,'LAN'),'CAM-1',PUR);C(P(sw,'7'),P(cam2,'LAN'),'CAM-2',PUR);C(P(sw,'8'),P(ap1,'PoE'),'AP-1',ORG,'Cat6A');
+  C(P(rt,'LAN2'),P(nvr,'LAN'),'NVR-1',PUR);C(P(rt,'LAN3'),P(ap2,'PoE'),'AP-2',ORG);}},
+ {id:'clinic',name:'診所',tag:'醫療',icons:['fw','seat','NAS'],desc:'防火牆、Switch、配線架拉到掛號櫃台、診間與藥局，含病歷備份 NAS 和候診區 Wi-Fi。',build(){
+  const isp=ISP();
+  const fw=D('fw',{name:'FW-01',brand:'Fortinet',model:'FortiGate 40F',ip:'192.168.1.1',n:5,loc:'掛號櫃台後方機櫃'});
+  const sw=D('sw',{name:'SW-01',brand:'Zyxel',model:'GS1920-24HPv2',ip:'192.168.1.2',n:24,sfp:2,loc:'機櫃'});
+  const pp=D('patch',{name:'PP-1',model:'Cat6 8 孔',n:8,loc:'機櫃'});
+  const s1=D('seat',{name:'掛號櫃台',loc:'1F 大廳'}),s2=D('seat',{name:'診間 1',loc:'1F'}),s3=D('seat',{name:'診間 2',loc:'1F'}),s4=D('seat',{name:'藥局',loc:'1F'});
+  const pcR=D('end',{name:'掛號電腦',kind:'PC 桌機',brand:'Acer',model:'Veriton M',ip:'192.168.10.11',loc:'掛號櫃台',note:'健保讀卡機接 USB'});
+  const prR=D('end',{name:'掛號印表機',kind:'印表機',brand:'Brother',model:'HL-L5210DN',ip:'192.168.10.50',loc:'掛號櫃台'});
+  const pc1=D('end',{name:'診間 1 電腦',kind:'PC 桌機',brand:'ASUS',model:'ExpertCenter D7',ip:'192.168.10.21',loc:'診間 1'});
+  const pc2=D('end',{name:'診間 2 電腦',kind:'PC 桌機',brand:'ASUS',model:'ExpertCenter D7',ip:'192.168.10.22',loc:'診間 2'});
+  const pcP=D('end',{name:'藥局電腦',kind:'PC 桌機',brand:'Acer',model:'Veriton M',ip:'192.168.10.31',loc:'藥局'});
+  const nas=D('end',{name:'病歷備份 NAS',kind:'NAS',brand:'Synology',model:'DS923+',ip:'192.168.10.100',loc:'機櫃'});
+  const ap=D('ap',{name:'AP-候診區',brand:'Zyxel',model:'NWA50AX',ip:'192.168.1.21',loc:'候診區天花板'});
+  V(sw,'2,3,4,5,6,23','10');V(sw,'24','','員工 VLAN 10／候診 Wi-Fi VLAN 20');
+  C(P(isp,'LAN'),P(fw,'WAN1'),'WAN-01',GRAY,'Cat5e');C(P(fw,'LAN1'),P(sw,'1'),'UP-01',RED);
+  ['1','2','3','4','5'].forEach((n,i)=>C(P(sw,String(i+2)),P(pp,n,0),'P-0'+n));
+  C(P(pp,'1',1),P(s1,'1',1),'H-001',GRAY);C(P(pp,'2',1),P(s1,'2',1),'H-002',GRAY);C(P(pp,'3',1),P(s2,'1',1),'H-003',GRAY);C(P(pp,'4',1),P(s3,'1',1),'H-004',GRAY);C(P(pp,'5',1),P(s4,'1',1),'H-005',GRAY);
+  C(P(s1,'1',0),P(pcR,'LAN'),'R-1');C(P(s1,'2',0),P(prR,'LAN'),'R-2',YEL);C(P(s2,'1',0),P(pc1,'LAN'),'D1-1');C(P(s3,'1',0),P(pc2,'LAN'),'D2-1');C(P(s4,'1',0),P(pcP,'LAN'),'PH-1');
+  C(P(sw,'23'),P(nas,'LAN'),'NAS-1',GRN);C(P(sw,'24'),P(ap,'PoE'),'AP-1',ORG,'Cat6A');}},
+ {id:'factory',name:'工廠（IT＋OT）',tag:'製造業',icons:['fw','sw','PLC 控制器'],desc:'辦公區與產線分開：核心 L3 Switch 用光纖拉到產線 Switch，接 PLC、HMI 與監視器。',build(){
+  const isp=ISP('中華電信 企業光纖');
+  const fw=D('fw',{name:'FW-01',brand:'Palo Alto Networks',model:'PA-440',ip:'10.0.0.1',loc:'機房 R1',note:'辦公 VLAN 與產線 OT VLAN 之間只開必要的埠'});
+  const core=D('sw',{name:'SW-CORE',brand:'Aruba (HPE)',model:'CX 6100',variant:'l3',ip:'10.0.0.2',n:24,sfp:4,loc:'機房 R1'});
+  const pp=D('patch',{name:'PP-辦公室',model:'Cat6 6 孔',n:6,loc:'機房 R1'});
+  const sA=D('seat',{name:'生管辦公室 01',loc:'2F 生管'}),sB=D('seat',{name:'生管辦公室 02',loc:'2F 生管'});
+  const pcA=D('end',{name:'生管 PC 01',kind:'PC 桌機',brand:'Lenovo',model:'ThinkCentre M70q',ip:'DHCP',loc:'2F 生管'});
+  const pcB=D('end',{name:'生管 PC 02',kind:'PC 桌機',brand:'Lenovo',model:'ThinkCentre M70q',ip:'DHCP',loc:'2F 生管'});
+  const srv=D('end',{name:'生產排程伺服器',kind:'伺服器',brand:'Dell',model:'PowerEdge R660',ip:'10.0.10.10',loc:'機房 R1'});
+  const ap=D('ap',{name:'AP-倉庫',brand:'Aruba (HPE)',model:'AP-505',ip:'10.0.0.21',loc:'倉庫'});
+  const ot=D('sw',{name:'SW-產線-A',brand:'Cisco',model:'Catalyst 1000-8P-2G',ip:'10.0.100.2',n:8,sfp:2,loc:'產線 A 控制箱'});
+  const plc1=D('end',{name:'PLC 沖壓機',kind:'PLC 控制器',brand:'Siemens',model:'SIMATIC S7-1200',ip:'10.0.100.11',loc:'產線 A'});
+  const plc2=D('end',{name:'PLC 輸送帶',kind:'PLC 控制器',brand:'Mitsubishi Electric',model:'MELSEC iQ-F',ip:'10.0.100.12',loc:'產線 A'});
+  const plc3=D('end',{name:'PLC 包裝機',kind:'PLC 控制器',brand:'Delta',model:'AS300',ip:'10.0.100.13',loc:'產線 A'});
+  const hmi=D('end',{name:'HMI 操作面板',kind:'平板 / HMI',ip:'10.0.100.21',loc:'產線 A'});
+  const cam=D('end',{name:'監視器 產線 A',kind:'IP Cam',brand:'Hikvision',model:'DS-2CD2143G2-I',ip:'10.0.30.11',loc:'產線 A'});
+  V(core,'2,3,20','10');V(core,'SFP1','','Trunk：OT VLAN 100、監視 VLAN 30');V(ot,'1,2,3,4','100','OT');V(ot,'8','30');
+  C(P(isp,'LAN'),P(fw,'WAN1'),'WAN-01',GRAY,'Cat5e');C(P(fw,'LAN1'),P(core,'1'),'UP-01',RED,'Cat6A');
+  C(P(core,'2'),P(pp,'1',0),'P-01');C(P(core,'3'),P(pp,'2',0),'P-02');
+  C(P(pp,'1',1),P(sA,'1',1),'H-2F-001',GRAY);C(P(pp,'2',1),P(sB,'1',1),'H-2F-002',GRAY);
+  C(P(sA,'1',0),P(pcA,'LAN'),'OF-01');C(P(sB,'1',0),P(pcB,'LAN'),'OF-02');
+  C(P(core,'20'),P(srv,'LAN'),'SRV-1',GRN);C(P(core,'24'),P(ap,'PoE'),'AP-1',BLUE,'Cat6A');
+  C(P(core,'SFP1'),P(ot,'SFP1'),'FO-A01',ORG,'光纖 多模');
+  C(P(ot,'1'),P(plc1,'LAN'),'OT-A1',YEL);C(P(ot,'2'),P(plc2,'LAN'),'OT-A2',YEL);C(P(ot,'3'),P(plc3,'LAN'),'OT-A3',YEL);C(P(ot,'4'),P(hmi,'LAN'),'OT-A4',YEL);C(P(ot,'8'),P(cam,'LAN'),'CAM-A1',PUR);}},
+ {id:'school',name:'學校電腦教室',tag:'教育',icons:['sw','PC 桌機','ap'],desc:'TANet 進校園防火牆，核心 Switch 拉到教室 Switch，接教師機、學生機、投影機與 AP。',build(){
+  const isp=ISP('TANet 學術網路');
+  const fw=D('fw',{name:'FW-校園',brand:'Sophos',model:'XGS 116',ip:'10.10.0.1',loc:'資訊中心'});
+  const core=D('sw',{name:'SW-CORE',brand:'D-Link',model:'DGS-1510-28X',variant:'l3',ip:'10.10.0.2',n:24,sfp:4,loc:'資訊中心'});
+  const cls=D('sw',{name:'SW-電腦教室',brand:'TP-Link',model:'TL-SG116',variant:'l2u',n:16,sfp:0,loc:'電腦教室講台'});
+  const tch=D('end',{name:'教師機',kind:'PC 桌機',brand:'ASUS',model:'ExpertCenter D7',ip:'DHCP',loc:'講台'});
+  const st=[1,2,3,4,5,6].map(i=>D('end',{name:'學生機 0'+i,kind:'PC 桌機',brand:'Acer',model:'Veriton M',ip:'DHCP',loc:'座位 '+i}));
+  const prj=D('end',{name:'教室投影機',kind:'投影機',brand:'Epson',loc:'教室天花板'});
+  const prn=D('end',{name:'教室印表機',kind:'印表機',brand:'Brother',model:'HL-L5210DN',loc:'講台旁'});
+  const ap=D('ap',{name:'AP-電腦教室',brand:'Ruckus',model:'R550',ip:'10.10.0.31',loc:'教室天花板'});
+  V(core,'2','40','電腦教室');V(core,'24','','教學 VLAN 40／行動裝置 VLAN 50');
+  C(P(isp,'LAN'),P(fw,'WAN1'),'WAN-01',GRAY);C(P(fw,'LAN1'),P(core,'1'),'UP-01',RED,'Cat6A');
+  C(P(core,'2'),P(cls,'1'),'UP-CR1',RED,'Cat6A');C(P(core,'24'),P(ap,'PoE'),'AP-1',ORG,'Cat6A');
+  C(P(cls,'2'),P(tch,'LAN'),'CR-T');st.forEach((d,i)=>C(P(cls,String(i+3)),P(d,'LAN'),'CR-0'+(i+1)));
+  C(P(cls,'15'),P(prj,'LAN'),'CR-PJ',GRN);C(P(cls,'16'),P(prn,'LAN'),'CR-PR',YEL);}},
+];
+const STARTS=[
+ {id:'blank',name:'空白畫面',tag:'新環境',icons:[],desc:'什麼都沒有，從左側點設備開始建立自己的網路。',build(){}},
+ {id:'skeleton',name:'基本骨架',tag:'新環境',icons:['fw','sw','patch'],desc:'先放好 ISP、防火牆、核心 Switch 和配線架，再往下接座位和設備。',build(){
+  const isp=ISP('ISP 線路');const fw=D('fw',{name:'FW-01',loc:'機房'});const sw=D('sw',{name:'SW-01',n:24,sfp:2,loc:'機房'});const pp=D('patch',{name:'PP-A',n:12,loc:'機房'});
+  C(P(isp,'LAN'),P(fw,'WAN1'),'WAN-01',GRAY);C(P(fw,'LAN1'),P(sw,'1'),'UP-01',RED);C(P(sw,'2'),P(pp,'1',0),'P-01');}},
+];
+function buildTpl(t){S={devices:[],cables:[]};t.build();return S}
+function sample(){buildTpl(TEMPLATES[0])}
+function tplStats(t){const keep=S;const o=buildTpl(t);S=keep;return{d:o.devices.length,c:o.cables.length}}
+
+/* ---------- auto layout: columns by hop distance from the internet edge ---------- */
+function autoLayout(){I=idx();renderCanvas();
+  const sz={};S.devices.forEach(d=>{const el=document.querySelector(`.dev[data-dev="${d.id}"]`);sz[d.id]={w:el?el.offsetWidth:220,h:el?el.offsetHeight:120}});
+  const adj={};S.devices.forEach(d=>adj[d.id]=new Set());
+  S.cables.forEach(c=>{const a=I.owner[c.a],b=I.owner[c.b];if(a&&b&&a!==b){adj[a.id].add(b.id);adj[b.id].add(a.id)}});
+  const rank=d=>d.type==='end'&&d.kind==='ISP 數據機'?0:d.type==='fw'?1:d.type==='router'?2:(d.type==='sw'&&d.variant==='l3')?3:d.type==='sw'?4:9;
+  const depth={};
+  [...S.devices].sort((a,b)=>rank(a)-rank(b)).forEach(r=>{if(depth[r.id]!=null||!adj[r.id].size)return;depth[r.id]=0;const q=[r.id];
+    while(q.length){const id=q.shift();adj[id].forEach(n=>{if(depth[n]==null){depth[n]=depth[id]+1;q.push(n)}})}});
+  let maxD=-1;Object.values(depth).forEach(v=>maxD=Math.max(maxD,v));
+  S.devices.forEach(d=>{if(depth[d.id]==null)depth[d.id]=maxD+1});
+  const cols=[];S.devices.forEach(d=>{(cols[depth[d.id]]=cols[depth[d.id]]||[]).push(d)});
+  const maxW=Math.max(1000,(stage.clientWidth||1100)/ui.zoom-80);
+  let x=40,y=40,rowH=0,inRow=0,prevSingle=false;const cx={},want={};
+  cols.forEach((col,k)=>{if(!col)return;
+    col.forEach(d=>{const ns=[...adj[d.id]].filter(n=>cx[n]!=null);want[d.id]=ns.length?ns.reduce((s,n)=>s+cx[n],0)/ns.length:(k===0?rank(d):1e9)});
+    col.sort((a,b)=>want[a.id]-want[b.id]);
+    const single=col.length===1;
+    if(inRow&&!(single&&prevSingle&&x+sz[col[0].id].w<=40+maxW)){x=40;y+=rowH+70;rowH=0;inRow=0}
+    col.forEach(d=>{const {w,h}=sz[d.id];if(inRow&&x+w>40+maxW){x=40;y+=rowH+50;rowH=0;inRow=0}
+      d.x=Math.round(x/10)*10;d.y=Math.round(y/10)*10;cx[d.id]=x+w/2;x+=w+40;rowH=Math.max(rowH,h);inRow++});
+    prevSingle=single});
 }
+
+/* ---------- welcome / template picker ---------- */
+function tplIcon(k){return`<span class="tile" style="--tc:${TICON[k]?tc(k):tc('end')}">${TICON[k]||KICON[k]}</span>`}
+function openWelcome(canContinue){
+  const card=t=>{const st=tplStats(t);return`<button class="tcard" data-tpl="${t.id}"><span class="trow"><span class="tiles">${t.icons.length?t.icons.map(tplIcon).join(''):'<span class="tile dash"><svg viewBox="0 0 24 24"><path d="M12 6v12M6 12h12"/></svg></span>'}</span><span class="pill">${esc(t.tag)}</span></span><b>${esc(t.name)}</b><span class="d">${esc(t.desc)}</span><span class="meta">${st.d?`${st.d} 台設備 · ${st.c} 條線`:'從零開始'}</span></button>`};
+  const used=S.devices.length;
+  $('modalRoot').innerHTML=`<div class="modal welcome" id="mod"><div class="wcard" role="dialog" aria-label="選擇起點">
+    <div class="whead"><span class="logo"><svg class="i" viewBox="0 0 24 24"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M6 8l5 8.5M18 8l-5 8.5"/></svg></span>
+    <div><h2>要從哪裡開始？</h2><p class="hint">挑一個最接近的產業範例來改，或建立新的網路環境。換了之後，按「復原」可以回到原本的畫面。</p></div>
+    <button class="btn" id="wClose" style="margin-left:auto">關閉</button></div>
+    ${canContinue&&used?`<button class="tcard cont" data-tpl="continue"><span class="tile" style="--tc:var(--accent)"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span><span><b>繼續上次的配置</b><span class="d">${used} 台設備 · ${S.cables.length} 條線，資料存在這台電腦的瀏覽器</span></span></button>`:''}
+    <span class="label">產業範例</span><div class="tgrid">${TEMPLATES.map(card).join('')}</div>
+    <span class="label">新的網路環境</span><div class="tgrid">${STARTS.map(card).join('')}</div>
+  </div></div>`;
+  const close=()=>$('modalRoot').innerHTML='';
+  $('wClose').onclick=close;$('mod').onclick=e=>{if(e.target.id==='mod')close()};
+  $('mod').querySelectorAll('[data-tpl]').forEach(b=>b.onclick=()=>{const id=b.dataset.tpl;close();if(id!=='continue')applyTpl(id)});
+  const first=$('mod').querySelector('[data-tpl]');first&&first.focus();
+}
+function applyTpl(id){const t=[...TEMPLATES,...STARTS].find(x=>x.id===id);if(!t)return;
+  const had=S.devices.length>0;if(had)snap();
+  buildTpl(t);ui.sel=null;ui.pending=null;ui.layer=null;renderLayerChips();
+  if(ui.view!=='map')setView('map');
+  autoLayout();save();renderAll();ui.autoPending=true;stage.scrollTo({left:0,top:0});
+  toast(id==='blank'?'已建立空白畫面，從左側點設備開始':`已載入「${t.name}」`,had)}
+
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
-function load(){try{const r=localStorage.getItem(KEY);if(r){S=normalize(JSON.parse(r));return}}catch(e){}sample()}
+function load(){try{const r=localStorage.getItem(KEY);if(r){S=normalize(JSON.parse(r));return true}}catch(e){}sample();return false}
 
 /* ---------- undo ---------- */
-function snap(){undoS.push(JSON.stringify(S));if(undoS.length>100)undoS.shift();redoS=[];syncUR()}
+function snap(){ui.autoPending=false;undoS.push(JSON.stringify(S));if(undoS.length>100)undoS.shift();redoS=[];syncUR()}
 function undo(){if(!undoS.length)return;redoS.push(JSON.stringify(S));S=JSON.parse(undoS.pop());after('已復原')}
 function redo(){if(!redoS.length)return;undoS.push(JSON.stringify(S));S=JSON.parse(redoS.pop());after('已重做')}
 function after(m){save();I=idx();validSel();syncUR();renderAll();toast(m)}
@@ -546,7 +700,7 @@ function renderCanvas(){I=idx();
 }
 function sizeStage(){$('canvas').style.transform=`scale(${ui.zoom})`;$('sizer').style.width=ui.cw*ui.zoom+'px';$('sizer').style.height=ui.ch*ui.zoom+'px';$('zReset').textContent=Math.round(ui.zoom*100)+'%'}
 function center(pid){const el=document.querySelector(`[data-port="${pid}"] .jack`);if(!el)return null;const r=el.getBoundingClientRect(),c=$('canvas').getBoundingClientRect();return{x:(r.left+r.width/2-c.left)/ui.zoom,y:(r.top+r.height/2-c.top)/ui.zoom}}
-function curve(a,b){const dy=Math.max(40,Math.abs(b.x-a.x)*.25);return{d:`M${a.x},${a.y} C${a.x},${a.y+dy} ${b.x},${b.y+dy} ${b.x},${b.y}`,mx:(a.x+b.x)/2,my:(a.y+b.y)/2+dy*.75}}
+function curve(a,b){const dx=b.x-a.x;if(Math.abs(dx)>Math.abs(b.y-a.y)&&Math.abs(dx)>60){const k=Math.max(40,Math.abs(dx)*.45)*Math.sign(dx);return{d:`M${a.x},${a.y} C${a.x+k},${a.y} ${b.x-k},${b.y} ${b.x},${b.y}`,mx:(a.x+b.x)/2,my:(a.y+b.y)/2}}const dy=Math.max(40,Math.abs(b.x-a.x)*.25);return{d:`M${a.x},${a.y} C${a.x},${a.y+dy} ${b.x},${b.y+dy} ${b.x},${b.y}`,mx:(a.x+b.x)/2,my:(a.y+b.y)/2+dy*.75}}
 function drawWires(){const tr=traceSet();let h='',top='';
   S.cables.forEach(c=>{const a=center(c.a),b=center(c.b);if(!a||!b)return;const k=curve(a,b);
     const cls=['cab'];if(tr.active)cls.push(tr.cabs.has(c.id)?'hot':'dim');if(link&&link.cable===c)cls.push('moving');
@@ -803,6 +957,8 @@ stage.addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDe
 function setZoom(z){ui.zoom=Math.min(1.6,Math.max(.4,z));sizeStage();drawWires()}
 $('zIn').onclick=()=>setZoom(ui.zoom+.1);$('zOut').onclick=()=>setZoom(ui.zoom-.1);$('zReset').onclick=()=>setZoom(1);
 $('bUndo').onclick=undo;$('bRedo').onclick=redo;
+$('bTpl').onclick=()=>openWelcome(false);
+$('bLayout').onclick=()=>{if(!S.devices.length)return;snap();autoLayout();save();renderAll();stage.scrollTo({left:0,top:0,behavior:'smooth'});toast('已自動排列',true)};
 function setView(v){ui.view=v;$('vMap').setAttribute('aria-pressed',v==='map');$('vTable').setAttribute('aria-pressed',v==='table');
   $('stagewrap').hidden=v!=='map';$('tableView').hidden=v!=='table';$('left').hidden=v!=='map';$('main').style.gridTemplateColumns=v==='map'?'':'minmax(0,1fr) 340px';renderAll()}
 $('vMap').onclick=()=>setView('map');$('vTable').onclick=()=>setView('table');
@@ -829,12 +985,12 @@ $('bData').onclick=()=>{let old=null;try{old=localStorage.getItem(OLDKEY)}catch(
   $('modalRoot').innerHTML=`<div class="modal" id="mod"><div class="mcard" role="dialog" aria-label="匯入匯出"><h2 style="margin:0;font-size:17px;font-weight:800">匯入 / 匯出</h2>
   <p class="hint">資料存在這台電腦的瀏覽器裡。要備份或交給同事，請複製下方 JSON；要還原，貼上後按「匯入」。</p>
   <textarea id="jd" aria-label="JSON 資料">${esc(JSON.stringify(S,null,1))}</textarea>
-  <div class="actions"><button class="btn primary" id="jCopy">複製</button><button class="btn" id="jImp">匯入</button><button class="btn" id="jSample">載入範例</button>${old?'<button class="btn" id="jOld">載入舊版資料</button>':''}<button class="btn danger" id="jClear">清空全部</button><button class="btn" id="jClose" style="margin-left:auto">關閉</button></div><div id="jMsg" class="hint"></div></div></div>`;
+  <div class="actions"><button class="btn primary" id="jCopy">複製</button><button class="btn" id="jImp">匯入</button><button class="btn" id="jSample">範本 / 新環境</button>${old?'<button class="btn" id="jOld">載入舊版資料</button>':''}<button class="btn danger" id="jClear">清空全部</button><button class="btn" id="jClose" style="margin-left:auto">關閉</button></div><div id="jMsg" class="hint"></div></div></div>`;
   const close=()=>$('modalRoot').innerHTML='';const replace=(o,m)=>{snap();S=normalize(o);ui.sel=null;ui.pending=null;save();close();renderAll();toast(m,true)};
   $('jClose').onclick=close;$('mod').onclick=e=>{if(e.target.id==='mod')close()};
   $('jCopy').onclick=()=>{const t=$('jd');navigator.clipboard.writeText(t.value).then(()=>toast('已複製到剪貼簿')).catch(()=>{t.focus();t.select();$('jMsg').textContent='已選取全文，請按 Ctrl+C 複製。'})};
   $('jImp').onclick=()=>{try{const o=JSON.parse($('jd').value);if(!Array.isArray(o.devices)||!Array.isArray(o.cables))throw 0;replace(o,'已匯入')}catch(e){$('jMsg').textContent='格式不正確：需要包含 devices 和 cables 的 JSON。'}};
-  $('jSample').onclick=()=>{const keep=S;sample();const s=S;S=keep;replace(s,'已載入範例')};
+  $('jSample').onclick=()=>{close();openWelcome(false)};
   if(old)$('jOld').onclick=()=>{try{replace(JSON.parse(old),'已載入舊版資料')}catch(e){$('jMsg').textContent='舊版資料讀取失敗。'}};
   $('jClear').onclick=()=>replace({devices:[],cables:[]},'已清空');
 };
@@ -846,9 +1002,11 @@ let tT;function toast(m,withUndo){let t=document.querySelector('.toast');if(!t){
 window.addEventListener('resize',()=>requestAnimationFrame(drawWires));
 document.fonts&&document.fonts.ready.then(()=>drawWires());
 
-load();I=idx();renderLeft();syncUR();
-const firstPc=S.devices.find(d=>d.name==='王小明');if(firstPc)ui.sel={port:firstPc.ports[0].id};
+const hadSaved=load();I=idx();renderLeft();syncUR();
+if(!hadSaved){autoLayout();ui.autoPending=true}
 renderAll();
+document.fonts&&document.fonts.ready.then(()=>{if(ui.autoPending){autoLayout();renderAll()}});
+openWelcome(hadSaved);
 </script>
 
 </body>
