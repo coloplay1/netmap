@@ -651,6 +651,45 @@ details.card>summary::-webkit-details-marker{display:none}
 .dock.lft .pop{right:auto;left:0}
 #legend{display:flex;flex-direction:row;align-items:center;gap:8px}
 #legend .grip{margin-left:-6px}
+
+/* ---- p12: port LEDs, label capsules, pair hint, HUD fit ---- */
+:root{--cap:rgba(15,23,42,.85);--led-off:#3a4554}
+body.light{--cap:rgba(255,255,255,.9);--led-off:#c3cbd5}
+.jack::before{content:"";position:absolute;top:2.5px;right:2.5px;width:4.5px;height:4.5px;border-radius:50%;background:var(--led-off);box-shadow:none;z-index:1}
+.jack.sfp::before{top:2px;width:4px;height:4px}
+.port.used .jack::before{top:2.5px;left:auto;right:2.5px;width:4.5px;height:4.5px;background:var(--ok);box-shadow:0 0 4px var(--ok)}
+.poe{top:1.5px;left:2px;right:auto;width:7px;height:7px;border-radius:0;background:none;color:var(--muted);opacity:.45;display:block}
+.poe svg{width:7px;height:7px;display:block}
+.port.used.haspoe .poe{color:var(--warn);opacity:1;filter:drop-shadow(0 0 2px var(--warn))}
+.port.used.haspoe .jack{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--warn) 40%,transparent),0 0 6px color-mix(in srgb,var(--warn) 25%,transparent)}
+.dev .dlabel{position:relative;z-index:2;width:max-content;max-width:none;margin-inline:auto;background:var(--cap);border-radius:4px;padding:2px 8px 3px}
+.dev.ports .dlabel{margin:8px auto 0}
+.dev .dlabel b{text-shadow:none}
+.dev .foot{position:relative;z-index:2;display:block;width:max-content;margin:3px auto 0;background:var(--cap);border-radius:4px;padding:1px 7px 2px}
+svg.pairh{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:4}
+svg.pairh path{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:3 3}
+svg.pairh circle{fill:var(--accent)}
+.port.pairhot .jack{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 35%,transparent)}
+.port.pairhot .pl{color:var(--accent);font-weight:800}
+.top .tright{flex-wrap:nowrap}
+#legend .lrow{flex-wrap:wrap;white-space:normal;row-gap:4px}
+@media (max-width:1240px){
+  .top .stat{display:none}
+  .views button{font-size:0;gap:0;padding:6px 10px}
+  .views button svg{display:inline-block}
+  #bStart{font-size:0;gap:0;padding:6px 9px}
+}
+@media (max-width:1040px) and (min-width:901px){.top .brand h1{display:none}}
+@media (min-width:901px){.top{flex-wrap:nowrap}.top .tmid{min-width:150px}.top .tleft,.top .tright{flex:0 0 auto}.top .tmid{flex:1 1 420px;max-width:440px;margin-inline:auto}}
+@media (max-width:900px){
+  .modeseg button,.tright .popwrap>.btn{font-size:12.5px;gap:5px;padding:6px 10px}
+  .views button{font-size:12.5px;padding:5px 9px}.views button svg{display:none}
+  #legend{display:none}
+}
+@media (max-width:600px){
+  .modeseg button,.tright .popwrap>.btn{font-size:0;gap:0;padding:6px 9px}
+  #bStart{display:none}
+}
 </style>
 </head>
 <body>
@@ -658,7 +697,7 @@ details.card>summary::-webkit-details-marker{display:none}
 <div class="banner" id="banner" hidden></div>
 <div class="main" id="main">
   <div class="stagewrap" id="stagewrap">
-    <div class="stage" id="stage"><div class="sizer" id="sizer"><div class="canvas" id="canvas"><svg class="wires" id="wires"></svg><div id="devs"></div><svg class="tmp" id="tmp"></svg></div></div></div>
+    <div class="stage" id="stage"><div class="sizer" id="sizer"><div class="canvas" id="canvas"><svg class="wires" id="wires"></svg><div id="devs"></div><svg class="tmp" id="tmp"></svg><svg class="pairh" id="pairhint" aria-hidden="true"></svg></div></div></div>
     <aside class="left fl hud" id="left" aria-label="設備"><div class="phd"><span class="grip" data-grip="left" title="拖曳移動" aria-label="拖曳移動設備列">⋮⋮</span><button class="pcol" data-pcol="left" title="收合 / 展開" aria-label="收合或展開設備列">–</button></div><span class="plabel"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>設備</span><div class="pal" id="types"></div></aside>
     <div class="legend fl hud" id="legend" hidden></div>
     <div class="emptyc fl" id="emptyc" hidden><b>畫布是空的</b><span>從左側把設備拖進來，或</span><div class="actions"><button class="btn primary" id="eStart">開始頁：新增 / 匯入 / 範例</button></div></div>
@@ -722,6 +761,7 @@ details.card>summary::-webkit-details-marker{display:none}
     <div class="popwrap"><button class="ibtn" data-popbtn="popPanels" aria-expanded="false" title="面板：顯示、收合、重設位置" aria-label="面板設定"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 4v16M3 15h5"/></svg></button>
       <div class="pop" id="popPanels" hidden><span class="label">顯示的面板</span><div class="togs" id="panelToggles" style="grid-template-columns:1fr"></div><span class="label">屬性面板</span><label class="tog"><input type="checkbox" id="autoDrawer">點設備時自動開啟</label><p class="hint">拖曳面板上的 ⋮⋮ 可以移動位置，按 – 收合。</p><button class="btn sm" id="panelReset">重設所有面板位置</button></div></div>
     <button class="ibtn" id="bTheme" title="切換深色 / 淺色" aria-label="切換深色或淺色"><svg class="i" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
+    <button class="btn" id="bStart" title="開啟歡迎視窗：新增 / 匯入 / 範例"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M17.5 14v7M14 17.5h7"/></svg>範本</button>
     <div class="popwrap"><button class="btn" data-popbtn="popFile" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><path d="M3 6h7l2 2h9v11H3z"/></svg>檔案<svg class="i" viewBox="0 0 24 24" style="width:13px;height:13px"><path d="m6 9 6 6 6-6"/></svg></button>
       <div class="pop" id="popFile" hidden><div class="menu">
         <button data-file="tpl">範本 / 新環境…</button>
@@ -1106,11 +1146,13 @@ function openWelcome(canContinue){
   $('mod').querySelectorAll('[data-wimp]').forEach(b=>b.onclick=()=>{const k=b.dataset.wimp;close();if(k==='json')$('fileIn').click();if(k==='lldp')openLLDP();if(k==='text')openJsonText()});
   const first=$('mod').querySelector('[data-tpl],[data-wimp]');first&&first.focus();
 }
+/* keep a margin so the floating device bar and top bar never cover a fresh layout */
+function padLayout(){if(!S.devices.length)return;const mx=Math.min(...S.devices.map(d=>d.x)),my=Math.min(...S.devices.map(d=>d.y));const tb=document.querySelector('header.top'),tbB=tb?tb.getBoundingClientRect().bottom:70;const dx=Math.max(0,170-mx),dy=Math.max(0,Math.max(130,tbB/.6)-my);if(!dx&&!dy)return;S.devices.forEach(d=>{d.x+=dx;d.y+=dy});S.cables.forEach(c=>(c.wps||[]).forEach(w=>{w.x+=dx;w.y+=dy}))}
 function applyTpl(id){if(!canEdit())return;const t=[...TEMPLATES,...STARTS].find(x=>x.id===id);if(!t)return;ui.shared=false;$('banner').hidden=true;ui.multi.clear();
   const had=S.devices.length>0;if(had)snap();
   buildTpl(t);ui.sel=null;ui.pending=null;ui.layer=null;renderLayerChips();
   if(ui.view!=='map')setView('map');
-  autoLayout();save();renderAll();ui.autoPending=true;stage.scrollTo({left:0,top:0});
+  autoLayout();padLayout();save();renderAll();ui.autoPending=true;stage.scrollTo({left:0,top:0});if(S.devices.length&&innerWidth>600)requestAnimationFrame(()=>fitTo(devBox(),1));
   toast(id==='blank'?'已建立空白畫面，從左側點設備開始':`已載入「${t.name}」`,had)}
 
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
@@ -1154,8 +1196,11 @@ function computeMatches(){const q=ui.q.trim().toLowerCase();if(!q)return null;co
   const lit=new Set(devs);ports.forEach(p=>lit.add(I.owner[p].id));S.cables.forEach(c=>{if(cabs.has(c.id)){lit.add(I.owner[c.a].id);lit.add(I.owner[c.b].id)}});
   return{devs,ports,cabs,lit,count:devs.size+ports.size+cabs.size}}
 function devBox(ids){let l=1e9,t=1e9,r=-1e9,b=-1e9;document.querySelectorAll('#devs .dev').forEach(el=>{if(ids&&!ids.has(el.dataset.dev))return;l=Math.min(l,el.offsetLeft);t=Math.min(t,el.offsetTop);r=Math.max(r,el.offsetLeft+el.offsetWidth);b=Math.max(b,el.offsetTop+el.offsetHeight)});return r<l?null:{l,t,r,b}}
-function fitTo(box,maxZ){if(!box)return;const st=stage;const w=box.r-box.l+80,h=box.b-box.t+80;const z=Math.min(maxZ||1.2,Math.max(.35,Math.min(st.clientWidth/w,st.clientHeight/h)));setZoom(z);
-  st.scrollTo({left:Math.max(0,(box.l+box.r)/2*ui.zoom-st.clientWidth/2),top:Math.max(0,(box.t+box.b)/2*ui.zoom-st.clientHeight/2),behavior:'smooth'})}
+function fitTo(box,maxZ){if(!box)return;const st=stage;const tb=document.querySelector('header.top');const sr=st.getBoundingClientRect();
+  const top=tb?Math.max(0,tb.getBoundingClientRect().bottom-sr.top+10):0,H=Math.max(200,st.clientHeight-top-64);
+  const lp=$('left');let lo=0;if(lp&&!lp.classList.contains('phide')&&lp.offsetWidth){const lr=lp.getBoundingClientRect();if(lr.left<sr.left+40&&lr.top<sr.top+st.clientHeight*.6)lo=Math.max(0,lr.right-sr.left+8)}const W=Math.max(200,st.clientWidth-lo-16);
+  const w=box.r-box.l+80,h=box.b-box.t+80;const z=Math.min(maxZ||1.2,Math.max(.35,Math.min(W/w,H/h)));setZoom(z);
+  st.scrollTo({left:Math.max(0,(box.l+box.r)/2*ui.zoom-lo-W/2),top:Math.max(0,(box.t+box.b)/2*ui.zoom-top-H/2),behavior:'smooth'})}
 function focusMatches(){if(ui.view!=='map')setView('map');const m=ui.match;if(!m||!m.lit.size){toast('沒有符合的結果');return}fitTo(devBox(m.lit),1.2)}
 
 /* ---------- canvas render ---------- */
@@ -1163,7 +1208,8 @@ function portBtn(p,tr,m){const c=I.cab[p.id];const d=I.owner[p.id];const cls=['p
   if(c)cls.push('used');if(ui.sel&&ui.sel.port===p.id)cls.push('sel');if(ui.multi.has(p.id))cls.push('multi');if(ui.pending===p.id)cls.push('pending');if(tr.ports.has(p.id))cls.push('intrace');if(m&&m.ports.has(p.id))cls.push('match');
   let tip=`${pname(p.id)}${p.kind==='sfp'?' · SFP':p.kind==='console'?' · Console':''}${p.mode==='trunk'?' · Trunk'+(p.tagged?' '+p.tagged:''):p.vlan?' · VLAN '+p.vlan:''}${p.poe?' · PoE':''}${p.lag?' · '+p.lag:''}${p.note?' · '+p.note:''}`;
   if(c){tip+=' · 線號 '+c.label;if(TYPES[d.type].pass){const ps=trace(p.id).filter(x=>x.k==='port');tip+=` · 路徑 ${pname(ps[0].p)} ➔ ${pname(ps[ps.length-1].p)}`}}else tip+=' · 未接線，拖曳到其他孔即可接線';
-  const icons=L.icons?`${p.poe?`<span class="poe">${BOLT}</span>`:''}${p.lag?`<span class="lagbar" style="--g:${lagColor(d.id+p.lag)}"></span>`:''}`:'';
+  if(p.poe)cls.push('haspoe');
+  const icons=L.icons?`${p.poe?`<span class="poe" aria-hidden="true">${BOLT}</span>`:''}${p.lag?`<span class="lagbar" style="--g:${lagColor(d.id+p.lag)}"></span>`:''}`:'';
   const pv=L.vlan&&(p.vlan||p.mode==='trunk')?`<span class="pv">${p.mode==='trunk'?'TRK':'v'+esc(p.vlan)}</span>`:'';
   return`<button class="${cls.join(' ')}" data-port="${p.id}" style="${c?'--c:'+cableStyle(c).color:''}" title="${esc(tip)}" aria-label="${esc(tip)}"><span class="jack ${p.kind}">${icons}</span><span class="pl">${esc(p.label)}</span>${pv}</button>`}
 function portsHTML(d,tr,m){const T=TYPES[d.type];const pb=p=>portBtn(p,tr,m);
@@ -1199,7 +1245,13 @@ function devArt(d){const A=(w,h,b)=>`<svg class="art" viewBox="0 0 ${w} ${h}" wi
   case '平板 / HMI':return A(70,56,`<rect x="3" y="3" width="64" height="46" rx="6" class="a2 al"/><rect x="9" y="9" width="52" height="34" rx="2" class="tc" opacity=".5"/><rect x="25" y="49" width="20" height="5" rx="2" class="a1"/>`);
   case '投影機':return A(80,44,`<rect x="3" y="8" width="74" height="28" rx="8" class="a1 al"/><circle cx="56" cy="22" r="9" class="a2 al"/><circle cx="56" cy="22" r="4.5" class="tc"/><rect x="12" y="16" width="24" height="4" rx="2" class="a2"/><rect x="12" y="24" width="16" height="4" rx="2" class="a2"/>`);
   default:return A(60,60,`<rect x="4" y="4" width="52" height="52" rx="12" class="a1 al"/><g transform="translate(15 15) scale(1.25)" class="tcs" stroke-width="2" fill="none">${iconOf(d).replace(/<\/?svg[^>]*>/g,'')}</g>`)}}
-function renderCanvas(){I=idx();ui.match=computeMatches();
+let pairHot=null;
+function clearPair(){if(pairHot){pairHot.forEach(x=>x.classList.remove('pairhot'));pairHot=null}const h=$('pairhint');if(h)h.innerHTML=''}
+function showPair(pb){const p=I.ports[pb.dataset.port];if(!p||!p.pair){clearPair();return}if(pairHot&&pairHot.includes(pb))return;clearPair();
+  const qb=document.querySelector(`#devs [data-port="${p.pair}"]`);if(!qb)return;pairHot=[pb,qb];pb.classList.add('pairhot');qb.classList.add('pairhot');
+  const f=center(p.side===0?p.id:p.pair),k=center(p.side===0?p.pair:p.id);if(!f||!k)return;const x=f.x-15;
+  $('pairhint').innerHTML=`<path d="M${f.x-12},${f.y} H${x} V${k.y} H${k.x-12}"/><circle cx="${x}" cy="${(f.y+k.y)/2}" r="2.5"/>`}
+function renderCanvas(){I=idx();ui.match=computeMatches();clearPair();
   const total=S.devices.reduce((a,d)=>a+d.ports.length,0);
   $('stat').textContent=`${S.devices.length} 台設備 · ${S.cables.length} 條線 · ${total} 孔`;
   const tr=traceSet(),m=ui.match,L=prefs.layers;
@@ -1226,7 +1278,32 @@ function center(pid){const el=document.querySelector(`#devs [data-port="${pid}"]
   const d=I.owner[pid];if(!d)return null;const ic=document.querySelector(`#devs .dev[data-dev="${d.id}"] .ico`);if(!ic)return null;const r=ic.getBoundingClientRect();
   const i=d.ports.findIndex(p=>p.id===pid),n=d.ports.length;const off=n>1?(i/(n-1)-.5)*Math.min(r.width/ui.zoom*.5,n*4):0;
   return{x:(r.left+r.width/2-c.left)/ui.zoom+off,y:(r.top+r.height/2-c.top)/ui.zoom}}
-function devRects(){const R={};document.querySelectorAll('#devs .dev').forEach(el=>{R[el.dataset.dev]={l:el.offsetLeft,t:el.offsetTop,r:el.offsetLeft+el.offsetWidth,b:el.offsetTop+el.offsetHeight}});return R}
+function devRects(){const R={};document.querySelectorAll('#devs .dev').forEach(el=>{const pl=el.querySelector('.plate,.ico');const t=el.offsetTop;
+  R[el.dataset.dev]={l:el.offsetLeft,t,r:el.offsetLeft+el.offsetWidth,b:t+el.offsetHeight,pb:pl?t+pl.offsetTop+pl.offsetHeight:t+el.offsetHeight}});return R}
+/* which way a port's cable leaves the faceplate: top row up, bottom row down; null = free */
+function portDir(pid){const d=I.owner[pid],p=I.ports[pid];if(!d||!p||viewOf(d)==='icon')return null;
+  if(TYPES[d.type].pass){const row=d.ports.filter(x=>x.side===p.side);return{dir:p.side===0?'up':'down',k:row.indexOf(p)}}
+  const main=d.ports.filter(x=>x.kind!=='sfp'),sfp=d.ports.filter(x=>x.kind==='sfp');const arr=p.kind==='sfp'?sfp:main;const i=arr.indexOf(p);
+  const two=arr.length>8||(arr===sfp&&main.length>8&&arr.length>1);if(!two)return null;
+  return{dir:i%2===0?'up':'down',k:Math.floor(i/2)}}
+/* escape route out of the device: a short rise above (or drop below) the plate, then round its side, so cables never cut across the faceplate */
+function escapeRoute(a,o,pd,R){const free=()=>{const dx=o.x-a.x,dy=o.y-a.y;if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>60)return{pts:[a],t:{x:Math.sign(dx),y:0}};return{pts:[a],t:{x:0,y:dy>=0?1:-1}}};
+  if(!pd||!R)return free();const st=(pd.k%4)*4,side=(pd.k%5)*4;
+  const outside=o.x<R.l||o.x>R.r;const toLeft=outside?o.x<R.l:(a.x-R.l<R.r-a.x);const ex=toLeft?R.l-12-side:R.r+12+side;
+  if(pd.dir==='up'){if(o.y<R.t)return{pts:[a],t:{x:0,y:-1}};
+    const y=R.t-9-st;
+    if(o.y<=R.pb&&outside)return{pts:[a,{x:a.x,y},{x:ex,y}],t:{x:toLeft?-1:1,y:0}};
+    if(o.y>R.pb)return{pts:[a,{x:a.x,y},{x:ex,y},{x:ex,y:R.pb+6}],t:{x:0,y:1}};
+    return{pts:[a],t:{x:0,y:-1}}}
+  if(o.y>R.pb||!(o.y<R.t))return{pts:[a],t:{x:0,y:1}};
+  const y=R.pb+9+st;return{pts:[a,{x:a.x,y},{x:ex,y},{x:ex,y:R.t-6}],t:{x:0,y:-1}}}
+function smartCurve(c,a,b,R){const da=I.owner[c.a].id,db=I.owner[c.b].id;const pa=portDir(c.a),pb=portDir(c.b);
+  if(!pa&&!pb)return curve(a,b);
+  const A=escapeRoute(a,b,pa,R[da]),B=escapeRoute(b,a,pb,R[db]);const ea=A.pts[A.pts.length-1],eb=B.pts[B.pts.length-1];
+  const k=Math.max(36,Math.min(220,Math.hypot(eb.x-ea.x,eb.y-ea.y)*.42));
+  const head=A.pts.length>1?roundPath(A.pts,8):`M${a.x},${a.y}`;
+  const tail=B.pts.length>1?roundPath(B.pts.slice().reverse(),8).replace(/^M[^ ]+/,''):'';
+  return`${head} C${ea.x+A.t.x*k},${ea.y+A.t.y*k} ${eb.x+B.t.x*k},${eb.y+B.t.y*k} ${eb.x},${eb.y}${tail}`}
 function curve(a,b){const dx=b.x-a.x;if(Math.abs(dx)>Math.abs(b.y-a.y)&&Math.abs(dx)>60){const k=Math.max(40,Math.abs(dx)*.45)*Math.sign(dx);return`M${a.x},${a.y} C${a.x+k},${a.y} ${b.x-k},${b.y} ${b.x},${b.y}`}
   const dy=Math.max(40,Math.abs(dx)*.25);return`M${a.x},${a.y} C${a.x},${a.y+dy} ${b.x},${b.y+dy} ${b.x},${b.y}`}
 function roundPath(P,r){const Q=[];P.forEach(p=>{const l=Q[Q.length-1];if(!l||Math.abs(l.x-p.x)>.5||Math.abs(l.y-p.y)>.5)Q.push(p)});
@@ -1244,7 +1321,7 @@ function orthoPts(a,b,ra,rb,wps,R,da,db,lanes){
 function wirePath(c,R,lanes){const a=center(c.a),b=center(c.b);if(!a||!b)return null;const da=I.owner[c.a].id,db=I.owner[c.b].id;const wps=c.wps||[];
   if(prefs.route==='ortho')return{d:roundPath(orthoPts(a,b,R[da],R[db],wps,R,da,db,lanes),9),a,b};
   if(wps.length)return{d:roundPath([a,...wps,b],36),a,b};
-  return{d:curve(a,b),a,b}}
+  return{d:smartCurve(c,a,b,R),a,b}}
 let runVlans={};
 function computeRunVlans(){runVlans={};S.cables.forEach(c=>{if(runVlans[c.id]!==undefined)return;const t=trace(c.a);let v='';
   for(const x of t)if(x.k==='port'){const p=I.ports[x.p];if(p.mode==='trunk'||(p.lag&&!p.vlan)){v='T';break}if(p.vlan&&!v)v=p.vlan}
@@ -1253,7 +1330,11 @@ function cableStyle(c){const mode=prefs.colorMode;let color=c.color,w=3,dash='';
   if(mode==='type'){const s=TYPE_STYLE[c.type]||TYPE_STYLE.Cat6;color=s.c;w=s.w;dash=s.dash||''}
   else if(mode==='vlan'){const v=runVlans[c.id];if(v==='T'){color='#7A8796';dash='10 4';w=3.5}else if(v)color=vlanColor(v);else color='#A9B4BE'}
   if(c.type==='Console'&&mode!=='type')dash='2 5';
+  else if(fixedRun(c))dash='7 5';
   return{color,w,dash}}
+/* a run punched down on the back of a patch panel or into the wall side of a seat jack is permanent in-wall cabling */
+function fixedRun(c){const pa=I.ports[c.a],pb=I.ports[c.b];if(!pa||!pb)return false;const oa=I.owner[c.a],ob=I.owner[c.b];
+  const wall=(o,p)=>p.side===1&&(o.type==='patch'||o.type==='seat');return wall(oa,pa)||wall(ob,pb)}
 function drawWires(){const tr=traceSet(),m=ui.match,R=devRects(),lanes={};computeRunVlans();let h='';
   S.cables.forEach(c=>{const g=wirePath(c,R,lanes);if(!g)return;const st=cableStyle(c);const cls=['cab'];
     if(tr.active)cls.push(tr.cabs.has(c.id)?'hot':'dim');else if(m&&!(m.cabs.has(c.id)||(m.lit.has(I.owner[c.a].id)&&m.lit.has(I.owner[c.b].id))))cls.push('faded');
@@ -1282,6 +1363,7 @@ function renderLegend(){const el=$('legend');const mode=prefs.colorMode;
   let h='';if(mode==='type'&&S.cables.length){const used=[...new Set(S.cables.map(c=>c.type||'Cat6'))];h=used.map(t=>{const s=TYPE_STYLE[t]||TYPE_STYLE.Cat6;return`<span>${line(s.c,s.w,s.dash)}${esc(t)}</span>`}).join('')}
   else if(mode==='vlan'&&S.cables.length){const vs=[...new Set(Object.values(runVlans))].sort((a,b)=>(a===''?1:0)-(b===''?1:0)||(a==='T'?1:0)-(b==='T'?1:0)||(+a)-(+b));
     h=vs.map(v=>v==='T'?`<span>${line('#7A8796',3.5,'10 4')}Trunk / LACP</span>`:v?`<span>${line(vlanColor(v),3)}VLAN ${esc(v)}</span>`:`<span>${line('#A9B4BE',3)}未設 VLAN</span>`).join('')}
+  if(S.cables.some(fixedRun))h+=`<span>${line('#A9B4BE',3,'7 5')}牆內固定佈線（配線架背面 ↔ 資訊座）</span>`;
   $('cableLegend').innerHTML=h}
 function renderEmpty(){const e=$('emptyc');if(e)e.hidden=S.devices.length>0||ui.view!=='map'}
 function renderHint(){renderEmpty();const el=$('hint');el.className='';
@@ -1794,6 +1876,9 @@ $('layAll').onclick=()=>{LAYERS.forEach(([k])=>prefs.layers[k]=1);savePrefs();re
 $('layNone').onclick=()=>{LAYERS.forEach(([k])=>prefs.layers[k]=0);savePrefs();renderViewPop();renderAll()};
 $('bTheme').onclick=()=>{prefs.skin=prefs.skin==='light'?'dark':'light';savePrefs();document.body.classList.toggle('light',prefs.skin==='light');renderAll()};
 $('eStart').onclick=()=>{if(canEdit())openWelcome(false)};
+$('bStart').onclick=()=>{if(canEdit())openWelcome(true)};
+$('devs').addEventListener('pointerover',e=>{if(canvas.classList.contains('dragging'))return;const pb=e.target.closest('.port');if(pb)showPair(pb);else clearPair()});
+$('devs').addEventListener('pointerleave',clearPair);
 $('mEdit').onclick=()=>setRo(false);$('mRo').onclick=()=>setRo(true);
 function applyRoUI(){document.body.classList.toggle('ro',ui.ro);$('mEdit').setAttribute('aria-pressed',!ui.ro);$('mRo').setAttribute('aria-pressed',ui.ro);$('types').querySelectorAll('button').forEach(b=>b.disabled=ui.ro);$('bLayout').disabled=ui.ro}
 function setRo(v){if(ui.ro===v)return;ui.ro=v;applyRoUI();ui.pending=null;$('addmenu').hidden=true;syncUR();renderAll();toast(v?'已切到唯讀，只能查線':'已切回編輯')}
