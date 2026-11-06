@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="機房線路對應圖：建立防火牆、Switch、AP、配線架與座位資訊座，孔對孔接線並追蹤整條路徑。">
+<meta name="description" content="機房線路對應圖：建立防火牆、Switch、AP、配線架與座位資訊座，埠對埠接線並追蹤整條路徑。">
 <title>機房線路對應圖</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800&family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap">
@@ -780,8 +780,8 @@ svg.wires .flowarr{pointer-events:none}
             <div class="seg wmode" id="wireMode" role="group" aria-label="線路顯示"><button data-wm="main">主幹</button><button data-wm="all">全部</button><button data-wm="none">隱藏</button></div>
             <p class="popnote">主幹：只畫設備之間的串接線，接到電腦、PLC 等終端的線以同色線號標示兩端。點設備會亮出經過它的所有線路。</p>
             <span class="label">設備顯示</span>
-            <div class="actions"><button class="btn sm" id="allIcon">全部收成圖示</button><button class="btn sm" id="allPorts">全部展開網路孔</button></div>
-            <p class="hint">雙擊設備可以單獨切換圖示與網路孔模式。</p>
+            <div class="actions"><button class="btn sm" id="allIcon">全部收成圖示</button><button class="btn sm" id="allPorts">全部展開網路埠</button></div>
+            <p class="hint">雙擊設備可以單獨切換圖示與網路埠模式。</p>
             <span class="label">資訊圖層</span>
             <div class="togs" id="layerToggles"></div>
             <div class="actions"><button class="btn sm" id="layAll">全部顯示</button><button class="btn sm" id="layNone">全部取消</button></div>
@@ -790,13 +790,13 @@ svg.wires .flowarr{pointer-events:none}
       <div class="drow">
         <div class="dgrp"><button id="zOut" title="縮小" aria-label="縮小">−</button><button id="zReset" title="回到 100%" class="zr">100%</button><button id="zIn" title="放大" aria-label="放大">+</button><button id="zFit" title="全覽：顯示全部設備" aria-label="全覽"><svg class="i" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>
         <div class="dgrp"><button id="bUndo" title="復原 (Ctrl+Z)" aria-label="復原"><svg class="i" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button><button id="bRedo" title="重做 (Ctrl+Y)" aria-label="重做"><svg class="i" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button></div>
-        <button class="dgrp qbtn ctxtog" id="bCtx" aria-pressed="true" title="屬性列：選取孔或線時顯示的快速設定列（點一下開 / 關）" aria-label="屬性列開關"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/><path d="M7 12h4M14.5 12h2.5"/></svg></button>
+        <button class="dgrp qbtn ctxtog" id="bCtx" aria-pressed="true" title="屬性列：選取埠或線時顯示的快速設定列（點一下開 / 關）" aria-label="屬性列開關"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/><path d="M7 12h4M14.5 12h2.5"/></svg></button>
         <div class="popwrap"><button class="dgrp qbtn" data-popbtn="popHelp" aria-expanded="false" title="操作說明與快捷鍵" aria-label="操作說明">?</button>
           <div class="pop up help" id="popHelp" hidden>
             <span class="label">操作</span>
             <dl class="keys">
-              <dt>拖曳孔 → 孔</dt><dd>接線（拖到收起的設備會自動接空孔）</dd><dt>拖曳已接線的孔</dt><dd>改插到別的孔</dd><dt>點孔</dt><dd>查整條路徑，孔上方出現設定列</dd>
-              <dt>雙擊設備</dt><dd>切換圖示 / 網路孔模式</dd><dt>Shift + 點孔</dt><dd>多選孔，設 LACP、PoE、VLAN</dd><dt>Shift + 拖曳空白處</dt><dd>框選孔</dd><dt>拖曳空白處</dt><dd>平移畫布</dd>
+              <dt>拖曳埠 → 埠</dt><dd>接線（拖到收起的設備會自動接空埠）</dd><dt>拖曳已接線的埠</dt><dd>改插到別的埠</dd><dt>點埠</dt><dd>查整條路徑，埠上方出現設定列</dd>
+              <dt>雙擊設備</dt><dd>切換圖示 / 網路埠模式</dd><dt>Shift + 點埠</dt><dd>多選埠，設 LACP、PoE、VLAN</dd><dt>Shift + 拖曳空白處</dt><dd>框選埠</dd><dt>拖曳空白處</dt><dd>平移畫布</dd>
               <dt>點線，再雙擊線</dt><dd>加錨點；雙擊錨點刪除</dd><dt>右鍵 / A</dt><dd>在游標位置加設備</dd>
               <dt>Delete</dt><dd>刪除選取</dd><dt>Ctrl+Z / Ctrl+Y</dt><dd>復原 / 重做</dd><dt>Ctrl+F</dt><dd>搜尋</dd><dt>Esc</dt><dd>取消、關閉</dd>
             </dl>
@@ -886,27 +886,27 @@ const TYPES={
     intro:'在不同網段之間轉送封包，依目的 IP 查路由表決定下一站。公司對外的 WAN 線路通常從這裡出去。',
     points:['路由表：靜態路由或 OSPF、BGP','常兼做 NAT、DHCP','多 WAN 備援與負載平衡']},
   sw:{n:'Switch',t:'SW',ports:24,sfp:2,ip:true,variants:{
-    l2m:{n:'L2 管理型',layers:[2],intro:'依 MAC 位址表把資料只送到目的孔，不會像 Hub 一樣廣播給所有人。管理型可以切 VLAN、看流量、設鏡像埠。',
-      points:['MAC 位址表：記住哪台電腦在哪一孔','VLAN（802.1Q）：一台 Switch 切成多個網段','STP：防止接成迴圈造成廣播風暴','PoE：直接供電給 AP、電話、攝影機（屬 L1 功能）']},
-    l2u:{n:'L2 非管理型',layers:[2],intro:'隨插即用，依 MAC 位址轉送，沒有管理介面，不能設 VLAN。適合座位區臨時擴充孔數。',
+    l2m:{n:'L2 管理型',layers:[2],intro:'依 MAC 位址表把資料只送到目的埠，不會像 Hub 一樣廣播給所有人。管理型可以切 VLAN、看流量、設鏡像埠。',
+      points:['MAC 位址表：記住哪台電腦在哪一埠','VLAN（802.1Q）：一台 Switch 切成多個網段','STP：防止接成迴圈造成廣播風暴','PoE：直接供電給 AP、電話、攝影機（屬 L1 功能）']},
+    l2u:{n:'L2 非管理型',layers:[2],intro:'隨插即用，依 MAC 位址轉送，沒有管理介面，不能設 VLAN。適合座位區臨時擴充埠數。',
       points:['不用設定，插上就通','沒有 VLAN，也看不到流量','注意不要接成迴圈']},
     l3:{n:'L3 Switch',layers:[2,3],intro:'除了 L2 交換，還能在 VLAN 之間做路由。常當作核心交換器，讓不同部門的網段互通，不必繞去防火牆或路由器。',
       points:['VLAN 間路由（SVI）','靜態路由、OSPF','ACL 存取控制','DHCP Relay']}}},
   hub:{n:'Hub',t:'HUB',ports:5,sfp:0,layers:[1],
-    intro:'把收到的電訊號複製到其他所有孔，大家共用頻寬，同時傳送就會碰撞。現在多半已被 Switch 取代，盤點時看到 Hub 建議列入汰換。',
+    intro:'把收到的電訊號複製到其他所有埠，大家共用頻寬，同時傳送就會碰撞。現在多半已被 Switch 取代，盤點時看到 Hub 建議列入汰換。',
     points:['不認得 MAC 位址，一律廣播','半雙工、共用頻寬','偶爾用來簡易抓封包']},
   ap:{n:'無線 AP',t:'AP',ports:1,sfp:0,layers:[1,2],ip:true,
     intro:'把 Wi-Fi（802.11）和有線網路橋接在一起，讓手機、筆電用無線連進同一個區網。AP 本身多半不做路由。',
-    points:['SSID 可對應不同 VLAN，例如員工、訪客','通常由 Switch 的 PoE 孔供電','多台 AP 用控制器或雲端集中管理']},
+    points:['SSID 可對應不同 VLAN，例如員工、訪客','通常由 Switch 的 PoE 埠供電','多台 AP 用控制器或雲端集中管理']},
   patch:{n:'配線架',t:'PP',ports:12,pass:true,sides:['前','後'],layers:[1],
     intro:'被動元件，不處理訊號。機櫃內的跳線插正面，牆內通往各座位的水平線打在背面，方便標示、換線與查線。',
-    points:['孔號要和座位資訊座對得上','常見 Cat6 / Cat6A，12、24、48 孔','查線時從這裡往前、往後各追一段']},
+    points:['埠號要和座位資訊座對得上','常見 Cat6 / Cat6A，12、24、48 埠','查線時從這裡往前、往後各追一段']},
   seat:{n:'座位資訊座',t:'座',ports:2,pass:true,sides:['桌面','牆內'],layers:[1],
-    intro:'座位旁牆面或地板上的網路孔。背面接牆內水平線回到機房配線架，正面用跳線接電腦或電話。',
-    points:['面板貼孔號，例如 3F-A01-1','一個面板常有 2 孔：電腦、電話','不通時先測這一段到配線架']},
+    intro:'座位旁牆面或地板上的網路埠。背面接牆內水平線回到機房配線架，正面用跳線接電腦或電話。',
+    points:['面板貼埠號，例如 3F-A01-1','一個面板常有 2 埠：電腦、電話','不通時先測這一段到配線架']},
   end:{n:'終端設備',t:'END',ports:1,sfp:0,layers:[1,2,3,4,5,6,7],ip:true,
     intro:'電腦、電話、印表機這類終端設備，從網路卡（L1）到應用程式（L7）跑完整的協定堆疊，是資料的起點與終點。',
-    points:['網路卡有固定的 MAC 位址','用 DHCP 或手動設定取得 IP','IP Phone 常有 PC 孔，可以再串一台電腦']},
+    points:['網路卡有固定的 MAC 位址','用 DHCP 或手動設定取得 IP','IP Phone 常有 PC 埠，可以再串一台電腦']},
 };
 const END_KINDS=Object.keys(KICON);
 
@@ -1109,7 +1109,7 @@ const PRESETS={
   fw:[{n:5},{n:8},{n:10},{n:8,sfp:2}],router:[{n:4},{n:5},{n:8}],hub:[{n:5},{n:8}],ap:[{n:1},{n:2}],
   patch:[{n:12},{n:24},{n:48}],seat:[{n:1},{n:2},{n:4}],end:[{n:1},{n:2}],
 };
-function specLabel(s){return`${s.n} 孔${s.poe?(s.poe==='all'?' PoE':`（${s.poe} 孔 PoE）`):''}${s.sfp?` + ${s.sfp} SFP`:''}`}
+function specLabel(s){return`${s.n} 埠${s.poe?(s.poe==='all'?' PoE':`（${s.poe} 埠 PoE）`):''}${s.sfp?` + ${s.sfp} SFP`:''}`}
 function specText(s){return`${s.n}P${s.poe?(s.poe==='all'?' PoE':` (${s.poe} PoE)`):''}${s.sfp?` + ${s.sfp} SFP`:''}`}
 const COLORS=[['藍','#2C6FB7'],['黃','#D4A017'],['綠','#3E9B5C'],['紅','#C8463D'],['灰','#7D8794'],['橘','#D9772B'],['紫','#7A55B5'],['粉','#D8679A']];
 const CABLE_TYPES=['Cat5e','Cat6','Cat6A','Cat7','光纖 單模','光纖 多模','DAC','Console'];
@@ -1119,7 +1119,7 @@ const SPEEDS=['','100M','1G','2.5G','5G','10G','25G','40G','100G'];
 const PAL=['#2F7DE1','#E0962A','#3DA35D','#8A5CE6','#E0574B','#13A69C','#D8679A','#7D8F2E','#B5651D','#5B6BD6'];
 const KEY='netmap-v2', OLDKEY='netmap-v1', PREFKEY='netmap-prefs';
 const PUBLIC_URL='https://coloplay1.github.io/netmap/';
-const LAYERS=[['brand','廠牌型號'],['ip','IP'],['mac','MAC'],['gw','Gateway'],['loc','位置 / 機櫃'],['vlan','孔位 VLAN'],['icons','PoE / LACP 圖示'],['label','所有線號'],['speed','線路速率']];
+const LAYERS=[['brand','廠牌型號'],['ip','IP'],['mac','MAC'],['gw','Gateway'],['loc','位置 / 機櫃'],['vlan','埠位 VLAN'],['icons','PoE / LACP 圖示'],['label','所有線號'],['speed','線路速率']];
 const ICON={edit:'<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg>',del:'<svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',dup:'<svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg>',chev:'<svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="m6 9 6 6 6-6"/></svg>',info:'<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>',qr:'<svg class="i" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><path d="M14 14h2v2h-2zM18 18h2v2h-2zM14 18h2M18 14h2"/></svg>'};
 const BOLT='<svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>';
 const si=s=>s.replace('<svg','<svg class="i"');
@@ -1178,7 +1178,7 @@ function normalize(o){o.racks=Array.isArray(o.racks)?o.racks:[];
   o.cables.forEach(c=>{if(!c.color)c.color='#2C6FB7';if(c.type==null)c.type='Cat6';if(c.len==null)c.len='';if(!c.dir)c.dir='none';if(c.speed==null)c.speed='';if(!Array.isArray(c.wps))c.wps=[]});
   return o}
 /* ---------- templates ---------- */
-function P(d,label,side){const p=d.ports.find(p=>p.label===label&&(side===undefined||p.side===side));if(!p)throw new Error('找不到孔 '+d.name+' '+label);return p.id}
+function P(d,label,side){const p=d.ports.find(p=>p.label===label&&(side===undefined||p.side===side));if(!p)throw new Error('找不到埠 '+d.name+' '+label);return p.id}
 function C(a,b,label,color,type){S.cables.push({id:uid('c'),a,b,label,color:color||'#2C6FB7',type:type||'Cat6',len:''})}
 function V(d,labels,vlan,note){String(labels).split(',').forEach(l=>{const p=d.ports.find(p=>p.label===l);if(p){if(vlan)p.vlan=vlan;if(note)p.note=note}})}
 const D=(type,o)=>addDev(type,Object.assign({x:0,y:0},o));
@@ -1189,7 +1189,7 @@ const TEMPLATES=[
   const isp=ISP();
   const fw=D('fw',{name:'FW-01',brand:'Fortinet',model:'FortiGate 60F',ip:'192.168.1.1',loc:'機櫃 R1-U40'});
   const sw=D('sw',{name:'SW-CORE-01',brand:'Cisco',model:'Catalyst 9200L-24P-4G',variant:'l3',ip:'192.168.1.2',loc:'機櫃 R1-U38'});
-  const pp=D('patch',{name:'PP-A',model:'Cat6 12 孔',n:12,loc:'機櫃 R1-U36'});
+  const pp=D('patch',{name:'PP-A',model:'Cat6 12 埠',n:12,loc:'機櫃 R1-U36'});
   const hub=D('hub',{name:'HUB-會議室',n:5,loc:'3F 會議室'});
   const prn=D('end',{name:'影印區印表機',kind:'印表機',brand:'HP',model:'Color LaserJet M479fdw',ip:'192.168.10.50',loc:'3F 影印區'});
   const ap=D('ap',{name:'AP-3F-01',brand:'Ubiquiti',model:'U6-Pro',ip:'192.168.1.21',loc:'3F 走廊天花板'});
@@ -1226,7 +1226,7 @@ const TEMPLATES=[
   S.racks.push({name:'R1',size:12});const isp=ISP();
   const fw=D('fw',{name:'FW-01',brand:'Fortinet',model:'FortiGate 40F',ip:'192.168.1.1',n:5,loc:'掛號櫃台後方 R1-U12'});
   const sw=D('sw',{name:'SW-01',brand:'Zyxel',model:'GS1920-24HPv2',ip:'192.168.1.2',n:24,sfp:2,loc:'壁掛機櫃 R1-U10'});
-  const pp=D('patch',{name:'PP-1',model:'Cat6 8 孔',n:8,loc:'壁掛機櫃 R1-U9'});
+  const pp=D('patch',{name:'PP-1',model:'Cat6 8 埠',n:8,loc:'壁掛機櫃 R1-U9'});
   const s1=D('seat',{name:'掛號櫃台',loc:'1F 大廳'}),s2=D('seat',{name:'診間 1',loc:'1F'}),s3=D('seat',{name:'診間 2',loc:'1F'}),s4=D('seat',{name:'藥局',loc:'1F'});
   const pcR=D('end',{name:'掛號電腦',kind:'PC 桌機',brand:'Acer',model:'Veriton M',ip:'192.168.10.11',loc:'掛號櫃台',note:'健保讀卡機接 USB'});
   const prR=D('end',{name:'掛號印表機',kind:'印表機',brand:'Brother',model:'HL-L5210DN',ip:'192.168.10.50',loc:'掛號櫃台'});
@@ -1245,7 +1245,7 @@ const TEMPLATES=[
   const isp=ISP('中華電信 企業光纖');
   const fw=D('fw',{name:'FW-01',brand:'Palo Alto Networks',model:'PA-440',ip:'10.0.0.1',loc:'機房 R1-U40',note:'辦公 VLAN 與產線 OT VLAN 之間只開必要的埠'});
   const core=D('sw',{name:'SW-CORE',brand:'Aruba (HPE)',model:'CX 6100',variant:'l3',ip:'10.0.0.2',n:24,sfp:4,loc:'機房 R1-U38'});
-  const pp=D('patch',{name:'PP-辦公室',model:'Cat6 6 孔',n:6,loc:'機房 R1-U36'});
+  const pp=D('patch',{name:'PP-辦公室',model:'Cat6 6 埠',n:6,loc:'機房 R1-U36'});
   const sA=D('seat',{name:'生管辦公室 01',loc:'2F 生管'}),sB=D('seat',{name:'生管辦公室 02',loc:'2F 生管'});
   const pcA=D('end',{name:'生管 PC 01',kind:'PC 桌機',brand:'Lenovo',model:'ThinkCentre M70q',ip:'DHCP',loc:'2F 生管'});
   const pcB=D('end',{name:'生管 PC 02',kind:'PC 桌機',brand:'Lenovo',model:'ThinkCentre M70q',ip:'DHCP',loc:'2F 生管'});
@@ -1421,7 +1421,7 @@ function pairCol(c){return PAL[(ui.pcIdx&&ui.pcIdx[c.id]||0)%PAL.length]}
 function portBtn(p,tr,m){const c=I.cab[p.id];const d=I.owner[p.id];const cls=['port'];const L=prefs.layers;
   if(c)cls.push('used');if(ui.sel&&ui.sel.port===p.id)cls.push('sel');if(ui.multi.has(p.id))cls.push('multi');if(ui.pending===p.id)cls.push('pending');if(tr.ports.has(p.id))cls.push('intrace');if(m&&m.ports.has(p.id))cls.push('match');
   let tip=`${pname(p.id)}${p.kind==='sfp'?' · SFP':p.kind==='console'?' · Console':''}${p.mode==='trunk'?' · Trunk'+(p.tagged?' '+p.tagged:''):p.vlan?' · VLAN '+p.vlan:''}${p.poe?' · PoE':''}${p.lag?' · '+p.lag:''}${p.note?' · '+p.note:''}`;
-  if(c){tip+=' · 線號 '+c.label;if(TYPES[d.type].pass){const ps=trace(p.id).filter(x=>x.k==='port');tip+=` · 路徑 ${pname(ps[0].p)} ➔ ${pname(ps[ps.length-1].p)}`}}else tip+=' · 未接線，拖曳到其他孔即可接線';
+  if(c){tip+=' · 線號 '+c.label;if(TYPES[d.type].pass){const ps=trace(p.id).filter(x=>x.k==='port');tip+=` · 路徑 ${pname(ps[0].p)} ➔ ${pname(ps[ps.length-1].p)}`}}else tip+=' · 未接線，拖曳到其他埠即可接線';
   if(p.poe)cls.push('haspoe');
   const icons=L.icons?`${p.poe?`<span class="poe" aria-hidden="true">${BOLT}</span>`:''}${p.lag?`<span class="lagbar" style="--g:${lagColor(d.id+p.lag)}"></span>`:''}`:'';
   const pv=L.vlan&&(p.vlan||p.mode==='trunk')?`<span class="pv">${p.mode==='trunk'?'TRK':'v'+esc(p.vlan)}</span>`:'';
@@ -1469,7 +1469,7 @@ function showPair(pb){const p=I.ports[pb.dataset.port];if(!p||!p.pair){clearPair
   $('pairhint').innerHTML=`<path d="M${f.x-12},${f.y} H${x} V${k.y} H${k.x-12}"/><circle cx="${x}" cy="${(f.y+k.y)/2}" r="2.5"/>`}
 function renderCanvas(){I=idx();ui.match=computeMatches();clearPair();ui.pcIdx={};S.cables.forEach((c,i)=>ui.pcIdx[c.id]=i);
   const total=S.devices.reduce((a,d)=>a+d.ports.length,0);
-  $('stat').textContent=`${S.devices.length} 台設備 · ${S.cables.length} 條線 · ${total} 孔`;
+  $('stat').textContent=`${S.devices.length} 台設備 · ${S.cables.length} 條線 · ${total} 埠`;
   const tr=traceSet(),m=ui.match,L=prefs.layers;
   $('qcount').hidden=!m;if(m)$('qn').textContent=m.count?`${m.count} 筆`:'沒有結果';
   $('devs').innerHTML=S.devices.map(d=>{const ls=layersOf(d);
@@ -1480,7 +1480,7 @@ function renderCanvas(){I=idx();ui.match=computeMatches();clearPair();ui.pcIdx={
     let tags='';if(view==='icon'){const cs=d.ports.map(p=>I.cab[p.id]).filter(c=>c&&!wireShown(c)&&!tr.cabs.has(c.id));if(cs.length)tags=`<div class="ctags">${cs.slice(0,6).map(c=>`<span class="ctag" style="--k:${pairCol(c)}">${esc(c.label||'線')}</span>`).join('')}${cs.length>6?`<span class="ctag more">+${cs.length-6}</span>`:''}</div>`}
     const lbl=`<div class="dlabel"><b>${esc(d.name)}</b><small>${esc(sub)}</small></div>${foot?`<div class="foot">${esc(foot)}</div>`:''}${tags}`;
     const hact=`<span class="hact"><button data-act="edit" data-id="${d.id}" title="編輯" aria-label="編輯 ${esc(d.name)}">${ICON.edit}</button><button class="del" data-act="del" data-id="${d.id}" title="刪除" aria-label="刪除 ${esc(d.name)}">${ICON.del}</button></span>`;
-    if(view==='icon')return`<div class="${cls.join(' ')}" data-dev="${d.id}" style="left:${d.x}px;top:${d.y}px;--tc:${tc(d.type)}"><div class="ico" data-drag="${d.id}" title="拖曳移動，雙擊展開網路孔">${devArt(d)}</div>${lbl}${hact}</div>`;
+    if(view==='icon')return`<div class="${cls.join(' ')}" data-dev="${d.id}" style="left:${d.x}px;top:${d.y}px;--tc:${tc(d.type)}"><div class="ico" data-drag="${d.id}" title="拖曳移動，雙擊展開網路埠">${devArt(d)}</div>${lbl}${hact}</div>`;
     return`<div class="${cls.join(' ')}" data-dev="${d.id}" style="left:${d.x}px;top:${d.y}px;--tc:${tc(d.type)}"><div class="plate" data-drag="${d.id}" title="拖曳移動，雙擊收成圖示"><div class="pleft"><span class="tile">${iconOf(d)}</span><span class="leds"><i></i><i></i></span></div><div class="body">${portsHTML(d,tr,m)}</div></div>${lbl}${hact}</div>`}).join('');
   ui.popId=null;
   let mx=0,my=0;S.devices.forEach(d=>{mx=Math.max(mx,d.x);my=Math.max(my,d.y)});S.cables.forEach(c=>(c.wps||[]).forEach(w=>{mx=Math.max(mx,w.x);my=Math.max(my,w.y)}));
@@ -1590,9 +1590,9 @@ function renderLegend(){const el=$('legend');const mode=prefs.colorMode;
   $('cableLegend').innerHTML=h}
 function renderEmpty(){const e=$('emptyc');if(e)e.hidden=S.devices.length>0||ui.view!=='map'}
 function renderHint(){renderEmpty();const el=$('hint');el.className='';
-  if(ui.ro){el.className='warnb';el.innerHTML=`唯讀模式：點孔可查整條路徑 <button id="hUnlock">解除</button>`}
-  else if(ui.pending){el.className='act';el.innerHTML=`從 <b>${esc(pname(ui.pending))}</b> 出發，點要接過去的孔 <button id="hCancel">取消</button>`}
-  else if(link&&link.active){el.className='act';el.innerHTML=`${link.cable?'拖到新的孔放開，就把線改插過去':'拖到另一個空的孔放開，就接上線'} · Esc 取消`}
+  if(ui.ro){el.className='warnb';el.innerHTML=`唯讀模式：點埠可查整條路徑 <button id="hUnlock">解除</button>`}
+  else if(ui.pending){el.className='act';el.innerHTML=`從 <b>${esc(pname(ui.pending))}</b> 出發，點要接過去的埠 <button id="hCancel">取消</button>`}
+  else if(link&&link.active){el.className='act';el.innerHTML=`${link.cable?'拖到新的埠放開，就把線改插過去':'拖到另一個空的埠放開，就接上線'} · Esc 取消`}
   
   else el.innerHTML='';
   const b=$('hCancel');if(b)b.onclick=()=>{ui.pending=null;renderAll()};const u=$('hUnlock');if(u)u.onclick=()=>setRo(false)}
@@ -1609,7 +1609,7 @@ function rdevHTML(d,r,tr){const uh=uhOf(d);const top=(r.size-(+d.u+uh-1))*UHPX;c
   <span class="rports ${ports.length<=12?'one':''}">${ports.map(p=>{const c=I.cab[p.id];return`<i class="rp ${p.kind}${c?' used':''}${tr.ports.has(p.id)?' intrace':''}${ui.sel&&ui.sel.port===p.id?' sel':''}" data-port="${p.id}" style="${c?'--c:'+cableStyle(c).color:''}" title="${esc(pname(p.id)+(c?' · '+c.label:' · 未接線'))}"></i>`}).join('')}</span><span class="ru">U${d.u}${uh>1?'–'+(+d.u+uh-1):''}</span></div>`}
 function renderRack(){I=idx();computeRunVlans();const tr=traceSet();const el=$('rackView');
   const tray=S.devices.filter(d=>rackable(d)&&!(d.rack&&d.u));
-  el.innerHTML=`<div class="rtools"><input id="rkName" placeholder="機櫃名稱，例如 R2" aria-label="機櫃名稱" ${ui.ro?'disabled':''}><select id="rkSize" aria-label="機櫃大小" ${ui.ro?'disabled':''}>${[42,24,18,12,9,6].map(n=>`<option value="${n}">${n}U</option>`).join('')}</select><button class="btn" id="rkAdd" ${ui.ro?'disabled':''}>新增機櫃</button><span class="hint">拖曳設備到機櫃的 U 位，拖回右側清單就下架；點小方塊可查那個孔的整條路徑。</span></div>
+  el.innerHTML=`<div class="rtools"><input id="rkName" placeholder="機櫃名稱，例如 R2" aria-label="機櫃名稱" ${ui.ro?'disabled':''}><select id="rkSize" aria-label="機櫃大小" ${ui.ro?'disabled':''}>${[42,24,18,12,9,6].map(n=>`<option value="${n}">${n}U</option>`).join('')}</select><button class="btn" id="rkAdd" ${ui.ro?'disabled':''}>新增機櫃</button><span class="hint">拖曳設備到機櫃的 U 位，拖回右側清單就下架；點小方塊可查那個埠的整條路徑。</span></div>
   <div class="rwrap"><div class="racks">${S.racks.map(r=>rackHTML(r,tr)).join('')||'<p class="hint">還沒有機櫃，先新增一個。</p>'}</div>
   <div class="tray" id="tray"><span class="label">未上架設備（${tray.length}）</span>${tray.map(d=>`<div class="titem" data-tdev="${d.id}" style="--tc:${tc(d.type)}"><span class="tile">${iconOf(d)}</span><span>${esc(d.name)}</span><small>${uhOf(d)}U</small></div>`).join('')||'<p class="hint">機櫃設備都上架了。</p>'}
   <p class="hint">座位資訊座、AP、電腦等不放機櫃的設備不會列在這裡。</p></div></div>`;
@@ -1650,7 +1650,7 @@ function renderInsp(){const box=$('insp'),el=$('inspBody');const s=ui.sel;I=I||i
   if(ui.multi.size>1||!s){close();return}
   if(s.dev){const d=S.devices.find(x=>x.id===s.dev);if(!d||(!prefs.autoDrawer&&ui.detail!==s.dev)){close();return}inspDev(el,d);title=`設備屬性 <small>（${esc(typeName(d))}）</small>`}
   else if(ui.detail!==selKey()){close();return}
-  else if(s.port){inspPort(el,s.port);title='網路孔詳細'}
+  else if(s.port){inspPort(el,s.port);title='網路埠詳細'}
   else if(s.cable){inspCable(el,S.cables.find(x=>x.id===s.cable));title='線材詳細'}
   box.inert=false;
   $('inspTitle').innerHTML=title;box.classList.add('open');document.body.classList.add('insp-open');
@@ -1662,7 +1662,7 @@ function inspDev(el,d){const T=TYPES[d.type];const ls=layersOf(d);const used=d.p
   const nMain=T.pass?d.ports.length/2:d.ports.filter(p=>p.kind!=='sfp').length,nSfp=T.pass?0:d.ports.filter(p=>p.kind==='sfp').length;
   const hasList=!!BRANDS[d.type];const sp=SPECS[d.model];
   el.innerHTML=`<div class="ihead"><span class="tile">${iconOf(d)}</span><div style="min-width:0"><div class="kicker"><span class="pill">${esc(typeName(d))}</span><span class="pill lyr">OSI ${range(ls)}</span></div><h2>${esc(d.name)}</h2></div></div>
-  <div class="sub">${esc([d.brand,d.model].filter(Boolean).join(' ')||'尚未填廠牌型號')}${d.ip?' · '+esc(d.ip):''} · ${used} / ${d.ports.length} 孔已接線${d.ports.some(p=>p.poe)?` · PoE ${d.ports.filter(p=>p.poe).length} 孔`:''}</div>
+  <div class="sub">${esc([d.brand,d.model].filter(Boolean).join(' ')||'尚未填廠牌型號')}${d.ip?' · '+esc(d.ip):''} · ${used} / ${d.ports.length} 埠已接線${d.ports.some(p=>p.poe)?` · PoE ${d.ports.filter(p=>p.poe).length} 埠`:''}</div>
   <div class="card"><span class="label">設定</span>
   ${inp('名稱','d.name',d.name)}
   ${T.variants?sel('類型','d.variant',d.variant,Object.entries(T.variants).map(([k,v])=>[k,v.n])):''}
@@ -1673,13 +1673,13 @@ function inspDev(el,d){const T=TYPES[d.type];const ls=layersOf(d);const used=d.p
   ${inp('位置','d.loc',d.loc,'3F 業務部')}
   ${rackable(d)?`<div class="row3">${sel('機櫃','d.rack',d.rack,[['','未上架'],...S.racks.map(r=>[r.name,r.name+'（'+r.size+'U）'])])}${inp('U 位（底部）','d.u',d.u,'—','number')}${sel('高度','d.uh',uhOf(d),[[1,'1U'],[2,'2U'],[3,'3U'],[4,'4U']])}</div>`:''}
   <div class="field"><label class="label" for="f-d-note">備註</label><textarea id="f-d-note" data-f="d.note" rows="2" placeholder="序號、保固、管理帳號放哪裡…">${esc(d.note)}</textarea></div></div>
-  <div class="card"><span class="label">孔位配置${sp?` · ${esc(d.model)} 規格 ${specText(sp)}`:''}</span>
-  <div class="chips">${(PRESETS[d.type]||[]).map((p,i)=>`<button class="chipbtn" data-preset="${i}" title="${T.pass?'每孔前後各一':''}">${specText(p)}</button>`).join('')}${sp?`<button class="chipbtn" data-preset="spec">套用 ${esc(d.model)} 規格</button>`:''}</div>
-  <div class="row2"><div class="field"><label class="label" for="pc-main">${T.pass?'孔數（前後各一）':'網路孔數'}</label><input id="pc-main" type="number" min="1" max="96" value="${nMain}"></div>
-  ${!T.pass&&d.type!=='end'&&d.type!=='hub'?`<div class="field"><label class="label" for="pc-sfp">SFP 光纖孔</label><input id="pc-sfp" type="number" min="0" max="8" value="${nSfp}"></div>`:''}</div>
-  <div class="actions"><button class="btn" data-ia="ports">套用孔數</button>${!T.pass&&d.type!=='end'&&d.type!=='ap'?`<button class="btn" data-ia="poeall">全部 RJ45 設為 PoE</button>`:''}</div></div>
-  <div class="card"><span class="label">網路孔 · 點一下查整條路徑</span><div class="portgrid">${d.ports.map(p=>{const c=I.cab[p.id];return`<button data-gport="${p.id}" data-nav="1" class="${c?'used':''}" style="${c?'--c:'+cableStyle(c).color:''}" title="${esc(pname(p.id)+(c?' · '+c.label:' · 未接線'))}">${esc(p.label)}${TYPES[d.type].pass?(p.side?'後':'前'):''}</button>`}).join('')}</div>
-  <div class="actions"><button class="btn sm" data-ia="toggleview" data-nav="1">${viewOf(d)==='icon'?'在畫布展開網路孔':'在畫布收成圖示'}</button></div></div>
+  <div class="card"><span class="label">埠位配置${sp?` · ${esc(d.model)} 規格 ${specText(sp)}`:''}</span>
+  <div class="chips">${(PRESETS[d.type]||[]).map((p,i)=>`<button class="chipbtn" data-preset="${i}" title="${T.pass?'每埠前後各一':''}">${specText(p)}</button>`).join('')}${sp?`<button class="chipbtn" data-preset="spec">套用 ${esc(d.model)} 規格</button>`:''}</div>
+  <div class="row2"><div class="field"><label class="label" for="pc-main">${T.pass?'埠數（前後各一）':'網路埠數'}</label><input id="pc-main" type="number" min="1" max="96" value="${nMain}"></div>
+  ${!T.pass&&d.type!=='end'&&d.type!=='hub'?`<div class="field"><label class="label" for="pc-sfp">SFP 光纖埠</label><input id="pc-sfp" type="number" min="0" max="8" value="${nSfp}"></div>`:''}</div>
+  <div class="actions"><button class="btn" data-ia="ports">套用埠數</button>${!T.pass&&d.type!=='end'&&d.type!=='ap'?`<button class="btn" data-ia="poeall">全部 RJ45 設為 PoE</button>`:''}</div></div>
+  <div class="card"><span class="label">網路埠 · 點一下查整條路徑</span><div class="portgrid">${d.ports.map(p=>{const c=I.cab[p.id];return`<button data-gport="${p.id}" data-nav="1" class="${c?'used':''}" style="${c?'--c:'+cableStyle(c).color:''}" title="${esc(pname(p.id)+(c?' · '+c.label:' · 未接線'))}">${esc(p.label)}${TYPES[d.type].pass?(p.side?'後':'前'):''}</button>`}).join('')}</div>
+  <div class="actions"><button class="btn sm" data-ia="toggleview" data-nav="1">${viewOf(d)==='icon'?'在畫布展開網路埠':'在畫布收成圖示'}</button></div></div>
   <details class="card"><summary>設備介紹與 OSI 層級（${range(ls)}）</summary><div class="about"><p>${info.intro||T.intro}</p><ul>${(info.points||T.points).map(x=>`<li>${x}</li>`).join('')}</ul></div>${ladder(ls)}</details>
   <div class="actions"><button class="btn" data-ia="qr" data-nav="1">${ICON.qr} QR / 連結</button><button class="btn" data-ia="dup">${si(ICON.dup)} 複製</button><button class="btn danger" data-ia="deldev">${si(ICON.del)} 刪除</button></div>`;
 }
@@ -1687,31 +1687,31 @@ function inspPort(el,pid){const p=I.ports[pid],d=I.owner[pid],c=I.cab[pid],steps
   el.style.setProperty('--tc',tc(d.type));
   const ends=steps.filter(x=>x.k==='port');const A=ends[0].p,B=ends[ends.length-1].p;const sw=!TYPES[d.type].pass&&!['end','ap','hub'].includes(d.type);
   const lags=[...new Set(d.ports.map(x=>x.lag).filter(Boolean))];
-  el.innerHTML=`<div class="ihead"><span class="tile">${iconOf(d)}</span><div style="min-width:0"><div class="kicker"><span class="pill">網路孔</span>${c?`<span class="pill" style="background:color-mix(in srgb,${cableStyle(c).color} 22%,transparent);color:var(--ink)">已接線</span>`:'<span class="pill">未接線</span>'}${p.poe?'<span class="pill" style="color:var(--warn)">PoE</span>':''}${p.lag?`<span class="pill">${esc(p.lag)}</span>`:''}</div><h2>${esc(d.name)} · ${esc(pshort(pid))}</h2></div></div>
+  el.innerHTML=`<div class="ihead"><span class="tile">${iconOf(d)}</span><div style="min-width:0"><div class="kicker"><span class="pill">網路埠</span>${c?`<span class="pill" style="background:color-mix(in srgb,${cableStyle(c).color} 22%,transparent);color:var(--ink)">已接線</span>`:'<span class="pill">未接線</span>'}${p.poe?'<span class="pill" style="color:var(--warn)">PoE</span>':''}${p.lag?`<span class="pill">${esc(p.lag)}</span>`:''}</div><h2>${esc(d.name)} · ${esc(pshort(pid))}</h2></div></div>
   <div class="card"><span class="label">完整路徑${A!==B?' · '+esc(I.owner[A].name)+' ↔ '+esc(I.owner[B].name):''}</span>
   <ol class="chain">${steps.map((x,i)=>{const last=i===steps.length-1;const rail=`<span class="rail"><span class="node"></span>${last?'':'<span class="seg-line"></span>'}</span>`;
-    if(x.k==='port'){const pp=I.ports[x.p];return`<li class="${x.start?'start':''}">${rail}<div class="hop"><b>${esc(I.owner[x.p].name)}</b><div class="mono">孔 ${esc(pshort(x.p))}${pp.mode==='trunk'?' · Trunk':pp.vlan?' · VLAN '+esc(pp.vlan):''}${pp.poe?' · PoE':''}${pp.lag?' · '+esc(pp.lag):''}${pp.note?' · '+esc(pp.note):''}</div></div></li>`}
+    if(x.k==='port'){const pp=I.ports[x.p];return`<li class="${x.start?'start':''}">${rail}<div class="hop"><b>${esc(I.owner[x.p].name)}</b><div class="mono">埠 ${esc(pshort(x.p))}${pp.mode==='trunk'?' · Trunk':pp.vlan?' · VLAN '+esc(pp.vlan):''}${pp.poe?' · PoE':''}${pp.lag?' · '+esc(pp.lag):''}${pp.note?' · '+esc(pp.note):''}</div></div></li>`}
     if(x.k==='cable')return`<li class="cable" style="--c:${cableStyle(x.c).color}">${rail}<div class="hop">線號 <b>${esc(x.c.label)}</b>${x.c.type?' · '+esc(x.c.type):''}${x.c.speed?' · '+esc(x.c.speed):''}${x.c.len?' · '+esc(x.c.len)+' m':''}</div></li>`;
     return`<li class="inner">${rail}<div class="hop">穿過${TYPES[x.d.type].n}（${x.d.type==='patch'?'正面跳線 ⇄ 背面固定線':'桌面 ⇄ 牆內'}）</div></li>`}).join('')}</ol>
-  ${c?'':'<p class="hint">這個孔還沒接線。直接從它拖曳到另一個孔，或按下方按鈕再點目標孔。</p>'}</div>
-  <div class="card"><span class="label">孔位設定</span>
-  <div class="row2">${inp('孔位標示','p.label',p.label)}${sel('接頭','p.kind',p.kind,[['rj45','RJ45'],['sfp','SFP 光纖'],['console','Console']])}</div>
+  ${c?'':'<p class="hint">這個埠還沒接線。直接從它拖曳到另一個埠，或按下方按鈕再點目標埠。</p>'}</div>
+  <div class="card"><span class="label">埠位設定</span>
+  <div class="row2">${inp('埠位標示','p.label',p.label)}${sel('接頭','p.kind',p.kind,[['rj45','RJ45'],['sfp','SFP 光纖'],['console','Console']])}</div>
   <div class="row2">${sel('模式','p.mode',p.mode||'access',[['access','Access'],['trunk','Trunk']])}${inp(p.mode==='trunk'?'Native VLAN':'VLAN','p.vlan',p.vlan||'','—')}</div>
   ${p.mode==='trunk'?inp('Tagged VLAN','p.tagged',p.tagged||'','例：10,20,30'):''}
   <div class="row2"><div class="field"><label class="label" for="f-p-lag">LACP 群組</label><input id="f-p-lag" data-f="p.lag" value="${esc(p.lag||'')}" placeholder="例：Po1" list="lagList"><datalist id="lagList">${lags.map(g=>`<option value="${esc(g)}">`).join('')}</datalist></div>
   ${sw&&p.kind==='rj45'?`<label class="checkrow" style="align-self:end;padding-bottom:8px"><input type="checkbox" data-f="p.poe" ${p.poe?'checked':''}> PoE 供電</label>`:'<span></span>'}</div>
   ${inp('備註','p.note',p.note||'','例：分機 301、Gi1/0/2')}</div>
-  <div class="actions">${c?`<button class="btn" data-ia="gocable" data-nav="1">編輯這條線</button><button class="btn danger" data-ia="unplug">拔除線</button>`:`<button class="btn primary" data-ia="pend">選擇要接到的孔</button>`}<button class="btn" data-ia="godev" data-nav="1">設備設定</button></div>
-  <p class="hint">Shift + 點其他孔可以多選，一次設定 LACP、PoE 或 VLAN。</p>`;
+  <div class="actions">${c?`<button class="btn" data-ia="gocable" data-nav="1">編輯這條線</button><button class="btn danger" data-ia="unplug">拔除線</button>`:`<button class="btn primary" data-ia="pend">選擇要接到的埠</button>`}<button class="btn" data-ia="godev" data-nav="1">設備設定</button></div>
+  <p class="hint">Shift + 點其他埠可以多選，一次設定 LACP、PoE 或 VLAN。</p>`;
 }
 function inspMulti(el){const ps=[...ui.multi].map(id=>I.ports[id]).filter(Boolean);const devs=[...new Set(ps.map(p=>I.owner[p.id].id))];const one=devs.length===1?S.devices.find(d=>d.id===devs[0]):null;
   let next='Po1';if(one){let n=1;while(one.ports.some(p=>p.lag==='Po'+n))n++;next='Po'+n}
-  el.innerHTML=`<div class="ihead"><span class="tile" style="--tc:var(--accent)"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></span><div><div class="kicker"><span class="pill">多選</span></div><h2>已選 ${ps.length} 個孔</h2></div></div>
+  el.innerHTML=`<div class="ihead"><span class="tile" style="--tc:var(--accent)"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></span><div><div class="kicker"><span class="pill">多選</span></div><h2>已選 ${ps.length} 個埠</h2></div></div>
   <div class="sub">${ps.map(p=>esc(pname(p.id))).join('、')}</div>
-  <div class="card"><span class="label">LACP 聚合（Port-Channel）</span>${one?`<div class="row2"><div class="field"><label class="label" for="mLag">群組名稱</label><input id="mLag" value="${next}"></div><span></span></div><div class="actions"><button class="btn primary" data-ma="lag">設為同一個 LACP 群組</button><button class="btn" data-ma="unlag">解除群組</button></div>`:'<p class="hint">LACP 群組需要在同一台設備上，請只選同一台的孔。</p>'}</div>
+  <div class="card"><span class="label">LACP 聚合（Port-Channel）</span>${one?`<div class="row2"><div class="field"><label class="label" for="mLag">群組名稱</label><input id="mLag" value="${next}"></div><span></span></div><div class="actions"><button class="btn primary" data-ma="lag">設為同一個 LACP 群組</button><button class="btn" data-ma="unlag">解除群組</button></div>`:'<p class="hint">LACP 群組需要在同一台設備上，請只選同一台的埠。</p>'}</div>
   <div class="card"><span class="label">PoE 供電</span><div class="actions"><button class="btn" data-ma="poe1">開啟 PoE</button><button class="btn" data-ma="poe0">關閉 PoE</button></div></div>
   <div class="card"><span class="label">VLAN</span><div class="row2"><div class="field"><label class="label" for="mMode">模式</label><select id="mMode"><option value="access">Access</option><option value="trunk">Trunk</option></select></div><div class="field"><label class="label" for="mVlan">VLAN / Native</label><input id="mVlan" placeholder="例：10"></div></div>
-  <div class="field"><label class="label" for="mTag">Tagged VLAN（Trunk）</label><input id="mTag" placeholder="例：10,20,30"></div><div class="actions"><button class="btn" data-ma="vlan">套用到 ${ps.length} 個孔</button></div></div>
+  <div class="field"><label class="label" for="mTag">Tagged VLAN（Trunk）</label><input id="mTag" placeholder="例：10,20,30"></div><div class="actions"><button class="btn" data-ma="vlan">套用到 ${ps.length} 個埠</button></div></div>
   <div class="actions"><button class="btn" data-ma="clear" data-nav="1">清除選取</button></div>`}
 function inspCable(el,c){const st=cableStyle(c);
   el.innerHTML=`<div class="ihead"><span class="tile" style="background:${st.color}"><svg viewBox="0 0 24 24"><path d="M4 18c4 0 4-12 8-12s4 12 8 12"/></svg></span><div style="min-width:0"><div class="kicker"><span class="pill">線材</span>${c.type?`<span class="pill">${esc(c.type)}</span>`:''}${c.speed?`<span class="pill">${esc(c.speed)}</span>`:''}</div><h2>${esc(c.label)}</h2></div></div>
@@ -1748,7 +1748,7 @@ insp.addEventListener('click',e=>{
   const b=e.target.closest('[data-ia]');if(!b)return;const a=b.dataset.ia;
   if(a==='toggleview'){toggleView(curObj('d'));return}
   if(a==='ports'){const d=curObj('d');if(!canEdit())return;const n=Math.min(96,Math.max(1,parseInt($('pc-main').value)||1));const sf=$('pc-sfp')?Math.min(8,Math.max(0,parseInt($('pc-sfp').value)||0)):null;setCounts(d,n,sf,null)}
-  if(a==='poeall'){const d=curObj('d');if(!canEdit())return;snap();applyPoe(d,'all');save();renderAll();toast('RJ45 孔已全部設為 PoE',true)}
+  if(a==='poeall'){const d=curObj('d');if(!canEdit())return;snap();applyPoe(d,'all');save();renderAll();toast('RJ45 埠已全部設為 PoE',true)}
   if(a==='dup')dupDev(curObj('d'));
   if(a==='qr')openShare(curObj('d'));
   if(a==='deldev')delDev(ui.sel.dev);
@@ -1762,7 +1762,7 @@ insp.addEventListener('click',e=>{
   if(a==='delcable')delCable(ui.sel.cable);
 });
 function multiAction(a){if(a==='clear'){ui.multi.clear();renderAll();return}if(!canEdit())return;const ps=[...ui.multi].map(id=>I.ports[id]).filter(Boolean);snap();
-  if(a==='lag'){const g=($('mLag').value||'Po1').trim();ps.forEach(p=>p.lag=g);toast(`${ps.length} 個孔設為 ${g}`,true)}
+  if(a==='lag'){const g=($('mLag').value||'Po1').trim();ps.forEach(p=>p.lag=g);toast(`${ps.length} 個埠設為 ${g}`,true)}
   if(a==='unlag'){ps.forEach(p=>p.lag='');toast('已解除群組',true)}
   if(a==='poe1'||a==='poe0'){ps.forEach(p=>{if(p.kind==='rj45')p.poe=a==='poe1'});toast(a==='poe1'?'已開啟 PoE':'已關閉 PoE',true)}
   if(a==='vlan'){const mode=$('mMode').value,v=$('mVlan').value.trim(),t=$('mTag').value.trim();ps.forEach(p=>{p.mode=mode;p.vlan=v;p.tagged=mode==='trunk'?t:''});toast('VLAN 已套用',true)}
@@ -1789,7 +1789,7 @@ let combos={};
 function openCombo(n,q){if(n.disabled)return;const d=curObj('d');if(!d)return;const f=n.dataset.f;const pop=$(n.id+'-pop');if(!pop)return;
   const opts=f==='d.brand'?brandOptions(d,q):modelOptions(d,q);combos[n.id]={opts,active:q?0:-1};
   const cur=f==='d.brand'?d.brand:d.model;
-  pop.innerHTML=opts.length?opts.map((o,i)=>`<li role="option" id="${n.id}-o${i}" data-i="${i}" aria-selected="${i===combos[n.id].active}" class="${o.v===cur?'cur':''}"><span class="n"><span>${hl(o.v,q)}</span>${o.hit?`<span class="kw">符合「${esc(o.hit)}」</span>`:''}${o.pc?`<span class="pc">${esc(o.pc)}</span>`:o.pc===null?'<span class="pc none" title="這個型號還沒有收錄孔數，選了不會自動改孔數">孔數未收錄</span>':''}</span>${o.sub?`<span class="s">${hl(o.sub,q)}</span>`:''}</li>`).join('')
+  pop.innerHTML=opts.length?opts.map((o,i)=>`<li role="option" id="${n.id}-o${i}" data-i="${i}" aria-selected="${i===combos[n.id].active}" class="${o.v===cur?'cur':''}"><span class="n"><span>${hl(o.v,q)}</span>${o.hit?`<span class="kw">符合「${esc(o.hit)}」</span>`:''}${o.pc?`<span class="pc">${esc(o.pc)}</span>`:o.pc===null?'<span class="pc none" title="這個型號還沒有收錄埠數，選了不會自動改埠數">埠數未收錄</span>':''}</span>${o.sub?`<span class="s">${hl(o.sub,q)}</span>`:''}</li>`).join('')
     :`<li class="empty">${q?`沒有符合「${esc(q)}」的${f==='d.brand'?'廠牌':'型號'}，會直接存成你輸入的內容`:'這個廠牌暫無型號建議，可直接輸入'}</li>`;
   pop.hidden=false;n.setAttribute('aria-expanded','true')}
 function closeCombo(n){const pop=$(n.id+'-pop');if(pop)pop.hidden=true;n.setAttribute('aria-expanded','false');n.removeAttribute('aria-activedescendant')}
@@ -1815,8 +1815,8 @@ insp.addEventListener('keydown',e=>{const n=e.target;if(!n.dataset||!n.dataset.c
 
 /* ---------- mutations ---------- */
 function nextLabel(){let m=0;S.cables.forEach(c=>{const r=/^C-(\d+)$/.exec(c.label);if(r)m=Math.max(m,+r[1])});return'C-'+String(m+1).padStart(3,'0')}
-function badTarget(from,to){if(!to||to===from)return'請拖到另一個孔';const c=I.cab[from];const other=c?(c.a===from?c.b:c.a):null;
-  if(to===other)return'這條線本來就接在那裡';if(I.cab[to])return'目標孔已經有線，先拔除再接';if(I.ports[from].pair===to)return'同一個孔的前後面不需要接線';return null}
+function badTarget(from,to){if(!to||to===from)return'請拖到另一個埠';const c=I.cab[from];const other=c?(c.a===from?c.b:c.a):null;
+  if(to===other)return'這條線本來就接在那裡';if(I.cab[to])return'目標埠已經有線，先拔除再接';if(I.ports[from].pair===to)return'同一個埠的前後面不需要接線';return null}
 function connect(from,to){if(!canEdit())return;const bad=badTarget(from,to);if(bad){toast(bad);renderAll();return}
   snap();let c=I.cab[from];
   if(c){if(c.a===from)c.a=to;else c.b=to;c.wps=[];toast(`已把 ${c.label} 改插到 ${pname(to)}`,true)}
@@ -1836,7 +1836,7 @@ function setCounts(d,n,sf,poe,msg){snap();const T=TYPES[d.type];let removed=[];
     if(sf!=null){while(sfp.length<sf)sfp.push({id:uid('p'),label:'SFP'+(sfp.length+1),kind:'sfp',mode:'access'});while(sfp.length>sf)removed.push(sfp.pop())}
     d.ports=[...main,...sfp];if(poe!=null)applyPoe(d,poe)}
   const ids=new Set(removed.map(p=>p.id));const lost=S.cables.filter(c=>ids.has(c.a)||ids.has(c.b)).length;S.cables=S.cables.filter(c=>!ids.has(c.a)&&!ids.has(c.b));
-  renderAll();relaxLayout();save();toast(`${msg||'孔數已更新'}${lost?`，移除 ${lost} 條線`:''}`,true)}
+  renderAll();relaxLayout();save();toast(`${msg||'埠數已更新'}${lost?`，移除 ${lost} 條線`:''}`,true)}
 function freeSpot(){const R=Object.values(devRects()),z=ui.zoom;const vx=(stage.scrollLeft-PAD)/z,vy=(stage.scrollTop-PAD)/z,vw=stage.clientWidth/z,vh=stage.clientHeight/z;const W=240,H=140,M=24;
   const cx=vx+vw/2-W/2,cy=vy+vh/2-H/2,free=(x,y)=>!R.some(r=>x<r.r+M&&x+W>r.l-M&&y<r.b+M&&y+H>r.t-M);
   for(let ring=0;ring<30;ring++){const pts=ring?[]:[[0,0]];for(let i=-ring;i<=ring;i++)pts.push([i,-ring],[i,ring],[-ring,i],[ring,i]);
@@ -1862,7 +1862,7 @@ function renderTable(){I=idx();computeRunVlans();const q=ui.q.trim().toLowerCase
     body=`<div class="tw"><table><thead><tr><th>A 端</th><th>B 端</th><th>段數</th><th>VLAN</th><th>完整路徑</th></tr></thead><tbody>${html||'<tr><td colspan="5" class="hint">沒有符合的線路</td></tr>'}</tbody></table></div>`}
   else{const html=S.devices.filter(d=>!q||devText(d).includes(q)).map(d=>{const used=d.ports.filter(p=>I.cab[p.id]).length;
       return`<tr data-dev="${d.id}" style="--tc:${tc(d.type)}"><td><span class="typecell"><span class="tile">${iconOf(d)}</span>${esc(typeName(d))}</span></td><td>${esc(d.name)}</td><td>${esc([d.brand,d.model].filter(Boolean).join(' ')||'—')}</td><td class="mono">${esc(d.ip||'—')}</td><td>${esc(locText(d)||'—')}</td><td class="mono">${range(layersOf(d))}</td><td class="mono">${used} / ${d.ports.length}</td></tr>`}).join('');
-    body=`<div class="tw"><table><thead><tr><th>類型</th><th>名稱</th><th>廠牌 / 型號</th><th>IP</th><th>位置</th><th>OSI</th><th>孔位使用</th></tr></thead><tbody>${html||'<tr><td colspan="7" class="hint">沒有符合的設備</td></tr>'}</tbody></table></div>`}
+    body=`<div class="tw"><table><thead><tr><th>類型</th><th>名稱</th><th>廠牌 / 型號</th><th>IP</th><th>位置</th><th>OSI</th><th>埠位使用</th></tr></thead><tbody>${html||'<tr><td colspan="7" class="hint">沒有符合的設備</td></tr>'}</tbody></table></div>`}
   $('tableView').innerHTML=tabs+body+'<p class="hint">點任一列會回到拓樸圖並標出位置。要給驗收或印紙本，用「檔案 ▸ 匯出配線表 CSV」可直接用 Excel 開。</p>';
   $('tableView').querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{ui.tab=b.dataset.tab;renderTable()});
   $('tableView').querySelectorAll('tr[data-go]').forEach(r=>r.onclick=()=>{ui.sel={port:r.dataset.go};setView('map');fitTo(devBox(new Set([I.owner[r.dataset.go].id])),1)});
@@ -1878,12 +1878,12 @@ function renderAll(){if(ui.view==='map')renderCanvas();else{I=idx();computeRunVl
 function download(name,mime,data){try{const blob=data instanceof Blob?data:new Blob([data],{type:mime});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);return true}catch(e){return false}}
 const stamp=()=>new Date().toISOString().slice(0,10);
 function csv(rows){return rows.map(r=>r.map(v=>{v=String(v??'');return/[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}).join(',')).join('\r\n')}
-function cablesCSV(){I=idx();computeRunVlans();return csv([['線號','線材','速率','長度(m)','方向','VLAN','A 設備','A 孔','A 位置','B 設備','B 孔','B 位置'],...S.cables.map(c=>{const A=I.owner[c.a],B=I.owner[c.b];
+function cablesCSV(){I=idx();computeRunVlans();return csv([['線號','線材','速率','長度(m)','方向','VLAN','A 設備','A 埠','A 位置','B 設備','B 埠','B 位置'],...S.cables.map(c=>{const A=I.owner[c.a],B=I.owner[c.b];
   return[c.label,c.type,c.speed,c.len,{none:'',ab:'A→B',ba:'B→A',both:'雙向'}[c.dir||'none'],runVlans[c.id]==='T'?'Trunk':runVlans[c.id],A.name,pshort(c.a),locText(A),B.name,pshort(c.b),locText(B)]})])}
-function runsCSV(){I=idx();return csv([['起點設備','起點孔','終點設備','終點孔','段數','VLAN','完整路徑'],...allRuns().map(t=>{const ps=t.filter(x=>x.k==='port');const a=ps[0].p,b=ps[ps.length-1].p;
+function runsCSV(){I=idx();return csv([['起點設備','起點埠','終點設備','終點埠','段數','VLAN','完整路徑'],...allRuns().map(t=>{const ps=t.filter(x=>x.k==='port');const a=ps[0].p,b=ps[ps.length-1].p;
   const vl=[...new Set(ps.map(x=>{const p=I.ports[x.p];return p.mode==='trunk'?'Trunk':p.vlan}).filter(Boolean))].join(' ');
   return[I.owner[a].name,pshort(a),I.owner[b].name,pshort(b),t.filter(x=>x.k==='cable').length,vl,runText(t)]})])}
-function devicesCSV(){I=idx();return csv([['類型','名稱','廠牌','型號','IP','MAC','Gateway','位置','機櫃','U 位','OSI','孔數','已接線','PoE 孔','備註'],...S.devices.map(d=>[typeName(d),d.name,d.brand,d.model,d.ip,d.mac,d.gw,d.loc,d.rack,d.u,range(layersOf(d)),d.ports.length,d.ports.filter(p=>I.cab[p.id]).length,d.ports.filter(p=>p.poe).length,d.note])])}
+function devicesCSV(){I=idx();return csv([['類型','名稱','廠牌','型號','IP','MAC','Gateway','位置','機櫃','U 位','OSI','埠數','已接線','PoE 埠','備註'],...S.devices.map(d=>[typeName(d),d.name,d.brand,d.model,d.ip,d.mac,d.gw,d.loc,d.rack,d.u,range(layersOf(d)),d.ports.length,d.ports.filter(p=>I.cab[p.id]).length,d.ports.filter(p=>p.poe).length,d.note])])}
 function openText(title,name,text,mime){modal(`<h2>${esc(title)}</h2><p class="hint">按「下載」存成檔案；如果瀏覽器擋下下載，可以按「複製」貼到 Excel 或記事本。</p><textarea id="xText" readonly>${esc(text)}</textarea>
   <div class="actions"><button class="btn primary" id="xDl">下載 ${esc(name)}</button><button class="btn" id="xCopy">複製</button><button class="btn" data-close style="margin-left:auto">關閉</button></div>`);
   $('xDl').onclick=()=>{download(name,mime,(mime.includes('csv')?'﻿':'')+text);toast('已下載 '+name)};
@@ -1954,7 +1954,7 @@ function findPort(d,iface){const n=ifNum(iface);const T=TYPES[d.type];let p=null
     else{const main=d.ports.filter(x=>x.kind!=='sfp');while(main.length<n)main.push({id:uid('p'),label:portLabel(d.type,main.length,Math.max(n,2)),kind:'rj45',mode:'access'});d.ports=[...main,...d.ports.filter(x=>x.kind==='sfp')];p=main[n-1]}}
   return p||null}
 function openLLDP(){if(!canEdit())return;const locals=S.devices.filter(d=>['sw','router','fw'].includes(d.type));
-  modal(`<h2>匯入 LLDP / CDP 鄰居表</h2><p class="hint">貼上 Switch 的 <b>show lldp neighbors</b> 或 <b>show cdp neighbors</b> 結果（Cisco 格式），或每行一筆的 CSV：<b>本機孔,遠端設備,遠端孔,類型</b>。系統會依介面編號對到孔位，找不到的遠端設備會自動新增。</p>
+  modal(`<h2>匯入 LLDP / CDP 鄰居表</h2><p class="hint">貼上 Switch 的 <b>show lldp neighbors</b> 或 <b>show cdp neighbors</b> 結果（Cisco 格式），或每行一筆的 CSV：<b>本機埠,遠端設備,遠端埠,類型</b>。系統會依介面編號對到埠位，找不到的遠端設備會自動新增。</p>
   <div class="row2"><div class="field"><label class="label" for="lLocal">這份表格是從哪台設備抓的</label><select id="lLocal">${locals.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('')}<option value="__new">＋ 新增一台 Switch</option></select></div>
   <div class="field" id="lNewWrap" ${locals.length?'hidden':''}><label class="label" for="lNew">新 Switch 名稱</label><input id="lNew" value="SW-CORE-01"></div></div>
   <textarea id="lText" placeholder="Device ID   Local Intf   Hold-time   Capability   Port ID"></textarea>
@@ -1965,16 +1965,16 @@ function openLLDP(){if(!canEdit())return;const locals=S.devices.filter(d=>['sw',
   $('lSample').onclick=()=>{$('lText').value=SAMPLE_LLDP;$('lParse').click()};
   let rows=[];
   $('lParse').onclick=()=>{rows=parseNeighbors($('lText').value);$('lGo').disabled=!rows.length;
-    $('lPrev').innerHTML=rows.length?`<span class="label">找到 ${rows.length} 筆鄰居</span><div class="prevtbl tw"><table><thead><tr><th>本機孔</th><th>遠端設備</th><th>遠端孔</th><th>判斷類型</th><th>狀態</th></tr></thead><tbody>${rows.map(r=>{const ex=S.devices.find(d=>norm(d.name)===norm(r.rdev));return`<tr><td class="mono">${esc(r.lport)}</td><td>${esc(r.rdev)}</td><td class="mono">${esc(r.rport)}</td><td>${ex?esc(typeName(ex)):guessType(r.cap,r.rdev).label}</td><td>${ex?'已存在':'新增'}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="hint">沒有解析到鄰居資料，請確認貼上的是含「Device ID … Port ID」欄位的表格，或改用 CSV。</p>'};
+    $('lPrev').innerHTML=rows.length?`<span class="label">找到 ${rows.length} 筆鄰居</span><div class="prevtbl tw"><table><thead><tr><th>本機埠</th><th>遠端設備</th><th>遠端埠</th><th>判斷類型</th><th>狀態</th></tr></thead><tbody>${rows.map(r=>{const ex=S.devices.find(d=>norm(d.name)===norm(r.rdev));return`<tr><td class="mono">${esc(r.lport)}</td><td>${esc(r.rdev)}</td><td class="mono">${esc(r.rport)}</td><td>${ex?esc(typeName(ex)):guessType(r.cap,r.rdev).label}</td><td>${ex?'已存在':'新增'}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="hint">沒有解析到鄰居資料，請確認貼上的是含「Device ID … Port ID」欄位的表格，或改用 CSV。</p>'};
   $('lGo').onclick=()=>{if(!rows.length)return;snap();I=idx();let local;
     if($('lLocal').value==='__new'){local=addDev('sw',{name:$('lNew').value.trim()||'SW-CORE-01',n:24,sfp:4,x:40,y:40})}else local=S.devices.find(d=>d.id===$('lLocal').value);
     let created=0,linked=0;const skipped=[];let mx=0;S.devices.forEach(d=>mx=Math.max(mx,d.x));let ny=40;
     rows.forEach(r=>{let rd=S.devices.find(d=>norm(d.name)===norm(r.rdev));
       if(!rd){const g=guessType(r.cap,r.rdev);rd=addDev(g.type,{name:r.rdev,kind:g.kind,x:mx+360,y:ny,note:'由 LLDP/CDP 匯入'});ny+=140;created++}
       I=idx();const lp=findPort(local,r.lport),rp=findPort(rd,r.rport);I=idx();
-      if(!lp||!rp){skipped.push(`${r.lport} → ${r.rdev}：找不到對應的孔`);return}
+      if(!lp||!rp){skipped.push(`${r.lport} → ${r.rdev}：找不到對應的埠`);return}
       const ex=I.cab[lp.id];if(ex&&(ex.a===rp.id||ex.b===rp.id))return;
-      if(ex||I.cab[rp.id]){skipped.push(`${r.lport} → ${r.rdev} ${r.rport}：孔位已有線`);return}
+      if(ex||I.cab[rp.id]){skipped.push(`${r.lport} → ${r.rdev} ${r.rport}：埠位已有線`);return}
       if(!lp.note)lp.note=r.lport;if(!rp.note)rp.note=r.rport;
       S.cables.push({id:uid('c'),a:lp.id,b:rp.id,label:nextLabel(),color:ui.lastColor,type:ifSfp(r.lport)?'光纖 多模':'Cat6',len:'',speed:'',dir:'none',wps:[]});linked++;I=idx()});
     const doLay=$('lLayout').checked;normalize(S);save();closeModal();if(ui.view!=='map')setView('map');if(doLay)autoLayout();save();ui.sel={dev:local.id};renderAll();
@@ -2072,7 +2072,7 @@ document.addEventListener('pointerup',e=>{
   if(wpd){const W=wpd;wpd=null;if(W.moved){save();renderAll()}return}
   if(mq){const M=mq;mq=null;M.box.remove();if(M.x1==null)return;const l=Math.min(M.x0,M.x1),r=Math.max(M.x0,M.x1),t=Math.min(M.y0,M.y1),b=Math.max(M.y0,M.y1);
     const sel=S.devices.flatMap(d=>d.ports).filter(p=>{const c=center(p.id);return c&&c.x>=l&&c.x<=r&&c.y>=t&&c.y<=b}).map(p=>p.id);
-    ui.multi=new Set(sel);ui.sel=sel.length===1?{port:sel[0]}:null;if(sel.length===1)ui.multi.clear();renderAll();if(sel.length>1)toast(`已框選 ${sel.length} 個孔`);return}
+    ui.multi=new Set(sel);ui.sel=sel.length===1?{port:sel[0]}:null;if(sel.length===1)ui.multi.clear();renderAll();if(sel.length>1)toast(`已框選 ${sel.length} 個埠`);return}
   if(link){const L=link;link=null;const t=L.active?portAt(e.clientX,e.clientY,L.from):null;endLinkUI();
     if(!L.active){portClick(L.from,L.mod)}else{if(!t||t===L.from){renderAll();return}connect(L.from,t)}return}
   if(drag){const D=drag;drag=null;canvas.classList.remove('dragging');if(!D.moved){const now=Date.now();if(lastDev.id===D.d.id&&now-lastDev.t<450){lastDev={};toggleView(D.d);return}lastDev={id:D.d.id,t:now};ui.sel={dev:D.d.id};ui.multi.clear();renderAll()}else{save();renderCanvas()}}
@@ -2208,7 +2208,7 @@ document.addEventListener('pointerup',()=>{if(!pd)return;const P=pd;pd=null;P.el
 document.addEventListener('click',e=>{const b=e.target.closest('[data-pcol]');if(!b)return;const p=pstate(b.dataset.pcol);p.col=!p.col;savePrefs();placePanel(b.dataset.pcol)});
 $('popPanels').addEventListener('change',e=>{const t=e.target;if(t.dataset.ptog){pstate(t.dataset.ptog).hide=!t.checked;savePrefs();placePanel(t.dataset.ptog)}if(t.id==='autoDrawer'){prefs.autoDrawer=t.checked;savePrefs();renderInsp()}});
 function syncCtxBtn(){$('bCtx').setAttribute('aria-pressed',prefs.ctxOn!==false)}
-$('bCtx').onclick=()=>{prefs.ctxOn=prefs.ctxOn===false;savePrefs();syncCtxBtn();renderCtx();toast(prefs.ctxOn?'屬性列已開啟：點孔或線就會出現':'屬性列已關閉，可從右下角再開啟；也能按「詳細」或雙擊開啟屬性面板')};
+$('bCtx').onclick=()=>{prefs.ctxOn=prefs.ctxOn===false;savePrefs();syncCtxBtn();renderCtx();toast(prefs.ctxOn?'屬性列已開啟：點埠或線就會出現':'屬性列已關閉，可從右下角再開啟；也能按「詳細」或雙擊開啟屬性面板')};
 syncCtxBtn();
 let cd=null;
 $('ctx').addEventListener('pointerdown',e=>{const g=e.target.closest('[data-cgrip]');if(!g)return;e.preventDefault();const el=$('ctx');const P=(el.offsetParent||stage).getBoundingClientRect(),R=el.getBoundingClientRect();
@@ -2242,8 +2242,8 @@ function renderCtx(){const el=$('ctx');if(prefs.ctxOn===false||ui.view!=='map'||
   const X='<button class="x" data-cx="close" aria-label="關閉" title="關閉 (Esc)">×</button>',V='<span class="vs"></span>';
   if(ui.multi.size>1){const ids=[...ui.multi].filter(i=>I.ports[i]);anchor=center(ids[ids.length-1]);const devs=new Set(ids.map(i=>I.owner[i].id));let next='';
     if(devs.size===1){const d=I.owner[ids[0]];let n=1;while(d.ports.some(p=>p.lag==='Po'+n))n++;next='Po'+n}
-    html=`<span class="ct">已選 ${ids.length} 孔<small>${devs.size===1?esc(I.owner[ids[0]].name):devs.size+' 台設備'}</small></span>${V}
-    ${next?`<button class="tg" data-cx="lag" data-g="${next}" title="把這些孔綁成同一個 Port-Channel">LACP ${next}</button>`:''}<button class="tg" data-cx="unlag">解除群組</button>${V}
+    html=`<span class="ct">已選 ${ids.length} 埠<small>${devs.size===1?esc(I.owner[ids[0]].name):devs.size+' 台設備'}</small></span>${V}
+    ${next?`<button class="tg" data-cx="lag" data-g="${next}" title="把這些埠綁成同一個 Port-Channel">LACP ${next}</button>`:''}<button class="tg" data-cx="unlag">解除群組</button>${V}
     <button class="tg" data-cx="poe1">${BOLT.replace('<svg','<svg width="11" height="11" fill="currentColor"')} PoE 開</button><button class="tg" data-cx="poe0">PoE 關</button>${V}
     <select data-cxm="mode" aria-label="模式">${opt([['access','Access'],['trunk','Trunk']],'access')}</select><input data-cxm="vlan" placeholder="VLAN" aria-label="VLAN" style="width:64px"><button class="tg go" data-cx="vlan">套用</button>${X}`}
   else if(ui.sel&&ui.sel.cable){const c=S.cables.find(x=>x.id===ui.sel.cable);const p=c&&document.getElementById('w-'+c.id);if(c&&p){let L=0;try{L=p.getTotalLength()}catch(e){}if(L)anchor=p.getPointAtLength(L/2);
