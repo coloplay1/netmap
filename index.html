@@ -12,23 +12,23 @@
 <style>
 /* Layout: soft toolbar with popovers · left palette · dot-grid canvas (curved or orthogonal cable routing, waypoints) · rack view · tables · right inspector */
 :root{
-  --bg:#EDF1F4; --panel:#FFFFFF; --soft:#F3F6F8; --sunk:#E4EAEE; --ink:#1E2932; --muted:#6A7682; --line:#DCE3E8; --line2:#C5CFD7;
-  --accent:#0E8C8A; --accent-soft:#DDF2F1; --on-accent:#FFFFFF; --ok:#2E9A5A; --danger:#D2493F; --warn:#D98A1E; --dot:#CBD4DB; --rack:#2A333D; --rack-ink:#C9D2DA;
-  --t-fw:#E0574B; --t-router:#8A5CE6; --t-sw:#2F7DE1; --t-hub:#8B97A4; --t-ap:#13A69C; --t-patch:#E0962A; --t-seat:#3DA35D; --t-end:#5D6E80;
-  --shadow:0 1px 2px rgba(25,45,60,.06),0 10px 28px -14px rgba(25,45,60,.28);
+  --bg:#161D29; --panel:#222B3A; --panel-a:rgba(34,43,58,.94); --soft:#2B3547; --sunk:#1A2230; --ink:#E7ECF3; --muted:#98A4B7; --line:#344157; --line2:#44526A;
+  --accent:#3FB9E6; --accent-soft:#17384B; --on-accent:#06141C; --ok:#45D483; --danger:#F0685D; --warn:#F2A33A; --dot:#29334A; --rack:#0E131B; --rack-ink:#8793A6;
+  --t-fw:#EF5F52; --t-router:#5B8FF0; --t-sw:#41B4E6; --t-hub:#97A3B2; --t-ap:#2EC0B4; --t-patch:#EDA840; --t-seat:#56BC74; --t-end:#8796AA;
+  --plate1:#2E394B; --plate2:#252E3E; --plate-line:#3E4B62; --art1:#3A4659; --art2:#2A3445; --art-line:#56657E; --art-hi:#6B7C98;
+  --shadow:0 12px 32px -14px rgba(0,0,0,.7),0 2px 6px rgba(0,0,0,.25);
   --f-body:"Nunito","Noto Sans TC",system-ui,"PingFang TC","Microsoft JhengHei",sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#11171E; --panel:#19212A; --soft:#1F2832; --sunk:#26313C; --ink:#E6ECF1; --muted:#97A4B1; --line:#2B3743; --line2:#3A4856;
-  --accent:#36C2BD; --accent-soft:#163A3C; --on-accent:#08201F; --ok:#4CC27E; --danger:#EE6A60; --warn:#F0A848; --dot:#25303B; --rack:#0B0F14; --rack-ink:#8E9BA8;
-  --t-fw:#F0695D; --t-router:#A27CF2; --t-sw:#5598EE; --t-hub:#94A1AE; --t-ap:#2EC0B4; --t-patch:#EDA840; --t-seat:#56BC74; --t-end:#7D8EA0;
-  --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 30px -14px rgba(0,0,0,.6); color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#11171E; --panel:#19212A; --soft:#1F2832; --sunk:#26313C; --ink:#E6ECF1; --muted:#97A4B1; --line:#2B3743; --line2:#3A4856;
-  --accent:#36C2BD; --accent-soft:#163A3C; --on-accent:#08201F; --ok:#4CC27E; --danger:#EE6A60; --warn:#F0A848; --dot:#25303B; --rack:#0B0F14; --rack-ink:#8E9BA8;
-  --t-fw:#F0695D; --t-router:#A27CF2; --t-sw:#5598EE; --t-hub:#94A1AE; --t-ap:#2EC0B4; --t-patch:#EDA840; --t-seat:#56BC74; --t-end:#7D8EA0;
-  --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 30px -14px rgba(0,0,0,.6); color-scheme:dark}
+body.light{
+  --bg:#E9EEF2; --panel:#FFFFFF; --panel-a:rgba(255,255,255,.95); --soft:#F1F4F7; --sunk:#E3E9EE; --ink:#1E2932; --muted:#66727F; --line:#D8E0E6; --line2:#C2CCD5;
+  --accent:#0E8CB8; --accent-soft:#DDF0F7; --on-accent:#FFFFFF; --ok:#2E9A5A; --danger:#D2493F; --warn:#D98A1E; --dot:#C9D3DB; --rack:#2A333D; --rack-ink:#C9D2DA;
+  --t-fw:#E0574B; --t-router:#3F74DB; --t-sw:#1F8EC2; --t-hub:#7F8B98; --t-ap:#13A69C; --t-patch:#E0962A; --t-seat:#3DA35D; --t-end:#5D6E80;
+  --plate1:#FBFCFD; --plate2:#EDF1F5; --plate-line:#C9D2DB; --art1:#E4E9EF; --art2:#CFD8E0; --art-line:#93A1B1; --art-hi:#FFFFFF;
+  --shadow:0 12px 30px -14px rgba(25,45,60,.35),0 1px 3px rgba(25,45,60,.08);
+  color-scheme:light;
+}
 html,body{height:100%}
 [hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;display:flex;flex-direction:column;overflow:hidden}
@@ -418,19 +418,138 @@ aside.left{padding:12px 8px 20px;gap:8px;align-items:stretch}
 .addmenu button:hover,.addmenu button:focus-visible{background:var(--soft)}
 .addmenu .tile{width:24px;height:24px;border-radius:7px}
 .addmenu .tile svg{width:14px;height:14px}
+
+/* ===== floating skin: canvas fills the window, every control floats above it ===== */
+body{display:block;background:var(--bg)}
+.main{position:fixed;inset:0;display:block}
+.stagewrap{position:absolute;inset:0;display:block}
+.stage{position:absolute;inset:0;background-image:radial-gradient(var(--dot) 1.4px,transparent 1.4px);background-size:24px 24px}
+.fl{background:var(--panel-a);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:16px}
+.top{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:max(14px,env(safe-area-inset-left,0px));right:max(14px,env(safe-area-inset-right,0px));z-index:30;padding:8px 10px 8px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--panel-a);box-shadow:var(--shadow)}
+.top .brand{flex:1 1 0;min-width:max-content;margin:0}
+.top .brand h1{font-size:18px}
+.top .tright{flex:1 1 0;display:flex;justify-content:flex-end;align-items:center;gap:8px;min-width:max-content;flex-wrap:wrap}
+.seg{background:var(--sunk);border:1px solid var(--line);border-radius:12px;padding:3px}
+.seg button{border-radius:9px}
+.seg button[aria-pressed="true"]{background:var(--soft);color:var(--ink);box-shadow:0 1px 0 rgba(255,255,255,.05),0 2px 6px rgba(0,0,0,.2)}
+.views button{padding:6px 14px;font-size:14px}
+.search{background:var(--sunk);border:1px solid var(--line);border-radius:12px;width:250px}
+.modeseg .dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.modeseg #mEdit[aria-pressed="true"] .dot{background:var(--ok);box-shadow:0 0 6px var(--ok)}
+.modeseg #mRo[aria-pressed="true"]{background:var(--warn);color:#fff}
+.ibtn{width:36px;height:36px;border-radius:11px;border:1px solid var(--line);background:var(--sunk);display:grid;place-items:center;color:var(--ink)}
+.ibtn:hover{background:var(--soft)}
+.btn{border-radius:11px;background:var(--soft);border-color:var(--line)}
+.btn:hover:not(:disabled){background:var(--sunk)}
+.pop{background:var(--panel);border-color:var(--line);border-radius:14px}
+.card{background:var(--sunk);border:1px solid var(--line)}
+.field input,.field select,.field textarea{background:var(--soft);border-color:var(--line)}
+.label{text-transform:none}
+/* left device dock */
+#left{position:absolute;left:max(14px,env(safe-area-inset-left,0px));top:50%;transform:translateY(-50%);padding:10px 8px;display:flex;flex-direction:column;gap:8px;z-index:15;max-height:calc(100% - 220px);overflow:auto;width:auto;box-shadow:var(--shadow);background:var(--panel-a)}
+#left .plabel{display:flex;align-items:center;justify-content:center;gap:4px;font-size:13px;color:var(--ink);padding:2px 4px 6px;border-bottom:1px solid var(--line)}
+#left .plabel svg{width:14px;height:14px}
+.pal{gap:8px}
+.pal button{width:54px;height:54px;padding:0;border-radius:13px;background:var(--sunk);border:1px solid var(--line);justify-content:center}
+.pal button:hover:not(:disabled){background:var(--soft);border-color:var(--tc)}
+.pal button .pn{display:none}
+.pal .tile{width:36px;height:36px;border-radius:10px}
+/* legend */
+#legend{position:absolute;left:max(14px,env(safe-area-inset-left,0px));bottom:14px;top:auto;right:auto;z-index:15;padding:10px 14px;max-width:min(560px,calc(100% - 520px));display:flex;flex-direction:column;gap:6px}
+#legend .lrow{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center;font-size:12.5px}
+#legend .dotk{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:6px;vertical-align:-1px}
+#legend .lt{font-size:13px;font-weight:800}
+/* hint */
+.hintbar{position:absolute;left:50%;top:calc(84px + env(safe-area-inset-top,0px));bottom:auto;right:auto;transform:translateX(-50%);max-width:calc(100% - 40px);justify-content:center;z-index:14}
+#hint:empty{display:none}
+#hint{background:var(--panel-a);border:1px solid var(--line)}
+/* bottom-right dock */
+.dock{position:absolute;right:max(14px,env(safe-area-inset-right,0px));bottom:14px;display:flex;flex-direction:column;align-items:flex-end;gap:8px;background:none;box-shadow:none;padding:0;border-radius:0;z-index:18;max-width:calc(100% - 28px)}
+.drow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.dock .dbtn{height:42px;padding:0 14px;border-radius:13px;border:1px solid var(--line);background:var(--panel-a);box-shadow:var(--shadow);font-size:14px}
+.dock .dgrp{display:flex;align-items:center;gap:2px;height:42px;padding:0 5px;border-radius:13px;border:1px solid var(--line);background:var(--panel-a);box-shadow:var(--shadow)}
+.dock .dgrp button{height:32px;min-width:32px;border-radius:9px}
+.dock .zr{min-width:56px;font-size:14px}
+.dock .qbtn{width:42px;justify-content:center;font-size:16px;padding:0}
+.dock button:hover:not(:disabled){background:var(--soft)}
+.pop.up{bottom:calc(100% + 10px)}
+/* inspector */
+#insp{position:absolute;right:max(14px,env(safe-area-inset-right,0px));top:calc(84px + env(safe-area-inset-top,0px));width:360px;max-height:calc(100% - 84px - 128px);padding:0;display:flex;flex-direction:column;gap:0;overflow:hidden;z-index:16;background:var(--panel-a)}
+.ihd{display:flex;align-items:center;gap:8px;padding:14px 14px 12px 18px;border-bottom:1px solid var(--line);font-size:16.5px;font-weight:800}
+.ihd b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ihd small{font-weight:600;color:var(--muted)}
+.ihd .x,.ctx .ct .x{margin-left:auto;border:0;background:transparent;color:var(--muted);width:30px;height:30px;border-radius:9px;font-size:20px;line-height:1;flex:none}
+.ihd .x:hover{background:var(--soft);color:var(--ink)}
+.ibody{overflow:auto;padding:14px 16px 18px;display:flex;flex-direction:column;gap:14px;min-height:0}
+.ibody>*{flex-shrink:0}
+.portgrid{display:flex;flex-wrap:wrap;gap:4px}
+.portgrid button{min-width:30px;height:24px;padding:0 5px;border-radius:6px;border:1px solid var(--line2);background:var(--sunk);font-family:var(--f-mono);font-size:10.5px;color:var(--muted)}
+.portgrid button.used{border-color:var(--c);background:color-mix(in srgb,var(--c) 28%,var(--sunk));color:var(--ink)}
+.portgrid button:hover{border-color:var(--accent)}
+.rack-view,.table-view{position:absolute;top:calc(84px + env(safe-area-inset-top,0px));left:14px;right:14px;bottom:14px;z-index:5}
+body.insp-open .rack-view,body.insp-open .table-view{right:388px}
+.toast{top:calc(84px + env(safe-area-inset-top,0px));pointer-events:none}
+.toast button{pointer-events:auto}
+/* devices: icon mode and port (faceplate) mode */
+.dev{background:transparent;border:0;box-shadow:none;border-radius:0;min-width:0}
+.dev:hover{border-color:transparent}
+.dev.sel,.dev.trace{box-shadow:none}
+.dev .dlabel{display:flex;flex-direction:column;align-items:center;text-align:center;line-height:1.25;pointer-events:none}
+.dev .dlabel b{font-size:14px;font-weight:700;white-space:nowrap;text-shadow:0 1px 3px var(--bg)}
+.dev .dlabel small{font-size:11px;color:var(--muted);white-space:nowrap}
+.dev .dlabel .lyr{margin:3px 0 0;font-size:9.5px}
+.dev .foot{text-align:center;padding:2px 0 0;font-size:10.5px}
+.dev.icon{display:flex;flex-direction:column;align-items:center;gap:7px}
+.dev .ico{position:relative;cursor:grab;touch-action:none;filter:drop-shadow(0 10px 14px rgba(0,0,0,.35));transition:transform .15s;border-radius:10px;line-height:0}
+.dev .ico:active{cursor:grabbing}
+.dev.icon:hover .ico{transform:translateY(-2px)}
+.dev.icon.sel .ico{outline:2.5px solid var(--accent);outline-offset:7px}
+.dev.icon.trace .ico{outline:2.5px solid var(--warn);outline-offset:7px}
+.dev.icon.tgt-ok .ico{outline:3px solid var(--ok);outline-offset:7px}
+.dev.icon.tgt-bad .ico{outline:3px solid var(--danger);outline-offset:7px}
+.art{display:block;overflow:visible}
+.art .a1{fill:var(--art1)}.art .a2{fill:var(--art2)}.art .al{stroke:var(--art-line);stroke-width:1.5}.art .ah{fill:var(--art-hi)}.art .hole{fill:var(--sunk);stroke:var(--art-line);stroke-width:.8}
+.art .tc{fill:var(--tc)}.art .tcs{stroke:var(--tc);fill:none}.art .led{fill:var(--ok)}.art .wl{stroke:#fff;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.dev.ports{display:flex;flex-direction:column;align-items:center}
+.dev .plate{display:flex;align-items:stretch;gap:12px;background:linear-gradient(180deg,var(--plate1),var(--plate2));border:1px solid var(--plate-line);border-radius:11px;padding:9px 12px 8px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),var(--shadow);cursor:grab;touch-action:none}
+.dev .plate:active{cursor:grabbing}
+.plate .pleft{display:flex;flex-direction:column;justify-content:space-between;align-items:center;gap:8px;padding-right:11px;border-right:1px solid var(--plate-line)}
+.plate .pleft .tile{width:26px;height:26px;border-radius:8px}
+.plate .pleft .tile svg{width:15px;height:15px}
+.plate .leds{display:flex;gap:4px}
+.plate .leds i{width:5px;height:5px;border-radius:50%;background:var(--ok);box-shadow:0 0 6px var(--ok)}
+.plate .leds i+i{background:var(--warn);box-shadow:0 0 6px var(--warn)}
+.dev.ports .body{padding:0}
+.dev.ports .dlabel{margin-top:8px}
+.dev.ports.sel .plate{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent),var(--shadow)}
+.dev.ports.trace .plate{border-color:var(--warn);box-shadow:0 0 0 2px var(--warn),var(--shadow)}
+.jack{background:var(--sunk);border-color:var(--plate-line)}
+.jack::after{background:var(--plate1);border-color:var(--plate-line)}
+.dev .hact{position:absolute;top:-14px;right:-14px;display:none;width:auto;opacity:1;overflow:visible;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:2px;box-shadow:var(--shadow);z-index:3}
+.dev:hover .hact,.dev.sel .hact{display:flex}
+.ro .dev .hact{display:none}
+svg.wires .lbl rect{fill:var(--panel);stroke:var(--line2)}
+svg.wires .lbl text{stroke:none;paint-order:normal;fill:var(--ink);font-weight:600}
+.ctx{background:var(--panel);z-index:19}
+.addmenu{z-index:21}
 @media (max-width:900px){
-  .hintbar{display:none}
-  aside.left{flex-direction:row;overflow-x:auto;align-items:center}
-  .pal{flex-direction:row}
-  .plabel,.palhint{display:none}
-  body{overflow:auto;height:auto}
-  .main{grid-template-columns:1fr!important}
-  aside.left,aside.right{box-shadow:0 1px 0 var(--line)}
-  .stagewrap{height:62vh}
-  aside.left{order:1} .stagewrap,.table-view,.rack-view{order:2} aside.right{order:3}
-  .searchbox,.search{width:100%}
+  .top{gap:8px;padding:8px}
+  .top .brand h1,.top .stat{display:none}
+  .top .brand,.top .tright{flex:0 0 auto;min-width:0}
+  .views button{padding:5px 9px;font-size:12.5px}
+  .views button svg{display:none}
+  .tright{flex:1 1 100%!important;flex-wrap:nowrap!important;justify-content:flex-start!important}
+  .searchbox{flex:1;min-width:0}.search{width:100%}
+  .modeseg button,.tright .popwrap>.btn{font-size:0;gap:0;padding:6px 9px}
+  .modeseg .dot{margin:0 2px}
+  .hintbar,#legend{display:none}
+  #left{top:auto;bottom:126px;transform:none;max-height:calc(100% - 330px)}
+  .pal button{width:44px;height:44px}.pal .tile{width:30px;height:30px}
+  #insp{left:8px;right:8px;width:auto;top:auto;bottom:8px;max-height:55%;z-index:25}
+  body.insp-open .rack-view,body.insp-open .table-view{right:14px}
+  .rack-view,.table-view{top:150px}
   .rbody{width:300px}
-  .pop{right:auto;left:0}
+  .pop{right:auto;left:0}.dock .pop{left:auto;right:0}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -438,79 +557,83 @@ aside.left{padding:12px 8px 20px;gap:8px;align-items:stretch}
 <body>
 
 <div class="banner" id="banner" hidden></div>
-<div class="top">
-  <div class="brand"><span class="logo"><svg class="i" viewBox="0 0 24 24"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M6 8l5 8.5M18 8l-5 8.5"/></svg></span><h1>機房線路對應圖</h1><span class="stat" id="stat"></span></div>
-  <div class="seg" role="group" aria-label="檢視">
-    <button id="vMap" aria-pressed="true">拓樸圖</button>
-    <button id="vRack" aria-pressed="false">機櫃</button>
-    <button id="vTable" aria-pressed="false">線路表</button>
-  </div>
-  <label class="searchbox"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg><input class="search" id="q" type="search" placeholder="搜尋線號、IP、設備、廠牌…" aria-label="搜尋"><span class="qcount" id="qcount" hidden><span id="qn"></span><button type="button" id="qfocus">對焦</button></span></label>
-  <div class="seg modeseg" role="group" aria-label="模式"><button id="mEdit" aria-pressed="true" title="可以接線、移動、修改"><svg class="i" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>編輯</button><button id="mRo" aria-pressed="false" title="只能查線，不會誤觸拔線"><svg class="i" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>唯讀</button></div>
-  <div class="popwrap"><button class="btn" data-popbtn="popFile" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><path d="M4 4h10l6 6v10H4z"/><path d="M14 4v6h6"/></svg>檔案</button>
-    <div class="pop" id="popFile" hidden><div class="menu">
-      <button data-file="tpl">範本 / 新環境…</button>
-      <hr>
-      <button data-file="saveJson">下載專案檔（JSON）</button>
-      <button data-file="openJson">開啟專案檔…</button>
-      <hr>
-      <button data-file="csvCables">匯出配線表 CSV（每條線）</button>
-      <button data-file="csvRuns">匯出完整路徑 CSV</button>
-      <button data-file="csvDevices">匯出設備清單 CSV</button>
-      <button data-file="image">匯出拓樸圖 SVG / PNG</button>
-      <hr>
-      <button data-file="lldp">匯入 LLDP / CDP 鄰居表…</button>
-      <button data-file="share">分享連結 / QR Code…</button>
-      <button data-file="jsonText">JSON 文字匯入 / 匯出…</button>
-    </div></div></div>
-  <input type="file" id="fileIn" accept=".json,application/json" hidden>
-</div>
-
 <div class="main" id="main">
-  <aside class="left" id="left" aria-label="設備">
-    <span class="plabel">設備</span>
-    <div class="pal" id="types"></div>
-    <p class="palhint">拖到畫布放下，或點一下加入。也可以在畫布按右鍵或 A 鍵</p>
-  </aside>
-
   <div class="stagewrap" id="stagewrap">
     <div class="stage" id="stage"><div class="sizer" id="sizer"><div class="canvas" id="canvas"><svg class="wires" id="wires"></svg><div id="devs"></div><svg class="tmp" id="tmp"></svg></div></div></div>
-    <div class="legend" id="legend" hidden></div>
+    <aside class="left fl" id="left" aria-label="設備"><span class="plabel"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>設備</span><div class="pal" id="types"></div></aside>
+    <div class="legend fl" id="legend" hidden></div>
     <div class="hintbar"><div id="hint"></div></div>
     <div class="ctx" id="ctx" hidden></div>
     <div class="addmenu" id="addmenu" hidden role="menu" aria-label="加入設備"></div>
     <div class="dock" id="dock" role="toolbar" aria-label="畫布工具">
-      <div class="dgrp"><button id="bUndo" title="復原 (Ctrl+Z)" aria-label="復原"><svg class="i" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button><button id="bRedo" title="重做 (Ctrl+Y)" aria-label="重做"><svg class="i" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button></div>
-      <div class="dgrp"><button id="zOut" title="縮小" aria-label="縮小">−</button><button id="zReset" title="回到 100%" class="zr">100%</button><button id="zIn" title="放大" aria-label="放大">+</button><button id="zFit" title="全覽：顯示全部設備" aria-label="全覽"><svg class="i" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>
-      <div class="dgrp" role="group" aria-label="走線方式"><button data-route="curve" title="曲線走線" aria-label="曲線走線"><svg class="i" viewBox="0 0 24 24"><path d="M4 18C10 18 8 6 20 6"/></svg></button><button data-route="ortho" title="直角走線（自動分道、避開設備）" aria-label="直角走線"><svg class="i" viewBox="0 0 24 24"><path d="M4 18h7V6h9"/></svg></button></div>
-      <div class="popwrap"><button data-popbtn="popView" aria-expanded="false" title="線色與資訊圖層" class="dtxt"><svg class="i" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/></svg>圖層</button>
-        <div class="pop up" id="popView" hidden>
-          <span class="label">線條顏色</span>
-          <div class="seg" role="group" aria-label="線條顏色"><button data-cmode="custom">自訂</button><button data-cmode="type">依線材</button><button data-cmode="vlan">依 VLAN</button></div>
-          <span class="label">資訊圖層</span>
-          <div class="togs" id="layerToggles"></div>
-        </div></div>
-      <button id="bLayout" title="依連線關係重新排列設備" class="dtxt"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="6" rx="1.5"/><rect x="14" y="3" width="7" height="6" rx="1.5"/><rect x="8.5" y="15" width="7" height="6" rx="1.5"/><path d="M6.5 9v3h11V9M12 12v3"/></svg>排列</button>
-      <div class="popwrap"><button data-popbtn="popHelp" aria-expanded="false" title="操作說明與快捷鍵" aria-label="操作說明" class="qbtn">?</button>
-        <div class="pop up help" id="popHelp" hidden>
-          <span class="label">操作</span>
-          <dl class="keys">
-            <dt>拖曳孔 → 孔</dt><dd>接線</dd><dt>拖曳已接線的孔</dt><dd>改插到別的孔</dd><dt>點孔</dt><dd>查整條路徑，孔上方出現設定列</dd>
-            <dt>Shift + 點孔</dt><dd>多選孔，設 LACP、PoE、VLAN</dd><dt>Shift + 拖曳空白處</dt><dd>框選孔</dd><dt>拖曳空白處</dt><dd>平移畫布</dd>
-            <dt>點線，再雙擊線</dt><dd>加錨點；雙擊錨點刪除</dd><dt>右鍵 / A</dt><dd>在游標位置加設備</dd>
-            <dt>Delete</dt><dd>刪除選取</dd><dt>Ctrl+Z / Ctrl+Y</dt><dd>復原 / 重做</dd><dt>Ctrl+F</dt><dd>搜尋</dd><dt>Esc</dt><dd>取消、關閉</dd>
-          </dl>
-          <span class="label">依 OSI 層標示設備</span>
-          <div class="lchips" id="lchips"></div>
-          <p class="hint">廠牌欄可打中文、縮寫或產品線，例如「飛塔」「ubnt」「Catalyst」。</p>
-        </div></div>
+      <div class="drow">
+        <div class="popwrap"><button class="dbtn" data-popbtn="popColor" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="8" cy="10" r="1.3"/><circle cx="12" cy="7.5" r="1.3"/><circle cx="16" cy="10" r="1.3"/><path d="M12 21a3 3 0 0 1 0-6h2"/></svg>線色</button>
+          <div class="pop up" id="popColor" hidden><span class="label">線條顏色</span><div class="seg" role="group" aria-label="線條顏色"><button data-cmode="custom">自訂</button><button data-cmode="type">依線材</button><button data-cmode="vlan">依 VLAN</button></div><p class="hint">依線材：單模光纖黃、多模水藍、DAC 粗黑、Console 淺藍虛線。依 VLAN：Trunk 為深灰虛線。</p></div></div>
+        <div class="popwrap"><button class="dbtn" data-popbtn="popRoute" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><path d="M4 20h6V8h10"/><circle cx="4" cy="20" r="1.5"/><circle cx="20" cy="8" r="1.5"/></svg>走線</button>
+          <div class="pop up" id="popRoute" hidden><span class="label">走線方式</span><div class="seg" role="group" aria-label="走線方式"><button data-route="curve">曲線</button><button data-route="ortho">直角（自動分道）</button></div><span class="label">排列</span><button class="btn" id="bLayout"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="6" rx="1.5"/><rect x="14" y="3" width="7" height="6" rx="1.5"/><rect x="8.5" y="15" width="7" height="6" rx="1.5"/><path d="M6.5 9v3h11V9M12 12v3"/></svg>依連線自動排列設備</button></div></div>
+        <div class="popwrap"><button class="dbtn" data-popbtn="popView" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>顯示圖層</button>
+          <div class="pop up" id="popView" hidden>
+            <span class="label">設備顯示</span>
+            <div class="actions"><button class="btn sm" id="allIcon">全部收成圖示</button><button class="btn sm" id="allPorts">全部展開網路孔</button></div>
+            <p class="hint">雙擊設備可以單獨切換圖示與網路孔模式。</p>
+            <span class="label">資訊圖層</span>
+            <div class="togs" id="layerToggles"></div>
+            <div class="actions"><button class="btn sm" id="layAll">全部顯示</button><button class="btn sm" id="layNone">全部取消</button></div>
+          </div></div>
+      </div>
+      <div class="drow">
+        <div class="dgrp"><button id="zOut" title="縮小" aria-label="縮小">−</button><button id="zReset" title="回到 100%" class="zr">100%</button><button id="zIn" title="放大" aria-label="放大">+</button><button id="zFit" title="全覽：顯示全部設備" aria-label="全覽"><svg class="i" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>
+        <div class="dgrp"><button id="bUndo" title="復原 (Ctrl+Z)" aria-label="復原"><svg class="i" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button><button id="bRedo" title="重做 (Ctrl+Y)" aria-label="重做"><svg class="i" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button></div>
+        <div class="popwrap"><button class="dgrp qbtn" data-popbtn="popHelp" aria-expanded="false" title="操作說明與快捷鍵" aria-label="操作說明">?</button>
+          <div class="pop up help" id="popHelp" hidden>
+            <span class="label">操作</span>
+            <dl class="keys">
+              <dt>拖曳孔 → 孔</dt><dd>接線（拖到收起的設備會自動接空孔）</dd><dt>拖曳已接線的孔</dt><dd>改插到別的孔</dd><dt>點孔</dt><dd>查整條路徑，孔上方出現設定列</dd>
+              <dt>雙擊設備</dt><dd>切換圖示 / 網路孔模式</dd><dt>Shift + 點孔</dt><dd>多選孔，設 LACP、PoE、VLAN</dd><dt>Shift + 拖曳空白處</dt><dd>框選孔</dd><dt>拖曳空白處</dt><dd>平移畫布</dd>
+              <dt>點線，再雙擊線</dt><dd>加錨點；雙擊錨點刪除</dd><dt>右鍵 / A</dt><dd>在游標位置加設備</dd>
+              <dt>Delete</dt><dd>刪除選取</dd><dt>Ctrl+Z / Ctrl+Y</dt><dd>復原 / 重做</dd><dt>Ctrl+F</dt><dd>搜尋</dd><dt>Esc</dt><dd>取消、關閉</dd>
+            </dl>
+            <span class="label">依 OSI 層標示設備</span>
+            <div class="lchips" id="lchips"></div>
+            <p class="hint">廠牌欄可打中文、縮寫或產品線，例如「飛塔」「ubnt」「Catalyst」。</p>
+          </div></div>
+      </div>
     </div>
   </div>
   <div class="rack-view" id="rackView" hidden></div>
   <div class="table-view" id="tableView" hidden></div>
-
-  <aside class="right insp" id="insp"></aside>
+  <aside class="insp fl" id="insp" hidden aria-label="屬性"><div class="ihd"><b id="inspTitle"></b><button class="x" id="inspClose" aria-label="關閉">×</button></div><div class="ibody" id="inspBody"></div></aside>
 </div>
+<header class="top fl">
+  <div class="brand"><span class="logo"><svg class="i" viewBox="0 0 24 24"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M6 8l5 8.5M18 8l-5 8.5"/></svg></span><h1>機房線路對應圖</h1><span class="stat" id="stat"></span></div>
+  <div class="seg views" role="group" aria-label="檢視">
+    <button id="vMap" aria-pressed="true"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.8 2.6 2.8 15.4 0 18M12 3c-2.8 2.6-2.8 15.4 0 18"/></svg>拓樸視圖</button>
+    <button id="vRack" aria-pressed="false"><svg class="i" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h8"/></svg>機櫃視圖</button>
+    <button id="vTable" aria-pressed="false"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/></svg>線路表</button>
+  </div>
+  <div class="tright">
+    <label class="searchbox"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg><input class="search" id="q" type="search" placeholder="搜尋設備、IP 或線號…" aria-label="搜尋"><span class="qcount" id="qcount" hidden><span id="qn"></span><button type="button" id="qfocus">對焦</button></span></label>
+    <div class="seg modeseg" role="group" aria-label="模式"><button id="mEdit" aria-pressed="true" title="可以接線、移動、修改"><i class="dot"></i>編輯</button><button id="mRo" aria-pressed="false" title="只能查線，不會誤觸拔線"><svg class="i" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>唯讀</button></div>
+    <button class="ibtn" id="bTheme" title="切換深色 / 淺色" aria-label="切換深色或淺色"><svg class="i" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
+    <div class="popwrap"><button class="btn" data-popbtn="popFile" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><path d="M3 6h7l2 2h9v11H3z"/></svg>檔案<svg class="i" viewBox="0 0 24 24" style="width:13px;height:13px"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="pop" id="popFile" hidden><div class="menu">
+        <button data-file="tpl">範本 / 新環境…</button>
+        <hr>
+        <button data-file="saveJson">下載專案檔（JSON）</button>
+        <button data-file="openJson">開啟專案檔…</button>
+        <hr>
+        <button data-file="csvCables">匯出配線表 CSV（每條線）</button>
+        <button data-file="csvRuns">匯出完整路徑 CSV</button>
+        <button data-file="csvDevices">匯出設備清單 CSV</button>
+        <button data-file="image">匯出拓樸圖 SVG / PNG</button>
+        <hr>
+        <button data-file="lldp">匯入 LLDP / CDP 鄰居表…</button>
+        <button data-file="share">分享連結 / QR Code…</button>
+        <button data-file="jsonText">JSON 文字匯入 / 匯出…</button>
+      </div></div></div>
+    <input type="file" id="fileIn" accept=".json,application/json" hidden>
+  </div>
+</header>
 <div id="modalRoot"></div>
 
 <script>
@@ -836,14 +959,14 @@ function autoLayout(){I=idx();renderCanvas();
   let maxD=-1;Object.values(depth).forEach(v=>maxD=Math.max(maxD,v));
   S.devices.forEach(d=>{if(depth[d.id]==null)depth[d.id]=maxD+1});
   const cols=[];S.devices.forEach(d=>{(cols[depth[d.id]]=cols[depth[d.id]]||[]).push(d)});
-  const maxW=Math.max(1000,(stage.clientWidth||1100)/ui.zoom-80);
-  let x=40,y=40,rowH=0,inRow=0,prevSingle=false;const cx={},want={};
+  const maxW=Math.max(900,((stage.clientWidth||1300)-140)/ui.zoom-60);
+  let x=110,y=100,rowH=0,inRow=0,prevSingle=false;const cx={},want={};
   cols.forEach((col,k)=>{if(!col)return;
     col.forEach(d=>{const ns=[...adj[d.id]].filter(n=>cx[n]!=null);want[d.id]=ns.length?ns.reduce((s,n)=>s+cx[n],0)/ns.length:(k===0?rank(d):1e9)});
     col.sort((a,b)=>want[a.id]-want[b.id]);
     const single=col.length===1;
-    if(inRow&&!(single&&prevSingle&&x+sz[col[0].id].w<=40+maxW)){x=40;y+=rowH+70;rowH=0;inRow=0}
-    col.forEach(d=>{const {w,h}=sz[d.id];if(inRow&&x+w>40+maxW){x=40;y+=rowH+50;rowH=0;inRow=0}
+    if(inRow&&!(single&&prevSingle&&x+sz[col[0].id].w<=110+maxW)){x=110;y+=rowH+70;rowH=0;inRow=0}
+    col.forEach(d=>{const {w,h}=sz[d.id];if(inRow&&x+w>110+maxW){x=110;y+=rowH+50;rowH=0;inRow=0}
       d.x=Math.round(x/10)*10;d.y=Math.round(y/10)*10;cx[d.id]=x+w/2;x+=w+40;rowH=Math.max(rowH,h);inRow++});
     prevSingle=single});
 }
@@ -934,6 +1057,31 @@ function portsHTML(d,tr,m){const T=TYPES[d.type];const pb=p=>portBtn(p,tr,m);
     return`<div class="ports" style="grid-template-columns:repeat(${arr.length},28px)">${arr.map(pb).join('')}</div>`};
   return`<div class="pgroup">${grid(main)}${grid(sfp)}</div>`}
 function locText(d){const r=d.rack&&d.u?`${d.rack}-U${d.u}`:'';return d.loc&&r&&d.loc.toUpperCase().includes(r)?d.loc:[d.loc,r].filter(Boolean).join(' · ')}
+/* ---------- device illustrations (icon mode) ---------- */
+function viewOf(d){return d.view||((d.type==='sw'||d.type==='patch')?'ports':'icon')}
+function holes(x0,y,n,step,w,h){let o='';for(let i=0;i<n;i++)o+=`<rect class="hole" x="${x0+i*step}" y="${y}" width="${w}" height="${h}" rx="1"/>`;return o}
+function devArt(d){const A=(w,h,b)=>`<svg class="art" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true">${b}</svg>`;const k=d.type==='end'?d.kind:d.type;
+  switch(k){
+  case 'fw':{let m='';[4,17,30,43].forEach((y,i)=>{const off=i%2?13:0;for(let x=-13+off;x<84;x+=26)m+=`<rect x="${Math.max(3,x+2)}" y="${y+2}" width="${Math.min(23,84-Math.max(3,x+2)-3,x+25-Math.max(3,x+2))}" height="10" rx="1.5" class="tc"/>`});
+    return A(86,60,`<rect x="1" y="2" width="84" height="56" rx="6" class="a2 al"/>${m}<rect x="3" y="4" width="80" height="4" rx="2" fill="rgba(255,255,255,.18)"/>`)}
+  case 'router':return A(62,62,`<circle cx="31" cy="31" r="28" class="tc"/><circle cx="31" cy="31" r="28" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="2"/><path class="wl" stroke-width="3" d="M31 13v12M26 18l5-5 5 5M31 49V37M26 44l5 5 5-5M13 31h12M18 26l-5 5 5 5M49 31H37M44 26l5 5-5 5"/>`);
+  case 'sw':return A(132,34,`<rect x="1" y="3" width="130" height="28" rx="5" class="a1 al"/><circle cx="12" cy="12" r="2.5" class="led"/><circle cx="12" cy="22" r="2.5" class="tc"/><rect x="20" y="8" width="1" height="18" class="al" stroke-width="1"/>${holes(28,8,11,8.6,6.5,6)}${holes(28,19,11,8.6,6.5,6)}<rect x="124" y="9" width="4" height="16" rx="1" class="a2"/>`);
+  case 'hub':return A(96,28,`<rect x="1" y="3" width="94" height="22" rx="5" class="a1 al"/>${holes(30,10,5,11,8,7)}<circle cx="12" cy="14" r="2.5" class="led"/><circle cx="20" cy="14" r="2.5" class="tc"/>`);
+  case 'patch':return A(132,30,`<rect x="1" y="3" width="130" height="24" rx="4" class="a1 al"/><rect x="5" y="6" width="5" height="18" rx="1" class="a2"/><rect x="122" y="6" width="5" height="18" rx="1" class="a2"/>${holes(16,9,12,8.6,6.5,7)}<rect x="16" y="19" width="102" height="4" rx="1" class="tc" opacity=".8"/>`);
+  case 'ap':return A(76,48,`<path class="tcs" stroke-width="3" stroke-linecap="round" d="M24 14a20 20 0 0 1 28 0M30 20a11 11 0 0 1 16 0"/><ellipse cx="38" cy="36" rx="34" ry="10" class="a1 al"/><ellipse cx="38" cy="33" rx="26" ry="5" class="ah" opacity=".35"/><circle cx="38" cy="36" r="2.6" class="led"/>`);
+  case 'seat':return A(58,50,`<rect x="2" y="2" width="54" height="46" rx="7" class="ah al" opacity=".95"/><circle cx="29" cy="8" r="1.6" class="a2"/><circle cx="29" cy="42" r="1.6" class="a2"/><path d="M9 16h16v12h-4v4h-8v-4H9z" class="hole"/><path d="M33 16h16v12h-4v4h-8v-4h-4z" class="hole"/><rect x="9" y="35" width="16" height="3" rx="1.5" class="tc"/><rect x="33" y="35" width="16" height="3" rx="1.5" class="tc"/>`);
+  case '伺服器':case 'NAS':return A(50,76,`<rect x="5" y="2" width="40" height="72" rx="6" class="a1 al"/><rect x="11" y="9" width="28" height="9" rx="2" class="a2 al"/><rect x="11" y="22" width="28" height="9" rx="2" class="a2 al"/>${k==='NAS'?'<rect x="11" y="35" width="28" height="9" rx="2" class="a2 al"/>':''}<circle cx="38" cy="65" r="2.6" class="led"/><path d="M12 65h14" class="al" stroke-width="2" stroke-linecap="round"/>`);
+  case 'NVR 錄影主機':return A(104,30,`<rect x="1" y="3" width="102" height="24" rx="5" class="a1 al"/><circle cx="14" cy="15" r="5" class="tc"/><circle cx="14" cy="15" r="2" class="a2"/><circle cx="84" cy="15" r="2.4" class="led"/><circle cx="92" cy="15" r="2.4" class="tc"/><rect x="28" y="12" width="40" height="6" rx="2" class="a2"/>`);
+  case 'PC 桌機':return A(74,64,`<rect x="3" y="2" width="68" height="44" rx="5" class="a2 al"/><rect x="8" y="7" width="58" height="34" rx="2" class="tc" opacity=".45"/><path d="M14 13h22M14 19h30" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/><path d="M31 46h12l3 10H28z" class="a1"/><rect x="20" y="56" width="34" height="5" rx="2.5" class="a1 al"/>`);
+  case '筆電':return A(84,52,`<rect x="14" y="2" width="56" height="38" rx="4" class="a2 al"/><rect x="18" y="6" width="48" height="30" rx="2" class="tc" opacity=".45"/><path d="M4 42h76l-5 8H9z" class="a1 al"/>`);
+  case 'IP Phone':return A(64,56,`<path d="M6 18 18 4h40v46H6z" class="a1 al"/><rect x="26" y="9" width="26" height="14" rx="2" class="tc" opacity=".5"/>${holes(28,28,3,8,5,4)}${holes(28,35,3,8,5,4)}${holes(28,42,3,8,5,4)}<path d="M8 20c-2 10 0 20 4 26h8V22z" class="a2 al"/>`);
+  case '印表機':return A(74,58,`<rect x="16" y="2" width="42" height="16" rx="2" class="ah" opacity=".9"/><rect x="3" y="16" width="68" height="28" rx="6" class="a1 al"/><rect x="14" y="38" width="46" height="18" rx="2" class="ah"/><circle cx="60" cy="25" r="2.5" class="led"/><rect x="10" y="23" width="30" height="4" rx="2" class="tc"/>`);
+  case 'IP Cam':return A(78,50,`<path d="M10 10h46l14 8v10l-14 8H10z" class="a1 al"/><circle cx="62" cy="23" r="7" class="a2 al"/><circle cx="62" cy="23" r="3" class="tc"/><path d="M26 36v8h-14v4h26v-4h-8v-8" class="a2"/>`);
+  case 'ISP 數據機':return A(78,52,`<path d="M58 4v16M62 8a6 6 0 0 1 0 8" class="tcs" stroke-width="2.5" stroke-linecap="round"/><rect x="3" y="18" width="72" height="30" rx="7" class="a1 al"/>${[0,1,2,3].map(i=>`<circle cx="${16+i*9}" cy="33" r="2.4" class="${i<3?'led':'tc'}"/>`).join('')}<rect x="54" y="29" width="14" height="8" rx="2" class="hole"/>`);
+  case 'PLC 控制器':return A(60,64,`<rect x="3" y="4" width="54" height="56" rx="4" class="a1 al"/>${holes(9,9,6,7.5,5,5)}${holes(9,50,6,7.5,5,5)}<rect x="9" y="20" width="26" height="22" rx="2" class="tc" opacity=".55"/><circle cx="44" cy="25" r="2.4" class="led"/><circle cx="44" cy="33" r="2.4" class="tc"/>`);
+  case '平板 / HMI':return A(70,56,`<rect x="3" y="3" width="64" height="46" rx="6" class="a2 al"/><rect x="9" y="9" width="52" height="34" rx="2" class="tc" opacity=".5"/><rect x="25" y="49" width="20" height="5" rx="2" class="a1"/>`);
+  case '投影機':return A(80,44,`<rect x="3" y="8" width="74" height="28" rx="8" class="a1 al"/><circle cx="56" cy="22" r="9" class="a2 al"/><circle cx="56" cy="22" r="4.5" class="tc"/><rect x="12" y="16" width="24" height="4" rx="2" class="a2"/><rect x="12" y="24" width="16" height="4" rx="2" class="a2"/>`);
+  default:return A(60,60,`<rect x="4" y="4" width="52" height="52" rx="12" class="a1 al"/><g transform="translate(15 15) scale(1.25)" class="tcs" stroke-width="2" fill="none">${iconOf(d).replace(/<\/?svg[^>]*>/g,'')}</g>`)}}
 function renderCanvas(){I=idx();ui.match=computeMatches();
   const total=S.devices.reduce((a,d)=>a+d.ports.length,0);
   $('stat').textContent=`${S.devices.length} 台設備 · ${S.cables.length} 條線 · ${total} 孔`;
@@ -943,10 +1091,11 @@ function renderCanvas(){I=idx();ui.match=computeMatches();
     const cls=['dev'];if(ui.sel&&ui.sel.dev===d.id)cls.push('sel');if(tr.devs.has(d.id)||(m&&m.devs.has(d.id)))cls.push('trace');if(m&&!m.lit.has(d.id))cls.push('faded');if(ui.layer&&!ls.includes(ui.layer))cls.push('dimmed');if(ui.popId===d.id)cls.push('popin');
     const sub=(L.brand&&[d.brand,d.model].filter(Boolean).join(' '))||typeName(d);
     const foot=[L.ip&&d.ip,L.mac&&d.mac&&'MAC '+d.mac,L.gw&&d.gw&&'GW '+d.gw,L.loc&&locText(d)].filter(Boolean).join(' · ');
-    return`<div class="${cls.join(' ')}" data-dev="${d.id}" style="left:${d.x}px;top:${d.y}px;--tc:${tc(d.type)}">
-      <header data-drag="${d.id}" title="拖曳移動，雙擊編輯"><span class="tile">${iconOf(d)}</span><span class="ttl"><b>${esc(d.name)}</b><small>${esc(sub)}</small></span><span class="lyr">${range(ls)}</span>
-      <span class="hact"><button data-act="edit" data-id="${d.id}" title="編輯" aria-label="編輯 ${esc(d.name)}">${ICON.edit}</button><button class="del" data-act="del" data-id="${d.id}" title="刪除" aria-label="刪除 ${esc(d.name)}">${ICON.del}</button></span></header>
-      <div class="body">${portsHTML(d,tr,m)}</div>${foot?`<div class="foot">${esc(foot)}</div>`:''}</div>`}).join('');
+    const view=viewOf(d);cls.push(view);
+    const lbl=`<div class="dlabel"><b>${esc(d.name)}</b><small>${esc(sub)}</small></div>${foot?`<div class="foot">${esc(foot)}</div>`:''}`;
+    const hact=`<span class="hact"><button data-act="edit" data-id="${d.id}" title="編輯" aria-label="編輯 ${esc(d.name)}">${ICON.edit}</button><button class="del" data-act="del" data-id="${d.id}" title="刪除" aria-label="刪除 ${esc(d.name)}">${ICON.del}</button></span>`;
+    if(view==='icon')return`<div class="${cls.join(' ')}" data-dev="${d.id}" style="left:${d.x}px;top:${d.y}px;--tc:${tc(d.type)}"><div class="ico" data-drag="${d.id}" title="拖曳移動，雙擊展開網路孔">${devArt(d)}</div>${lbl}${hact}</div>`;
+    return`<div class="${cls.join(' ')}" data-dev="${d.id}" style="left:${d.x}px;top:${d.y}px;--tc:${tc(d.type)}"><div class="plate" data-drag="${d.id}" title="拖曳移動，雙擊收成圖示"><div class="pleft"><span class="tile">${iconOf(d)}</span><span class="leds"><i></i><i></i></span></div><div class="body">${portsHTML(d,tr,m)}</div></div>${lbl}${hact}</div>`}).join('');
   ui.popId=null;
   let mx=0,my=0;S.devices.forEach(d=>{mx=Math.max(mx,d.x);my=Math.max(my,d.y)});S.cables.forEach(c=>(c.wps||[]).forEach(w=>{mx=Math.max(mx,w.x);my=Math.max(my,w.y)}));
   ui.cw=Math.max(1800,mx+700);ui.ch=Math.max(1200,my+500);
@@ -955,7 +1104,11 @@ function renderCanvas(){I=idx();ui.match=computeMatches();
   drawWires();renderHint();
 }
 function sizeStage(){$('canvas').style.transform=`scale(${ui.zoom})`;$('sizer').style.width=ui.cw*ui.zoom+'px';$('sizer').style.height=ui.ch*ui.zoom+'px';$('zReset').textContent=Math.round(ui.zoom*100)+'%'}
-function center(pid){const el=document.querySelector(`#devs [data-port="${pid}"] .jack`);if(!el)return null;const r=el.getBoundingClientRect(),c=$('canvas').getBoundingClientRect();return{x:(r.left+r.width/2-c.left)/ui.zoom,y:(r.top+r.height/2-c.top)/ui.zoom}}
+function center(pid){const el=document.querySelector(`#devs [data-port="${pid}"] .jack`);const c=$('canvas').getBoundingClientRect();
+  if(el){const r=el.getBoundingClientRect();return{x:(r.left+r.width/2-c.left)/ui.zoom,y:(r.top+r.height/2-c.top)/ui.zoom}}
+  const d=I.owner[pid];if(!d)return null;const ic=document.querySelector(`#devs .dev[data-dev="${d.id}"] .ico`);if(!ic)return null;const r=ic.getBoundingClientRect();
+  const i=d.ports.findIndex(p=>p.id===pid),n=d.ports.length;const off=n>1?(i/(n-1)-.5)*Math.min(r.width/ui.zoom*.5,n*4):0;
+  return{x:(r.left+r.width/2-c.left)/ui.zoom+off,y:(r.top+r.height/2-c.top)/ui.zoom}}
 function devRects(){const R={};document.querySelectorAll('#devs .dev').forEach(el=>{R[el.dataset.dev]={l:el.offsetLeft,t:el.offsetTop,r:el.offsetLeft+el.offsetWidth,b:el.offsetTop+el.offsetHeight}});return R}
 function curve(a,b){const dx=b.x-a.x;if(Math.abs(dx)>Math.abs(b.y-a.y)&&Math.abs(dx)>60){const k=Math.max(40,Math.abs(dx)*.45)*Math.sign(dx);return`M${a.x},${a.y} C${a.x+k},${a.y} ${b.x-k},${b.y} ${b.x},${b.y}`}
   const dy=Math.max(40,Math.abs(dx)*.25);return`M${a.x},${a.y} C${a.x},${a.y+dy} ${b.x},${b.y+dy} ${b.x},${b.y}`}
@@ -981,7 +1134,7 @@ function computeRunVlans(){runVlans={};S.cables.forEach(c=>{if(runVlans[c.id]!==
   t.forEach(x=>{if(x.k==='cable')runVlans[x.c.id]=v});if(runVlans[c.id]===undefined)runVlans[c.id]=v})}
 function cableStyle(c){const mode=prefs.colorMode;let color=c.color,w=3,dash='';
   if(mode==='type'){const s=TYPE_STYLE[c.type]||TYPE_STYLE.Cat6;color=s.c;w=s.w;dash=s.dash||''}
-  else if(mode==='vlan'){const v=runVlans[c.id];if(v==='T'){color='#4A5560';dash='10 4';w=3.5}else if(v)color=vlanColor(v);else color='#A9B4BE'}
+  else if(mode==='vlan'){const v=runVlans[c.id];if(v==='T'){color='#7A8796';dash='10 4';w=3.5}else if(v)color=vlanColor(v);else color='#A9B4BE'}
   if(c.type==='Console'&&mode!=='type')dash='2 5';
   return{color,w,dash}}
 function drawWires(){const tr=traceSet(),m=ui.match,R=devRects(),lanes={};computeRunVlans();let h='';
@@ -1000,23 +1153,25 @@ function drawWires(){const tr=traceSet(),m=ui.match,R=devRects(),lanes={};comput
     if(c.dir==='ab')dh+=chev(len*.5,true);else if(c.dir==='ba')dh+=chev(len*.5,false);else if(c.dir==='both')dh+=chev(len*.4,false)+chev(len*.6,true);
     const txt=[showLabel?c.label:'',showSpeed?c.speed:''].filter(Boolean).join(' · ');
     const off=dir&&c.dir!=='both'?-14:-12;
-    if(txt)dh+=`<text x="${mid.x}" y="${mid.y+(dir?off:4)}" text-anchor="middle">${esc(txt)}</text>`;
+    if(txt){const tw=[...txt].reduce((a,ch)=>a+(ch.charCodeAt(0)>255?11.5:6.6),0)+16;dh+=`<g class="lbl" transform="translate(${mid.x},${mid.y+(dir?off-4:0)})"><rect x="${-tw/2}" y="-10" width="${tw}" height="20" rx="10"/><text x="0" y="4" text-anchor="middle">${esc(txt)}</text></g>`}
     if(selected&&!ui.ro){const kp=el.getPointAtLength(len*.22);dh+=`<g class="knob" data-delcable="${c.id}" transform="translate(${kp.x},${kp.y})"><title>拔除這條線</title><circle r="10"/><path d="M-3.5,-3.5L3.5,3.5M3.5,-3.5L-3.5,3.5"/></g>`;
       (c.wps||[]).forEach((w,i)=>{dh+=`<circle class="wp" data-wp="${c.id}:${i}" cx="${w.x}" cy="${w.y}" r="6.5"><title>拖曳移動錨點，雙擊刪除</title></circle>`})}
   });
   $('deco').innerHTML=dh;renderLegend();renderCtx()}
-function renderLegend(){const el=$('legend');const mode=prefs.colorMode;if(mode==='custom'||!S.cables.length){el.hidden=true;return}
-  const line=(c,w,dash)=>`<svg viewBox="0 0 26 8"><path d="M2 4H24" stroke="${c}" stroke-width="${w}" stroke-linecap="round"${dash?` stroke-dasharray="${dash}"`:''}/></svg>`;let h='';
-  if(mode==='type'){const used=[...new Set(S.cables.map(c=>c.type||'Cat6'))];h=used.map(t=>{const s=TYPE_STYLE[t]||TYPE_STYLE.Cat6;return`<span class="lg">${line(s.c,s.w,s.dash)}${esc(t)}</span>`}).join('')}
-  else{const vs=[...new Set(Object.values(runVlans))].sort((a,b)=>(a===''?1:0)-(b===''?1:0)||(a==='T'?1:0)-(b==='T'?1:0)||(+a)-(+b));
-    h=vs.map(v=>v==='T'?`<span class="lg">${line('#4A5560',3.5,'10 4')}Trunk / LACP</span>`:v?`<span class="lg">${line(vlanColor(v),3)}VLAN ${esc(v)}</span>`:`<span class="lg">${line('#A9B4BE',3)}未設 VLAN</span>`).join('')}
-  el.innerHTML=`<span class="label">${mode==='type'?'線材':'VLAN'}</span>${h}`;el.hidden=false}
+function renderLegend(){const el=$('legend');const mode=prefs.colorMode;if(!S.devices.length){el.hidden=true;return}
+  const line=(c,w,dash)=>`<svg viewBox="0 0 26 8" style="width:22px;height:8px;margin-right:5px;vertical-align:0"><path d="M2 4H24" stroke="${c}" stroke-width="${w}" stroke-linecap="round"${dash?` stroke-dasharray="${dash}"`:''}/></svg>`;
+  const types=Object.keys(TYPES).filter(t=>S.devices.some(d=>d.type===t));
+  let h=`<span class="lt">圖例</span><div class="lrow">${types.map(t=>`<span><i class="dotk" style="background:${tc(t)}"></i>${TYPES[t].n}</span>`).join('')}</div>`;
+  if(mode==='type'&&S.cables.length){const used=[...new Set(S.cables.map(c=>c.type||'Cat6'))];h+=`<div class="lrow">${used.map(t=>{const s=TYPE_STYLE[t]||TYPE_STYLE.Cat6;return`<span>${line(s.c,s.w,s.dash)}${esc(t)}</span>`}).join('')}</div>`}
+  else if(mode==='vlan'&&S.cables.length){const vs=[...new Set(Object.values(runVlans))].sort((a,b)=>(a===''?1:0)-(b===''?1:0)||(a==='T'?1:0)-(b==='T'?1:0)||(+a)-(+b));
+    h+=`<div class="lrow">${vs.map(v=>v==='T'?`<span>${line('#7A8796',3.5,'10 4')}Trunk / LACP</span>`:v?`<span>${line(vlanColor(v),3)}VLAN ${esc(v)}</span>`:`<span>${line('#A9B4BE',3)}未設 VLAN</span>`).join('')}</div>`}
+  el.innerHTML=h;el.hidden=false}
 function renderHint(){const el=$('hint');el.className='';
   if(ui.ro){el.className='warnb';el.innerHTML=`唯讀模式：點孔可查整條路徑 <button id="hUnlock">解除</button>`}
   else if(ui.pending){el.className='act';el.innerHTML=`從 <b>${esc(pname(ui.pending))}</b> 出發，點要接過去的孔 <button id="hCancel">取消</button>`}
   else if(link&&link.active){el.className='act';el.innerHTML=`${link.cable?'拖到新的孔放開，就把線改插過去':'拖到另一個空的孔放開，就接上線'} · Esc 取消`}
-  else if(ui.multi.size>1)el.innerHTML=`已選 ${ui.multi.size} 個孔，可在右側設定 LACP、PoE、VLAN`;
-  else el.innerHTML=`<b>拖曳</b>孔到孔接線 · 右鍵或 A 加設備 · 右下角 <b>?</b> 看全部操作`;
+  
+  else el.innerHTML='';
   const b=$('hCancel');if(b)b.onclick=()=>{ui.pending=null;renderAll()};const u=$('hUnlock');if(u)u.onclick=()=>setRo(false)}
 
 /* ---------- rack view ---------- */
@@ -1065,18 +1220,13 @@ function sel(label,f,val,opts){return`<div class="field"><label class="label" fo
 function combo(label,f,val,ph){const id=fid(f);return`<div class="field combo"><label class="label" for="${id}">${label}</label><div class="cbox"><input id="${id}" data-f="${f}" data-combo="1" value="${esc(val)}" placeholder="${esc(ph||'')}" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="${id}-pop"><button type="button" class="cbtn" tabindex="-1" data-cbtn="${id}" aria-label="展開建議">${ICON.chev}</button></div><ul class="cpop" id="${id}-pop" role="listbox" hidden></ul></div>`}
 function ladder(ls){return`<div class="osi" role="list" aria-label="OSI 七層">${OSI.map(([n,zh,ex])=>`<div class="osi-row${ls.includes(n)?' on':''}" role="listitem"><span class="ln">L${n}</span><span class="zh">${zh}</span><span class="ex">${ex}</span></div>`).join('')}</div>`}
 function brandNote(d){const m=BMETA[d.brand];if(!m||!m.d)return'';return`<div class="brandnote">${ICON.info}<span><b>${esc(d.brand)}${m.zh?' '+esc(m.zh):''}</b>：${esc(m.d)}</span></div>`}
-function renderInsp(){const el=$('insp');const s=ui.sel;I=I||idx();el.style.removeProperty('--tc');
-  if(ui.multi.size>1)inspMulti(el);
-  else if(!s){
-    const who={7:['防火牆 NGFW','終端'],6:['防火牆','終端'],5:['防火牆','終端'],4:['防火牆','終端'],3:['防火牆','路由器','L3 Switch','終端'],2:['Switch','AP','終端'],1:['Hub','配線架','資訊座','AP','網路線']};
-    el.innerHTML=`<div><span class="label">開始使用</span><h2 style="margin-top:4px">點選設備、網路孔或線</h2></div>
-    <div class="card"><ol class="steps"><li>從左側把設備拖到畫布，或在畫布按右鍵</li><li>從一個孔拖曳到另一個孔接線</li><li>點孔看它一路接到哪裡</li><li>點設備看介紹、選廠牌、改設定</li></ol></div>
-    <div class="card"><span class="label">設備對應 OSI 七層</span>
-    <div class="osi">${OSI.map(([n,zh])=>`<div class="osi-row on" style="grid-template-columns:30px 76px 1fr"><span class="ln">L${n}</span><span class="zh">${zh}</span><span class="who">${who[n].map(w=>`<span>${w}</span>`).join('')}</span></div>`).join('')}</div>
-    <p class="hint">越往上層，設備看懂的資訊越多：Hub 只轉送電訊號，Switch 認得 MAC，路由器看 IP，次世代防火牆能辨識是哪個應用程式。</p></div>`}
-  else if(s.dev)inspDev(el,S.devices.find(x=>x.id===s.dev));
-  else if(s.port)inspPort(el,s.port);
-  else if(s.cable)inspCable(el,S.cables.find(x=>x.id===s.cable));
+function renderInsp(){const box=$('insp'),el=$('inspBody');const s=ui.sel;I=I||idx();el.style.removeProperty('--tc');let title='';
+  if(ui.multi.size>1){inspMulti(el);title='多選孔位'}
+  else if(!s){box.hidden=true;document.body.classList.remove('insp-open');return}
+  else if(s.dev){const d=S.devices.find(x=>x.id===s.dev);inspDev(el,d);title=`設備屬性 <small>（${esc(typeName(d))}）</small>`}
+  else if(s.port){inspPort(el,s.port);title='網路孔'}
+  else if(s.cable){inspCable(el,S.cables.find(x=>x.id===s.cable));title='線材'}
+  $('inspTitle').innerHTML=title;box.hidden=false;document.body.classList.add('insp-open');
   if(ui.ro)el.querySelectorAll('input,select,textarea,button').forEach(x=>{if(!x.hasAttribute('data-nav'))x.disabled=true});
 }
 function inspDev(el,d){const T=TYPES[d.type];const ls=layersOf(d);const used=d.ports.filter(p=>I.cab[p.id]).length;
@@ -1103,6 +1253,8 @@ function inspDev(el,d){const T=TYPES[d.type];const ls=layersOf(d);const used=d.p
   <div class="row2"><div class="field"><label class="label" for="pc-main">${T.pass?'孔數（前後各一）':'網路孔數'}</label><input id="pc-main" type="number" min="1" max="96" value="${nMain}"></div>
   ${!T.pass&&d.type!=='end'&&d.type!=='hub'?`<div class="field"><label class="label" for="pc-sfp">SFP 光纖孔</label><input id="pc-sfp" type="number" min="0" max="8" value="${nSfp}"></div>`:''}</div>
   <div class="actions"><button class="btn" data-ia="ports">套用孔數</button>${!T.pass&&d.type!=='end'&&d.type!=='ap'?`<button class="btn" data-ia="poeall">全部 RJ45 設為 PoE</button>`:''}</div></div>
+  <div class="card"><span class="label">網路孔 · 點一下查整條路徑</span><div class="portgrid">${d.ports.map(p=>{const c=I.cab[p.id];return`<button data-gport="${p.id}" data-nav="1" class="${c?'used':''}" style="${c?'--c:'+cableStyle(c).color:''}" title="${esc(pname(p.id)+(c?' · '+c.label:' · 未接線'))}">${esc(p.label)}${TYPES[d.type].pass?(p.side?'後':'前'):''}</button>`}).join('')}</div>
+  <div class="actions"><button class="btn sm" data-ia="toggleview" data-nav="1">${viewOf(d)==='icon'?'在畫布展開網路孔':'在畫布收成圖示'}</button></div></div>
   <div class="actions"><button class="btn" data-ia="qr" data-nav="1">${ICON.qr} QR / 連結</button><button class="btn" data-ia="dup">${si(ICON.dup)} 複製</button><button class="btn danger" data-ia="deldev">${si(ICON.del)} 刪除</button></div>`;
 }
 function inspPort(el,pid){const p=I.ports[pid],d=I.owner[pid],c=I.cab[pid],steps=trace(pid);
@@ -1148,6 +1300,7 @@ function curObj(pref){const s=ui.sel;if(!s)return null;if(pref==='d'&&s.dev)retu
 function setField(f,val){if(ui.ro)return null;const[pref,key]=f.split('.');const o=curObj(pref);if(!o)return null;if(!ui.fieldSnapped){snap();ui.fieldSnapped=true}
   o[key]=key==='vlan'||key==='lag'||key==='tagged'?String(val).trim():(key==='u'||key==='uh')?(val===''?'':+val):val;save();return o}
 const insp=$('insp');
+$('inspClose').onclick=()=>{ui.sel=null;ui.multi.clear();ui.pending=null;renderAll()};
 insp.addEventListener('focusin',e=>{ui.fieldSnapped=false;if(e.target.dataset.combo)openCombo(e.target,'')});
 insp.addEventListener('focusout',e=>{if(e.target.dataset.combo)setTimeout(()=>{if(document.activeElement!==e.target)closeCombo(e.target)},120)});
 insp.addEventListener('input',e=>{const t=e.target;const f=t.dataset.f;if(!f)return;const val=t.type==='checkbox'?t.checked:t.value;const o=setField(f,val);if(!o)return;const key=f.split('.')[1];
@@ -1165,7 +1318,9 @@ insp.addEventListener('click',e=>{
   const pr=e.target.closest('[data-preset]');if(pr){const d=curObj('d');if(!d||!canEdit())return;const sp=pr.dataset.preset==='spec'?SPECS[d.model]:PRESETS[d.type][+pr.dataset.preset];
     setCounts(d,sp.n,TYPES[d.type].pass||d.type==='end'||d.type==='hub'?null:(sp.sfp||0),sp.poe||0,`已套用 ${specText(sp)}`);return}
   const ma=e.target.closest('[data-ma]');if(ma){multiAction(ma.dataset.ma);return}
+  const gp=e.target.closest('[data-gport]');if(gp){ui.sel={port:gp.dataset.gport};ui.multi.clear();renderAll();return}
   const b=e.target.closest('[data-ia]');if(!b)return;const a=b.dataset.ia;
+  if(a==='toggleview'){toggleView(curObj('d'));return}
   if(a==='ports'){const d=curObj('d');if(!canEdit())return;const n=Math.min(96,Math.max(1,parseInt($('pc-main').value)||1));const sf=$('pc-sfp')?Math.min(8,Math.max(0,parseInt($('pc-sfp').value)||0)):null;setCounts(d,n,sf,null)}
   if(a==='poeall'){const d=curObj('d');if(!canEdit())return;snap();applyPoe(d,'all');save();renderAll();toast('RJ45 孔已全部設為 PoE',true)}
   if(a==='dup')dupDev(curObj('d'));
@@ -1254,9 +1409,9 @@ function setCounts(d,n,sf,poe,msg){snap();const T=TYPES[d.type];let removed=[];
   const ids=new Set(removed.map(p=>p.id));const lost=S.cables.filter(c=>ids.has(c.a)||ids.has(c.b)).length;S.cables=S.cables.filter(c=>!ids.has(c.a)&&!ids.has(c.b));
   save();toast(`${msg||'孔數已更新'}${lost?`，移除 ${lost} 條線`:''}`,true);renderAll()}
 function freeSpot(){const R=Object.values(devRects()),z=ui.zoom;const vx=stage.scrollLeft/z,vy=stage.scrollTop/z,vw=stage.clientWidth/z,vh=stage.clientHeight/z;const W=280,H=150,M=24;
-  for(let y=vy+30;y<vy+Math.max(vh-80,60);y+=30)for(let x=vx+30;x<vx+Math.max(vw-W*.6,60);x+=30){if(!R.some(r=>x<r.r+M&&x+W>r.l-M&&y<r.b+M&&y+H>r.t-M))return{x,y}}
-  for(let y=vy+30;y<vy+vh+1600;y+=40)for(let x=vx+30;x<vx+Math.max(vw-W*.6,60);x+=40){if(!R.some(r=>x<r.r+M&&x+W>r.l-M&&y<r.b+M&&y+H>r.t-M))return{x,y,off:true}}
-  return{x:vx+30,y:Math.max(vy,...R.map(r=>r.b))+40,off:true}}
+  for(let y=vy+100;y<vy+Math.max(vh-150,120);y+=30)for(let x=vx+110;x<vx+Math.max(vw-W*.6,60);x+=30){if(!R.some(r=>x<r.r+M&&x+W>r.l-M&&y<r.b+M&&y+H>r.t-M))return{x,y}}
+  for(let y=vy+100;y<vy+vh+1600;y+=40)for(let x=vx+110;x<vx+Math.max(vw-W*.6,60);x+=40){if(!R.some(r=>x<r.r+M&&x+W>r.l-M&&y<r.b+M&&y+H>r.t-M))return{x,y,off:true}}
+  return{x:vx+110,y:Math.max(vy+100,...R.map(r=>r.b))+40,off:true}}
 function addNew(type,pos){if(!canEdit())return;if(ui.view!=='map')setView('map');const T=TYPES[type];const p=pos||freeSpot();snap();
   const count=S.devices.filter(d=>d.type===type).length+1;const nn=String(count).padStart(2,'0');
   const name=type==='seat'?`座位 ${nn}`:type==='end'?`PC-${nn}`:`${T.t}-${nn}`;
@@ -1312,12 +1467,12 @@ function topoSVG(){const cv=$('canvas').getBoundingClientRect(),z=ui.zoom;const 
   s+='</g>';
   document.querySelectorAll('#devs .dev').forEach(el=>{const r=rel(el);const d=S.devices.find(x=>x.id===el.dataset.dev);const t=resolveColor(tc(d.type));
     s+=`<rect x="${r.x}" y="${r.y}" width="${r.w}" height="${r.h}" rx="14" fill="${col('--panel')}" stroke="${col('--line2')}"/><rect x="${r.x+10}" y="${r.y+9}" width="30" height="30" rx="9" fill="${t}"/>`;
-    s+=`<text x="${r.x+48}" y="${r.y+22}" font-size="13.5" font-weight="800" fill="${col('--ink')}">${esc(d.name)}</text><text x="${r.x+48}" y="${r.y+37}" font-size="11" fill="${col('--muted')}">${esc(el.querySelector('.ttl small').textContent)}</text>`;
+    s+=`<text x="${r.x+48}" y="${r.y+22}" font-size="13.5" font-weight="800" fill="${col('--ink')}">${esc(d.name)}</text><text x="${r.x+48}" y="${r.y+37}" font-size="11" fill="${col('--muted')}">${esc((el.querySelector('.dlabel small')||{textContent:''}).textContent)}</text>`;
     const ft=el.querySelector('.foot');if(ft){const fr=rel(ft);s+=`<text x="${fr.x+10}" y="${fr.y+10}" font-size="10.5" fill="${col('--muted')}" font-family="JetBrains Mono, Consolas, monospace">${esc(ft.textContent)}</text>`}
     el.querySelectorAll('.port').forEach(pb=>{const j=rel(pb.querySelector('.jack'));const c=I.cab[pb.dataset.port];const cc=c?resolveColor(cableStyle(c).color):'';
       s+=`<rect x="${j.x}" y="${j.y}" width="${j.w}" height="${j.h}" rx="4" fill="${c?cc:col('--soft')}" fill-opacity="${c?.35:1}" stroke="${c?cc:col('--line2')}" stroke-width="1.5"/>`;
       const pl=rel(pb.querySelector('.pl'));s+=`<text x="${pl.x+pl.w/2}" y="${pl.y+9}" font-size="8.5" text-anchor="middle" fill="${col('--muted')}" font-family="JetBrains Mono, Consolas, monospace">${esc(pb.querySelector('.pl').textContent)}</text>`})});
-  $('deco').querySelectorAll('text').forEach(t=>{s+=`<text x="${+t.getAttribute('x')-ox}" y="${+t.getAttribute('y')-oy}" text-anchor="middle" font-size="10.5" font-weight="700" fill="${col('--ink')}" stroke="${col('--bg')}" stroke-width="4" paint-order="stroke" font-family="JetBrains Mono, Consolas, monospace">${esc(t.textContent)}</text>`});
+  $('deco').querySelectorAll('.lbl').forEach(g=>{const m=/translate\(([-\d.]+),([-\d.]+)\)/.exec(g.getAttribute('transform'));const t=g.querySelector('text');s+=`<text x="${+m[1]-ox}" y="${+m[2]+4-oy}" text-anchor="middle" font-size="10.5" font-weight="700" fill="${col('--ink')}" stroke="${col('--bg')}" stroke-width="4" paint-order="stroke" font-family="JetBrains Mono, Consolas, monospace">${esc(t.textContent)}</text>`});
   s+=`<text x="${W-12}" y="${H-10}" text-anchor="end" font-size="11" fill="${col('--muted')}">機房線路對應圖 · ${stamp()}</text></svg>`;return{svg:s,W,H}}
 function openImage(){if(ui.view!=='map')setView('map');const go=()=>{const r=topoSVG();if(!r){toast('畫面上還沒有設備');return}const url='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(r.svg);
   modal(`<h2>匯出拓樸圖</h2><p class="hint">圖片會照目前畫面的走線、顏色與圖層輸出。PNG 為 2 倍解析度。</p><div class="imgprev"><img src="${url}" alt="拓樸圖預覽"></div>
@@ -1420,10 +1575,18 @@ function modal(html,wide){$('modalRoot').innerHTML=`<div class="modal" id="mod">
 function closeModal(){$('modalRoot').innerHTML=''}
 
 /* ---------- pointer interactions ---------- */
+let lastDev={};
+function toggleView(d){d.view=viewOf(d)==='icon'?'ports':'icon';save();ui.sel={dev:d.id};renderAll();toast(d.view==='icon'?`${d.name} 收成圖示`:`${d.name} 展開網路孔`)}
+function setAllView(v){if(!S.devices.length)return;snap();S.devices.forEach(d=>d.view=v);if(ui.view!=='map')setView('map');autoLayout();save();renderAll();toast((v==='icon'?'已全部收成圖示':'已全部展開網路孔')+'，並重新排列',true)}
 let link=null,drag=null,wpd=null,mq=null,pan=null,pdrag=null,hoverEl=null,rafW=0,rafD=0;
 const canvas=$('canvas'),stage=$('stage');
 function toCanvas(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)/ui.zoom,y:(e.clientY-r.top)/ui.zoom}}
-function portAt(x,y){const el=document.elementFromPoint(x,y);const p=el&&el.closest&&el.closest('#devs .port');return p?p.dataset.port:null}
+function portAt(x,y,from){const el=document.elementFromPoint(x,y);if(!el||!el.closest)return null;const p=el.closest('#devs .port');if(p)return p.dataset.port;
+  const dv=el.closest('#devs .dev.icon');const src=from||(link&&link.from);if(dv&&src)return autoPort(S.devices.find(d=>d.id===dv.dataset.dev),src);return null}
+function autoPort(d,from){if(!d||!I.ports[from])return null;const fp=I.ports[from],fd=I.owner[from];if(fd.id===d.id)return null;
+  const free=d.ports.filter(p=>!I.cab[p.id]);const same=free.filter(p=>(fp.kind==='sfp')===(p.kind==='sfp'));let list=same.length?same:free;
+  if(TYPES[d.type].pass){const side=d.type==='patch'?((TYPES[fd.type].pass)?1:0):(['end','ap'].includes(fd.type)?0:1);const sl=list.filter(p=>p.side===side);if(sl.length)list=sl}
+  return list.length?list[0].id:null}
 canvas.addEventListener('pointerdown',e=>{if(e.button!==0)return;
   if(e.target.closest('[data-act]'))return;
   const wp=e.target.closest('[data-wp]');if(wp&&!ui.ro){e.preventDefault();const[cid,i]=wp.dataset.wp.split(':');wpd={c:S.cables.find(c=>c.id===cid),i:+i,moved:false};return}
@@ -1445,7 +1608,7 @@ document.addEventListener('pointermove',e=>{
       link.active=true;link.cable=I.cab[link.from]||null;link.anchor=link.cable?(link.cable.a===link.from?link.cable.b:link.cable.a):link.from;
       canvas.classList.add('linking');const fe=document.querySelector(`#devs [data-port="${link.from}"]`);fe&&fe.classList.add('from');drawWires();renderHint()}
     const a=center(link.anchor),b=toCanvas(e);if(a)$('tmp').innerHTML=`<path d="${curve(a,b)}"/><circle cx="${a.x}" cy="${a.y}" r="4"/><circle cx="${b.x}" cy="${b.y}" r="5"/>`;
-    const t=portAt(e.clientX,e.clientY);const te=t&&document.querySelector(`#devs [data-port="${t}"]`);
+    const t=portAt(e.clientX,e.clientY);const te=t&&(document.querySelector(`#devs [data-port="${t}"]`)||document.querySelector(`#devs .dev[data-dev="${I.owner[t].id}"]`));
     if(hoverEl&&hoverEl!==te)hoverEl.classList.remove('tgt-ok','tgt-bad');
     if(te&&t!==link.from){const bad=badTarget(link.from,t);te.classList.toggle('tgt-ok',!bad);te.classList.toggle('tgt-bad',!!bad);hoverEl=te}else hoverEl=null;
     autoScroll(e);return}
@@ -1470,9 +1633,9 @@ document.addEventListener('pointerup',e=>{
   if(mq){const M=mq;mq=null;M.box.remove();if(M.x1==null)return;const l=Math.min(M.x0,M.x1),r=Math.max(M.x0,M.x1),t=Math.min(M.y0,M.y1),b=Math.max(M.y0,M.y1);
     const sel=S.devices.flatMap(d=>d.ports).filter(p=>{const c=center(p.id);return c&&c.x>=l&&c.x<=r&&c.y>=t&&c.y<=b}).map(p=>p.id);
     ui.multi=new Set(sel);ui.sel=sel.length===1?{port:sel[0]}:null;if(sel.length===1)ui.multi.clear();renderAll();if(sel.length>1)toast(`已框選 ${sel.length} 個孔`);return}
-  if(link){const L=link;link=null;const t=L.active?portAt(e.clientX,e.clientY):null;endLinkUI();
+  if(link){const L=link;link=null;const t=L.active?portAt(e.clientX,e.clientY,L.from):null;endLinkUI();
     if(!L.active){portClick(L.from,L.mod)}else{if(!t||t===L.from){renderAll();return}connect(L.from,t)}return}
-  if(drag){const D=drag;drag=null;canvas.classList.remove('dragging');if(!D.moved){ui.sel={dev:D.d.id};ui.multi.clear();renderAll()}else{save();renderCanvas()}}
+  if(drag){const D=drag;drag=null;canvas.classList.remove('dragging');if(!D.moved){const now=Date.now();if(lastDev.id===D.d.id&&now-lastDev.t<450){lastDev={};toggleView(D.d);return}lastDev={id:D.d.id,t:now};ui.sel={dev:D.d.id};ui.multi.clear();renderAll()}else{save();renderCanvas()}}
 });
 document.addEventListener('pointercancel',()=>{if(pdrag){if(pdrag.ghost)pdrag.ghost.remove();pdrag=null}if(pan){pan=null;canvas.classList.remove('panning')}if(link){link=null;endLinkUI();renderAll()}if(drag){drag=null;canvas.classList.remove('dragging');save();renderCanvas()}if(mq){mq.box.remove();mq=null}wpd=null;
   if(rdrag){if(rdrag.ghost)rdrag.ghost.remove();rdrag=null;document.querySelectorAll('.rdrop').forEach(x=>x.remove())}});
@@ -1496,7 +1659,7 @@ function removeWp(key){if(!canEdit())return;const[cid,i]=key.split(':');const c=
 function addWp(cid,e){if(!canEdit())return;const c=S.cables.find(x=>x.id===cid);if(!c)return;const p=toCanvas(e);const pt={x:Math.round(p.x/10)*10,y:Math.round(p.y/10)*10};
   const P=[center(c.a),...(c.wps||[]),center(c.b)];let best=0,bd=1e9;for(let i=0;i<P.length-1;i++){const a=P[i],b=P[i+1];const vx=b.x-a.x,vy=b.y-a.y;const L2=vx*vx+vy*vy||1;let t=((pt.x-a.x)*vx+(pt.y-a.y)*vy)/L2;t=Math.max(0,Math.min(1,t));const dd=Math.hypot(a.x+vx*t-pt.x,a.y+vy*t-pt.y);if(dd<bd){bd=dd;best=i}}
   snap();c.wps=c.wps||[];c.wps.splice(best,0,pt);ui.sel={cable:c.id};save();renderAll();toast('已新增錨點，拖曳它整理走線',true)}
-canvas.addEventListener('dblclick',e=>{if(e.target.closest('[data-wp],[data-cable]'))return;const h=e.target.closest('[data-drag]');if(h&&!e.target.closest('[data-act]')){ui.sel={dev:h.dataset.drag};ui.focus='d.name';renderAll()}});
+canvas.addEventListener('dblclick',e=>{e.preventDefault()});
 stage.addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();setZoom(ui.zoom*(e.deltaY<0?1.08:1/1.08))},{passive:false});
 
 /* ---------- toolbar ---------- */
@@ -1504,6 +1667,10 @@ function setZoom(z){ui.zoom=Math.min(1.6,Math.max(.35,z));sizeStage();drawWires(
 $('zIn').onclick=()=>setZoom(ui.zoom+.1);$('zOut').onclick=()=>setZoom(ui.zoom-.1);$('zReset').onclick=()=>setZoom(1);$('zFit').onclick=()=>{if(ui.view!=='map')setView('map');fitTo(devBox(),1)};
 $('bUndo').onclick=undo;$('bRedo').onclick=redo;
 $('bLayout').onclick=()=>{if(!canEdit()||!S.devices.length)return;snap();if(ui.view!=='map')setView('map');autoLayout();save();renderAll();stage.scrollTo({left:0,top:0,behavior:'smooth'});toast('已自動排列',true)};
+$('allIcon').onclick=()=>setAllView('icon');$('allPorts').onclick=()=>setAllView('ports');
+$('layAll').onclick=()=>{LAYERS.forEach(([k])=>prefs.layers[k]=1);savePrefs();renderViewPop();renderAll()};
+$('layNone').onclick=()=>{LAYERS.forEach(([k])=>prefs.layers[k]=0);savePrefs();renderViewPop();renderAll()};
+$('bTheme').onclick=()=>{prefs.skin=prefs.skin==='light'?'dark':'light';savePrefs();document.body.classList.toggle('light',prefs.skin==='light');renderAll()};
 $('mEdit').onclick=()=>setRo(false);$('mRo').onclick=()=>setRo(true);
 function applyRoUI(){document.body.classList.toggle('ro',ui.ro);$('mEdit').setAttribute('aria-pressed',!ui.ro);$('mRo').setAttribute('aria-pressed',ui.ro);$('types').querySelectorAll('button').forEach(b=>b.disabled=ui.ro);$('bLayout').disabled=ui.ro}
 function setRo(v){if(ui.ro===v)return;ui.ro=v;applyRoUI();ui.pending=null;$('addmenu').hidden=true;syncUR();renderAll();toast(v?'已切到唯讀，只能查線':'已切回編輯')}
@@ -1540,7 +1707,7 @@ function openJsonText(){let old=null;try{old=localStorage.getItem(OLDKEY)}catch(
   $('jClear').onclick=()=>{if(!canEdit())return;loadProject({devices:[],cables:[],racks:[]},'已清空');closeModal()}}
 
 function renderLeft(){
-  $('types').innerHTML=Object.entries(TYPES).map(([k,T])=>`<button data-type="${k}" title="拖到畫布，或點一下加入${T.n}" style="--tc:${tc(k)}"><span class="tile">${k==='end'?KICON['PC 桌機']:TICON[k]}</span>${T.n.replace('座位資訊座','資訊座').replace('終端設備','終端')}</button>`).join('');
+  $('types').innerHTML=Object.entries(TYPES).map(([k,T])=>`<button data-type="${k}" title="拖到畫布，或點一下加入${T.n}" style="--tc:${tc(k)}"><span class="tile">${k==='end'?KICON['PC 桌機']:TICON[k]}</span><span class="pn">${T.n}</span></button>`).join('');
   $('types').querySelectorAll('[data-type]').forEach(b=>b.onclick=e=>{if(e.detail===0)addNew(b.dataset.type)});
   renderLayerChips()}
 function renderLayerChips(){$('lchips').innerHTML=OSI.map(([n,zh])=>`<button data-l="${n}" aria-pressed="${ui.layer===n}"><span class="ln">L${n}</span>${zh}</button>`).join('');
@@ -1604,7 +1771,7 @@ function positionCtx(a){const el=$('ctx');ui.ctxA=a;const sx=a.x*ui.zoom-stage.s
   el.classList.toggle('below',sy-h-24<8);el.style.left=left+'px';el.style.top=sy+'px';el.style.setProperty('--ax',Math.max(16,Math.min(w-16,sx-left+w/2))+'px')}
 $('ctx').addEventListener('click',e=>{const b=e.target.closest('[data-cx],[data-cxcol]');if(!b)return;const a=b.dataset.cx;
   if(a==='close'){ui.sel=null;ui.multi.clear();renderAll();return}
-  if(a==='more'){const n=$('f-p-vlan')||$('insp');$('insp').scrollTop=0;n.focus&&n.focus();return}
+  if(a==='more'){const n=$('f-p-vlan')||$('inspBody');$('inspBody').scrollTop=0;n.focus&&n.focus();return}
   if(!canEdit())return;
   if(ui.multi.size>1){const ps=[...ui.multi].map(i=>I.ports[i]).filter(Boolean);snap();
     if(a==='lag')ps.forEach(p=>p.lag=b.dataset.g);if(a==='unlag')ps.forEach(p=>p.lag='');if(a==='poe1'||a==='poe0')ps.forEach(p=>{if(p.kind==='rj45')p.poe=a==='poe1'});
@@ -1625,6 +1792,7 @@ $('ctx').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset.cxm
 
 /* ---------- init ---------- */
 function readHash(){const h=location.hash.slice(1);if(!h||!h.includes('='))return null;const ps=new URLSearchParams(h);return{p:ps.get('p'),dev:ps.get('dev'),ro:ps.get('ro')==='1'}}
+document.body.classList.toggle('light',prefs.skin==='light');
 const H=readHash();let hadSaved=false;
 if(H&&H.p&&window.LZString){try{const o=JSON.parse(LZString.decompressFromEncodedURIComponent(H.p));S=normalize({devices:o.devices,cables:o.cables,racks:o.racks||[]});ui.shared=true}catch(e){hadSaved=load()}}else hadSaved=load();
 I=idx();renderLeft();renderViewPop();syncUR();
