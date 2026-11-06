@@ -738,6 +738,17 @@ svg.wires .cab.dim .vis{opacity:.1}
 svg.wires .cab.hot.rev .vis{animation-direction:reverse}
 svg.wires .flowarr path{stroke:var(--bg);stroke-width:1.6;stroke-linejoin:round;paint-order:stroke;pointer-events:none}
 svg.wires .flowarr{pointer-events:none}
+
+/* ---- p18: movable / collapsible context bar ---- */
+.ctx .cgrip{cursor:grab;color:var(--muted);font-size:13px;letter-spacing:-2px;padding:4px 4px 4px 0;margin-left:-4px;touch-action:none;user-select:none;align-self:stretch;display:flex;align-items:center}
+.ctx.moving .cgrip{cursor:grabbing}
+.ctx.pinned{transform:none}
+.ctx.pinned::after{display:none}
+.ctx.mini{gap:4px;padding:4px 6px 4px 10px}
+.ctx .ct.mini{max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dock .ctxtog[aria-pressed="true"]{color:var(--accent)}
+.dock .ctxtog[aria-pressed="false"]{opacity:.55}
+.dock.hud,#dock{z-index:22}
 </style>
 </head>
 <body>
@@ -775,6 +786,7 @@ svg.wires .flowarr{pointer-events:none}
       <div class="drow">
         <div class="dgrp"><button id="zOut" title="縮小" aria-label="縮小">−</button><button id="zReset" title="回到 100%" class="zr">100%</button><button id="zIn" title="放大" aria-label="放大">+</button><button id="zFit" title="全覽：顯示全部設備" aria-label="全覽"><svg class="i" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>
         <div class="dgrp"><button id="bUndo" title="復原 (Ctrl+Z)" aria-label="復原"><svg class="i" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button><button id="bRedo" title="重做 (Ctrl+Y)" aria-label="重做"><svg class="i" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button></div>
+        <button class="dgrp qbtn ctxtog" id="bCtx" aria-pressed="true" title="屬性列：選取孔或線時顯示的快速設定列（點一下開 / 關）" aria-label="屬性列開關"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/><path d="M7 12h4M14.5 12h2.5"/></svg></button>
         <div class="popwrap"><button class="dgrp qbtn" data-popbtn="popHelp" aria-expanded="false" title="操作說明與快捷鍵" aria-label="操作說明">?</button>
           <div class="pop up help" id="popHelp" hidden>
             <span class="label">操作</span>
@@ -2188,7 +2200,17 @@ document.addEventListener('pointermove',e=>{if(!pd)return;pd.el.style.left=pd.ox
 document.addEventListener('pointerup',()=>{if(!pd)return;const P=pd;pd=null;P.el.classList.remove('moving');const c=clampPanel(P.el);Object.assign(pstate(P.id),c);savePrefs();placePanel(P.id)});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-pcol]');if(!b)return;const p=pstate(b.dataset.pcol);p.col=!p.col;savePrefs();placePanel(b.dataset.pcol)});
 $('popPanels').addEventListener('change',e=>{const t=e.target;if(t.dataset.ptog){pstate(t.dataset.ptog).hide=!t.checked;savePrefs();placePanel(t.dataset.ptog)}if(t.id==='autoDrawer'){prefs.autoDrawer=t.checked;savePrefs();renderInsp()}});
-$('panelReset').onclick=()=>{PANELS.forEach(([id])=>{const p=pstate(id);delete p.x;delete p.y;p.col=false;p.hide=false});savePrefs();applyPanels();toast('面板已回到預設位置')};
+function syncCtxBtn(){$('bCtx').setAttribute('aria-pressed',prefs.ctxOn!==false)}
+$('bCtx').onclick=()=>{prefs.ctxOn=prefs.ctxOn===false;savePrefs();syncCtxBtn();renderCtx();toast(prefs.ctxOn?'屬性列已開啟：點孔或線就會出現':'屬性列已關閉，可從右下角再開啟；也能按「詳細」或雙擊開啟屬性面板')};
+syncCtxBtn();
+let cd=null;
+$('ctx').addEventListener('pointerdown',e=>{const g=e.target.closest('[data-cgrip]');if(!g)return;e.preventDefault();const el=$('ctx');const P=(el.offsetParent||stage).getBoundingClientRect(),R=el.getBoundingClientRect();
+  if(!prefs.ctxPos){prefs.ctxPos={x:R.left-P.left,y:R.top-P.top};positionCtx(ui.ctxA)}
+  cd={sx:e.clientX,sy:e.clientY,ox:prefs.ctxPos.x,oy:prefs.ctxPos.y};el.classList.add('moving');g.setPointerCapture&&g.setPointerCapture(e.pointerId)});
+document.addEventListener('pointermove',e=>{if(!cd)return;prefs.ctxPos={x:cd.ox+e.clientX-cd.sx,y:cd.oy+e.clientY-cd.sy};positionCtx(ui.ctxA)});
+document.addEventListener('pointerup',()=>{if(!cd)return;cd=null;$('ctx').classList.remove('moving');const el=$('ctx');prefs.ctxPos={x:parseFloat(el.style.left),y:parseFloat(el.style.top)};savePrefs()});
+$('ctx').addEventListener('dblclick',e=>{if(!e.target.closest('[data-cgrip]'))return;prefs.ctxPos=null;savePrefs();renderCtx();toast('屬性列回到跟著選取的位置')});
+$('panelReset').onclick=()=>{prefs.ctxPos=null;prefs.ctxMin=false;prefs.ctxOn=true;syncCtxBtn();PANELS.forEach(([id])=>{const p=pstate(id);delete p.x;delete p.y;p.col=false;p.hide=false});savePrefs();applyPanels();toast('面板已回到預設位置')};
 window.addEventListener('resize',()=>PANELS.forEach(([id])=>{if(pstate(id).x!=null)placePanel(id)}));
 
 $('types').addEventListener('pointerdown',e=>{const b=e.target.closest('[data-type]');if(!b||e.button!==0||b.disabled)return;e.preventDefault();pdrag={type:b.dataset.type,sx:e.clientX,sy:e.clientY,moved:false}});
@@ -2208,7 +2230,7 @@ document.addEventListener('pointerdown',e=>{if(!$('addmenu').hidden&&!e.target.c
 stage.addEventListener('scroll',()=>{$('addmenu').hidden=true;if(!$('ctx').hidden&&ui.ctxA)positionCtx(ui.ctxA)},{passive:true});
 
 /* ---------- context popover above the selected port, ports or cable ---------- */
-function renderCtx(){const el=$('ctx');if(ui.view!=='map'||ui.ro||(link&&link.active)||(drag&&drag.moved)||pan&&pan.moved){el.hidden=true;return}
+function renderCtx(){const el=$('ctx');if(prefs.ctxOn===false||ui.view!=='map'||ui.ro||(link&&link.active)||(drag&&drag.moved)||pan&&pan.moved){el.hidden=true;return}
   let html='',anchor=null;const opt=(arr,v)=>arr.map(([k,t])=>`<option value="${esc(k)}"${String(k)===String(v)?' selected':''}>${esc(t)}</option>`).join('');
   const X='<button class="x" data-cx="close" aria-label="關閉" title="關閉 (Esc)">×</button>',V='<span class="vs"></span>';
   if(ui.multi.size>1){const ids=[...ui.multi].filter(i=>I.ports[i]);anchor=center(ids[ids.length-1]);const devs=new Set(ids.map(i=>I.owner[i].id));let next='';
@@ -2228,13 +2250,22 @@ function renderCtx(){const el=$('ctx');if(ui.view!=='map'||ui.ro||(link&&link.ac
     <select data-cxp="mode" aria-label="模式">${opt([['access','Access'],['trunk','Trunk']],p.mode||'access')}</select><input data-cxp="vlan" value="${esc(p.vlan||'')}" placeholder="VLAN" aria-label="VLAN" style="width:64px">${p.mode==='trunk'?`<input data-cxp="tagged" value="${esc(p.tagged||'')}" placeholder="Tagged 10,20" aria-label="Tagged VLAN" style="width:104px">`:''}${poeOK?`<button class="tg" data-cx="poe" aria-pressed="${!!p.poe}">${BOLT.replace('<svg','<svg width="11" height="11" fill="currentColor"')} PoE</button>`:''}${V}
     ${c?'<button class="tg danger" data-cx="unplugp">拔線</button>':'<button class="tg go" data-cx="pend">接到…</button>'}<button class="tg" data-cx="detail">詳細</button>${X}`}
   if(!html||!anchor){el.hidden=true;ui.ctxA=null;return}
-  el.innerHTML=html;el.hidden=false;positionCtx(anchor)}
-function positionCtx(a){const el=$('ctx');ui.ctxA=a;const sx=PAD+a.x*ui.zoom-stage.scrollLeft,sy=PAD+a.y*ui.zoom-stage.scrollTop;
+  const G='<span class="grip cgrip" data-cgrip title="拖曳移動（雙擊回到跟著選取位置）" aria-label="拖曳移動屬性列">⋮⋮</span>';
+  const M=`<button class="x" data-cx="min" title="${prefs.ctxMin?'展開':'縮小'}" aria-label="${prefs.ctxMin?'展開屬性列':'縮小屬性列'}">${prefs.ctxMin?'+':'–'}</button>`;
+  if(prefs.ctxMin){const t=document.createElement('div');t.innerHTML=html;const ct=t.querySelector('.ct');const name=(t.querySelector('input.lb')||{}).value||(ct&&ct.firstChild?ct.firstChild.textContent:'')||'屬性';
+    html=`<span class="ct mini">${esc(name)}</span>${M}${X}`}
+  else html=html.replace(/<button class="x" data-cx="close"/,M+'<button class="x" data-cx="close"');
+  el.innerHTML=G+html;el.classList.toggle('mini',!!prefs.ctxMin);el.hidden=false;positionCtx(anchor)}
+function positionCtx(a){const el=$('ctx');ui.ctxA=a;
+  if(prefs.ctxPos){el.classList.add('pinned');el.classList.remove('below');el.style.visibility='';const P=el.offsetParent||stage;const W=P.clientWidth,H=P.clientHeight;
+    el.style.left=Math.max(8,Math.min(W-el.offsetWidth-8,prefs.ctxPos.x))+'px';el.style.top=Math.max(8,Math.min(H-el.offsetHeight-8,prefs.ctxPos.y))+'px';return}
+  el.classList.remove('pinned');const sx=PAD+a.x*ui.zoom-stage.scrollLeft,sy=PAD+a.y*ui.zoom-stage.scrollTop;
   if(sx<0||sy<0||sx>stage.clientWidth||sy>stage.clientHeight){el.style.visibility='hidden';return}el.style.visibility='';
   const w=el.offsetWidth,h=el.offsetHeight,W=stage.clientWidth;const left=Math.max(w/2+8,Math.min(W-w/2-8,sx));
   el.classList.toggle('below',sy-h-24<(innerWidth<=900?120:76));el.style.left=left+'px';el.style.top=sy+'px';el.style.setProperty('--ax',Math.max(16,Math.min(w-16,sx-left+w/2))+'px')}
 $('ctx').addEventListener('click',e=>{const b=e.target.closest('[data-cx],[data-cxcol]');if(!b)return;const a=b.dataset.cx;
   if(a==='close'){ui.sel=null;ui.multi.clear();renderAll();return}
+  if(a==='min'){prefs.ctxMin=!prefs.ctxMin;savePrefs();renderCtx();return}
   if(a==='detail'){ui.detail=selKey();renderInsp();$('inspBody').scrollTop=0;return}
   if(!canEdit())return;
   if(ui.multi.size>1){const ps=[...ui.multi].map(i=>I.ports[i]).filter(Boolean);snap();
