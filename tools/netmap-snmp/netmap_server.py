@@ -14,6 +14,7 @@ import base64, http.server, json, os, re, socket, sqlite3, sys, threading, time,
 from concurrent.futures import ThreadPoolExecutor
 
 import netmap_snmp as ns
+import netmap_sshmon as sm
 
 APP = "netmap"
 # 主控台不是 UTF-8 時（英文版 Windows、輸出導到檔案）也不要因為中文訊息當掉
@@ -21,7 +22,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.4.0"
+VERSION = "1.5.0"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -119,6 +120,55 @@ class Store:
                              "FROM samples WHERE inb IS NOT NULL GROUP BY pid, (ts/?)", (res, res, res, res))
             s.db.commit()
 
+    # ---------- SSH 監控的帳密（只存在這台電腦，不會送到網頁） ----------
+    def ssh_creds(s, host):
+        c = (s.settings.get("ssh") or {}).get(host)
+        if not c: return None
+        return {"user": c.get("user", ""), "password": unprotect(c.get("pw")), "hostkey": c.get("hostkey", "")}
+
+    def add_ssh_device(s, info, user, password):
+        """把 SSH 監控設備加到圖上（同 IP 的設備就沿用並補上介面）。回傳 (設備, 是否新建)。"""
+        ip, port = info["host"], int(info.get("port") or 22); key = f"{ip}:{port}"
+        s.settings.setdefault("ssh", {})[key] = {"user": user, "pw": protect(password), "hostkey": info.get("hostkey", "")}
+        s.save_settings()
+        with s.lock:
+            proj = json.loads(json.dumps(s.project)); devs = proj.setdefault("devices", [])
+        d = next((x for x in devs if x.get("ip") == ip or (x.get("sshmon") or {}).get("host") == key), None)
+        created = d is None
+        if created:
+            typ = info.get("type") or "router"
+            d = {"id": ns.nid("d"), "type": "end" if typ == "server" else typ, "name": info.get("name") or ip, "brand": info.get("brand", ""),
+                 "model": info.get("model", ""), "ip": ip, "mac": "", "gw": "", "loc": "", "rack": "", "u": "", "uh": "", "x": 0, "y": 0, "ports": []}
+            if typ == "server": d["kind"] = "伺服器"
+            devs.append(d)
+        d["sshmon"] = {"host": key}; d.pop("monitor", None)
+        d["note"] = " ".join(x for x in [f"SSH 監控 {time.strftime('%Y-%m-%d')}", info.get("firmware", ""), info.get("kernel", "")] if x)
+        if info.get("brand") and not d.get("brand"): d["brand"] = info["brand"]
+        if info.get("model") and not d.get("model"): d["model"] = info["model"]
+        bylab = {str(p.get("label", "")).lower(): p for p in d.get("ports", [])}
+        for ifn, lab, note in info.get("ports", []):
+            p = bylab.get(lab.lower()) or next((q for q in d["ports"] if q.get("ifName") == ifn), None)
+            if not p:
+                p = {"id": ns.nid("p"), "label": lab, "kind": "rj45", "poe": False, "mode": "access", "vlan": "", "tagged": "", "lag": "", "note": note}
+                d["ports"].append(p)
+            p["ifName"] = ifn
+        others = [x for x in devs if x is not d and (x.get("x") or x.get("y"))]
+        if created and others:   # 放在現有圖的右邊，不打亂原本的版面
+            d["x"] = max(x.get("x") or 0 for x in others) + 300; d["y"] = min(x.get("y") or 0 for x in others)
+        s.set_project(proj)
+        return d, created
+
+    def remove_ssh(s, dev_id):
+        """停止這台設備的 SSH 監控並刪掉帳密（設備留在圖上）。"""
+        with s.lock:
+            proj = json.loads(json.dumps(s.project))
+        d = next((x for x in proj.get("devices", []) if x["id"] == dev_id), None)
+        if not d or not d.get("sshmon"): return False
+        key = d.pop("sshmon")["host"]; d["monitor"] = False
+        (s.settings.get("ssh") or {}).pop(key, None); s.save_settings()
+        s.set_project(proj)
+        return True
+
     def save_settings(s):
         with s.lock:
             tmp = os.path.join(s.dir, "settings.json.tmp")
@@ -205,12 +255,26 @@ OPER, HC_IN, HC_OUT, IN32, OUT32, IERR, OERR, HSPEED = ("1.3.6.1.2.1.2.2.1.8", "
 UPTIME = "1.3.6.1.2.1.1.3.0"
 MONITOR_TYPES = {"fw", "router", "sw", "hub", "ap"}
 
+def counter_delta(now, before, wrap):
+    """計數器差值。變小時：接近上限才當作繞回，否則是設備重開機／計數歸零，這一次不算（避免流量圖出現假尖峰）。"""
+    d = now - before
+    if d >= 0: return d
+    if wrap == 2 ** 32 and before > wrap * 0.75: return d + wrap
+    return None
+
+
+def too_fast(din, dout, dt_, speed):
+    """超過介面速率 1.5 倍的值不可能是真的（計數器異常），丟掉這一點。"""
+    return bool(speed) and max(din, dout) * 8 / dt_ > speed * 1.5
+
+
 class Poller:
     def __init__(s, store, log=print):
         s.store, s.log = store, log
         s.status = {"ts": 0, "devices": {}, "ports": {}}
         s.prev = {}          # (host, ifIndex) → (t, in, out, ierr, oerr)
         s.ifmaps = {}        # host → (time, {label → ifIndex})
+        s.links = {}         # "ip:port" → sm.SshLink（保持連線）
         s.thread = None; s.stop_ev = threading.Event(); s.wake = threading.Event()
         s.running = False; s.last_cycle = 0; s.cycle_secs = 0
 
@@ -218,6 +282,8 @@ class Poller:
         out = []
         for d in s.store.project.get("devices", []):
             if d.get("monitor") is False: continue
+            if (d.get("sshmon") or {}).get("host"):
+                out.append((d, "ssh://" + d["sshmon"]["host"])); continue
             host = (d.get("snmp") or {}).get("host") or (d.get("ip") if d.get("type") in MONITOR_TYPES else "")
             host = (host or "").strip()
             if host and re.match(r"^[\w.\-]+(:\d+)?$", host): out.append((d, host))
@@ -233,6 +299,42 @@ class Poller:
                 if not n: continue
                 for k in (n, ns.short_if(n), ns.port_label(n)): m.setdefault(k.lower(), i)
         s.ifmaps[host] = (time.time(), m); return m
+
+    def link(s, key):
+        c = s.store.ssh_creds(key)
+        if not c: raise sm.SshError("沒有這台設備的 SSH 帳密，請在 netmap.exe 重新加入")
+        L = s.links.get(key)
+        if not L or L.user != c["user"] or L.password != c["password"]:
+            if L: L.close()
+            ip, port = sm.split_host(key)
+            L = s.links[key] = sm.SshLink(ip, port, c["user"], c["password"], c["hostkey"])
+        return L
+
+    def poll_ssh(s, d, host):
+        key = host[6:]; now = time.time(); res = {"dev": {"up": False, "err": "", "last": int(now), "via": "ssh"}, "ports": {}, "rows": []}
+        try:
+            data = sm.read_ports(s.link(key))
+        except Exception as e:
+            res["dev"]["err"] = str(e) or "SSH 連線失敗"; return res
+        res["dev"]["up"] = True; t = time.time()
+        for p in d.get("ports", []):
+            ifn = p.get("ifName")
+            if not ifn or ifn not in data: continue
+            rx, tx, re_, te, up, speed = data[ifn]
+            k = (host, ifn); prev = s.prev.get(k); s.prev[k] = (t, rx, tx, re_, te)
+            rin = rout = None; die = doe = 0
+            if prev and t - prev[0] > 0.5:
+                dt_ = t - prev[0]; din, dout = rx - prev[1], tx - prev[2]
+                din, dout = counter_delta(rx, prev[1], 2 ** 32), counter_delta(tx, prev[2], 2 ** 32)
+                if din is not None and dout is not None and not too_fast(din, dout, dt_, speed):
+                    rin, rout = din * 8 / dt_, dout * 8 / dt_
+                    die, doe = max(0, re_ - prev[3]), max(0, te - prev[4])
+            st = {"up": up, "in": rin, "out": rout, "speed": speed, "util": (max(rin or 0, rout or 0) / speed) if speed and rin is not None else None,
+                  "ie": die, "oe": doe, "if": ifn}
+            res["ports"][p["id"]] = st
+            if rin is not None or up is not None:
+                res["rows"].append((int(t), p["id"], rin, rout, 1 if up is not False else 0, die, doe))
+        return res
 
     def poll_device(s, d, host, opts):
         now = time.time(); res = {"dev": {"up": False, "err": "", "last": int(now)}, "ports": {}, "rows": []}
@@ -271,11 +373,10 @@ class Poller:
                 rin = rout = None; die = doe = 0
                 if prev and inc is not None and prev[1] is not None and t - prev[0] > 0.5:
                     dt_ = t - prev[0]
-                    din = inc - prev[1]; dout = (outc or 0) - (prev[2] or 0)
-                    if din < 0: din += wrap
-                    if dout < 0: dout += wrap
-                    rin, rout = din * 8 / dt_, dout * 8 / dt_
-                    die, doe = max(0, ie - prev[3]), max(0, oe - prev[4])
+                    din, dout = counter_delta(inc, prev[1], wrap), counter_delta(outc or 0, prev[2] or 0, wrap)
+                    if din is not None and dout is not None and not too_fast(din, dout, dt_, (vals.get(f"{HSPEED}.{i}") or 0) * 1_000_000):
+                        rin, rout = din * 8 / dt_, dout * 8 / dt_
+                        die, doe = max(0, ie - prev[3]), max(0, oe - prev[4])
                 speed = (vals.get(f"{HSPEED}.{i}") or 0) * 1_000_000
                 oper = vals.get(f"{OPER}.{i}")
                 cache[i] = {"up": None if oper is None else oper == 1, "in": rin, "out": rout, "speed": speed,
@@ -298,7 +399,7 @@ class Poller:
         devs, ports, rows = {}, {}, []
         if tg:
             with ThreadPoolExecutor(max_workers=min(16, len(tg))) as ex:
-                for (d, host), r in zip(tg, ex.map(lambda x: s.poll_device(x[0], x[1], opts), tg)):
+                for (d, host), r in zip(tg, ex.map(lambda x: s.poll_ssh(x[0], x[1]) if x[1].startswith("ssh://") else s.poll_device(x[0], x[1], opts), tg)):
                     devs[d["id"]] = {**r["dev"], "host": host}; ports.update(r["ports"]); rows += r["rows"]
         s.store.add_samples(rows, {pid: p.get("speed") for pid, p in ports.items()})
         s.status = {"ts": int(time.time()), "devices": devs, "ports": ports}
@@ -321,6 +422,8 @@ class Poller:
 
     def stop(s):
         s.stop_ev.set(); s.wake.set()
+        for L in list(s.links.values()): L.close()
+        s.links.clear()
 
     def poke(s):
         s.ifmaps.clear(); s.wake.set()

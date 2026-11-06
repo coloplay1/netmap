@@ -15,6 +15,7 @@ from tkinter.scrolledtext import ScrolledText
 import netmap_snmp as ns
 import netmap_server as srv
 import netmap_collect as col
+import netmap_sshmon as sm
 
 VERSION_URL = os.environ.get("NETMAP_VERSION_URL") or "https://coloplay1.github.io/netmap/version.json"
 DOWNLOAD_URL = "https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe"
@@ -344,6 +345,8 @@ class App:
         s.v_state = tk.StringVar(value="○ 已停止"); s.lbl_state = ttk.Label(top, textvariable=s.v_state, style="Off.TLabel"); s.lbl_state.pack(side="left")
         s.btn_svc = ttk.Button(top, text="啟動服務", style="Accent.TButton", command=s.toggle_service); s.btn_svc.pack(side="right")
         ttk.Button(top, text="立即輪詢", command=lambda: s.service.poller.poke()).pack(side="right", padx=(0, 8))
+        ttk.Button(top, text="加入 SSH 設備…", command=s.add_ssh_dialog).pack(side="right", padx=(0, 8))
+        ttk.Button(top, text="移除 SSH 監控", command=s.remove_ssh).pack(side="right", padx=(0, 8))
         urlf = ttk.Frame(fr); urlf.pack(fill="x", pady=(8, 0))
         ttk.Label(urlf, text="網頁網址：").pack(side="left")
         s.url_box = ttk.Frame(urlf); s.url_box.pack(side="left")
@@ -374,7 +377,7 @@ class App:
         s.v_svcfoot = tk.StringVar(value="尚未輪詢"); ttk.Label(fr, textvariable=s.v_svcfoot, style="Muted.TLabel", wraplength=840).pack(side="bottom", anchor="w", pady=(6, 0))
         cols = ("name", "host", "state", "ports", "traffic")
         s.tree = ttk.Treeview(fr, columns=cols, show="headings", height=8)
-        for k, t, w in (("name", "設備", 200), ("host", "SNMP 位址", 150), ("state", "狀態", 110), ("ports", "埠（上線／離線）", 140), ("traffic", "最忙的埠", 240)):
+        for k, t, w in (("name", "設備", 200), ("host", "監控方式／位址", 170), ("state", "狀態", 110), ("ports", "埠（上線／離線）", 140), ("traffic", "最忙的埠", 240)):
             s.tree.heading(k, text=t); s.tree.column(k, width=w, anchor="w")
         s.tree.pack(fill="both", expand=True, pady=(10, 0))
         s.tree.tag_configure("down", foreground="#b42318"); s.tree.tag_configure("up", foreground="#1a7f37")
@@ -421,6 +424,69 @@ class App:
             messagebox.showerror(TITLE, f"服務無法啟動：網頁埠 {s.store.settings.get('port')} 可能已被其他程式使用。\n\n請換一個埠（例如 8081）後按「套用」再啟動。\n\n（{e}）")
         s.refresh_service()
 
+    # ───────────── SSH 監控設備 ─────────────
+    def add_ssh_dialog(s):
+        dlg = tk.Toplevel(s.root); dlg.title("加入 SSH 監控設備"); dlg.transient(s.root); dlg.resizable(False, False)
+        fr = ttk.Frame(dlg, padding=18); fr.pack(fill="both", expand=True)
+        ttk.Label(fr, text="給沒有 SNMP 的設備用：家用路由器（ASUS 等）、Linux 主機、NAS、OpenWrt。"
+                           "程式會用 SSH 登入，定時讀取每個介面的流量（只讀取，不改設定），畫出即時流量與 MRTG 流量圖。",
+                  wraplength=460, justify="left", style="Muted.TLabel").grid(row=0, column=0, columnspan=4, sticky="w")
+        v_ip, v_port, v_user, v_pw = tk.StringVar(), tk.StringVar(value="22"), tk.StringVar(), tk.StringVar()
+        for r, (lab, var, w, show) in enumerate((("設備 IP", v_ip, 22, ""), ("SSH 埠", v_port, 8, ""), ("帳號", v_user, 22, ""), ("密碼", v_pw, 22, "•")), start=1):
+            ttk.Label(fr, text=lab).grid(row=r, column=0, sticky="w", pady=4, padx=(0, 10))
+            e = ascii_field(ttk.Entry(fr, textvariable=var, width=w, show=show), var); e.grid(row=r, column=1, sticky="w")
+            if r == 1: e.focus_set()
+        v_msg = tk.StringVar(value="帳密以 Windows 帳號加密保存在這台電腦，不會出現在網頁上。")
+        ttk.Label(fr, textvariable=v_msg, wraplength=460, justify="left", style="Muted.TLabel").grid(row=5, column=0, columnspan=4, sticky="w", pady=(10, 0))
+        row = ttk.Frame(fr); row.grid(row=6, column=0, columnspan=4, sticky="e", pady=(14, 0))
+        btn = ttk.Button(row, text="連線並加入", style="Accent.TButton"); btn.pack(side="right")
+        ttk.Button(row, text="取消", command=dlg.destroy).pack(side="right", padx=(0, 8))
+
+        def done(info, err, user, pw):
+            if not dlg.winfo_exists(): return
+            btn.configure(state="normal")
+            if err: v_msg.set(f"沒有加入：{err}"); return
+            if not info["ports"]: v_msg.set("連上了，但找不到有流量的介面。"); return
+            d, created = s.store.add_ssh_device(info, user, pw)
+            dlg.destroy()
+            if not s.service.running: s.start_service()
+            s.service.poller.poke(); s.refresh_service()
+            names = "、".join(lab for _i, lab, _n in info["ports"])
+            what = " ".join(x for x in (info.get("brand"), info.get("model")) if x) or info.get("name")
+            i = s.choose("已加入 SSH 監控", f"{'已加入' if created else '已更新'}「{d['name']}」（{what}）。\n\n監控的介面：{names}\n\n"
+                         "約 1 分鐘後就有即時流量，10 分鐘後流量圖開始出現。", ["開啟流量圖", "開啟網頁", "關閉"])
+            if i == 0: webbrowser.open(s.local_url() + "#mrtg=all")
+            elif i == 1: webbrowser.open(s.local_url())
+
+        def go(_e=None):
+            ip, user, pw = v_ip.get().strip(), v_user.get().strip(), v_pw.get()
+            try: port = int(v_port.get() or 22)
+            except ValueError: v_msg.set("SSH 埠要填數字（通常是 22）"); return
+            if not ip or not user or not pw: v_msg.set("請填設備 IP、帳號與密碼。"); return
+            btn.configure(state="disabled"); v_msg.set(f"連線 {ip}:{port}…")
+            def work():
+                try: info, err = sm.probe(ip, port, user, pw), None
+                except sm.SshError as e: info, err = None, str(e)
+                except Exception as e: info, err = None, f"{e.__class__.__name__}: {e}"
+                s.root.after(0, lambda: done(info, err, user, pw))
+            threading.Thread(target=work, daemon=True).start()
+        btn.configure(command=go); dlg.bind("<Return>", go); dlg.bind("<Escape>", lambda e: dlg.destroy())
+        dlg.update_idletasks()
+        dlg.geometry(f"+{s.root.winfo_rootx() + 80}+{s.root.winfo_rooty() + 90}"); dlg.grab_set()
+
+    def remove_ssh(s):
+        devs = {d["id"]: d for d in s.store.project.get("devices", []) if d.get("sshmon")}
+        sel = [i for i in s.tree.selection() if i in devs]
+        if not devs: messagebox.showinfo(TITLE, "目前沒有用 SSH 監控的設備。"); return
+        if not sel: messagebox.showinfo(TITLE, "請先在下方的列表點選要移除的 SSH 設備。"); return
+        d = devs[sel[0]]
+        if s.choose("移除 SSH 監控", f"停止用 SSH 監控「{d['name']}」（{d['sshmon']['host']}），並刪除保存的帳密？\n\n設備會留在圖上，已記錄的流量圖也會保留。"
+                    "\n\n不再需要的話，記得到設備上關閉 SSH。", ["移除", "取消"], default=1) != 0: return
+        s.store.remove_ssh(d["id"])
+        L = s.service.poller.links.pop(d["sshmon"]["host"], None)
+        if L: L.close()
+        s.refresh_service()
+
     def toggle_service(s):
         if s.service.running:
             s.service.stop(); s.service = srv.Service(s.store, log=lambda m: s.q.put(("svclog", m)))
@@ -443,6 +509,7 @@ class App:
             else:
                 ttk.Label(s.url_box, text="（服務未啟動）", style="Muted.TLabel").pack(side="left")
             stat = s.service.poller.status; devs = {d["id"]: d for d in s.store.project.get("devices", [])}
+            keep = s.tree.selection()
             s.tree.delete(*s.tree.get_children())
             tg = s.service.poller.targets()
             for d, host in tg:
@@ -454,9 +521,12 @@ class App:
                 if busy and busy.get("util") is not None:
                     bt = f"{busy['util']:.0%}　↓{fmt_bps(busy.get('in'))} ↑{fmt_bps(busy.get('out'))}"
                 state = "等待輪詢" if not ds else ("正常" if ds["up"] else ds.get("err") or "沒有回應")
-                s.tree.insert("", "end", values=(d.get("name", ""), host, state, f"{upn} ／ {dn}" if ps else "—", bt), tags=(("up" if ds and ds["up"] else "down") if ds else (),))
+                shown = ("SSH " + host[6:]) if host.startswith("ssh://") else ("SNMP " + host)
+                s.tree.insert("", "end", iid=d["id"], values=(d.get("name", ""), shown, state, f"{upn} ／ {dn}" if ps else "—", bt), tags=(("up" if ds and ds["up"] else "down") if ds else (),))
+            sel = [i for i in keep if s.tree.exists(i)]
+            if sel: s.tree.selection_set(sel)
             if not tg:
-                s.tree.insert("", "end", values=("（還沒有要監控的設備）", "先到「SNMP 掃描」掃描並設為監控的圖", "", "", ""))
+                s.tree.insert("", "end", values=("（還沒有要監控的設備）", "用「SNMP 掃描」掃描並設為監控的圖；沒有 SNMP 的設備按「加入 SSH 設備…」", "", "", ""))
             pl = s.service.poller
             if pl.last_cycle:
                 s.v_svcfoot.set(f"最後輪詢 {time.strftime('%H:%M:%S', time.localtime(pl.last_cycle))}，耗時 {pl.cycle_secs} 秒；每 {s.store.settings.get('interval')} 秒更新。資料位置：{s.store.dir}")

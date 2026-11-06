@@ -117,7 +117,7 @@ th{color:var(--ink2);font-weight:600;font-size:13px;white-space:nowrap}
 <li><a href="#fault">8. 故障查線</a></li>
 <li><a href="#save">9. 儲存、匯出與分享</a></li>
 <li><a href="#exe">10. netmap.exe（Windows 程式）</a>
-  <ol><li><a href="#e-install">下載與第一次開啟</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
+  <ol><li><a href="#e-install">下載與第一次開啟</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-ssh">SSH 流量監控</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
 <li><a href="#mobile">11. 手機操作</a></li>
 <li><a href="#keys">12. 快捷鍵</a></li>
 <li><a href="#faq">13. 常見問題</a></li>
@@ -365,6 +365,24 @@ th{color:var(--ink2);font-weight:600;font-size:13px;white-space:nowrap}
 </ul>
 <div class="tip"><b>💡</b>剛開始監控時，每日圖大約 10 分鐘後就會出現；週、月、年圖需要累積幾天以上才有意思。從舊版升級時，原本保留的詳細紀錄會自動整理進流量圖。設定裡的「詳細紀錄保留（天）」只影響即時卡片的 24 小時曲線，不影響流量圖。</div>
 
+<h3 id="e-ssh">SSH 流量監控（沒有 SNMP 的設備）</h3>
+<p>家用路由器（ASUS 等）、Linux 主機、NAS、OpenWrt 通常沒有 SNMP，但可以用 SSH 登入。netmap.exe 可以用 SSH 定時讀取每個介面的流量，一樣有即時流量和 MRTG 流量圖。</p>
+<figure class="narrow"><img src="manual/app-ssh.jpg" alt="加入 SSH 監控設備" loading="lazy"></figure>
+<ol class="steps">
+<li>設備先開啟 SSH。ASUS：管理頁「系統管理 → 系統設定」把「啟用 SSH」設為<b>只限 LAN</b>。</li>
+<li>netmap.exe「監控服務」分頁按 <b>加入 SSH 設備…</b>，填設備 IP、SSH 埠（通常 22）、帳號、密碼，按 <b>連線並加入</b>。</li>
+<li>程式會辨識設備並列出要監控的介面。ASUS 路由器會自動標成 <b>WAN</b>（對外）、<b>LAN</b>（內網全部）、<b>2.4G</b>、<b>5G</b> Wi-Fi；Linux 主機則用介面名稱（eth0、enp3s0…）。</li>
+<li>監控服務會自動啟動。約 1 分鐘後就有即時流量，10 分鐘後流量圖開始出現。</li>
+</ol>
+<ul>
+<li>如果圖上已經有同 IP 的設備（例如網段探索找到的路由器），會沿用那台設備並補上介面，不會重複建立。</li>
+<li>只執行讀取指令：<code>cat /proc/net/dev</code>、<code>/sys/class/net/*/operstate</code>、<code>speed</code>，ASUS 另外讀 <code>nvram get</code> 型號與介面名稱。不會修改設定。</li>
+<li>連線會一直保持，不會每次輪詢都重新登入，設備的登入紀錄不會被洗版。</li>
+<li>帳密以 Windows 帳號加密保存在這台電腦，不會出現在網頁或分享的圖裡。程式也會記住設備的 SSH 主機金鑰，金鑰改變（設備被換掉或有人冒充）時會停止連線並提示。</li>
+<li>WAN 的「流入」就是從網際網路進來的流量，也就是全家的下載量。</li>
+</ul>
+<div class="note"><b>⚠️</b>要長期監控就要讓 SSH 一直開著，請確認只開在 LAN、使用夠強的密碼。不再監控時，在「監控服務」的列表點選這台設備，按 <b>移除 SSH 監控</b>（會刪除保存的帳密），並關閉路由器的 SSH。</div>
+
 <h3 id="e-col">收集樣本（給 log 分析與設定檔備份開發用）</h3>
 <figure class="mid"><img src="manual/app-col.jpg" alt="收集樣本分頁" loading="lazy"></figure>
 <p>這個分頁是為了開發「log 分析告警」與「設定檔自動備份」而收集真實資料。只接收與讀取，不會修改設備設定。</p>
@@ -377,6 +395,7 @@ th{color:var(--ink2);font-weight:600;font-size:13px;white-space:nowrap}
 <h3 id="e-home">在家測試（例如 ASUS 路由器）</h3>
 <ol class="steps">
 <li><b>網段探索</b>：輸入家裡的網段（例如 <code>192.168.50.0/24</code>），可以看到手機、電視、NAS 等。</li>
+<li><b>流量圖</b>：路由器開啟 SSH（只限 LAN）後，在「監控服務」按「加入 SSH 設備…」，就能看到 WAN、LAN、Wi-Fi 的即時流量與 MRTG 流量圖。</li>
 <li><b>Syslog</b>：在 ASUS 路由器管理頁「系統記錄 → 遠端記錄伺服器」填這台電腦的 IP，回到 netmap.exe 開始收集，重開 Wi-Fi 或拔插網路線就會有 log 進來。也可以按「傳送測試訊息」確認接收正常。</li>
 <li><b>SSH</b>：在「系統管理 → 系統設定」把 SSH 設為<b>只限 LAN</b> 開啟，用路由器帳號登入並記錄。<b>測完請記得關閉 SSH</b>。</li>
 </ol>
@@ -423,6 +442,8 @@ th{color:var(--ink2);font-weight:600;font-size:13px;white-space:nowrap}
 <h2><span class="n">13</span>常見問題</h2>
 <h3>掃描家裡的網段，為什麼什麼都掃不到？</h3>
 <p>家用路由器與一般電腦預設都沒有開 SNMP。請改用「網段探索」，或在公司的網管 Switch、防火牆上使用 SNMP 掃描。</p>
+<h3>流量圖一直是空的？</h3>
+<p>流量圖只記錄監控服務讀得到的設備。有 SNMP 的設備用「SNMP 掃描」後設為監控的圖；沒有 SNMP 的設備用「加入 SSH 設備…」。之後要讓 netmap.exe 一直開著，關掉的時段圖上會是空白。</p>
 <h3>掃描顯示「沒有回應」？</h3>
 <p>程式會自動診斷：如果 ping 得到但 SNMP 沒回應，通常是設備沒開 SNMP、community 打錯，或設備的 SNMP 存取清單沒有允許這台電腦。如果連 ping 都不通，請確認網段與路由。</p>
 <h3>輸入框打不出「.」或「/」？</h3>

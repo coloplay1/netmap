@@ -869,7 +869,7 @@ body:not(.light){--mg-in:#22c55e;--mg-in-a:rgba(34,197,94,.45);--mg-out:#60a5fa;
 .mgstat b{font-weight:600}.mgstat .k{color:var(--muted)}
 .mgstat i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
 .mgstat .ki{background:var(--mg-in)}.mgstat .ko{background:var(--mg-out)}
-.mgempty{padding:18px;text-align:center;color:var(--muted);font-size:13px}
+.mgempty{padding:18px;text-align:center;color:var(--muted);font-size:13px;line-height:1.8}.mgempty b{color:var(--ink)}
 .mglist{max-height:min(62vh,640px);overflow:auto;border:1px solid var(--line);border-radius:12px}
 .mglist table{width:100%;min-width:0;border-collapse:collapse;font-size:13px}
 .mglist th{position:sticky;top:0;background:var(--panel);text-align:left;color:var(--muted);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;cursor:pointer}
@@ -1303,8 +1303,9 @@ const KEY='netmap-v2', OLDKEY='netmap-v1', PREFKEY='netmap-prefs';
 const PUBLIC_URL='https://coloplay1.github.io/netmap/';
 const MANUAL_URL=PUBLIC_URL+'manual.html';
 /* 版本紀錄：最新在最前面。exe = netmap.exe 的版本 */
-const APP_VERSION='2.5',EXE_VERSION='1.4.0';
+const APP_VERSION='2.6',EXE_VERSION='1.5.0';
 const CHANGELOG=[
+ {v:'2.6',exe:'1.5.0',d:'2026-11-06',t:'SSH 流量監控',i:['沒有 SNMP 的設備（家用路由器、Linux、NAS、OpenWrt）可以改用 SSH 監控流量，一樣有即時流量與 MRTG 流量圖','ASUS 路由器自動辨識 WAN、LAN、2.4G、5G Wi-Fi','設備重開機、計數器歸零時不再出現假的流量尖峰','流量圖沒有資料時，直接說明原因與下一步']},
  {v:'2.5',exe:'1.4.0',d:'2026-11-06',t:'MRTG 流量圖',i:['每個埠都有 MRTG 式的每日（5 分鐘）、每週（30 分鐘）、每月（2 小時）、每年（1 天）流量圖，列出最大／平均／目前值與使用率','流量圖總覽：所有埠最近 24 小時的小圖，可依最忙排序、篩選','可切換 bps／使用率 %、顯示尖峰，並匯出 CSV；流量圖資料保存約 2 年']},
  {v:'2.4',exe:'1.3.1',d:'2026-11-06',t:'版本資訊與使用手冊',i:['首頁顯示目前版本、更新內容與最新的 netmap.exe 下載','新增詳細的線上使用手冊（附畫面截圖）','netmap.exe 會自動檢查是否有新版本']},
  {v:'2.3',exe:'1.3.0',d:'2026-11-06',t:'收集樣本',i:['netmap.exe 新增「收集樣本」分頁：暫時當 Syslog／SNMP Trap 接收器，存成樣本檔','SSH 登入紀錄：自動處理 --More-- 與 enable，密碼、community、金鑰自動遮蔽']},
@@ -1888,9 +1889,9 @@ function peekHTML(s){I=I||idx();let a='',b='';
   else if(s.cable){const c=S.cables.find(x=>x.id===s.cable);if(!c)return'';a=`線 ${c.label||''}`;b=[c.type,c.speed,c.len?c.len+' m':''].filter(Boolean).join(' · ')}
   return`<div class="pk"><b>${esc(a)}</b><span>${esc(b)}</span></div><div class="pkhint">⌃ 往上拉或點這裡，展開設定</div>`}
 function liveDevHTML(d){if(!SRV)return'';const ld=ui.live&&ui.live.devices[d.id];const ps=d.ports.map(p=>ui.live&&ui.live.ports[p.id]).filter(Boolean);
-  if(!ld&&!ps.length)return`<div class="card"><span class="label">即時狀態</span><p class="hint">${d.ip||(d.snmp&&d.snmp.host)?'等待監控服務輪詢…':'填上 IP（或用 netmap.exe 掃描）後，監控服務就會讀取這台設備。'}</p></div>`;
+  if(!ld&&!ps.length)return`<div class="card"><span class="label">即時狀態</span><p class="hint">${d.ip||(d.snmp&&d.snmp.host)||d.sshmon?'等待監控服務輪詢…':'填上 IP（或用 netmap.exe 掃描）後，監控服務就會讀取這台設備。'}</p></div>`;
   const up=ps.filter(p=>p.up).length,dn=ps.filter(p=>p.up===false).length,busy=ps.filter(p=>p.util!=null).sort((a,b)=>b.util-a.util)[0];
-  return`<div class="card"><span class="label">即時狀態 <small>${ld?(ld.up?'<b class="c-ok">SNMP 正常</b>':`<b class="c-bad">${esc(ld.err||'沒有回應')}</b>`):''}</small></span><div class="lnums"><div><small>上線埠</small><b>${up}</b></div><div><small>離線埠</small><b class="${dn?'c-bad':''}">${dn}</b></div><div><small>最忙</small><b>${busy?Math.round(busy.util*100)+'%':'—'}</b></div><div><small>流量</small><b>${busy?'↓'+fmtBps(busy.in)+' ↑'+fmtBps(busy.out):'—'}</b></div></div></div>`}
+  return`<div class="card"><span class="label">即時狀態 <small>${ld?(ld.up?`<b class="c-ok">${ld.via==='ssh'?'SSH':'SNMP'} 正常</b>`:`<b class="c-bad">${esc(ld.err||'沒有回應')}</b>`):''}</small></span><div class="lnums"><div><small>上線埠</small><b>${up}</b></div><div><small>離線埠</small><b class="${dn?'c-bad':''}">${dn}</b></div><div><small>最忙</small><b>${busy?Math.round(busy.util*100)+'%':'—'}</b></div><div><small>流量</small><b>${busy?'↓'+fmtBps(busy.in)+' ↑'+fmtBps(busy.out):'—'}</b></div></div></div>`}
 function inspDev(el,d){const T=TYPES[d.type];const ls=layersOf(d);const used=d.ports.filter(p=>I.cab[p.id]).length;
   el.style.setProperty('--tc',tc(d.type));
   const info=T.variants?T.variants[d.variant]:T;
@@ -2261,7 +2262,7 @@ function openSNMP(){modal(`<h2>SNMP 掃描與即時監控</h2><p class="hint">�
    <li><b>掃描</b><small>在「SNMP 掃描」分頁輸入核心 Switch 的 IP（或網段，例如 192.168.1.0/24）和 community，按「開始掃描」。程式會沿著 LLDP / CDP 自動找到其他設備；SNMPv3 也支援。</small></li>
    <li><b>監控，或匯入到這裡</b><small>按「設為監控的圖」再到「監控服務」按「啟動服務」，用瀏覽器打開顯示的網址就能看到即時流量；或按「另存 JSON」，用下面的按鈕匯入到這個網頁。</small></li>
   </ol>
-  <div class="snmpget"><b>家裡或沒有 SNMP 的網路</b>家用路由器、電腦、手機通常不支援 SNMP。在程式裡改選「網段探索」，就能用 ping 與 ARP 列出在線的設備（IP、MAC、廠牌、名稱）並推測種類，只是看不出接在哪個埠。</div>
+  <div class="snmpget"><b>家裡或沒有 SNMP 的網路</b>家用路由器、電腦、手機通常不支援 SNMP。在程式裡改選「網段探索」，就能用 ping 與 ARP 列出在線的設備（IP、MAC、廠牌、名稱）並推測種類，只是看不出接在哪個埠。想看路由器的流量，在「監控服務」按「加入 SSH 設備…」，用 SSH 讀取 WAN、LAN、Wi-Fi 的流量。</div>
   <div class="snmpget"><b>會讀到</b>設備名稱、廠牌型號、序號、每個網路埠、LLDP / CDP 連線、VLAN（PVID / Trunk）、PoE、LACP，以及從 MAC 表 + ARP 推斷的終端設備與 IP。<br><b>需要手動補</b>配線架、資訊座等被動元件（不會回應 SNMP），以及終端設備的名稱。</div>
   <div class="actions"><button class="btn primary" id="sImp">匯入掃描結果 .json</button><button class="btn" data-close style="margin-left:auto">關閉</button></div>`,true);
   $('sImp').onclick=()=>{closeModal();$('fileIn').click()}}
@@ -2712,7 +2713,10 @@ async function openMRTGIndex(){ui.mrtg='all';setMgHash('all');
   const draw=()=>{const q=norm($('mgQ').value),idle=$('mgIdle').checked;
     let rows=all.filter(x=>(!q||norm(x.d.name+' '+pshort(x.pid)+' '+(x.d.ip||'')).includes(q))&&(!idle||x.peak>=1000));
     rows.sort(sortK==='busy'?(a,b)=>b.peak-a.peak:(a,b)=>(order.get(a.d.id)-order.get(b.d.id))||(a.d.ports.indexOf(I.ports[a.pid])-b.d.ports.indexOf(I.ports[b.pid])));
-    if(!all.length){$('mgList').innerHTML='<div class="mgempty">還沒有流量紀錄。監控服務每次輪詢都會記錄，第一張圖大約 10 分鐘後出現。</div>';return}
+    if(!all.length){const nd=Object.keys((ui.live&&ui.live.devices)||{}).length,ok=Object.values((ui.live&&ui.live.devices)||{}).filter(d=>d.up).length;
+      $('mgList').innerHTML=`<div class="mgempty">${!nd?'<b>目前沒有可以讀取流量的設備。</b><br>流量圖只記錄監控服務讀得到的設備：<br>・有 SNMP 的防火牆、網管 Switch、AP：在 netmap.exe 用「SNMP 掃描」掃描後設為監控的圖<br>・沒有 SNMP 的家用路由器、Linux、NAS：在 netmap.exe「監控服務」按「加入 SSH 設備…」'
+        :!ok?'<b>監控服務連不到任何設備。</b><br>請在 netmap.exe「監控服務」分頁看每台設備的狀態（帳密、IP 或 SNMP／SSH 是否開啟）。'
+        :'已經開始記錄，第一張圖大約 10 分鐘後出現。'}</div>`;return}
     if(!rows.length){$('mgList').innerHTML='<div class="mgempty">沒有符合的埠</div>';return}
     let last=null;
     $('mgList').innerHTML=`<table><thead><tr><th data-sk="dev">設備 · 埠${sortK==='dev'?' ▾':''}</th><th>24 小時</th><th data-sk="busy">最大${sortK==='busy'?' ▾':''}</th><th class="hide-s">平均 進／出</th><th class="hide-s">使用率</th></tr></thead><tbody>${rows.map(x=>{const r=x.r,sp=r.speed,u=sp?x.peak/sp:null;
