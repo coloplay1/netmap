@@ -20,6 +20,14 @@ Windows：雙擊 netmap.exe（或 Python 版的 run-app-windows.bat）開啟視�
   預設只有這台電腦可以編輯圖，其他電腦只能看；要讓大家都能改，勾選「允許內網其他電腦編輯圖」。
   資料（圖、流量紀錄、加密後的帳密）存在 %APPDATA%\netmap。
 
+【沒有 SNMP 的網路（家用、小型辦公室）】
+家用路由器、電腦、手機通常不支援 SNMP，SNMP 掃描會找不到東西。這時改用「網段探索」：
+  視窗版：在「掃描」分頁選「網段探索」，不填目標就會掃這台電腦所在的網段。
+  命令列：python netmap_snmp.py --discover          （或 --discover 192.168.1.0/24）
+會用 ping、常見連接埠與 ARP 表列出在線的設備（IP、MAC、廠牌、名稱），並依開放的服務推測種類。
+看不出誰接在哪個埠，預設先把設備都接到路由器，之後請在網頁上調整。
+SNMP 掃描沒有回應時，程式也會自動檢查設備是否在線，告訴你是「沒開 SNMP」還是「連不到」。
+
 【命令列版的用法】
 Windows：雙擊 run-windows.bat，依提示輸入要掃描的 IP 或網段、community。
 macOS / Linux：在終端機執行 ./run-mac-linux.sh

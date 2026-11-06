@@ -1604,7 +1604,7 @@ function renderCanvas(){I=idx();prepFault();ui.match=computeMatches();clearPair(
     const foot=[L.ip&&d.ip,L.mac&&d.mac&&'MAC '+d.mac,L.gw&&d.gw&&'GW '+d.gw,L.loc&&locText(d)].filter(Boolean).join(' · ');
     const view=viewOf(d);cls.push(view);{const fc=fClass('dev:'+d.id);if(fc)cls.push(fc);if(ui.affected&&ui.affected.has(d.id))cls.push('affected');const ld=liveDev(d.id);if(ld&&!ld.up)cls.push('ldevdown')}
     let tags='';if(view==='icon'){const cs=d.ports.map(p=>I.cab[p.id]).filter(c=>c&&!wireShown(c)&&!tr.cabs.has(c.id));if(cs.length)tags=`<div class="ctags">${cs.slice(0,6).map(c=>`<span class="ctag" style="--k:${pairCol(c)}">${esc(c.label||'線')}</span>`).join('')}${cs.length>6?`<span class="ctag more">+${cs.length-6}</span>`:''}</div>`}
-    const lb=(()=>{const ld=liveDev(d.id);return ld&&!ld.up?`<span class="lbadge" title="${esc(ld.err||'SNMP 沒有回應')}">離線</span>`:''})();
+    const lb=(()=>{const ld=liveDev(d.id);return ld&&!ld.up?`<span class="lbadge" title="SNMP：${esc(ld.err||'沒有回應')}（設備可能離線，或 SNMP 沒開）">無回應</span>`:''})();
     const lbl=`<div class="dlabel">${lb}<b>${esc(d.name)}</b><small>${esc(sub)}</small></div>${foot?`<div class="foot">${esc(foot)}</div>`:''}${tags}`;
     const hact=`<span class="hact"><button data-act="edit" data-id="${d.id}" title="編輯" aria-label="編輯 ${esc(d.name)}">${ICON.edit}</button><button class="del" data-act="del" data-id="${d.id}" title="刪除" aria-label="刪除 ${esc(d.name)}">${ICON.del}</button></span>`;
     if(view==='icon')return`<div class="${cls.join(' ')}" data-dev="${d.id}" style="left:${d.x}px;top:${d.y}px;--tc:${tc(d.type)}"><div class="ico" data-drag="${d.id}" title="拖曳移動，雙擊展開網路埠">${devArt(d)}</div>${lbl}${hact}</div>`;
@@ -2176,6 +2176,7 @@ function openSNMP(){modal(`<h2>SNMP 掃描與即時監控</h2><p class="hint">�
    <li><b>掃描</b><small>在「SNMP 掃描」分頁輸入核心 Switch 的 IP（或網段，例如 192.168.1.0/24）和 community，按「開始掃描」。程式會沿著 LLDP / CDP 自動找到其他設備；SNMPv3 也支援。</small></li>
    <li><b>監控，或匯入到這裡</b><small>按「設為監控的圖」再到「監控服務」按「啟動服務」，用瀏覽器打開顯示的網址就能看到即時流量；或按「另存 JSON」，用下面的按鈕匯入到這個網頁。</small></li>
   </ol>
+  <div class="snmpget"><b>家裡或沒有 SNMP 的網路</b>家用路由器、電腦、手機通常不支援 SNMP。在程式裡改選「網段探索」，就能用 ping 與 ARP 列出在線的設備（IP、MAC、廠牌、名稱）並推測種類，只是看不出接在哪個埠。</div>
   <div class="snmpget"><b>會讀到</b>設備名稱、廠牌型號、序號、每個網路埠、LLDP / CDP 連線、VLAN（PVID / Trunk）、PoE、LACP，以及從 MAC 表 + ARP 推斷的終端設備與 IP。<br><b>需要手動補</b>配線架、資訊座等被動元件（不會回應 SNMP），以及終端設備的名稱。</div>
   <div class="actions"><button class="btn primary" id="sImp">匯入掃描結果 .json</button><button class="btn" data-close style="margin-left:auto">關閉</button></div>`,true);
   $('sImp').onclick=()=>{closeModal();$('fileIn').click()}}

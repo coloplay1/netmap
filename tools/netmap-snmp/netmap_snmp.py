@@ -19,7 +19,7 @@ SNMP v1 / v2c 只用 Python 標準函式庫；SNMP v3 需要 `pip install pysnmp
 """
 import argparse, concurrent.futures as cf, datetime as dt, ipaddress, json, os, random, re, socket, sys, time
 
-VERSION = "1.0.0"
+VERSION = "1.2.0"
 # 主控台不是 UTF-8 時（英文版 Windows、輸出導到檔案）也不要因為中文訊息當掉
 for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
@@ -628,6 +628,219 @@ def probe(a, t):
     except Exception:
         return None
 
+# ───────────────────────── 網段探索（不需要 SNMP）＋ 診斷 ─────────────────────────
+import subprocess
+_NOWIN = 0x08000000 if os.name == "nt" else 0   # CREATE_NO_WINDOW：視窗版不要跳出黑色主控台
+
+def _run(cmd, timeout=5):
+    try:
+        r = subprocess.run(cmd, capture_output=True, timeout=timeout, creationflags=_NOWIN)
+        out = r.stdout or b""
+        for enc in ("utf-8", "cp950", "mbcs" if os.name == "nt" else "latin-1"):
+            try: return r.returncode, out.decode(enc)
+            except (UnicodeDecodeError, LookupError): pass
+        return r.returncode, out.decode("latin-1", "ignore")
+    except Exception:
+        return -1, ""
+
+def ping_host(ip, timeout=0.8):
+    """回傳 True 表示有收到這台的回覆（Windows 的 ping 對「目的地無法連線」也回 0，所以看 TTL=）。"""
+    if os.name == "nt": code, out = _run(["ping", "-n", "1", "-w", str(int(timeout * 1000)), ip], timeout + 3)
+    else: code, out = _run(["ping", "-c", "1", "-W", str(max(1, round(timeout))), ip], timeout + 3)
+    return "ttl=" in out.lower()
+
+PROBE_PORTS = [80, 443, 22, 23, 445, 139, 3389, 9100, 631, 554, 5060, 8080, 8443, 5000, 5001, 8009, 62078, 548]
+def tcp_probe(ip, ports=PROBE_PORTS, timeout=0.35):
+    """回傳 (alive, open_ports)。對方回 RST（連線被拒）也代表這台在線。"""
+    alive, opened = False, []
+    for p in ports:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM); s.settimeout(timeout)
+        try:
+            r = s.connect_ex((ip, p))
+            if r == 0: alive = True; opened.append(p)
+            elif r in (111, 10061): alive = True          # ECONNREFUSED / WSAECONNREFUSED
+        except OSError: pass
+        finally: s.close()
+    return alive, opened
+
+def parse_arp(text):
+    """解析 Windows `arp -a`（中英文版）或 Linux /proc/net/arp、`ip neigh`。回傳 {ip: MAC}。"""
+    out = {}
+    for line in text.splitlines():
+        m = re.search(r"(\d+\.\d+\.\d+\.\d+)\D[^\n]*?((?:[0-9A-Fa-f]{2}[-:]){5}[0-9A-Fa-f]{2})", line)
+        if not m: continue
+        ip, mac = m.group(1), m.group(2).replace("-", ":").upper()
+        if mac in ("FF:FF:FF:FF:FF:FF", "00:00:00:00:00:00") or mac.startswith("01:00:5E") or mac.startswith("33:33"): continue
+        if ip.endswith(".255") or ip.startswith(("224.", "239.", "255.")): continue
+        out[ip] = mac
+    return out
+
+def arp_table():
+    if os.name == "nt": return parse_arp(_run(["arp", "-a"])[1])
+    try: txt = open("/proc/net/arp").read()
+    except OSError: txt = ""
+    return parse_arp(txt + "\n" + _run(["ip", "neigh"])[1])
+
+def parse_gateway(text):
+    m = re.search(r"^\s*0\.0\.0\.0\s+0\.0\.0\.0\s+(\d+\.\d+\.\d+\.\d+)", text, re.M) or re.search(r"default via (\d+\.\d+\.\d+\.\d+)", text)
+    return m.group(1) if m else ""
+
+def default_gateway():
+    return parse_gateway(_run(["route", "print", "-4", "0.0.0.0"])[1] if os.name == "nt" else _run(["ip", "route", "show", "default"])[1])
+
+def local_ipv4():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.connect(("10.255.255.255", 1)); ip = s.getsockname()[0]; s.close(); return ip
+    except Exception: return ""
+
+def local_subnet():
+    ip = local_ipv4()
+    return str(ipaddress.ip_network(ip + "/24", strict=False)) if ip else ""
+
+_OUI = None
+def oui_vendor(mac):
+    """MAC 前 3 碼查廠牌（打包的 IEEE OUI 資料表；沒有資料表時回空字串）。"""
+    global _OUI
+    if not mac: return ""
+    if int(mac[1], 16) & 2: return "隨機 MAC"
+    if _OUI is None:
+        _OUI = {}
+        for d in ([getattr(sys, "_MEIPASS", "")] + [os.path.dirname(os.path.abspath(__file__))]):
+            p = os.path.join(d, "oui.json.gz")
+            if d and os.path.exists(p):
+                import gzip
+                try: _OUI = json.load(gzip.open(p, "rt", encoding="utf-8")); break
+                except Exception: _OUI = {}
+    return _OUI.get(mac.replace(":", "")[:6].upper(), "")
+
+VENDOR_BRANDS = [("asustek", "ASUS"), ("asus", "ASUS"), ("tp-link", "TP-Link"), ("tplink", "TP-Link"), ("apple", "Apple"), ("samsung", "Samsung"),
+                 ("hikvision", "Hikvision"), ("dahua", "Dahua"), ("vivotek", "VIVOTEK"), ("axis", "Axis"), ("synology", "Synology"), ("qnap", "QNAP"),
+                 ("ubiquiti", "Ubiquiti"), ("cisco meraki", "Cisco Meraki"), ("cisco", "Cisco"), ("fortinet", "Fortinet"), ("zyxel", "Zyxel"),
+                 ("d-link", "D-Link"), ("netgear", "Netgear"), ("mikrotik", "MikroTik"), ("routerboard", "MikroTik"), ("draytek", "DrayTek"),
+                 ("huawei", "Huawei"), ("xiaomi", "Xiaomi"), ("google", "Google"), ("amazon", "Amazon"), ("sony", "Sony"), ("lg electronics", "LG"),
+                 ("brother", "Brother"), ("seiko epson", "Epson"), ("epson", "Epson"), ("canon", "Canon"), ("ricoh", "Ricoh"), ("kyocera", "Kyocera"),
+                 ("fuji", "FUJIFILM"), ("hewlett packard enterprise", "HPE"), ("hp inc", "HP"), ("hewlett", "HP"), ("dell", "Dell"), ("lenovo", "Lenovo"),
+                 ("intel", "Intel"), ("realtek", "Realtek"), ("microsoft", "Microsoft"), ("raspberry", "Raspberry Pi"), ("yealink", "Yealink"),
+                 ("grandstream", "Grandstream"), ("aruba", "Aruba (HPE)"), ("ruckus", "Ruckus"), ("espressif", "Espressif"), ("nintendo", "Nintendo")]
+def brand_from_vendor(v):
+    t = (v or "").lower()
+    for k, b in VENDOR_BRANDS:
+        if k in t: return b
+    v = re.sub(r"[,.]?\s*(inc|co|ltd|corp|corporation|limited|gmbh|technologies|technology|electronics|computer)\b.*$", "", v or "", flags=re.I).strip(" ,.")
+    return v[:24]
+
+def guess_kind(ports, brand, vendor, is_gw, name=""):
+    t = f"{brand} {vendor} {name}".lower()
+    if is_gw: return "router", None
+    if {9100, 631} & set(ports) or brand in ("Brother", "Epson", "Canon", "Ricoh", "Kyocera", "FUJIFILM"): return "end", "印表機"
+    if 554 in ports or brand in ("Hikvision", "Dahua", "VIVOTEK", "Axis"): return "end", "IP Cam"
+    if 5060 in ports or brand in ("Yealink", "Grandstream"): return "end", "IP Phone"
+    if brand in ("Synology", "QNAP") or ({5000, 5001} <= set(ports)): return "end", "NAS"
+    if 3389 in ports or {445, 139} & set(ports): return "end", "PC 桌機"
+    if 62078 in ports or "iphone" in t or "ipad" in t: return "end", "其他"
+    if brand in ("Ubiquiti", "Aruba (HPE)", "Ruckus") and 22 in ports: return "ap", None
+    return "end", "其他"
+
+def reverse_name(ip, timeout=1.5):
+    res = [""]
+    def f():
+        try: res[0] = socket.gethostbyaddr(ip)[0]
+        except Exception: pass
+    th = __import__("threading").Thread(target=f, daemon=True); th.start(); th.join(timeout)
+    n = res[0].split(".")[0] if res[0] and not re.fullmatch(r"[\d.]+", res[0]) else ""
+    return n
+
+def diagnose(target, log=print):
+    """SNMP 沒回應時，判斷是「設備在線但沒開 SNMP」還是「整台連不到」。"""
+    host = target.split(":")[0]
+    try: ip = socket.gethostbyname(host)
+    except OSError: log(f"  ？ {host}：找不到這個主機名稱"); return "noname"
+    alive, opened = tcp_probe(ip, [80, 443, 8080, 8443, 22, 23], 0.6)
+    pong = ping_host(ip)
+    web = [p for p in opened if p in (80, 443, 8080, 8443)]
+    if web:
+        u = f"{'https' if web[0] in (443, 8443) else 'http'}://{ip}" + ("" if web[0] in (80, 443) else f":{web[0]}")
+        log(f"  ● {ip}：設備在線（管理網頁 {', '.join(map(str, web))} 埠有回應），但 SNMP 沒有回應。")
+        log(f"     → 多半是沒開 SNMP、community 不同，或設備只允許特定 IP 查詢。請登入 {u} 找 SNMP 設定。")
+        return "online"
+    if alive or pong:
+        log(f"  ● {ip}：設備在線（{'ping' if pong else '連線'}有回應），但 SNMP 沒有回應。")
+        log("     → 請確認設備有開 SNMP、community／帳密正確，並允許這台電腦的 IP 查詢。")
+        return "online"
+    log(f"  ✕ {ip}：連不到這台設備（ping 與常見埠都沒有回應）。請確認 IP 正確、這台電腦和設備在同一個網路。")
+    return "down"
+
+def discover(targets, log=print, progress=None, stop=lambda: False, link_gateway=True, workers=64):
+    """不需要 SNMP：找出網段裡在線的設備，回傳可匯入的專案。"""
+    targets = targets or [local_subnet()]
+    hosts = [t.split(":")[0] for t in expand(targets)]
+    me, gw = local_ipv4(), default_gateway()
+    log(f"網段探索：{len(hosts)} 個位址（本機 {me or '?'}，預設閘道 {gw or '?'}）")
+    found = {}
+    def check(ip):
+        if stop(): return ip, False, []
+        alive, opened = tcp_probe(ip, [80, 443, 445, 22, 62078, 554, 9100], 0.3)
+        if not alive: alive = ping_host(ip, 0.7)
+        return ip, alive, opened
+    done = 0
+    with cf.ThreadPoolExecutor(max_workers=workers) as ex:
+        for ip, alive, opened in ex.map(check, hosts):
+            done += 1
+            if progress and done % 4 == 0: progress(done, len(hosts), "probe")
+            if alive: found[ip] = {"ports": opened}
+    arp = arp_table()
+    hostset = set(hosts)
+    for ip in arp:
+        if ip in hostset and ip not in found: found[ip] = {"ports": []}
+    if me in hostset: found.setdefault(me, {"ports": []})
+    log(f"在線設備：{len(found)} 台，讀取名稱與服務…")
+    def detail(ip):
+        alive, opened = tcp_probe(ip, PROBE_PORTS, 0.3)
+        return ip, sorted(set(found[ip]["ports"]) | set(opened)), reverse_name(ip)
+    infos = {}
+    with cf.ThreadPoolExecutor(max_workers=32) as ex:
+        for i, (ip, ports, name) in enumerate(ex.map(detail, list(found))):
+            infos[ip] = (ports, name)
+            if progress: progress(i + 1, len(found), "detail")
+    project = {"app": "netmap", "version": 3, "source": f"netmap-discover {VERSION}", "savedAt": dt.datetime.now().isoformat(timespec="seconds"),
+               "layout": "auto", "devices": [], "cables": [], "racks": [], "faults": []}
+    D = project["devices"]; gwdev = None
+    for ip in sorted(found, key=lambda x: tuple(int(p) for p in x.split("."))):
+        ports, name = infos.get(ip, ([], ""))
+        mac = arp.get(ip, "")
+        vendor = oui_vendor(mac); brand = brand_from_vendor(vendor) if vendor != "隨機 MAC" else ""
+        typ, kind = guess_kind(ports, brand, vendor, ip == gw, name)
+        svc = {80: "網頁", 443: "HTTPS", 22: "SSH", 23: "Telnet", 445: "檔案分享", 3389: "遠端桌面", 9100: "列印", 631: "列印", 554: "影像串流",
+               5060: "SIP", 5000: "NAS", 5001: "NAS", 8009: "投放", 62078: "iOS", 548: "AFP", 8080: "網頁", 8443: "HTTPS"}
+        label = name or ("這台電腦" if ip == me else ("路由器" if ip == gw else (f"{kind} {ip}" if kind and kind != "其他" else (f"{brand} {ip}" if brand else ip))))
+        d = {"id": nid("d"), "type": typ, "name": label[:40], "brand": brand if brand in ("ASUS", "TP-Link", "Apple", "Hikvision", "Dahua", "VIVOTEK", "Axis", "Synology", "QNAP",
+             "Ubiquiti", "Cisco", "Fortinet", "Zyxel", "D-Link", "Netgear", "MikroTik", "DrayTek", "Huawei", "Brother", "Epson", "Canon", "Ricoh", "Kyocera",
+             "FUJIFILM", "HP", "Dell", "Lenovo", "Samsung", "Yealink", "Grandstream", "Aruba (HPE)", "Ruckus") else "", "model": "",
+             "ip": ip, "mac": mac, "gw": gw if ip != gw else "", "loc": "",
+             "note": " · ".join(x for x in [("MAC 廠商：" + vendor) if vendor else "", "開放：" + "、".join(dict.fromkeys(svc[p] for p in ports if p in svc)) if ports else "",
+                                            "這台電腦" if ip == me and name else "", "由網段探索建立，接法請自行確認"] if x),
+             "rack": "", "u": "", "uh": "", "x": 0, "y": 0, "ports": []}
+        d["monitor"] = False   # 網段探索找到的設備多半沒有 SNMP，預設不讓監控服務去輪詢
+        if typ == "router":
+            d["ports"] = [{"id": nid("p"), "label": "WAN", "kind": "rj45", "poe": False, "mode": "access", "vlan": "", "tagged": "", "lag": "", "note": ""}]
+            gwdev = d
+        elif typ == "ap":
+            d["ports"] = [{"id": nid("p"), "label": "ETH1", "kind": "rj45", "poe": False, "mode": "access", "vlan": "", "tagged": "", "lag": "", "note": ""}]
+        else:
+            d["kind"] = kind or "其他"
+            d["ports"] = [{"id": nid("p"), "label": "LAN", "kind": "rj45", "poe": False, "mode": "access", "vlan": "", "tagged": "", "lag": "", "note": ""}]
+        D.append(d)
+    if link_gateway and gwdev:
+        others = [d for d in D if d is not gwdev]
+        for i, d in enumerate(others):
+            p = {"id": nid("p"), "label": f"LAN{i + 1}", "kind": "rj45", "poe": False, "mode": "access", "vlan": "", "tagged": "", "lag": "", "note": ""}
+            gwdev["ports"].append(p)
+            project["cables"].append({"id": nid("c"), "a": p["id"], "b": d["ports"][0]["id"], "label": f"N-{i + 1:03d}", "type": "Cat6", "speed": "",
+                                      "color": "#7D8794", "len": "", "dir": "none", "wps": []})
+    if progress: progress(1, 1, "done")
+    log(f"完成：{len(D)} 台設備" + ("，已先接到路由器（實際是有線還是 Wi‑Fi、接在哪個埠請自行調整）" if link_gateway and gwdev else ""))
+    return project
+
 DEFAULTS = dict(community="public", version="2c", user=None, auth_proto="SHA", auth_key=None, priv_proto="AES", priv_key=None, context="",
                 port=161, timeout=2.0, retries=1, workers=48, max_devices=300, no_follow=False, no_fdb=False, no_neighbors=False)
 
@@ -650,6 +863,12 @@ def run_scan(a, targets, log=print, progress=None, stop=lambda: False, on_device
                 break
     alive.sort(key=lambda t: [int(x) if x.isdigit() else 0 for x in re.split(r"[.:]", t)])
     log(f"有回應的設備：{len(alive)} 台")
+    if not alive and not stop():
+        if len(targets) <= 8:
+            log("\n檢查為什麼沒有回應…")
+            for t in targets: diagnose(t, log)
+        else:
+            log("\n整個範圍都沒有設備回應 SNMP。家用路由器、電腦、手機通常不支援 SNMP；只想列出在線的設備，可改用「網段探索」（--discover）。")
     seen, queue, devs, failed = set(), list(alive), [], []
     while queue and len(devs) < a.max_devices and not stop():
         t = queue.pop(0)
@@ -701,9 +920,11 @@ def main(argv=None):
     ap.add_argument("--no-fdb", action="store_true", help="不讀 MAC 表（不推斷終端設備）")
     ap.add_argument("--no-neighbors", action="store_true", help="不為沒掃到的 LLDP/CDP 鄰居建立設備")
     ap.add_argument("--raw", help="另存原始資料（除錯用）")
+    ap.add_argument("--discover", action="store_true", help="網段探索：不需要 SNMP，用 ping／ARP 列出在線設備（不填目標＝本機網段）")
+    ap.add_argument("--no-link", action="store_true", help="網段探索時不要把設備先接到預設閘道")
     ap.add_argument("--version-info", action="version", version=f"netmap-snmp {VERSION}")
     a = ap.parse_args(argv)
-    interactive = not a.targets
+    interactive = not a.targets and not a.discover
     if interactive:
         print(f"netmap-snmp {VERSION}  —  機房線路對應圖 SNMP 掃描\n")
         print("輸入要掃描的設備 IP 或網段（可多個，用空白分隔），例如：192.168.1.1 192.168.1.0/24")
@@ -722,6 +943,11 @@ def main(argv=None):
     if a.version == "3" and not a.user: print("SNMPv3 需要 -u 使用者"); return 2
     t0 = time.time()
     print()
+    if a.discover:
+        proj = discover(a.targets, link_gateway=not a.no_link)
+        out = a.output or f"netmap-discover-{dt.datetime.now():%Y%m%d-%H%M}.json"
+        with open(out, "w", encoding="utf-8") as f: json.dump(proj, f, ensure_ascii=False, indent=1)
+        print(f"→ {os.path.abspath(out)}\n下一步：打開 {APP_URL} ，選「匯入 ▸ 開啟專案檔」。"); return 0
     proj, devs, failed = run_scan(a, a.targets)
     if not proj:
         print("\n沒有收集到任何設備。請確認：IP 正確、設備已開啟 SNMP、community / 帳密正確、防火牆允許 UDP 161。")

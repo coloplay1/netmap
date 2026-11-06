@@ -103,15 +103,19 @@ class App:
 
     # ───────────── 掃描分頁 ─────────────
     def build_scan(s, fr):
-        s.nb.add(fr, text="  SNMP 掃描  ")
+        s.nb.add(fr, text="  掃描  ")
         c = s.store.settings["snmp"]
+        s.v_mode = tk.StringVar(value=s.store.settings.get("scan_mode", "snmp"))
+        mode = ttk.Frame(fr); mode.pack(fill="x", pady=(0, 8))
+        ttk.Radiobutton(mode, text="SNMP 掃描（防火牆、網管 Switch，可畫出連線與流量）", value="snmp", variable=s.v_mode, command=s.sync_mode).pack(side="left")
+        ttk.Radiobutton(mode, text="網段探索（不需要 SNMP，列出在線的設備）", value="disc", variable=s.v_mode, command=s.sync_mode).pack(side="left", padx=(18, 0))
         top = ttk.LabelFrame(fr, text="掃描目標", padding=10); top.pack(fill="x")
         s.v_targets = tk.StringVar(value=s.store.settings.get("last_targets", ""))
         e = ttk.Entry(top, textvariable=s.v_targets); e.pack(fill="x"); e.focus_set(); ascii_field(e, s.v_targets)
-        ttk.Label(top, text="核心 Switch 的 IP 就夠了，程式會沿著 LLDP／CDP 找到其他設備。也可以輸入網段或範圍，用空白分隔：192.168.1.0/24  10.0.0.1-50",
-                  style="Muted.TLabel", wraplength=820).pack(anchor="w", pady=(6, 0))
+        s.v_hint = tk.StringVar()
+        ttk.Label(top, textvariable=s.v_hint, style="Muted.TLabel", wraplength=820).pack(anchor="w", pady=(6, 0))
 
-        auth = ttk.LabelFrame(fr, text="SNMP 帳密（唯讀即可）", padding=10); auth.pack(fill="x", pady=(10, 0))
+        auth = ttk.LabelFrame(fr, text="SNMP 帳密（唯讀即可）", padding=10); auth.pack(fill="x", pady=(10, 0)); s.auth_box = auth
         s.v_ver = tk.StringVar(value={"1": "v1", "2c": "v2c", "3": "v3"}.get(c.get("version", "2c"), "v2c"))
         s.v_comm = tk.StringVar(value=srv.unprotect(c.get("community")) or "public")
         s.v_user = tk.StringVar(value=c.get("user", "")); s.v_aproto = tk.StringVar(value=c.get("auth_proto") or "SHA")
@@ -134,7 +138,7 @@ class App:
             wdg.grid(row=r, column=col * 2 + 1, sticky="w", pady=3)
         ttk.Checkbutton(auth, text="記住帳密（以 Windows 帳號加密保存，監控服務也會用這組）", variable=s.v_remember).pack(anchor="w", pady=(8, 0))
 
-        opt = ttk.Frame(fr); opt.pack(fill="x", pady=(8, 0))
+        opt = ttk.Frame(fr); opt.pack(fill="x", pady=(8, 0)); s.opt_box = opt
         s.v_follow = tk.BooleanVar(value=True); s.v_fdb = tk.BooleanVar(value=True); s.v_nbr = tk.BooleanVar(value=True)
         s.v_timeout = tk.StringVar(value=str(c.get("timeout", 2)))
         ttk.Checkbutton(opt, text="沿著 LLDP／CDP 自動找鄰居", variable=s.v_follow).pack(side="left")
@@ -143,7 +147,14 @@ class App:
         ttk.Label(opt, text="逾時（秒）").pack(side="left", padx=(14, 4))
         ttk.Spinbox(opt, from_=1, to=10, increment=1, textvariable=s.v_timeout, width=4).pack(side="left")
 
-        run = ttk.Frame(fr); run.pack(fill="x", pady=(10, 0))
+        s.disc_box = ttk.LabelFrame(fr, text="網段探索", padding=10)
+        s.v_link = tk.BooleanVar(value=True)
+        ttk.Label(s.disc_box, text="用 ping、常見連接埠與 ARP 表找出在線的設備，列出 IP、MAC、廠牌與名稱，並依開放的服務推測種類（印表機、攝影機、NAS、電腦）。看不出誰接在哪個埠，連線請在網頁上自己拉。",
+                  style="Muted.TLabel", wraplength=820).pack(anchor="w")
+        dr = ttk.Frame(s.disc_box); dr.pack(fill="x", pady=(8, 0))
+        ttk.Button(dr, text="填入本機網段", command=lambda: s.v_targets.set(ns.local_subnet() or s.v_targets.get())).pack(side="left")
+        ttk.Checkbutton(dr, text="先把設備都接到預設閘道（路由器），之後可自己改", variable=s.v_link).pack(side="left", padx=(14, 0))
+        run = ttk.Frame(fr); run.pack(fill="x", pady=(10, 0)); s.run_box = run
         s.btn_scan = ttk.Button(run, text="開始掃描", style="Accent.TButton", command=s.start_scan); s.btn_scan.pack(side="left")
         s.btn_stop = ttk.Button(run, text="停止", command=s.cancel_scan, state="disabled"); s.btn_stop.pack(side="left", padx=(8, 0))
         s.pb = ttk.Progressbar(run, mode="determinate", length=260); s.pb.pack(side="left", padx=(16, 8))
@@ -156,7 +167,28 @@ class App:
         s.btn_use = ttk.Button(s.after_box, text="設為監控的圖（取代目前的圖）", command=s.use_scan, state="disabled"); s.btn_use.pack(side="left")
         s.btn_merge = ttk.Button(s.after_box, text="只把 SNMP 對應套到目前的圖", command=s.merge_scan, state="disabled"); s.btn_merge.pack(side="left", padx=(8, 0))
         s.btn_save = ttk.Button(s.after_box, text="另存 JSON…", command=s.save_scan, state="disabled"); s.btn_save.pack(side="left", padx=(8, 0))
-        s.sync_auth()
+        s.btn_try = ttk.Button(s.after_box, text="改用網段探索", command=s.try_discover)
+        s.sync_auth(); s.sync_mode()
+
+    def sync_mode(s):
+        disc = s.v_mode.get() == "disc"
+        if disc:
+            s.auth_box.pack_forget(); s.opt_box.pack_forget(); s.disc_box.pack(fill="x", pady=(10, 0), before=s.run_box)
+            s.v_hint.set("不填＝這台電腦所在的網段。也可以輸入網段或範圍：192.168.1.0/24  192.168.1.1-100")
+            s.btn_scan.configure(text="開始探索") if hasattr(s, "btn_scan") else None
+        else:
+            s.disc_box.pack_forget(); s.auth_box.pack(fill="x", pady=(10, 0), before=s.run_box); s.opt_box.pack(fill="x", pady=(8, 0), before=s.run_box)
+            s.v_hint.set("核心 Switch 的 IP 就夠了，程式會沿著 LLDP／CDP 找到其他設備。也可以輸入網段或範圍，用空白分隔：192.168.1.0/24  10.0.0.1-50")
+            s.btn_scan.configure(text="開始掃描") if hasattr(s, "btn_scan") else None
+        s.store.settings["scan_mode"] = s.v_mode.get()
+
+    def try_discover(s):
+        s.v_mode.set("disc"); s.sync_mode(); s.btn_try.pack_forget()
+        t = s.v_targets.get().split()
+        if len(t) == 1 and "/" not in t[0] and "-" not in t[0]:
+            try: s.v_targets.set(str(ns.ipaddress.ip_network(t[0] + "/24", strict=False)))
+            except ValueError: pass
+        s.start_scan()
 
     def sync_auth(s):
         v3 = s.v_ver.get() == "v3"
@@ -188,9 +220,28 @@ class App:
 
     def start_scan(s):
         targets = ascii_text(s.v_targets.get()).replace(",", " ").replace(";", " ").split()
+        disc = s.v_mode.get() == "disc"
+        if disc and not targets:
+            sub = ns.local_subnet()
+            if sub: s.v_targets.set(sub); targets = [sub]
         if not targets: messagebox.showinfo(TITLE, "請先輸入要掃描的 IP 或網段。"); return
+        if disc:
+            s.store.settings["last_targets"] = " ".join(targets); s.store.save_settings(); s.stop_scan = False
+            s.btn_scan.configure(state="disabled"); s.btn_stop.configure(state="normal"); s.btn_try.pack_forget()
+            for b in (s.btn_use, s.btn_merge, s.btn_save): b.configure(state="disabled")
+            s.log.configure(state="normal"); s.log.delete("1.0", "end"); s.log.configure(state="disabled"); s.pb["value"] = 0
+            link = s.v_link.get()
+            def dwork():
+                t0 = time.time()
+                try:
+                    proj = ns.discover(targets, log=lambda m: s.q.put(("log", m)), progress=lambda d, t, ph: s.q.put(("prog", (d, t, ph))),
+                                       stop=lambda: s.stop_scan, link_gateway=link)
+                    s.q.put(("done", (proj if proj and proj["devices"] else None, [], time.time() - t0)))
+                except Exception as e:
+                    s.q.put(("error", str(e)))
+            s.scan_thread = threading.Thread(target=dwork, daemon=True); s.scan_thread.start(); return
         if s.v_ver.get() == "v3" and not s.v_user.get().strip(): messagebox.showinfo(TITLE, "SNMPv3 需要填使用者。"); return
-        s.remember(); a = s.scan_opts(); s.stop_scan = False
+        s.remember(); a = s.scan_opts(); s.stop_scan = False; s.btn_try.pack_forget()
         s.btn_scan.configure(state="disabled"); s.btn_stop.configure(state="normal")
         for b in (s.btn_use, s.btn_merge, s.btn_save): b.configure(state="disabled")
         s.log.configure(state="normal"); s.log.delete("1.0", "end"); s.log.configure(state="disabled"); s.pb["value"] = 0
@@ -388,14 +439,18 @@ class App:
                     s.svclog.configure(state="normal"); s.svclog.insert("end", time.strftime("%H:%M:%S ") + v + "\n"); s.svclog.see("end"); s.svclog.configure(state="disabled")
                 elif k == "prog":
                     d, t, ph = v; s.pb["maximum"] = max(1, t); s.pb["value"] = d
-                    s.v_scanstat.set({"probe": f"探測位址 {d}/{t}", "collect": f"讀取第 {d + 1} 台設備…", "done": "整理結果…"}.get(ph, ""))
+                    s.v_scanstat.set({"probe": f"探測位址 {d}/{t}", "collect": f"讀取第 {d + 1} 台設備…", "detail": f"讀取名稱與服務 {d}/{t}", "done": "整理結果…"}.get(ph, ""))
                 elif k in ("done", "error"):
                     s.btn_scan.configure(state="normal"); s.btn_stop.configure(state="disabled")
                     if k == "error": s.write(f"錯誤：{v}"); s.v_scanstat.set("掃描失敗"); continue
                     proj, failed, secs = v; s.last_project = proj
                     if not proj:
                         s.v_scanstat.set("沒有掃到設備")
-                        s.write("\n沒有收集到任何設備。請確認：IP 正確、設備已開啟 SNMP、community／帳密正確、這台電腦能連到設備的 UDP 161。")
+                        if s.v_mode.get() == "snmp":
+                            s.write("\n沒有收集到任何設備。家用路由器、電腦、手機通常不支援 SNMP；只想列出網路上有哪些設備，可以按下面的「改用網段探索」。")
+                            s.btn_try.pack(side="right")
+                        else:
+                            s.write("\n沒有找到在線的設備。請確認網段正確，以及這台電腦有連上這個網路。")
                     else:
                         s.v_scanstat.set(f"完成：{len(proj['devices'])} 台設備、{len(proj['cables'])} 條線（{secs:.1f} 秒）")
                         s.write(f"\n完成：{len(proj['devices'])} 台設備、{len(proj['cables'])} 條線。")
