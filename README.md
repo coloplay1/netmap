@@ -64,6 +64,7 @@ python netmap_snmp.py 10.0.0.1 -v 3 -u netmon -a SHA -A 認證密碼 -x AES -X �
   - 點埠可看即時流量與 24 小時曲線；離線埠、錯誤封包、壅塞會進入故障查線的自動健檢
   - 跑 netmap.exe 的電腦自動監控自己的網卡流量；即時狀態卡片顯示今日流量縮圖
   - MRTG 流量圖：每個埠的日（5 分鐘）／週（30 分鐘）／月（2 小時）／年（1 天）圖，最大／平均／目前值與使用率，保存約 2 年；網址加 `#mrtg=all` 直接打開總覽
+  - 右側分成「設備資訊」與「網路流量」分頁；無線連線（Wi-Fi 2.4G／5G／6G）畫成虛線並納入查線；SSH 監控的路由器可列出有線／無線用戶端並一鍵套用到圖上
   - SSH 流量監控：沒有 SNMP 的家用路由器（ASUS 自動辨識 WAN／LAN／Wi-Fi）、Linux、NAS、OpenWrt 用 SSH 讀 `/proc/net/dev`，一樣有即時流量與流量圖；帳密以 DPAPI 加密、記住主機金鑰
   - 誰在用流量：接收 NetFlow v5／v9、IPFIX、sFlow（UDP 2055／6343），每台電腦的下載／上傳排行、連去哪裡、用什麼服務，以及在路徑每一段佔多少；接在傻瓜 Switch 後的電腦也看得到
   - 各廠牌設定教學：SonicWall、FortiGate、Cisco、Meraki、MikroTik、UniFi、pfSense、OPNsense、Sophos、Palo Alto、Check Point、Juniper、Aruba、H3C、Huawei、Ruckus、TP-Link 等 26 種，怎麼開 SNMP 與流量匯出

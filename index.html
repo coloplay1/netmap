@@ -526,7 +526,7 @@ body.insp-open .rack-view,body.insp-open .table-view{right:388px}
 .dev.ports.trace .plate{border-color:var(--warn);box-shadow:0 0 0 2px var(--warn),var(--shadow)}
 .jack{background:var(--sunk);border-color:var(--plate-line)}
 .jack::after{background:var(--plate1);border-color:var(--plate-line)}
-.dev .hact{position:absolute;top:-14px;right:-14px;display:none;width:auto;opacity:1;overflow:visible;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:2px;box-shadow:var(--shadow);z-index:3}
+.dev .hact{position:absolute;top:calc(100% + 4px);left:50%;transform:translateX(-50%);display:none;width:auto;opacity:1;overflow:visible;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:2px;box-shadow:var(--shadow);z-index:3}
 .dev:hover .hact,.dev.sel .hact{display:flex}
 .ro .dev .hact{display:none}
 svg.wires .lbl rect{fill:var(--panel);stroke:var(--line2)}
@@ -891,6 +891,29 @@ svg.wires .cab.fst-bad .vis,svg.wires .cab.fst-bad .halo{stroke:var(--bad)!impor
 .dspark .dsh{display:flex;justify-content:space-between;gap:8px;font-size:11.5px;color:var(--muted);margin-bottom:2px}.dspark .dsh b{color:var(--ink);font-variant-numeric:tabular-nums}
 .dspark svg{display:block;width:100%;height:46px}
 .dspark .ax{fill:var(--muted);font:9px "JetBrains Mono",Consolas,monospace}
+/* 右側分頁 */
+.itabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--sunk);border:1px solid var(--line);border-radius:12px;padding:3px;margin:2px 0 12px;position:sticky;top:-2px;z-index:2}
+.itabs button{border:0;background:transparent;color:var(--muted);font-weight:700;font-size:13px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;gap:6px}
+.itabs button[aria-selected="true"]{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.itabs .sdot{width:8px;height:8px;border-radius:50%;background:var(--line2)}.itabs .sdot.ok{background:#22c55e}.itabs .sdot.bad{background:#ef4444}
+.itab[hidden]{display:none!important}
+.prow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 2px;border-top:1px solid var(--line);font-size:12.5px;cursor:pointer}
+.prow:hover b{color:var(--accent)}.prow .dot{width:8px;height:8px;border-radius:50%;background:var(--line2)}.prow .dot.up{background:#22c55e}.prow .dot.down{background:#ef4444}
+.prow small{color:var(--muted);font-variant-numeric:tabular-nums}
+.clist{margin-top:4px}.crow{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 2px;border-top:1px solid var(--line);font-size:12.5px}
+.crow svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}.crow .w{color:#22d3ee}.crow .e{color:var(--muted)}
+.crow b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.crow small{color:var(--muted);font-size:11.5px}
+.crow .bd{font-size:11px;font-weight:700;border-radius:999px;padding:1px 7px;background:var(--soft);white-space:nowrap}
+.crow .bd.b24{color:#f59e0b}.crow .bd.b5{color:#22d3ee}.crow .bd.b6{color:#a78bfa}
+.crow .onmap{color:var(--muted);font-size:11px}.crow .onmap.warn{color:#f59e0b}
+.cfilt{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 2px}
+/* 無線連線 */
+.wifi-l{fill:none;stroke-width:2;stroke-dasharray:1.5 6;stroke-linecap:round;opacity:.9}
+.wifi-l.b24{stroke:#f59e0b}.wifi-l.b5{stroke:#22d3ee}.wifi-l.b6{stroke:#a78bfa}.wifi-l.bx{stroke:#94a3b8}
+.wifig.dim{opacity:.15}.wifig.hot .wifi-l{stroke-width:3;opacity:1;animation:wdash 1.2s linear infinite}
+@keyframes wdash{to{stroke-dashoffset:-15}}
+.wifig .wlbl rect{fill:var(--panel);stroke:currentColor;stroke-width:1}.wifig .wlbl text{font:700 10px "JetBrains Mono",Consolas,monospace;fill:currentColor}
+.wpill{display:inline-flex;align-items:center;gap:2px;font-weight:700;color:#22d3ee}.wpill.b24{color:#f59e0b}.wpill.b6{color:#a78bfa}.wpill svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round}
 /* 誰在用流量（NetFlow／IPFIX／sFlow） */
 .fltabs{display:inline-flex;gap:4px}
 .fltbl td .bar2{display:inline-flex;width:90px;height:7px;border-radius:4px;overflow:hidden;background:var(--soft);vertical-align:middle;margin-right:6px}
@@ -1137,6 +1160,7 @@ const TICON={
 const KICON={
   'PC 桌機':SV('<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>'),
   '筆電':SV('<rect x="5" y="5" width="14" height="10" rx="1.5"/><path d="M3 19h18"/>'),
+  '手機':SV('<rect x="7" y="2.5" width="10" height="19" rx="2.2"/><path d="M11 18.5h2"/>'),
   'IP Phone':SV('<path d="M6.5 4h3l1.5 4-2.2 1.4a11 11 0 0 0 5.8 5.8L16 13l4 1.5v3a2 2 0 0 1-2 2A15.5 15.5 0 0 1 4.5 6a2 2 0 0 1 2-2z"/>'),
   '印表機':SV('<path d="M7 9V4h10v5"/><rect x="4" y="9" width="16" height="7" rx="2"/><path d="M7 14h10v6H7z"/>'),
   '伺服器':SV('<rect x="4" y="4" width="16" height="7" rx="1.5"/><rect x="4" y="13" width="16" height="7" rx="1.5"/><path d="M8 7.5h.01M8 16.5h.01" stroke-width="3"/>'),
@@ -1394,8 +1418,9 @@ const PUBLIC_URL='https://coloplay1.github.io/netmap/';
 /*VENDORS*/const VENDOR_GUIDE={"vendors":[{"id":"sonicwall","name":"SonicWall","kind":"防火牆（SonicOS 7）","match":["sonicwall"],"snmp":["Device ▸ Settings ▸ SNMP：勾選 Enable SNMP，在 View 設定唯讀 community「{COMM}」（或建立 SNMPv3 使用者）。","Network ▸ System ▸ Interfaces：編輯 LAN 介面（例如 X0），在 Management 勾選 SNMP，允許從內網查詢。","存取規則若有限制，允許 {IP} 連到防火牆的 UDP 161。"],"flow":"IPFIX（建議）／NetFlow v9／v5","flow_steps":["Device ▸ AppFlow ▸ Flow Reporting ▸ Settings：Report Connections 選 All（或 Interface-based 只報指定介面）。","External Collector 分頁：勾選「Send Flows and Real-Time Data To External Collector」（可能需要重新開機）。","External Flow Reporting Format 選 IPFIX，External Collector's IP 填 {IP}，Port 填 {NF}。","按 Generate ALL Templates 產生範本，再按 Accept。"],"doc":"https://www.sonicwall.com/support/technical-documentation/docs/sonicos-7-1-appflow_device/Content/appflow-d-flow-reporting-user-config-netflow-v10.htm"},{"id":"fortinet","name":"Fortinet FortiGate","kind":"防火牆（FortiOS）","match":["fortinet","fortigate","fortiswitch"],"snmp":["System ▸ SNMP：開啟 SNMP Agent，新增 SNMP v1/v2c community「{COMM}」，Hosts 加入 {IP}，只勾 Accept queries（或用 SNMPv3）。","Network ▸ Interfaces：編輯 LAN 介面，Administrative Access 勾選 SNMP。"],"snmp_cli":"config system snmp sysinfo\n    set status enable\nend\nconfig system snmp community\n    edit 1\n        set name \"{COMM}\"\n        config hosts\n            edit 1\n                set ip {IP} 255.255.255.255\n            next\n        end\n        set trap-v1-status disable\n        set trap-v2c-status disable\n    next\nend","flow":"NetFlow v9（一筆含雙向流量）","flow_steps":["只能用 CLI 設定（FortiOS 7.4.2 以後可設多個收集器）。","在 LAN 介面開啟取樣（netflow-sampler）。舊版 FortiOS 是 config system netflow 底下直接 set collector-ip。"],"flow_cli":"config system netflow\n    config collectors\n        edit 1\n            set collector-ip {IP}\n            set collector-port {NF}\n        next\n    end\nend\nconfig system interface\n    edit \"internal\"\n        set netflow-sampler both\n    next\nend","doc":"https://docs.fortinet.com/document/fortigate/7.4.0/new-features/840728"},{"id":"cisco","name":"Cisco Catalyst／IOS","kind":"交換器、路由器（IOS／IOS-XE）","match":["cisco","catalyst"],"snmp":["用 ACL 限定只有 {IP} 能查詢，並開啟 LLDP（CDP 預設已開）。"],"snmp_cli":"ip access-list standard NETMAP\n permit host {IP}\nsnmp-server community {COMM} RO NETMAP\nlldp run","flow":"Flexible NetFlow v9（路由器、Catalyst 9300／9400 等；部分入門款交換器不支援）","flow_steps":["在連接內網的介面套用 flow monitor（ingress）。"],"flow_cli":"flow exporter NETMAP\n destination {IP}\n transport udp {NF}\n export-protocol netflow-v9\nflow monitor NETMAP-MON\n exporter NETMAP\n record netflow ipv4 original-input\ninterface GigabitEthernet0/1\n ip flow monitor NETMAP-MON input"},{"id":"meraki","name":"Cisco Meraki","kind":"MX 防火牆、MS 交換器","match":["meraki"],"snmp":["Organization ▸ Settings：開啟 SNMP（這是雲端的 SNMP，netmap 讀不到埠流量）。","要讓 netmap 直接讀設備：Network-wide ▸ General ▸ Reporting 開啟 SNMP，設定 community「{COMM}」，並允許 {IP}。"],"flow":"NetFlow v9（MX）","flow_steps":["Network-wide ▸ Configure ▸ General ▸ Reporting：NetFlow traffic reporting 選 Enabled。","NetFlow collector IP 填 {IP}，port 填 {NF}，儲存。","MX 只匯出經過路由或 NAT 的流量，同一個 VLAN 裡互傳的流量不會出現。"],"doc":"https://documentation.meraki.com/MX/Monitoring_and_Reporting/NetFlow_Overview"},{"id":"mikrotik","name":"MikroTik RouterOS","kind":"路由器、交換器","match":["mikrotik","routerboard"],"snmp":["IP ▸ SNMP：Enabled 打勾；Communities 改成「{COMM}」，Addresses 填 {IP}/32，只開 Read Access。"],"snmp_cli":"/snmp set enabled=yes\n/snmp community set [find default=yes] name={COMM} addresses={IP}/32 read-access=yes write-access=no","flow":"NetFlow v9／IPFIX（Traffic Flow）","flow_steps":["IP ▸ Traffic Flow：Enabled 打勾，Interfaces 選 all。","Targets 新增：Dst. Address {IP}、Port {NF}、Version 9（或 IPFIX）。"],"flow_cli":"/ip traffic-flow set enabled=yes interfaces=all\n/ip traffic-flow target add dst-address={IP} port={NF} version=9","doc":"https://manual.mikrotik.com/docs/diagnostics-monitoring-and-troubleshooting/traffic-flow/"},{"id":"ubiquiti","name":"Ubiquiti UniFi","kind":"閘道器、交換器、AP","match":["ubiquiti","unifi","ubnt"],"snmp":["UniFi Network：Settings ▸ System（或 Settings ▸ Network 依版本）找到 SNMP，開啟 SNMPv1/v2c 並設定 community「{COMM}」。","UniFi 交換器與 AP 也會套用同一組設定。"],"flow":"IPFIX（UniFi Network 9.1 以後的閘道器）","flow_steps":["Settings ▸ CyberSecure ▸ Traffic Logging：開啟 NetFlow（IPFIX）。","收集器填 {IP}，埠 {NF}。"],"doc":"https://help.ui.com/hc/en-us/articles/32201256219799"},{"id":"edgerouter","name":"Ubiquiti EdgeRouter","kind":"路由器（EdgeOS）","match":["edgerouter","edgeos"],"snmp":["System ▸ SNMP 開啟並設定 community，或用 CLI。"],"snmp_cli":"configure\nset service snmp community {COMM} authorization ro\nset service snmp community {COMM} client {IP}\ncommit ; save","flow":"NetFlow v9","flow_cli":"configure\nset system flow-accounting interface eth1\nset system flow-accounting netflow version 9\nset system flow-accounting netflow server {IP} port {NF}\ncommit ; save","flow_steps":["把 eth1 換成連接內網的介面。"]},{"id":"pfsense","name":"pfSense","kind":"防火牆","match":["pfsense","netgate"],"snmp":["Services ▸ SNMP：Enable，Read Community String 填「{COMM}」，Bind Interfaces 選 LAN。"],"flow":"NetFlow v9／IPFIX（softflowd 套件）","flow_steps":["System ▸ Package Manager 安裝 softflowd。","Services ▸ softflowd：Interface 選 LAN，Destination Host 填 {IP}，Port {NF}，NetFlow version 選 9 或 IPFIX，儲存。"]},{"id":"opnsense","name":"OPNsense","kind":"防火牆","match":["opnsense","deciso"],"snmp":["System ▸ Firmware ▸ Plugins 安裝 os-net-snmp。","Services ▸ Net-SNMP：Enable，community 填「{COMM}」。"],"flow":"NetFlow v5／v9（內建）","flow_steps":["Reporting ▸ NetFlow：Interfaces 選 LAN（可多選）。","WAN 介面若也選了，放進 Egress only 避免重複計算。","Version 選 v9，Destinations 輸入 {IP}:{NF} 後按 Enter，套用。"],"doc":"https://docs.opnsense.org/manual/how-tos/netflow_exporter.html"},{"id":"sophos","name":"Sophos Firewall","kind":"防火牆（SFOS／XGS）","match":["sophos"],"snmp":["System services ▸ SNMP（或 Administration ▸ SNMP）：開啟 Agent，新增 community「{COMM}」，Manager IP 填 {IP}，只給查詢權限。","Administration ▸ Device access：LAN zone 勾選 SNMP。"],"flow":"NetFlow v5","flow_steps":["System ▸ Administration ▸ Netflow：Add，Netflow server IP 填 {IP}，port {NF}，儲存。","只會匯出有開記錄的規則：Rules and policies ▸ Firewall rules，要統計的規則開啟 Log firewall traffic。","NetFlow v5 沒有 IPv6。"],"doc":"https://www.avanet.com/en/kb/sophos-firewall-netflow-monitoring/"},{"id":"paloalto","name":"Palo Alto Networks","kind":"防火牆（PAN-OS）","match":["palo alto","paloalto"],"snmp":["Device ▸ Setup ▸ Operations ▸ SNMP Setup：選 V2c 填 community「{COMM}」（或 V3）。","Network ▸ Network Profiles ▸ Interface Mgmt：建立允許 SNMP 的設定檔並套到 LAN 介面，Permitted IP 加 {IP}。"],"flow":"NetFlow v9","flow_steps":["Device ▸ Server Profiles ▸ NetFlow：新增，Server 填 {IP}、Port {NF}。","Network ▸ Interfaces：編輯 LAN 介面 ▸ Advanced ▸ NetFlow Profile 選剛才的設定，Commit。"]},{"id":"checkpoint","name":"Check Point","kind":"防火牆（Gaia）","match":["check point","checkpoint"],"snmp":["Gaia Portal ▸ System Management ▸ SNMP：開啟 SNMP Agent，Version 選 v2/v3，Read Only Community 填「{COMM}」。"],"flow":"NetFlow v9／IPFIX","flow_steps":["Gaia Portal ▸ Network Management ▸ NetFlow Export：新增收集器 {IP}、Port {NF}，格式選 NetFlow V9 或 IPFIX。"]},{"id":"juniper","name":"Juniper","kind":"交換器（EX）、防火牆（SRX）","match":["juniper","junos"],"snmp":["只允許 {IP} 查詢。"],"snmp_cli":"set snmp community {COMM} authorization read-only\nset snmp community {COMM} clients {IP}/32\nset protocols lldp interface all\ncommit","flow":"sFlow（EX 交換器）；SRX 用 J-Flow v9／IPFIX","flow_steps":["EX 交換器：在上行與要觀察的介面開 sFlow。"],"flow_cli":"set protocols sflow collector {IP} udp-port {SF}\nset protocols sflow sample-rate ingress 1024\nset protocols sflow interfaces ge-0/0/0\ncommit"},{"id":"aruba","name":"HPE Aruba","kind":"交換器（AOS-S／AOS-CX）","match":["aruba","hpe","procurve"],"snmp":["AOS-S（2530／2930 等）："],"snmp_cli":"snmp-server community \"{COMM}\" operator restricted\nsnmp-server host {IP} community \"{COMM}\"\nlldp run","flow":"sFlow","flow_steps":["AOS-S：設定 sFlow 收集器並在各埠開啟取樣。AOS-CX：sflow collector {IP} 後 sflow enable。"],"flow_cli":"sflow 1 destination {IP} {SF}\ninterface 1-24 sflow 1 sampling 1024\ninterface 1-24 sflow 1 polling 30"},{"id":"h3c","name":"H3C／HPE Comware","kind":"交換器、路由器","match":["h3c","comware"],"snmp":["只允許唯讀查詢。"],"snmp_cli":"snmp-agent\nsnmp-agent sys-info version v2c\nsnmp-agent community read {COMM}\nlldp global enable","flow":"sFlow（交換器）／NetStream（路由器，相當於 NetFlow）","flow_cli":"sflow agent ip <交換器管理IP>\nsflow collector 1 ip {IP} port {SF}\ninterface GigabitEthernet1/0/1\n sflow sampling-rate 4096\n sflow flow collector 1","flow_steps":["在要觀察的埠（例如上行埠）開啟 sFlow 取樣。"]},{"id":"huawei","name":"華為 Huawei","kind":"交換器、路由器、防火牆","match":["huawei"],"snmp":["只允許唯讀查詢。"],"snmp_cli":"snmp-agent\nsnmp-agent sys-info version v2c\nsnmp-agent community read cipher {COMM}\nlldp enable","flow":"sFlow（交換器）／NetStream（路由器、防火牆）","flow_cli":"sflow agent ip <交換器管理IP>\nsflow collector 1 ip {IP} udp-port {SF}\ninterface GigabitEthernet0/0/1\n sflow sampling collector 1\n sflow sampling rate 4096","flow_steps":["在要觀察的埠開啟 sFlow 取樣。"]},{"id":"ruckus","name":"Ruckus ICX","kind":"交換器","match":["ruckus","brocade"],"snmp":["只允許唯讀查詢。"],"snmp_cli":"snmp-server community {COMM} ro\nlldp run","flow":"sFlow","flow_cli":"sflow destination {IP} {SF}\nsflow enable\ninterface ethernet 1/1/1\n sflow forwarding","flow_steps":["在要觀察的埠開啟 sflow forwarding。"]},{"id":"tplink","name":"TP-Link Omada／JetStream","kind":"交換器、閘道器","match":["tp-link","tplink","omada"],"snmp":["單機管理：Maintenance ▸ SNMP ▸ Global Config 開啟，Community 新增「{COMM}」唯讀。","Omada 控制器：Settings ▸ Services ▸ SNMP 開啟並設定 community，會套用到所有設備。"],"flow":"部分 JetStream L2+／L3 交換器支援 sFlow；Omada 閘道器目前沒有 NetFlow","flow_steps":["支援 sFlow 的機型：Maintenance ▸ sFlow，Collector 填 {IP}、Port {SF}，再到 Sampler 在上行埠開啟取樣。"]},{"id":"zyxel","name":"Zyxel","kind":"防火牆（USG FLEX／ATP）、交換器","match":["zyxel"],"snmp":["防火牆：System ▸ SNMP 開啟，設定 Get Community「{COMM}」，Service Control 只允許 LAN。","交換器：Management ▸ SNMP（或 Advanced Application ▸ SNMP）設定唯讀 community。"],"flow":"多數機型沒有 NetFlow／sFlow；可以看埠流量（SNMP）","flow_steps":["沒有流量匯出的話，「誰在用」可以改看上游防火牆或支援 sFlow 的交換器。"]},{"id":"draytek","name":"DrayTek Vigor","kind":"路由器","match":["draytek","vigor"],"snmp":["System Maintenance ▸ SNMP：Enable SNMP Agent，Get Community 填「{COMM}」，Manager Host IP 填 {IP}。"],"flow":"沒有 NetFlow／sFlow","flow_steps":["可以看 WAN／LAN 埠流量（SNMP）；要知道誰在用，請改用支援流量匯出的設備。"]},{"id":"netgear","name":"NETGEAR","kind":"網管交換器","match":["netgear"],"snmp":["System ▸ SNMP ▸ SNMP V1/V2 ▸ Community Configuration：新增唯讀 community「{COMM}」，IP 填 {IP}。"],"flow":"部分 M4300／M4350 等支援 sFlow","flow_steps":["Monitoring ▸ sFlow：Receiver 填 {IP}、Port {SF}，在上行埠設定 Sampler。"]},{"id":"dlink","name":"D-Link","kind":"網管交換器","match":["d-link","dlink"],"snmp":["Management ▸ SNMP Settings：SNMP Global State 開啟，Community 新增「{COMM}」read only。"],"flow":"DGS-3000 以上等系列支援 sFlow","flow_steps":["支援的機型：sFlow ▸ Collector 填 {IP}、Port {SF}，並在埠上開啟 Flow Sampler。"]},{"id":"synology","name":"Synology NAS","kind":"NAS","match":["synology"],"snmp":["控制台 ▸ 終端機 & SNMP ▸ SNMP：啟動 SNMP 服務，勾選 SNMPv1/v2c，community 填「{COMM}」。","也可以改用「加入 SSH 設備…」讀流量（控制台 ▸ 終端機 開啟 SSH）。"],"flow":"沒有流量匯出","flow_steps":[]},{"id":"asus","name":"ASUS 家用路由器","kind":"家用路由器","match":["asus"],"snmp":["多數機型沒有 SNMP，請改用 netmap.exe「監控服務 ▸ 加入 SSH 設備…」。","開 SSH：系統管理 ▸ 系統設定 ▸ 啟用 SSH 選「只限 LAN」。測完不用時記得關閉。"],"flow":"沒有流量匯出","flow_steps":[]},{"id":"windows","name":"Windows 電腦／伺服器","kind":"電腦","match":["microsoft","windows"],"snmp":["設定 ▸ 系統 ▸ 選用功能 ▸ 新增「簡易網路管理通訊協定（SNMP）」。","服務（services.msc）▸ SNMP Service ▸ 安全性：新增唯讀 community「{COMM}」，「接受來自這些主機」加入 {IP}。"],"flow":"沒有流量匯出","flow_steps":[]},{"id":"linux","name":"Linux 主機","kind":"伺服器","match":["linux","ubuntu","debian","red hat","centos"],"snmp":["最簡單：用 netmap.exe「加入 SSH 設備…」讀流量，不用裝東西。","或安裝 snmpd，在 /etc/snmp/snmpd.conf 加入 rocommunity {COMM} {IP}，重新啟動 snmpd。"],"flow":"可安裝 softflowd 匯出 NetFlow","flow_cli":"sudo apt install softflowd\nsudo softflowd -i eth0 -n {IP}:{NF} -v 9"}],"common":{"snmp_tip":"建議所有設備用同一組唯讀 community（例如「{COMM}」）或同一組 SNMPv3 帳密，並只允許 netmap.exe 那台電腦（{IP}）查詢。不要用 public，也不要開寫入權限。","flow_tip":"流量匯出只要開在一台設備上就夠了（通常是防火牆，在 LAN 介面開）。同一台設備的同一份流量若在多個介面都匯出，可能會重複計算。"}};/*VENDORS_END*/
 const MANUAL_URL=PUBLIC_URL+'manual.html';
 /* 版本紀錄：最新在最前面。exe = netmap.exe 的版本 */
-const APP_VERSION='2.9.3',EXE_VERSION='1.7.3';
+const APP_VERSION='3.0',EXE_VERSION='1.8.0';
 const CHANGELOG=[
+ {v:'3.0',exe:'1.8.0',d:'2026-11-07',t:'右側分頁、無線連線、抓出 Wi-Fi 設備',i:['右側分成「設備資訊」與「網路流量」兩個分頁，分頁上的燈號顯示監控狀態；埠也分成「埠設定」與「網路流量」','新增無線連線：手機、筆電可設成用 Wi-Fi 連到 AP 或路由器（2.4G／5G／6G），畫成虛線並標頻段，查線、故障查線、影響範圍都會經過','用 SSH 監控的路由器會列出連在它上面的設備（有線／無線、頻段、名稱、訊號），一鍵把無線設備套用到圖上','設備的編輯／刪除按鈕移到名稱下方，不再擋住埠與線','新增「手機」設備種類']},
  {v:'2.9.3',exe:'1.7.3',d:'2026-11-07',t:'數字鍵盤可以輸入「.」',i:['netmap.exe 所有輸入框都能用鍵盤右邊數字鍵的「.」輸入 IP']},
  {v:'2.9.2',exe:'1.7.2',d:'2026-11-07',t:'看不到流量時說明原因',i:['點設備時，右側一定會說明為什麼沒有即時狀態：線上版網頁、IP 和 netmap.exe 那台電腦不一樣，或是還在等第一次讀取','監控網頁會告訴你 netmap.exe 那台電腦的 IP，方便對照']},
  {v:'2.9.1',exe:'1.7.1',d:'2026-11-07',t:'今日流量縮圖、自動監控本機',i:['即時狀態卡片加上今日流量縮圖與今日下載／上傳總量，點縮圖打開這台設備的流量圖','跑 netmap.exe 的那台電腦會自動監控自己的網卡流量，不需要 SNMP（圖上這台電腦的 IP 要填對）','一般電腦不再顯示「等待監控服務輪詢」，改說明怎麼看它的流量']},
@@ -1693,24 +1718,26 @@ function trace(pid){const fwd=walk(pid,'cable'),back=walk(pid,'inner').reverse()
 function traceSet(){if(ui.fault&&!ui.sel){const ft=faultTrace();if(ft)return ft}const ports=new Set(),cabs=new Set(),devs=new Set();let start=null;
   if(ui.sel&&ui.sel.port)start=ui.sel.port;else if(ui.sel&&ui.sel.cable){const c=S.cables.find(c=>c.id===ui.sel.cable);if(c)start=c.a}
   const dir={};let lp=null;
-  const add=s=>{if(s.k==='port'){ports.add(s.p);devs.add(I.owner[s.p].id);lp=s.p}if(s.k==='cable'){cabs.add(s.c.id);if(dir[s.c.id]==null)dir[s.c.id]=lp}};
+  const wifis=new Set();const add=s=>{if(s.k==='port'){ports.add(s.p);devs.add(I.owner[s.p].id);lp=s.p}if(s.k==='cable'){cabs.add(s.c.id);if(dir[s.c.id]==null)dir[s.c.id]=lp}if(s.k==='wifi'){wifis.add(s.dev);devs.add(s.dev);devs.add(s.ap)}};
   const seq=t=>{lp=null;t.forEach(add)};
   if(start&&I.ports[start]){seq(trace(start));return{ports,cabs,devs,active:true,dir}}
-  else if(ui.sel&&ui.sel.dev){const d=S.devices.find(x=>x.id===ui.sel.dev);if(d){d.ports.forEach(p=>{if(I.cab[p.id]&&!ports.has(p.id))seq(trace(p.id))});seq(upstream(d));if(cabs.size){devs.add(d.id);return{ports,cabs,devs,active:true,dev:d.id,dir}}}}
-  return{ports,cabs,devs,active:!!start}}
+  else if(ui.sel&&ui.sel.dev){const d=S.devices.find(x=>x.id===ui.sel.dev);if(d){d.ports.forEach(p=>{if(I.cab[p.id]&&!ports.has(p.id))seq(trace(p.id))});seq(upstream(d));if(cabs.size||wifis.size){devs.add(d.id);return{ports,cabs,devs,wifis,active:true,dev:d.id,dir}}}}
+  return{ports,cabs,devs,wifis,active:!!start}}
 /* backbone = cables between network gear; a cable to a PC, PLC, printer… is an access cable */
 function isMain(c){const acc=d=>!d||(d.type==='end'&&d.kind!=='ISP 數據機');return!acc(I.owner[c.a])&&!acc(I.owner[c.b])}
 function wireShown(c){return prefs.wireMode==='all'||(prefs.wireMode==='main'&&isMain(c))}
 /* device graph over whole runs (patch panels and wall jacks are pass-through), used to walk from a device up to the network entry */
 function runGraph(){const adj={};S.devices.forEach(d=>{if(TYPES[d.type].pass)return;d.ports.forEach(p=>{if(!I.cab[p.id])return;const t=trace(p.id);const ps=t.filter(x=>x.k==='port');const far=I.owner[ps[ps.length-1].p];
-  if(!far||far.id===d.id||TYPES[far.type].pass)return;(adj[d.id]=adj[d.id]||[]).push({to:far.id,t})})});return adj}
+  if(!far||far.id===d.id||TYPES[far.type].pass)return;(adj[d.id]=adj[d.id]||[]).push({to:far.id,t})})});
+  S.devices.forEach(d=>{const w=d.wifi;if(!w||!w.ap)return;const ap=S.devices.find(x=>x.id===w.ap);if(!ap||ap.id===d.id)return;const t=[{k:'wifi',dev:d.id,ap:ap.id,band:w.band||''}];
+    (adj[d.id]=adj[d.id]||[]).push({to:ap.id,t});(adj[ap.id]=adj[ap.id]||[]).push({to:d.id,t})});return adj}
 function rootRank(d){return d.type==='end'&&d.kind==='ISP 數據機'?0:d.type==='fw'?1:d.type==='router'?2:(d.type==='sw'&&d.variant==='l3')?3:d.type==='sw'?4:9}
 function upstream(d,adjIn){const adj=adjIn||runGraph();const ds=S.devices.filter(x=>adj[x.id]);if(!ds.length)return[];const best=Math.min(...ds.map(rootRank));if(best===9)return[];
   const dist={},q=ds.filter(x=>rootRank(x)===best).map(x=>x.id);q.forEach(id=>dist[id]=0);
   while(q.length){const id=q.shift();(adj[id]||[]).forEach(e=>{if(dist[e.to]==null){dist[e.to]=dist[id]+1;q.push(e.to)}})}
   let starts=[d.id];if(TYPES[d.type].pass){starts=[];d.ports.forEach(p=>{if(!I.cab[p.id])return;trace(p.id).filter(x=>x.k==='port').forEach(x=>{const o=I.owner[x.p];if(!TYPES[o.type].pass&&!starts.includes(o.id))starts.push(o.id)})})}
   const out=[];starts.forEach(x=>{let g=0;while(dist[x]>0&&g++<64){const e=(adj[x]||[]).find(e=>dist[e.to]===dist[x]-1);if(!e)break;out.push(...e.t);x=e.to}});return out}
-function runText(t){return t.map(x=>x.k==='port'?`${I.owner[x.p].name} ${pshort(x.p)}`:x.k==='cable'?`[${x.c.label}]`:'⇄').join(' ➔ ').replace(/ ➔ ⇄ ➔ /g,' ⇄ ')}
+function runText(t){return t.map(x=>x.k==='port'?`${I.owner[x.p].name} ${pshort(x.p)}`:x.k==='cable'?`[${x.c.label}]`:x.k==='wifi'?`((Wi-Fi ${x.band||''}))`:'⇄').join(' ➔ ').replace(/ ➔ ⇄ ➔ /g,' ⇄ ')}
 
 /* ---------- search ---------- */
 function devText(d){return[d.name,d.loc,d.note,d.brand,brandKw(d.brand),d.model,d.ip,d.mac,d.gw,d.rack,typeName(d)].join(' ').toLowerCase()}
@@ -1793,7 +1820,7 @@ function renderCanvas(){I=idx();prepFault();ui.match=computeMatches();clearPair(
     const view=viewOf(d);cls.push(view);{const fc=fClass('dev:'+d.id);if(fc)cls.push(fc);if(ui.affected&&ui.affected.has(d.id))cls.push('affected');const ld=liveDev(d.id);if(ld&&!ld.up)cls.push('ldevdown')}
     let tags='';if(view==='icon'){const cs=d.ports.map(p=>I.cab[p.id]).filter(c=>c&&!wireShown(c)&&!tr.cabs.has(c.id));if(cs.length)tags=`<div class="ctags">${cs.slice(0,6).map(c=>`<span class="ctag" style="--k:${pairCol(c)}">${esc(c.label||'線')}</span>`).join('')}${cs.length>6?`<span class="ctag more">+${cs.length-6}</span>`:''}</div>`}
     const lb=(()=>{const ld=liveDev(d.id);return ld&&!ld.up?`<span class="lbadge" title="SNMP：${esc(ld.err||'沒有回應')}（設備可能離線，或 SNMP 沒開）">無回應</span>`:''})();
-    const lbl=`<div class="dlabel">${lb}<b>${esc(d.name)}</b><small>${esc(sub)}</small></div>${foot?`<div class="foot">${esc(foot)}</div>`:''}${tags}`;
+    const lbl=`<div class="dlabel">${lb}<b>${esc(d.name)}</b><small>${esc(sub)}${d.wifi&&d.wifi.ap?' · '+wifiPill(d):''}</small></div>${foot?`<div class="foot">${esc(foot)}</div>`:''}${tags}`;
     const hact=`<span class="hact"><button data-act="edit" data-id="${d.id}" title="編輯" aria-label="編輯 ${esc(d.name)}">${ICON.edit}</button><button class="del" data-act="del" data-id="${d.id}" title="刪除" aria-label="刪除 ${esc(d.name)}">${ICON.del}</button></span>`;
     if(view==='icon')return`<div class="${cls.join(' ')}" data-dev="${d.id}" style="left:${d.x}px;top:${d.y}px;--tc:${tc(d.type)}"><div class="ico" data-drag="${d.id}" title="拖曳移動，雙擊展開網路埠">${devArt(d)}</div>${lbl}${hact}</div>`;
     return`<div class="${cls.join(' ')}" data-dev="${d.id}" style="left:${d.x}px;top:${d.y}px;--tc:${tc(d.type)}"><div class="plate" data-drag="${d.id}" title="拖曳移動，雙擊收成圖示"><div class="pleft"><span class="tile">${iconOf(d)}</span><span class="leds"><i></i><i></i></span></div><div class="body">${portsHTML(d,tr,m)}</div></div>${lbl}${hact}</div>`}).join('');
@@ -1885,6 +1912,7 @@ function drawWires(){peekDev=null;const tr=traceSet(),m=ui.match,R=devRects(),la
     {const lc=liveCable(c);if(lc)cls.push('lv-'+lc.lvl)}if(tr.dir&&tr.dir[c.id]===c.b)cls.push('rev');
     if(link&&link.cable===c)cls.push('moving');if(ui.sel&&ui.sel.cable===c.id)cls.push('selc');
     h+=`<g class="${cls.join(' ')}" data-cable="${c.id}" data-da="${I.owner[c.a].id}" data-db="${I.owner[c.b].id}" style="--w:${st.w}px">${tr.cabs.has(c.id)?`<path class="halo" d="${g.d}" stroke="${st.color}"/>`:''}<path class="vis" id="w-${c.id}" d="${g.d}" stroke="${st.color}"${st.dash?` stroke-dasharray="${st.dash}"`:''}/><path class="hit" d="${g.d}"/></g>`});
+  h+=wifiLinksSVG(tr,R);
   $('wires').innerHTML=h+'<g id="deco"></g>';
   const L=prefs.layers;let dh='';const placed=[],devB=Object.values(R).map(r=>({x:(r.l+r.r)/2,y:(r.t+r.b)/2,w:r.r-r.l,h:r.b-r.t}));
   const freeAt=(x,y,w,h,dv)=>![...placed,...(dv?devB:[])].some(b=>x-w/2<b.x+b.w/2+4&&x+w/2>b.x-b.w/2-4&&y-h/2<b.y+b.h/2+3&&y+h/2>b.y-b.h/2-3);
@@ -1982,9 +2010,9 @@ function renderInsp(){const box=$('insp'),el=$('inspBody');const s=ui.sel;I=I||i
   const close=()=>{box.classList.remove('open');box.inert=true;document.body.classList.remove('insp-open')};
   if(!s)ui.detail=null;
   if(ui.multi.size>1||!s){close();return}
-  if(s.dev){const d=S.devices.find(x=>x.id===s.dev);if(!d||(!prefs.autoDrawer&&ui.detail!==s.dev)){close();return}inspDev(el,d);if(SRV)setTimeout(()=>loadDevSpark(d.id));title=`設備屬性 <small>（${esc(typeName(d))}）</small>`}
+  if(s.dev){const d=S.devices.find(x=>x.id===s.dev);if(!d||(!prefs.autoDrawer&&ui.detail!==s.dev)){close();return}inspDev(el,d);drawerTabs(el,'dev',d);title=`設備屬性 <small>（${esc(typeName(d))}）</small>`}
   else if(ui.detail!==selKey()&&!(SRV&&ui.ro&&s.port)){close();return}
-  else if(s.port){inspPort(el,s.port);title='網路埠詳細';if(SRV){el.insertAdjacentHTML('afterbegin',liveCardHTML(s.port));loadChart(s.port)}}
+  else if(s.port){inspPort(el,s.port);title='網路埠詳細';drawerTabs(el,'port',s.port)}
   else if(s.cable){inspCable(el,S.cables.find(x=>x.id===s.cable));title='線材詳細'}
   box.inert=false;
   $('inspTitle').innerHTML=title;box.classList.add('open');document.body.classList.add('insp-open');
@@ -2012,7 +2040,7 @@ function inspDev(el,d){const T=TYPES[d.type];const ls=layersOf(d);const used=d.p
   const hasList=!!BRANDS[d.type];const sp=SPECS[d.model];
   el.innerHTML=`<div class="ihead"><span class="tile">${iconOf(d)}</span><div style="min-width:0"><div class="kicker"><span class="pill">${esc(typeName(d))}</span><span class="pill lyr">OSI ${range(ls)}</span></div><h2>${esc(d.name)}</h2></div></div>
   <div class="sub">${esc([d.brand,d.model].filter(Boolean).join(' ')||'尚未填廠牌型號')}${d.ip?' · '+esc(d.ip):''} · ${used} / ${d.ports.length} 埠已接線${d.ports.some(p=>p.poe)?` · PoE ${d.ports.filter(p=>p.poe).length} 埠`:''}</div>
-  ${liveDevHTML(d)}${flowDevHTML(d)}<div class="card"><span class="label">設定</span>
+  <div class="card"><span class="label">設定</span>
   ${inp('名稱','d.name',d.name)}
   ${T.variants?sel('類型','d.variant',d.variant,Object.entries(T.variants).map(([k,v])=>[k,v.n])):''}
   ${d.type==='end'?sel('種類','d.kind',d.kind,END_KINDS.map(k=>[k,k])):''}
@@ -2022,7 +2050,7 @@ function inspDev(el,d){const T=TYPES[d.type];const ls=layersOf(d);const used=d.p
   ${inp('位置','d.loc',d.loc,'3F 業務部')}
   ${rackable(d)?`<div class="row3">${sel('機櫃','d.rack',d.rack,[['','未上架'],...S.racks.map(r=>[r.name,r.name+'（'+r.size+'U）'])])}${inp('U 位（底部）','d.u',d.u,'—','number')}${sel('高度','d.uh',uhOf(d),[[1,'1U'],[2,'2U'],[3,'3U'],[4,'4U']])}</div>`:''}
   <div class="field"><label class="label" for="f-d-note">備註</label><textarea id="f-d-note" data-f="d.note" rows="2" placeholder="序號、保固、管理帳號放哪裡…">${esc(d.note)}</textarea></div></div>
-  <div class="card"><span class="label">埠位配置${sp?` · ${esc(d.model)} 規格 ${specText(sp)}`:''}</span>
+  ${wifiCardHTML(d)}<div class="card"><span class="label">埠位配置${sp?` · ${esc(d.model)} 規格 ${specText(sp)}`:''}</span>
   <div class="chips">${(PRESETS[d.type]||[]).map((p,i)=>`<button class="chipbtn" data-preset="${i}" title="${T.pass?'每埠前後各一':''}">${specText(p)}</button>`).join('')}${sp?`<button class="chipbtn" data-preset="spec">套用 ${esc(d.model)} 規格</button>`:''}</div>
   <div class="row2"><div class="field"><label class="label" for="pc-main">${T.pass?'埠數（前後各一）':'網路埠數'}</label><input id="pc-main" type="number" min="1" max="96" value="${nMain}"></div>
   ${!T.pass&&d.type!=='end'&&d.type!=='hub'?`<div class="field"><label class="label" for="pc-sfp">SFP 光纖埠</label><input id="pc-sfp" type="number" min="0" max="8" value="${nSfp}"></div>`:''}</div>
@@ -2921,6 +2949,83 @@ function openVendorGuide(id){const V=VENDOR_GUIDE.vendors;let cur=V.find(v=>v.id
   draw();const on=$('mod').querySelector('[data-vg][aria-pressed="true"]');on&&on.scrollIntoView({block:'nearest'})}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-vguide]');if(b){e.preventDefault();openVendorGuide(b.dataset.vguide)}});
 
+/* ======================= 無線連線（Wi-Fi） ======================= */
+const WIFI_SVG='<svg viewBox="0 0 24 24"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0M12 19h.01"/></svg>';
+const bandCls=b=>/^2/.test(b||'')?'b24':/^5/.test(b||'')?'b5':/^6/.test(b||'')?'b6':'bx';
+function wifiPill(d){return d.wifi&&d.wifi.ap?`<span class="wpill ${bandCls(d.wifi.band)}" title="無線連線">${WIFI_SVG}${esc(d.wifi.band||'Wi-Fi')}</span>`:''}
+function edgePt(r,x,y){const cx=(r.l+r.r)/2,cy=(r.t+r.pb)/2,dx=x-cx,dy=y-cy;if(!dx&&!dy)return[cx,cy];const hw=(r.r-r.l)/2+6,hh=(r.pb-r.t)/2+6;const k=Math.min(hw/Math.abs(dx||1e-9),hh/Math.abs(dy||1e-9));return[cx+dx*k,cy+dy*k]}
+function wifiLinksSVG(tr,R){let h='';S.devices.forEach(d=>{const w=d.wifi;if(!w||!w.ap)return;const ap=S.devices.find(x=>x.id===w.ap);const a=R[d.id],b=ap&&R[ap.id];if(!a||!b)return;
+  const hot=tr.wifis&&tr.wifis.has(d.id),sel=ui.sel&&ui.sel.dev&&(ui.sel.dev===d.id);if(!hot&&!sel&&prefs.wireMode!=='all')return;
+  const ac=[(b.l+b.r)/2,(b.t+b.pb)/2],dc=[(a.l+a.r)/2,(a.t+a.pb)/2];const [x1,y1]=edgePt(b,dc[0],dc[1]),[x2,y2]=edgePt(a,ac[0],ac[1]);
+  const mx=(x1+x2)/2,my=(y1+y2)/2,bc=bandCls(w.band),lab=w.band||'Wi-Fi',lw=lab.length*6.2+22;
+  const col={b24:'#f59e0b',b5:'#22d3ee',b6:'#a78bfa',bx:'#94a3b8'}[bc];
+  h+=`<g class="wifig${tr.active?(hot?' hot':' dim'):''}" data-wifi="${d.id}" style="color:${col}"><path class="wifi-l ${bc}" d="M${x1.toFixed(1)},${y1.toFixed(1)}L${x2.toFixed(1)},${y2.toFixed(1)}"/>
+    <g class="wlbl" transform="translate(${(mx-lw/2).toFixed(1)},${(my-9).toFixed(1)})"><rect width="${lw.toFixed(1)}" height="18" rx="9"/><g transform="translate(5,3) scale(.5)" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0M12 19h.01"/></g><text x="18" y="12.5">${esc(lab)}</text></g></g>`});return h}
+function apCandidates(d){return S.devices.filter(x=>x.id!==d.id&&['ap','router','fw'].includes(x.type))}
+function nearestAp(d){const c=apCandidates(d);if(!c.length)return null;return c.slice().sort((a,b)=>((a.type==='ap'?0:1)-(b.type==='ap'?0:1))||(Math.hypot(a.x-d.x,a.y-d.y)-Math.hypot(b.x-d.x,b.y-d.y)))[0]}
+/* 改成無線時，拿掉接到同一台 AP／路由器的網路線 */
+function dropCablesTo(d,apId){const gone=[];d.ports.forEach(p=>{const cb=I.cab[p.id];if(!cb)return;const t=trace(p.id).filter(x=>x.k==='port');const far=I.owner[t[t.length-1].p];if(far&&far.id===apId){S.cables=S.cables.filter(z=>z.id!==cb.id);gone.push(cb.label||'線')}});return gone}
+function wifiCardHTML(d){if(TYPES[d.type].pass||!['end','ap','hub','sw'].includes(d.type))return'';const w=d.wifi,aps=apCandidates(d);
+  return`<div class="card"><span class="label">連線方式</span>
+    <div class="seg" role="group" aria-label="連線方式"><button data-wfm="wire" aria-pressed="${!w}">有線</button><button data-wfm="wifi" aria-pressed="${!!w}">無線 Wi-Fi</button></div>
+    ${w?`<div class="row2" style="margin-top:8px"><div class="field"><label class="label" for="wfAp">連到</label><select id="wfAp">${aps.map(a=>`<option value="${a.id}"${a.id===w.ap?' selected':''}>${esc(a.name)}（${esc(typeName(a))}）</option>`).join('')}</select></div>
+      <div class="field"><label class="label" for="wfBand">頻段</label><select id="wfBand">${[['','不確定'],['2.4G','2.4 GHz'],['5G','5 GHz'],['5G-2','5 GHz（第二組）'],['6G','6 GHz']].map(([v,t])=>`<option value="${v}"${(w.band||'')===v?' selected':''}>${t}</option>`).join('')}</select></div></div>
+      <div class="field"><label class="label" for="wfSsid">SSID（選填）</label><input id="wfSsid" value="${esc(w.ssid||'')}" placeholder="例如 Office-5G"></div>`
+      :`<p class="hint" style="margin:8px 0 0">手機、筆電、平板等用 Wi-Fi 上網的設備，可以改成「無線」，畫面上會用虛線連到 AP 或路由器，查線與故障查線也會經過它。</p>`}</div>`}
+function wireWifiCard(el,d){el.querySelectorAll('[data-wfm]').forEach(b=>b.onclick=()=>{if(!canEdit())return;const m=b.dataset.wfm;
+    if(m==='wifi'&&!d.wifi){const ap=nearestAp(d);if(!ap){toast('圖上還沒有 AP 或路由器，請先加入一台');return}snap();d.wifi={ap:ap.id,band:''};const gone=dropCablesTo(d,ap.id);save();I=idx();const left=d.ports.filter(p=>I.cab[p.id]).map(p=>I.cab[p.id].label||'線');renderAll();toast(`已改成無線，連到 ${ap.name}${gone.length?`，並移除網路線 ${gone.join('、')}`:''}${left.length?`（網路線 ${left.join('、')} 還保留著，不需要可以拔掉）`:''}`,true)}
+    else if(m==='wire'&&d.wifi){snap();delete d.wifi;save();I=idx();renderAll();toast('已改成有線，請把網路線接到正確的埠',true)}});
+  const ap=el.querySelector('#wfAp'),bd=el.querySelector('#wfBand');
+  if(ap)ap.onchange=()=>{snap();d.wifi.ap=ap.value;const gone=dropCablesTo(d,ap.value);save();I=idx();renderAll();if(gone.length)toast(`已移除網路線 ${gone.join('、')}`,true)};
+  if(bd)bd.onchange=()=>{snap();d.wifi.band=bd.value;save();renderAll()};
+  const ss=el.querySelector('#wfSsid');if(ss){ss.onfocus=()=>snap();ss.oninput=()=>{d.wifi.ssid=ss.value.trim();save()}}}
+
+/* ======================= 右側分頁：設備資訊／網路流量 ======================= */
+function devState(d){const ld=ui.live&&ui.live.devices[d.id];return ld?(ld.up?'ok':'bad'):flowRate(d)?'ok':'none'}
+function portState(pid){const L=livePort(pid);return L?(L.up===false?'bad':'ok'):'none'}
+function devPortsHTML(d){if(!SRV)return'';const rows=d.ports.map(p=>({p,L:ui.live&&ui.live.ports[p.id]})).filter(x=>x.L);if(rows.length<2)return'';
+  return`<div class="card"><span class="label">每個埠 <small>點一列看日／週／月／年圖</small></span>${rows.map(({p,L})=>`<div class="prow" data-mrtg="${p.id}"><span class="dot ${L.up?'up':L.up===false?'down':''}"></span><b>埠 ${esc(p.label)}</b><small>${L.in!=null?`↓${fmtBps(L.in)} ↑${fmtBps(L.out)}${L.util!=null?' · '+Math.round(L.util*100)+'%':''}`:L.up===false?'離線':'—'}</small></div>`).join('')}</div>`}
+function clientsHTML(d){const ld=SRV&&ui.live&&ui.live.devices[d.id];const cl=ld&&ld.clients;if(!cl)return'';
+  const f=ui.cfilt||'wifi',wl=cl.filter(c=>c.wireless).length;const rows=cl.filter(c=>f==='all'||(f==='wifi')===c.wireless);
+  const onMap=c=>S.devices.find(x=>(x.mac&&x.mac.toLowerCase()===c.mac)||(c.ip&&x.ip===c.ip));
+  return`<div class="card"><span class="label">連在這台的設備 <small>${cl.length} 台 · 無線 ${wl} 台${ld.clients_at?' · '+new Date(ld.clients_at*1000).toLocaleTimeString('zh-TW',{hour12:false,hour:'2-digit',minute:'2-digit'})+' 更新':''}</small></span>
+    <div class="cfilt seg" role="group"><button data-cfilt="wifi" aria-pressed="${f==='wifi'}">無線 ${wl}</button><button data-cfilt="wire" aria-pressed="${f==='wire'}">有線 ${cl.length-wl}</button><button data-cfilt="all" aria-pressed="${f==='all'}">全部</button></div>
+    <div class="clist">${rows.slice(0,40).map(c=>{const m=onMap(c);const mis=m&&c.wireless&&!(m.wifi&&m.wifi.ap===d.id);
+      return`<div class="crow"><span class="${c.wireless?'w':'e'}">${c.wireless?WIFI_SVG:'<svg viewBox="0 0 24 24"><rect x="5" y="9" width="14" height="10" rx="1.5"/><path d="M9 9V5h6v4M9 13h.01M12 13h.01M15 13h.01"/></svg>'}</span>
+        <span style="min-width:0"><b>${esc(c.name||(m&&m.name)||c.ip)}</b><small>${esc(c.ip)} · ${esc(c.mac.toUpperCase())}${c.rssi!=null?` · 訊號 ${c.rssi} dBm`:''}</small>${m?`<small class="onmap${mis?' warn':''}">${mis?'圖上是有線，可改成無線':'圖上：'+esc(m.name)}</small>`:'<small class="onmap">不在圖上</small>'}</span>
+        ${c.wireless?`<span class="bd ${bandCls(c.band)}">${esc(c.band||'Wi-Fi')}</span>`:'<span class="bd">有線</span>'}</div>`}).join('')||'<p class="hint">沒有符合的設備</p>'}</div>
+    ${canEdit()&&!ui.ro?`<div class="actions"><button class="btn primary" data-applycl="${d.id}">把無線設備套用到圖上</button></div><p class="hint">會把圖上已有的設備改成無線連到「${esc(d.name)}」（並移除接到這台的網路線），不在圖上的無線設備會新增在旁邊。可以復原。</p>`:''}</div>`}
+function guessKind(name){const n=(name||'').toLowerCase();
+  if(/iphone|android|galaxy|pixel|redmi|xiaomi|oppo|vivo|realme|huawei|honor|oneplus|sony-xperia|asus_|zenfone|phone/.test(n))return'手機';
+  if(/ipad|tab|tablet|kindle/.test(n))return'平板 / HMI';if(/macbook|laptop|notebook|nb-|thinkpad|zenbook|vivobook/.test(n))return'筆電';
+  if(/print|epson|canon|brother|hp[-_]?[0-9a-f]{6}/.test(n))return'印表機';if(/cam|ipc|hikvision|dahua|tapo/.test(n))return'IP Cam';
+  if(/desktop|pc|win-/.test(n))return'PC 桌機';if(/nas|synology|diskstation|qnap/.test(n))return'NAS';return'其他'}
+function applyClients(apId){if(!canEdit())return;const ap=S.devices.find(x=>x.id===apId);const ld=ui.live&&ui.live.devices[apId];if(!ap||!ld||!ld.clients)return;
+  snap();let added=0,changed=0;const gone=[];const wl=ld.clients.filter(c=>c.wireless);let k=0;
+  wl.forEach(c=>{let d=S.devices.find(x=>x.mac&&x.mac.toLowerCase()===c.mac)||S.devices.find(x=>c.ip&&x.ip===c.ip);if(d&&d.id===apId)return;
+    if(!d){const n=wl.length,ang=Math.PI*(0.15+0.7*(n>1?k/(n-1):.5)),r=260+(k%2)*70;k++;
+      d=addDev('end',{name:c.name||c.ip,kind:guessKind(c.name),ip:c.ip,mac:c.mac.toUpperCase(),note:'由路由器的用戶端清單建立（無線）',x:Math.round(ap.x+Math.cos(ang)*r),y:Math.round(ap.y+Math.sin(ang)*r+60),n:1});added++}
+    else{if(!d.mac)d.mac=c.mac.toUpperCase();if(c.name&&(!d.name||/^\d+\.\d+\.\d+\.\d+$/.test(d.name)))d.name=c.name;if(d.type==='end'&&(!d.kind||d.kind==='其他')&&guessKind(c.name)!=='其他')d.kind=guessKind(c.name)}
+    if(!d.wifi||d.wifi.ap!==apId||(c.band&&d.wifi.band!==c.band)){d.wifi=Object.assign({},d.wifi||{},{ap:apId,band:c.band&&c.band!=='Wi-Fi'?c.band:((d.wifi&&d.wifi.band)||''),auto:true});changed++}
+    I=idx();gone.push(...dropCablesTo(d,apId))});
+  save();I=idx();renderAll();toast(`無線設備：新增 ${added} 台、更新 ${changed} 台${gone.length?`，移除網路線 ${gone.join('、')}`:''}`,true)}
+function devFlowTab(d){let h=liveDevHTML(d)+flowDevHTML(d)+devPortsHTML(d)+clientsHTML(d);
+  if(!h.trim())h=`<div class="card"><span class="label">網路流量</span><p class="hint">${d.ip?'這台沒有流量資料。':'先在「設備資訊」填上 IP，監控服務才對得到這台設備。'}${TYPES[d.type].pass?'配線架、資訊座是被動元件，不會有流量資料；請看接在兩端的 Switch 埠。':''}</p></div>`;
+  return h}
+function portFlowTab(pid){if(SRV)return liveCardHTML(pid);return`<div class="card"><span class="label">網路流量</span><p class="hint">這是線上版網頁，沒有監控資料。用 netmap.exe 監控服務的網址開啟這張圖，就能看到這個埠的即時流量、24 小時曲線與這段線上的主要使用者。<a href="${MANUAL_URL}#e-srv" target="_blank" rel="noopener">怎麼設定？</a></p></div>`}
+function drawerTabs(el,kind,x){const st=kind==='dev'?devState(x):portState(x);const key=SRV?'itabSrv':'itabWeb';
+  let tab=prefs[key]||(SRV&&(st!=='none'||ui.ro)?'flow':'info');
+  const head=[...el.children].filter(c=>c.classList.contains('ihead')||c.classList.contains('sub'));
+  const info=document.createElement('div');info.className='itab';info.dataset.itab='info';[...el.children].forEach(c=>{if(!head.includes(c))info.appendChild(c)});
+  const bar=document.createElement('div');bar.className='itabs';bar.setAttribute('role','tablist');
+  bar.innerHTML=`<button role="tab" data-itabbtn="info">${kind==='dev'?'設備資訊':'埠設定'}</button><button role="tab" data-itabbtn="flow" title="${st==='ok'?'有監控資料':st==='bad'?'沒有回應':'沒有監控資料'}"><i class="sdot ${st}"></i>網路流量</button>`;
+  const fl=document.createElement('div');fl.className='itab';fl.dataset.itab='flow';fl.innerHTML=kind==='dev'?devFlowTab(x):portFlowTab(x);
+  el.append(bar,info,fl);
+  const set=t=>{bar.querySelectorAll('button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.itabbtn===t)));info.hidden=t!=='info';fl.hidden=t!=='flow';
+    if(t==='flow'&&SRV){if(kind==='port')loadChart(x);else loadDevSpark(x.id)}};
+  bar.querySelectorAll('button').forEach(b=>b.onclick=()=>{prefs[key]=b.dataset.itabbtn;savePrefs();set(b.dataset.itabbtn)});
+  if(kind==='dev'){wireWifiCard(el,x);fl.querySelectorAll('[data-cfilt]').forEach(b=>b.onclick=()=>{ui.cfilt=b.dataset.cfilt;renderInsp()});fl.querySelectorAll('[data-applycl]').forEach(b=>b.onclick=()=>applyClients(b.dataset.applycl))}
+  set(tab)}
 /* ======================= 誰在用流量（NetFlow／IPFIX／sFlow） ======================= */
 const FL_WIN=[[15,'15 分鐘'],[60,'1 小時'],[1440,'24 小時'],[10080,'7 天']];
 const fmtBytes=n=>{n=+n||0;const u=['B','KB','MB','GB','TB'];let i=0;while(n>=1024&&i<4){n/=1024;i++}return(i?n.toFixed(n<10?1:0):n)+' '+u[i]};
@@ -3070,13 +3175,15 @@ function faultHops(f){I=I||idx();const d=S.devices.find(x=>x.id===f.start);if(!d
   items.forEach(it=>{if(it.k==='port'){const o=I.owner[it.p];const pass=TYPES[o.type].pass;
       if(!pass&&o.id!==last&&prev&&prev.k==='cable'){push({k:'port',id:it.p});push({k:'dev',id:o.id});last=o.id}
       else{if(!pass&&o.id!==last){push({k:'dev',id:o.id});last=o.id}push({k:'port',id:it.p})}}
-    else if(it.k==='cable')push({k:'cable',id:it.c.id});prev=it});
+    else if(it.k==='cable')push({k:'cable',id:it.c.id});
+    else if(it.k==='wifi'){push({k:'wifi',id:it.dev});const nx=it.dev===last?it.ap:it.dev;if(nx!==last){push({k:'dev',id:nx});last=nx}}prev=it});
   if(!upstream(d).length&&rootRank(d)!==best)push({k:'gap',id:'0'});
   return hops}
 function hopInfo(h){I=I||idx();
   if(h.k==='dev'){const d=S.devices.find(x=>x.id===h.id);if(!d)return{t:'（已刪除的設備）',s:''};return{t:d.name,s:[typeName(d),[d.brand,d.model].filter(Boolean).join(' '),d.ip].filter(Boolean).join(' · '),dev:d.id,ic:'dev'}}
   if(h.k==='port'){const p=I.ports[h.id],d=I.owner[h.id];if(!p)return{t:'（已刪除的埠）',s:''};const pass=TYPES[d.type].pass;
     return{t:`${d.name} 埠 ${p.label}${pass?(p.side?'（後）':'（前）'):''}`,s:[p.mode==='trunk'?'Trunk':p.vlan?'VLAN '+p.vlan:'',p.poe?'PoE':'',p.lag?'LACP '+p.lag:'',p.kind==='sfp'?'SFP':''].filter(Boolean).join(' · '),dev:d.id,ic:'port'}}
+  if(h.k==='wifi'){const d=S.devices.find(x=>x.id===h.id),ap=d&&d.wifi&&S.devices.find(x=>x.id===d.wifi.ap);if(!d||!ap)return{t:'（已移除的無線連線）',s:''};return{t:`Wi-Fi ${d.wifi.band||''}`.trim(),s:`${d.name} ↔ ${ap.name}${d.wifi.ssid?' · '+d.wifi.ssid:''} · 檢查訊號、密碼、AP 是否正常`,dev:ap.id,ic:'cable'}}
   if(h.k==='cable'){const c=S.cables.find(x=>x.id===h.id);if(!c)return{t:'（已刪除的線）',s:''};return{t:`線 ${c.label||''}`,s:[c.type,c.speed,c.len?c.len+' m':'',fixedRun(c)?'牆內固定佈線':''].filter(Boolean).join(' · '),dev:I.owner[c.a].id,ic:'cable'}}
   return{t:'找不到通往網路入口的路徑',s:'線路可能在這裡中斷，或還沒畫到上游設備',ic:'gap'}}
 /* automatic health checks over the whole map: key -> reasons */

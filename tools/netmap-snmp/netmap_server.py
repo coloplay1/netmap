@@ -25,7 +25,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.7.3"
+VERSION = "1.8.0"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -322,6 +322,7 @@ class Poller:
         s.prev = {}          # (host, ifIndex) → (t, in, out, ierr, oerr)
         s.ifmaps = {}        # host → (time, {label → ifIndex})
         s.links = {}         # "ip:port" → sm.SshLink（保持連線）
+        s.clients = {}       # host → (時間, [用戶端])：路由器上的有線／無線設備，每 5 分鐘更新
         s.thread = None; s.stop_ev = threading.Event(); s.wake = threading.Event()
         s.running = False; s.last_cycle = 0; s.cycle_secs = 0
 
@@ -387,6 +388,12 @@ class Poller:
         except Exception as e:
             res["dev"]["err"] = str(e) or "SSH 連線失敗"; return res
         res["dev"]["up"] = True; t = time.time()
+        if d.get("type") in ("router", "ap", "fw") and d.get("clients") is not False:
+            c = s.clients.get(host)
+            if not c or time.time() - c[0] > 300:
+                try: c = s.clients[host] = (time.time(), sm.read_clients(s.link(key), [(p.get("ifName"), p.get("label")) for p in d.get("ports", []) if p.get("ifName")]))
+                except Exception: c = c or (time.time(), [])
+            res["dev"]["clients"] = c[1]; res["dev"]["clients_at"] = int(c[0])
         for p in d.get("ports", []):
             ifn = p.get("ifName")
             if not ifn or ifn not in data: continue

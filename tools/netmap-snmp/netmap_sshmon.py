@@ -169,6 +169,107 @@ def probe(host, port, user, password):
             "type": typ, "firmware": fw, "kernel": info.get("kernel", ""), "ports": friendly_ports(info, counters, sysinfo)}
 
 
+CLIENTS_CMD = ("cat /proc/net/arp; echo '@@C1@@'; (bridge fdb show 2>/dev/null); echo '@@C2@@'; "
+               "for b in /sys/class/net/*/brif; do [ -d \"$b\" ] || continue; br=${b%/brif}; br=${br##*/}; for i in $b/*; do echo \"$br ${i##*/} $(cat $i/port_no 2>/dev/null)\"; done; done; echo '@@C3@@'; "
+               "for b in /sys/class/net/*/brif; do [ -d \"$b\" ] || continue; br=${b%/brif}; br=${br##*/}; brctl showmacs $br 2>/dev/null | sed \"s/^/$br /\"; done; echo '@@C4@@'; "
+               "cat /var/lib/misc/dnsmasq.leases /tmp/dnsmasq.leases /tmp/dhcp.leases /var/dhcp.leases 2>/dev/null; echo '@@C5@@'; "
+               "(cat /tmp/clientlist.json 2>/dev/null | head -c 300000); echo; echo '@@C6@@'; "
+               "for w in $(iw dev 2>/dev/null | awk '/Interface/{print $2}'); do echo \"== $w\"; iw dev $w station dump 2>/dev/null | grep -E '^Station|signal:'; done")
+MAC_RE = re.compile(r"([0-9a-f]{2}(?::[0-9a-f]{2}){5})", re.I)
+WIFI_IF = re.compile(r"^(wl|ra|rai|rax|rae|ath|wlan|phy|wifi|apcli|wds)", re.I)
+
+
+def _band_key(k):
+    k = str(k).upper()
+    if k.startswith("2"): return "2.4G"
+    if k.startswith("5G2") or k == "5G-2": return "5G-2"
+    if k.startswith("5"): return "5G"
+    if k.startswith("6"): return "6G"
+    return None
+
+
+def parse_clients(text, ports=None):
+    """路由器的用戶端：[{ip, mac, iface, wireless, band, name, rssi}]。ports：[(ifName, label)]，用來認出 WAN 與 Wi-Fi 介面。"""
+    parts = re.split(r"@@C\d@@", text)
+    while len(parts) < 7: parts.append("")
+    arp, fdb, brif, showmacs, leases, clj, iw = parts[:7]
+    label = {i: l for i, l in (ports or [])}
+    wan = {i for i, l in label.items() if str(l).upper() == "WAN"}
+    band_of_if = {i: l for i, l in label.items() if l in ("2.4G", "5G", "5G-2", "6G")}
+    # IP ↔ MAC
+    ipmac = []
+    for line in arp.splitlines()[1:]:
+        f = line.split()
+        if len(f) >= 6 and f[2] != "0x0" and MAC_RE.fullmatch(f[3]) and f[3] != "00:00:00:00:00:00":
+            ipmac.append((f[0], f[3].lower(), f[5]))
+    # MAC → 實體介面（bridge fdb 或 brctl showmacs）
+    mac_if = {}
+    for line in fdb.splitlines():
+        m = re.match(r"([0-9a-f:]{17})\s+dev\s+(\S+)", line, re.I)
+        if m and "permanent" not in line and " self" not in line: mac_if.setdefault(m.group(1).lower(), m.group(2))
+    portno = {}
+    for line in brif.splitlines():
+        f = line.split()
+        if len(f) == 3:
+            try: portno[(f[0], int(f[2], 0))] = f[1]
+            except ValueError: pass
+    for line in showmacs.splitlines():
+        f = line.split()
+        if len(f) >= 4 and MAC_RE.fullmatch(f[2]) and f[3] == "no":
+            try: ifn = portno.get((f[0], int(f[1])))
+            except ValueError: ifn = None
+            if ifn: mac_if.setdefault(f[2].lower(), ifn)
+    # 名稱（DHCP 租約）
+    names = {}
+    for line in leases.splitlines():
+        f = line.split()
+        if len(f) >= 4 and MAC_RE.fullmatch(f[1]) and f[3] not in ("*", ""): names[f[1].lower()] = f[3]
+    # ASUS clientlist.json：{"路由器MAC": {"2G": {MAC: {...}}, "5G": {...}, "wired_mac": {...}}}
+    asus = {}
+    try:
+        import json
+        j = json.loads(clj.strip() or "{}")
+        for node in (j.values() if isinstance(j, dict) else []):
+            if not isinstance(node, dict): continue
+            for bk, macs in node.items():
+                if not isinstance(macs, dict): continue
+                band = _band_key(bk); wired = "wired" in str(bk).lower()
+                if band is None and not wired: continue
+                for mac, info in macs.items():
+                    if MAC_RE.fullmatch(str(mac)):
+                        asus[mac.lower()] = {"band": band, "wired": wired, "rssi": (info or {}).get("rssi") if isinstance(info, dict) else None,
+                                             "ip": (info or {}).get("ip") if isinstance(info, dict) else None}
+    except Exception:
+        pass
+    # iw station dump
+    iwsta = {}; cur_if = None; cur = None
+    for line in iw.splitlines():
+        if line.startswith("== "): cur_if = line[3:].strip(); continue
+        m = re.match(r"Station\s+([0-9a-f:]{17})", line.strip(), re.I)
+        if m: cur = m.group(1).lower(); iwsta[cur] = {"iface": cur_if, "rssi": None}; continue
+        m = re.match(r"signal:\s*(-?\d+)", line.strip())
+        if m and cur: iwsta[cur]["rssi"] = int(m.group(1))
+    out = []; seen = set()
+    for ip, mac, arpif in ipmac:
+        if mac in seen or arpif in wan: continue
+        seen.add(mac)
+        ifn = (iwsta.get(mac) or {}).get("iface") or mac_if.get(mac) or ""
+        a = asus.get(mac) or {}
+        band = a.get("band") or band_of_if.get(ifn) or (("Wi-Fi") if ifn and WIFI_IF.match(ifn) else None)
+        wireless = bool(band) or mac in iwsta
+        if a.get("wired"): wireless, band = False, None
+        rssi = (iwsta.get(mac) or {}).get("rssi") or a.get("rssi")
+        try: rssi = int(rssi) if rssi not in (None, "") else None
+        except (TypeError, ValueError): rssi = None
+        out.append({"ip": ip, "mac": mac, "iface": ifn, "wireless": wireless, "band": band if wireless else None, "name": names.get(mac, ""), "rssi": rssi})
+    out.sort(key=lambda c: tuple(int(x) if x.isdigit() else 0 for x in c["ip"].split(".")))
+    return out
+
+
+def read_clients(link, ports=None):
+    return parse_clients(link.run(CLIENTS_CMD, timeout=20), ports)
+
+
 def read_ports(link):
     """{ifname: (rx_bytes, tx_bytes, rx_errs, tx_errs, up, speed_bps)}"""
     counters, sysinfo = parse_read(link.run(READ_CMD))

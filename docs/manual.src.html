@@ -110,7 +110,7 @@ details.vend{border:1px solid var(--line);border-radius:12px;padding:10px 14px;m
 <li><a href="#quick">2. 五分鐘快速開始</a></li>
 <li><a href="#ui">3. 介面導覽</a></li>
 <li><a href="#build">4. 建立網路圖</a>
-  <ol><li><a href="#b-dev">新增設備與型號</a></li><li><a href="#b-cable">接線</a></li><li><a href="#b-patch">配線架與資訊座</a></li><li><a href="#b-layout">排列與走線</a></li></ol></li>
+  <ol><li><a href="#b-dev">新增設備與型號</a></li><li><a href="#b-cable">接線</a></li><li><a href="#b-wifi">無線連線</a></li><li><a href="#b-patch">配線架與資訊座</a></li><li><a href="#b-layout">排列與走線</a></li></ol></li>
 <li><a href="#trace">5. 查線路</a></li>
 <li><a href="#port">6. 埠設定（VLAN／PoE／LACP）</a></li>
 <li><a href="#view">7. 檢視與顯示</a>
@@ -189,7 +189,7 @@ details.vend{border:1px solid var(--line);border-radius:12px;padding:10px 14px;m
 <h3 id="b-dev">新增設備與選型號</h3>
 <ul>
 <li>點左側工具列的圖示，或在畫布空白處<b>按右鍵</b>／按 <kbd>A</kbd>，就會在游標位置加一台設備。</li>
-<li>點設備後右邊會打開「設備屬性」，可以設定名稱、<b>廠牌</b>、<b>型號</b>、IP、Gateway、MAC、位置、機櫃與 U 位。</li>
+<li>點設備後右邊會打開「設備屬性」，分成 <b>設備資訊</b> 與 <b>網路流量</b> 兩個分頁（分頁上的小燈號：綠＝有監控資料、紅＝沒有回應、灰＝沒有資料）。「設備資訊」可以設定名稱、<b>廠牌</b>、<b>型號</b>、IP、Gateway、MAC、位置、機櫃與 U 位。</li>
 <li>廠牌欄可以打中文、縮寫或產品線，例如「飛塔」「ubnt」「Catalyst」都找得到。</li>
 <li>型號清單旁會標示<b>埠數</b>（例如「24 埠 + 4 SFP」），選了型號後埠的數量與名稱會自動套用。</li>
 <li><b>雙擊設備</b>切換「圖示模式」與「網路埠模式」：圖示模式較精簡，網路埠模式可看到每個埠。</li>
@@ -204,6 +204,16 @@ details.vend{border:1px solid var(--line);border-radius:12px;padding:10px 14px;m
 <li>點線可以設定線號、線材（Cat6、單模／多模光纖、DAC、Console）、長度與顏色。</li>
 </ol>
 <p>埠的小燈號：<span class="dot" style="background:#94A3B8"></span>灰色＝空埠、<span class="dot" style="background:#22C55E"></span>綠色＝已接線，小閃電＝PoE 供電。</p>
+
+<h3 id="b-wifi">無線連線（Wi-Fi）</h3>
+<figure class="mid"><img src="manual/wifi.jpg" alt="無線連線" loading="lazy"><figcaption>點筆電：用虛線連到路由器並標出 5G；手機標 2.4G／5G。</figcaption></figure>
+<p>手機、筆電、平板這類用 Wi-Fi 上網的設備，不需要畫網路線：點設備 ▸「設備資訊」▸ <b>連線方式</b> 選 <b>無線 Wi-Fi</b>，再選它連到哪一台 AP 或路由器、哪個頻段（2.4G／5G／6G）。</p>
+<ul>
+<li>畫面上用虛線連到 AP，並標出頻段（2.4G 橘色、5G 藍綠色、6G 紫色）；設備名稱下方也會顯示 Wi-Fi 圖示。平常跟一般終端的線一樣收起來，點設備或在「顯示圖層」選「全部」時才畫出來。</li>
+<li>改成無線時，原本接到同一台 AP／路由器的網路線會自動移除（可以復原）。</li>
+<li>查線、故障查線、「如果這台壞了」都會經過無線連線：AP 壞掉時，連在上面的手機筆電會列入影響範圍。</li>
+<li>用 SSH 監控的路由器可以自動找出哪些設備是無線的，見 <a href="#e-ssh">SSH 流量監控</a>。</li>
+</ul>
 
 <h3 id="b-patch">配線架與資訊座</h3>
 <p>配線架有「前」「後」兩排。前面的埠用跳線接到 Switch，後面的埠用牆內線接到各樓層的資訊座（座位 A-01 之類）。</p>
@@ -403,6 +413,7 @@ details.vend{border:1px solid var(--line);border-radius:12px;padding:10px 14px;m
 <li>連線會一直保持，不會每次輪詢都重新登入，設備的登入紀錄不會被洗版。</li>
 <li>帳密以 Windows 帳號加密保存在這台電腦，不會出現在網頁或分享的圖裡。程式也會記住設備的 SSH 主機金鑰，金鑰改變（設備被換掉或有人冒充）時會停止連線並提示。</li>
 <li>WAN 的「流入」就是從網際網路進來的流量，也就是全家的下載量。</li>
+<li><b>連在路由器上的設備</b>：點路由器 ▸「網路流量」分頁，會列出連在它上面的設備（每 5 分鐘更新）：有線或無線、2.4G／5G、名稱（DHCP 主機名稱）、MAC 與訊號強度，並標出是否已在圖上。按 <b>把無線設備套用到圖上</b>，圖上已有的設備會改成無線連到這台路由器，不在圖上的無線設備會新增在旁邊（依名稱猜種類：手機、筆電、平板…）。資料來自路由器的 ARP 表、橋接 MAC 表、DHCP 租約，ASUS 另外讀它的用戶端清單。</li>
 </ul>
 <div class="note"><b>⚠️</b>要長期監控就要讓 SSH 一直開著，請確認只開在 LAN、使用夠強的密碼。不再監控時，在「監控服務」的列表點選這台設備，按 <b>移除 SSH 監控</b>（會刪除保存的帳密），並關閉路由器的 SSH。</div>
 
