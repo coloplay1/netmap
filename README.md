@@ -1,6 +1,6 @@
 # RackTrace 機房線路對應圖
 
-<img src="racktrace-mark.svg" width="96" alt="RackTrace 標誌">
+<picture><source media="(prefers-color-scheme: dark)" srcset="racktrace-wordmark-dark.svg"><img src="racktrace-wordmark.svg" width="560" alt="RackTrace 機房線路對應圖"></picture>
 
 點埠就查到整條線的機房文件工具（原名 netmap；網址、檔名 netmap.exe 不變）。
 
