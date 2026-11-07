@@ -30,3 +30,6 @@ try:
 except urllib.error.HTTPError as e: assert e.code == 403
 print(st.seen_update([{"mac": "00:11:22:33:44:55", "ip": "10.0.0.9"}], "ci"))
 sv.stop(); print("ops self-test OK")
+c = S.probe_candidates({"devices": [{"id": "a", "type": "sw", "ip": "10.0.0.2", "monitor": False}, {"id": "b", "type": "sw", "ip": "10.0.0.3"},
+                                    {"id": "c", "type": "end", "kind": "NAS", "ip": "10.0.0.4"}, {"id": "d", "type": "end", "kind": "PC 桌機", "ip": "10.0.0.5"}]}, set())
+assert [d["id"] for d in c] == ["a", "c"], c; print("probe candidates OK")

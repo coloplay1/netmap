@@ -100,7 +100,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="8 8 240 240" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22C3EE"/><stop offset="1" stop-color="#2563EB"/></linearGradient></defs><rect x="8" y="8" width="240" height="240" rx="58" fill="url(#g)"/><rect x="52" y="52" width="152" height="50" rx="14" fill="#fff"/><rect x="74" y="68" width="22" height="18" rx="4" fill="#2563EB"/><rect x="117" y="68" width="22" height="18" rx="4" fill="#F59E0B"/><rect x="160" y="68" width="22" height="18" rx="4" fill="#2563EB"/><path d="M128 102v34M80 170v-20a14 14 0 0 1 14-14h68a14 14 0 0 1 14 14v20" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/><rect x="56" y="170" width="48" height="36" rx="10" fill="#fff"/><rect x="152" y="170" width="48" height="36" rx="10" fill="#F59E0B"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v3.1.0 · netmap.exe v1.9.0</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v3.1.1 · netmap.exe v1.9.1</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -122,7 +122,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <li><a href="#save">9. 儲存、匯出與分享</a>
   <ol><li><a href="#s-history">歷史版本與還原</a></li><li><a href="#s-labels">線標列印</a></li></ol></li>
 <li><a href="#exe">10. netmap.exe（Windows 程式）</a>
-  <ol><li><a href="#e-install">下載與第一次開啟</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-detect">從線上版切換</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-ssh">SSH 流量監控</a></li><li><a href="#e-flow">誰在用流量</a></li><li><a href="#e-vendor">各廠牌設定教學</a></li><li><a href="#e-ping">心跳與事件</a></li><li><a href="#e-alert">告警通知</a></li><li><a href="#e-auth">管理密碼與檢視連結</a></li><li><a href="#e-seen">網路上的設備</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
+  <ol><li><a href="#e-install">下載與第一次開啟</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-autosnmp">自動偵測 SNMP</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-detect">從線上版切換</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-ssh">SSH 流量監控</a></li><li><a href="#e-flow">誰在用流量</a></li><li><a href="#e-vendor">各廠牌設定教學</a></li><li><a href="#e-ping">心跳與事件</a></li><li><a href="#e-alert">告警通知</a></li><li><a href="#e-auth">管理密碼與檢視連結</a></li><li><a href="#e-seen">網路上的設備</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
 <li><a href="#mobile">11. 手機操作</a></li>
 <li><a href="#keys">12. 快捷鍵</a></li>
 <li><a href="#faq">13. 常見問題</a></li>
@@ -137,7 +137,7 @@ code,td,li,p{overflow-wrap:anywhere}
   <div class="row">
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
-    <a class="btn ghost" href="#changelog">最新更新：v3.1.0</a>
+    <a class="btn ghost" href="#changelog">最新更新：v3.1.1</a>
   </div>
 </div>
 
@@ -394,6 +394,18 @@ code,td,li,p{overflow-wrap:anywhere}
 <h3 id="e-disc">網段探索（不需要 SNMP）</h3>
 <figure class="mid"><img src="manual/app-d2.jpg" alt="網段探索" loading="lazy"></figure>
 <p>在掃描分頁選「<b>網段探索</b>」，輸入網段（例如 <code>192.168.1.0/24</code>），程式用 ping 與 ARP 列出在線的設備，並依 MAC 判斷廠牌、依開啟的連接埠猜種類（印表機、NAS、攝影機…）。結果一樣可以帶入網頁，但因為沒有 SNMP，<b>不會有埠對埠的連線</b>，需要自己接線。</p>
+<h3 id="e-autosnmp">自動偵測 SNMP（不用重新掃描）</h3>
+<p>監控服務啟動後，每小時會用 netmap.exe 設定好的 SNMP 帳密，去試圖上<b>還沒有監控</b>的 Switch、路由器、防火牆、AP，以及伺服器、NAS、NVR、印表機。所以流程可以是：</p>
+<ol class="steps">
+<li>先用網段探索或手動把設備畫上圖，填好 IP。</li>
+<li>有空再到各台設備把 SNMP 打開（community 或 SNMPv3 帳密要和 netmap.exe 一樣）。</li>
+<li>下一次偵測時（最多一小時，或在監控網頁按 <b>檔案 ▸ 告警、心跳與權限設定 ▸ 心跳與設備偵測 ▸ 現在偵測一次</b>），有回應的設備就會自動開始監控：補上設備回報的實體埠與埠號、把 IP 名稱改成設備名稱，並記一筆「開始 SNMP 監控」事件。</li>
+</ol>
+<ul>
+<li>原本圖上已有、名稱一樣的埠會直接對應；網段探索建立的「WAN」「ETH1」這類佔位埠，沒接線的會拿掉。已接線但對不上的埠會留著，事件裡會提醒你改成設備上的埠名稱（或重新掃描一次）。</li>
+<li>LLDP／CDP 的鄰居關係（誰接誰）仍然要用 <b>SNMP 掃描</b> 才會畫出來；自動偵測只負責「開始監控」。</li>
+<li>不想要的話，在同一個設定頁取消勾選「自動偵測 SNMP」。</li>
+</ul>
 
 <h3 id="e-srv">監控服務與即時流量</h3>
 <figure class="mid"><img src="manual/app-g2.jpg" alt="監控服務分頁" loading="lazy"></figure>
@@ -671,7 +683,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 <figure><img src="manual/seen.jpg" alt="網路上的設備" loading="lazy"></figure>
 <ul>
 <li>資料來源：路由器、防火牆、L3 Switch 的 ARP 表（有 SNMP 的話，每 10 分鐘讀一次）、SSH 監控路由器的用戶端清單，以及 netmap.exe 那台電腦自己的 ARP 表。</li>
-<li>第一次讀到的那批當作原本就在；之後出現的才算 <b>新加入</b>，同一台 IP 改變會記成 <b>IP 變更</b>。要收到通知，在告警設定勾「新設備加入網路」。</li>
+<li>每個來源（每台路由器、Switch）第一次讀到的那批當作原本就在；之後出現的才算 <b>新加入</b>，同一台 IP 改變會記成 <b>IP 變更</b>。要收到通知，在告警設定勾「新設備加入網路」。</li>
 <li><b>不在圖上</b>：圖上沒有這個 MAC 或 IP 的設備，按 <b>加到圖上</b> 會建一台終端設備（名稱、廠牌、IP、MAC 自動帶入），再接線或設成無線即可。</li>
 <li><b>很久沒出現</b>：超過設定的時數（預設 24 小時）沒看到。圖上有填 MAC 的設備很久沒出現時可以發通知，適合盤點壞掉或被搬走的設備。</li>
 <li>手機常用「隨機 MAC」（廠牌顯示「隨機 MAC」），換個 Wi-Fi 或過一段時間 MAC 就會變，可能被當成新設備。</li>
@@ -761,7 +773,8 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 
 <section id="changelog">
 <h2><span class="n">14</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v3.1　心跳告警、歷史版本、權限、線標、多頁面、光纖束</b><span class="tag new">最新 · 2026-11-07</span><span class="tag">netmap.exe 1.9.0</span></div><ul><li>Ping 心跳：圖上所有有 IP 的設備都有綠／黃／紅燈號，斷線、延遲變高一眼看到；設備屬性看延遲曲線與最近事件</li><li>告警通知：設備斷線、主幹埠離線、新設備加入時送到 Telegram、Discord、Slack、Teams、LINE（Messaging API）、Email 或自訂 Webhook，同一段時間的事件合併成一則</li><li>事件紀錄：斷線、恢復、埠離線、新設備都記下來（保留 180 天），右上角鈴鐺顯示未讀</li><li>歷史版本：每次修改記下是誰、改了什麼，可以預覽舊版本再一鍵還原；線上版也會在這台瀏覽器自動留版本</li><li>管理密碼與檢視連結：其他電腦要登入才能編輯；可以產生只能看的連結或 QR Code 給主管、同仁</li><li>線標列印：A4 標籤紙（含 QR Code，掃了打開那條線）或匯出 Brother P-touch Editor 用的 CSV</li><li>網路上的設備：從路由器、防火牆的 ARP 表整理出新加入、很久沒出現、不在圖上的設備，一鍵加到圖上</li><li>多張圖（頁面）：樓層、機房、分公司分開畫，跨頁面的線顯示連接標籤，點一下跳過去；查線照樣整條走完</li><li>光纖收容箱與光纖束：一條多芯光纜一次建立，每一芯標 TIA-598 色碼，畫成一條粗線，點開看每一芯接到哪裡</li><li>平行線收成一條：同一對設備之間的多條線（例如 LACP）可以收成一條粗線</li><li>48 埠設備在縮小畫面或平板上點埠時，會放大成一排大按鈕讓你選，不會點錯</li></ul></div>
+<div class="clog"><div class="v"><b>v3.1.1　自動偵測 SNMP</b><span class="tag new">最新 · 2026-11-07</span><span class="tag">netmap.exe 1.9.1</span></div><ul><li>監控服務每小時用設定好的 SNMP 帳密，去試圖上還沒監控的網路設備、伺服器、NAS、NVR、印表機；有回應就自動開始監控並補上埠號，不用重新掃描</li><li>設定 ▸ 心跳與設備偵測 可以關閉，或按「現在偵測一次」</li></ul></div>
+<div class="clog"><div class="v"><b>v3.1　心跳告警、歷史版本、權限、線標、多頁面、光纖束</b><span class="tag">2026-11-07</span><span class="tag">netmap.exe 1.9.0</span></div><ul><li>Ping 心跳：圖上所有有 IP 的設備都有綠／黃／紅燈號，斷線、延遲變高一眼看到；設備屬性看延遲曲線與最近事件</li><li>告警通知：設備斷線、主幹埠離線、新設備加入時送到 Telegram、Discord、Slack、Teams、LINE（Messaging API）、Email 或自訂 Webhook，同一段時間的事件合併成一則</li><li>事件紀錄：斷線、恢復、埠離線、新設備都記下來（保留 180 天），右上角鈴鐺顯示未讀</li><li>歷史版本：每次修改記下是誰、改了什麼，可以預覽舊版本再一鍵還原；線上版也會在這台瀏覽器自動留版本</li><li>管理密碼與檢視連結：其他電腦要登入才能編輯；可以產生只能看的連結或 QR Code 給主管、同仁</li><li>線標列印：A4 標籤紙（含 QR Code，掃了打開那條線）或匯出 Brother P-touch Editor 用的 CSV</li><li>網路上的設備：從路由器、防火牆的 ARP 表整理出新加入、很久沒出現、不在圖上的設備，一鍵加到圖上</li><li>多張圖（頁面）：樓層、機房、分公司分開畫，跨頁面的線顯示連接標籤，點一下跳過去；查線照樣整條走完</li><li>光纖收容箱與光纖束：一條多芯光纜一次建立，每一芯標 TIA-598 色碼，畫成一條粗線，點開看每一芯接到哪裡</li><li>平行線收成一條：同一對設備之間的多條線（例如 LACP）可以收成一條粗線</li><li>48 埠設備在縮小畫面或平板上點埠時，會放大成一排大按鈕讓你選，不會點錯</li></ul></div>
 <div class="clog"><div class="v"><b>v3.0.1　修正：網段探索建立的本機沒有流量</b><span class="tag">2026-11-07</span><span class="tag">netmap.exe 1.8.1</span></div><ul><li>用網段探索建立的設備預設不輪詢，連帶讓跑 netmap.exe 的那台電腦也讀不到流量；現在本機一定會讀網卡流量</li></ul></div>
 <div class="clog"><div class="v"><b>v3.0　右側分頁、無線連線、抓出 Wi-Fi 設備</b><span class="tag">2026-11-07</span><span class="tag">netmap.exe 1.8.0</span></div><ul><li>右側分成「設備資訊」與「網路流量」兩個分頁，分頁上的燈號顯示監控狀態；埠也分成「埠設定」與「網路流量」</li><li>新增無線連線：手機、筆電可設成用 Wi-Fi 連到 AP 或路由器（2.4G／5G／6G），畫成虛線並標頻段，查線、故障查線、影響範圍都會經過</li><li>用 SSH 監控的路由器會列出連在它上面的設備（有線／無線、頻段、名稱、訊號），一鍵把無線設備套用到圖上</li><li>設備的編輯／刪除按鈕移到名稱下方，不再擋住埠與線</li><li>新增「手機」設備種類</li></ul></div>
 <div class="clog"><div class="v"><b>v2.9.3　數字鍵盤可以輸入「.」</b><span class="tag">2026-11-07</span><span class="tag">netmap.exe 1.7.3</span></div><ul><li>netmap.exe 所有輸入框都能用鍵盤右邊數字鍵的「.」輸入 IP</li></ul></div>
@@ -787,7 +800,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 <div class="clog"><div class="v"><b>v1.0　第一版</b><span class="tag">2026-11-06</span></div><ul><li>防火牆、Switch、配線架、資訊座埠對埠接線，點埠追蹤整條路徑</li><li>產業範例與自動排版</li></ul></div>
 </section>
 
-<p class="foot">機房線路對應圖 · 網頁 v3.1.0 · netmap.exe v1.9.0 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">機房線路對應圖 · 網頁 v3.1.1 · netmap.exe v1.9.1 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>

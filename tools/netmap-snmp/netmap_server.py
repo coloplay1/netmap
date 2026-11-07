@@ -30,7 +30,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.9.0"
+VERSION = "1.9.1"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -125,7 +125,7 @@ DEFAULT_SETTINGS = {"port": 8080, "interval": 60, "retention_days": 7, "lan_edit
                     "flow_enabled": False, "flow_port": 2055, "sflow_port": 6343,
                     "ping_enabled": True, "ping_interval": 30, "ping_fails": 2, "ping_slow_ms": 200, "ping_timeout": 1.0,
                     "alerts": {"enabled": False, "site": "", "on": {"down": True, "recover": True, "port": True, "slow": False, "snmp": False, "newdev": False, "gone": False}, "channels": []},
-                    "admin_hash": "", "view_token": "", "view_required": False, "inv_enabled": True, "inv_gone_hours": 24,
+                    "admin_hash": "", "view_token": "", "view_required": False, "inv_enabled": True, "inv_gone_hours": 24, "snmp_autoprobe": True,
                     "snmp": {"version": "2c", "community": "", "user": "", "auth_proto": "SHA", "auth_key": "", "priv_proto": "AES", "priv_key": "",
                              "context": "", "port": 161, "timeout": 2.0, "retries": 1}}
 
@@ -344,7 +344,10 @@ class Store:
         """items: [{mac, ip, name, wireless, via}]。回傳事件清單（新設備、IP 變更）。第一次收到資料時當作基準，不發「新設備」。"""
         now = int(time.time()); evs = []
         with s.lock:
-            baseline = not s.db.execute("SELECT 1 FROM seen LIMIT 1").fetchone()
+            # 第一次從某個來源（某台路由器、某台 Switch）讀到的清單當作基準，不算「新加入」
+            srcs = s.settings.setdefault("inv_sources", [])
+            baseline = not s.db.execute("SELECT 1 FROM seen LIMIT 1").fetchone() or (src and src not in srcs)
+            if src and src not in srcs: srcs.append(src); s.save_settings()
             for it in items:
                 mac = norm_mac(it.get("mac"))
                 if not mac: continue
@@ -500,12 +503,42 @@ def far_ends(project):
     return out, owner, port
 
 
+PROBE_EVERY = 3600
+PROBE_END_KINDS = {"伺服器", "NAS", "NVR 錄影主機", "印表機"}
+
+def probe_candidates(project, self_set):
+    """還沒有 SNMP 監控、但可能有 SNMP 的設備：網路設備，以及伺服器、NAS、NVR、印表機。"""
+    out = []
+    for d in project.get("devices", []):
+        ip = str(d.get("ip") or "").strip()
+        if not ip or not re.match(r"^[\w.\-]+$", ip) or ip in self_set: continue
+        if (d.get("snmp") or {}).get("host") or (d.get("sshmon") or {}).get("host") or d.get("snmp_probe") is False: continue
+        net = d.get("type") in MONITOR_TYPES
+        if net and d.get("monitor") is not False: continue            # 已經在輪詢清單裡
+        if not net and not (d.get("type") == "end" and d.get("kind") in PROBE_END_KINDS): continue
+        out.append(d)
+    return out
+
+def snmp_ports(cli):
+    """讀實體介面：[(ifIndex, 標籤, 種類, 原始名稱)]。"""
+    names = ns.by_index(cli.walk(ns.IF_NAME), ns.IF_NAME); descr = ns.by_index(cli.walk(ns.IF_DESCR), ns.IF_DESCR)
+    types = ns.by_index(cli.walk(ns.IF_TYPE), ns.IF_TYPE); speeds = ns.by_index(cli.walk(ns.IF_HSPEED), ns.IF_HSPEED)
+    out = []
+    for i in sorted(set(names) | set(descr), key=lambda x: int(x) if str(x).isdigit() else 0):
+        n = ns.s_(names.get(i)) or ns.s_(descr.get(i))
+        it = {"name": n, "descr": ns.s_(descr.get(i)), "type": int(types.get(i) or 0), "speed": int(speeds.get(i) or 0) * 1_000_000}
+        if n and ns.is_phys(it): out.append((i, ns.port_label(n), ns.port_kind(it), n))
+    return out
+
+
 class Poller:
     def __init__(s, store, log=print, emit=None):
         s.store, s.log = store, log
         s.emit = emit or (lambda ev: None)
         s.arp = {}           # host → 上次讀 ARP 表的時間
         s.inv_t = 0          # 上次整理「網路上的設備」的時間
+        s.probe_t = time.time() - PROBE_EVERY + 90   # 啟動 1～2 分鐘後先試一次 SNMP
+        s.probe_force = False; s.probe_last = {"ts": 0, "tried": 0, "found": []}
         s.status = {"ts": 0, "devices": {}, "ports": {}}
         s.prev = {}          # (host, ifIndex) → (t, in, out, ierr, oerr)
         s.ifmaps = {}        # host → (time, {label → ifIndex})
@@ -689,6 +722,10 @@ class Poller:
         except Exception as e: s.log(f"事件判斷錯誤：{e}")
         try: s.inventory(inv)
         except Exception as e: s.log(f"設備清單錯誤：{e}")
+        if s.store.settings.get("snmp_autoprobe", True) and (s.probe_force or time.time() - s.probe_t > PROBE_EVERY):
+            s.probe_force = False; s.probe_t = time.time()
+            try: s.autoprobe(opts)
+            except Exception as e: s.log(f"自動偵測 SNMP 錯誤：{e}")
         s.last_cycle = time.time(); s.cycle_secs = round(time.time() - t0, 2)
         down = [d for d in devs.values() if not d["up"]]
         s.log(f"輪詢完成：{len(devs)} 台設備（{len(down)} 台沒回應）、{len(ports)} 個埠，{s.cycle_secs} 秒")
@@ -727,6 +764,63 @@ class Poller:
             for ev in s.store.seen_gone(int(st.get("inv_gone_hours") or 24), known): s.emit(ev)
         for src, items in inv:
             for ev in s.store.seen_update(items, src): s.emit(ev)
+
+    def autoprobe(s, opts):
+        """用已設定的 SNMP 帳密試圖上還沒監控的設備；有回應就開始監控，並用設備回報的介面補上埠號。"""
+        cands = probe_candidates(s.store.project, self_ips())
+        s.probe_last = {"ts": int(time.time()), "tried": len(cands), "found": []}
+        if not cands: return
+        def try_one(d):
+            cli = None
+            try:
+                cli = ns.make_client(opts, d["ip"].strip(), quick=True)
+                r = cli.get([ns.SYS["name"], ns.SYS["descr"]])
+                if not r: return None
+                ports = []
+                try: ports = snmp_ports(cli)
+                except Exception: pass
+                return {"name": ns.s_(r.get(ns.SYS["name"])), "descr": ns.s_(r.get(ns.SYS["descr"])), "ports": ports}
+            except Exception:
+                return None
+            finally:
+                try: cli and cli.close()
+                except Exception: pass
+        with ThreadPoolExecutor(max_workers=min(16, len(cands))) as ex:
+            res = dict(zip([d["id"] for d in cands], ex.map(try_one, cands)))
+        hits = {k: v for k, v in res.items() if v}
+        if not hits: return
+        with s.store.lock: proj = json.loads(json.dumps(s.store.project))
+        cabled = {x for c in proj.get("cables", []) for x in (c.get("a"), c.get("b"))}
+        found = []
+        for d in proj.get("devices", []):
+            h = hits.get(d["id"])
+            if not h: continue
+            d["snmp"] = {"host": d["ip"].strip()}; d.pop("monitor", None)
+            ports = d.setdefault("ports", []); added = mapped = 0
+            if h["ports"]:
+                by = {}
+                for p in ports:
+                    for k in (str(p.get("label", "")).lower(), str(p.get("ifName", "")).lower()): by.setdefault(k, p)
+                used = set()
+                for ix, lab, kind, raw in h["ports"]:
+                    p = by.get(lab.lower()) or by.get(raw.lower()) or by.get(ns.short_if(raw).lower())
+                    if p and p["id"] not in used: p["ifIndex"] = ix; used.add(p["id"]); mapped += 1; continue
+                    ports.append({"id": ns.nid("p"), "label": lab, "kind": kind, "poe": False, "mode": "access", "vlan": "", "tagged": "", "lag": "", "note": raw if raw != lab else "", "ifIndex": ix}); added += 1
+                # 網段探索建立的「WAN／ETH1」這類佔位埠：沒接線又對不上就拿掉
+                ports[:] = [p for p in ports if p.get("ifIndex") not in (None, "") or p["id"] in cabled or p.get("side") is not None]
+            if h["descr"] and not d.get("model"):
+                br = ns.brand_of({"sysDescr": h["descr"]})
+                if br and not d.get("brand"): d["brand"] = br
+            nm = h["name"] if re.match(r"^(\d+\.){3}\d+$", h["name"] or "") else (h["name"] or "").split(".")[0]
+            if nm and re.match(r"^(\d+\.){3}\d+$|^(路由器|AP|Switch|設備)\b", d.get("name", "")): d["name"] = nm[:40]
+            unm = [p for p in ports if p["id"] in cabled and p.get("ifIndex") in (None, "")]
+            found.append({"dev": d["id"], "name": d.get("name"), "ip": d["ip"], "ports": len(h["ports"]), "added": added, "mapped": mapped, "unmapped": len(unm)})
+        s.store.set_project(proj, None, "自動偵測 SNMP", f"自動偵測到 SNMP：{'、'.join(f['name'] for f in found)}")
+        s.ifmaps.clear(); s.probe_last["found"] = found
+        for f in found:
+            s.emit({"kind": "snmp_found", "dev": f["dev"], "name": f["name"], "ip": f["ip"], "ts": int(time.time()),
+                    "detail": f"讀到 {f['ports']} 個埠" + (f"，新增 {f['added']} 個" if f["added"] else "") + (f"；有 {f['unmapped']} 個已接線的埠對不上，請在設備屬性改成設備上的埠名稱，或重新掃描" if f["unmapped"] else "")})
+        s.wake.set()
 
     def run(s):
         s.running = True
@@ -961,6 +1055,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
             if not sv: return s._send(500, {"error": "no service"})
             res = sv.notifier.deliver([{"kind": "test", "name": "netmap", "ts": int(time.time()), "detail": f"來自 {socket.gethostname()}，通知設定正常"}], only=body.get("id"))
             return s._send(200, {"results": res})
+        if path == "/api/snmp/probe":
+            if not s.is_admin(): return s._send(403, {"error": "需要管理員權限"})
+            s.server.poller.probe_force = True; s.server.poller.wake.set()
+            return s._send(200, {"ok": True, "candidates": len(probe_candidates(st.project, self_ips()))})
         if path == "/api/ping/now":
             if sv: sv.pinger.wake.set()
             return s._send(200, {"ok": True})
@@ -1023,6 +1121,7 @@ class Service:
         return {"ping_enabled": st.get("ping_enabled", True), "ping_interval": st.get("ping_interval", 30), "ping_fails": st.get("ping_fails", 2),
                 "ping_slow_ms": st.get("ping_slow_ms", 200), "ping_method": na.ping_method(),
                 "inv_enabled": st.get("inv_enabled", True), "inv_gone_hours": st.get("inv_gone_hours", 24),
+                "snmp_autoprobe": st.get("snmp_autoprobe", True), "snmp_probe": dict(s.poller.probe_last, candidates=len(probe_candidates(s.store.project, self_ips())), next=int(s.poller.probe_t + PROBE_EVERY)),
                 "alerts": {"enabled": bool(a.get("enabled")), "site": a.get("site", ""), "on": a.get("on") or {}, "channels": chans},
                 "channel_types": {k: {"name": v["name"], "fields": [[f, l, sec] for f, l, sec in v["fields"]]} for k, v in na.CHANNELS.items()},
                 "auth": {"has_password": bool(st.get("admin_hash")), "view_required": bool(st.get("view_required")), "lan_edit": bool(st.get("lan_edit")),
@@ -1037,6 +1136,7 @@ class Service:
             if "ping_fails" in b: st["ping_fails"] = num(b["ping_fails"], 1, 20, 2)
             if "ping_slow_ms" in b: st["ping_slow_ms"] = num(b["ping_slow_ms"], 10, 10000, 200)
             if "inv_enabled" in b: st["inv_enabled"] = bool(b["inv_enabled"])
+            if "snmp_autoprobe" in b: st["snmp_autoprobe"] = bool(b["snmp_autoprobe"])
             if "inv_gone_hours" in b: st["inv_gone_hours"] = num(b["inv_gone_hours"], 1, 24 * 90, 24)
             if "lan_edit" in b: st["lan_edit"] = bool(b["lan_edit"])
             if "view_required" in b: st["view_required"] = bool(b["view_required"])

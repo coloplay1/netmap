@@ -122,7 +122,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <li><a href="#save">9. 儲存、匯出與分享</a>
   <ol><li><a href="#s-history">歷史版本與還原</a></li><li><a href="#s-labels">線標列印</a></li></ol></li>
 <li><a href="#exe">10. netmap.exe（Windows 程式）</a>
-  <ol><li><a href="#e-install">下載與第一次開啟</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-detect">從線上版切換</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-ssh">SSH 流量監控</a></li><li><a href="#e-flow">誰在用流量</a></li><li><a href="#e-vendor">各廠牌設定教學</a></li><li><a href="#e-ping">心跳與事件</a></li><li><a href="#e-alert">告警通知</a></li><li><a href="#e-auth">管理密碼與檢視連結</a></li><li><a href="#e-seen">網路上的設備</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
+  <ol><li><a href="#e-install">下載與第一次開啟</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-autosnmp">自動偵測 SNMP</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-detect">從線上版切換</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-ssh">SSH 流量監控</a></li><li><a href="#e-flow">誰在用流量</a></li><li><a href="#e-vendor">各廠牌設定教學</a></li><li><a href="#e-ping">心跳與事件</a></li><li><a href="#e-alert">告警通知</a></li><li><a href="#e-auth">管理密碼與檢視連結</a></li><li><a href="#e-seen">網路上的設備</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
 <li><a href="#mobile">11. 手機操作</a></li>
 <li><a href="#keys">12. 快捷鍵</a></li>
 <li><a href="#faq">13. 常見問題</a></li>
@@ -394,6 +394,18 @@ code,td,li,p{overflow-wrap:anywhere}
 <h3 id="e-disc">網段探索（不需要 SNMP）</h3>
 <figure class="mid"><img src="manual/app-d2.jpg" alt="網段探索" loading="lazy"></figure>
 <p>在掃描分頁選「<b>網段探索</b>」，輸入網段（例如 <code>192.168.1.0/24</code>），程式用 ping 與 ARP 列出在線的設備，並依 MAC 判斷廠牌、依開啟的連接埠猜種類（印表機、NAS、攝影機…）。結果一樣可以帶入網頁，但因為沒有 SNMP，<b>不會有埠對埠的連線</b>，需要自己接線。</p>
+<h3 id="e-autosnmp">自動偵測 SNMP（不用重新掃描）</h3>
+<p>監控服務啟動後，每小時會用 netmap.exe 設定好的 SNMP 帳密，去試圖上<b>還沒有監控</b>的 Switch、路由器、防火牆、AP，以及伺服器、NAS、NVR、印表機。所以流程可以是：</p>
+<ol class="steps">
+<li>先用網段探索或手動把設備畫上圖，填好 IP。</li>
+<li>有空再到各台設備把 SNMP 打開（community 或 SNMPv3 帳密要和 netmap.exe 一樣）。</li>
+<li>下一次偵測時（最多一小時，或在監控網頁按 <b>檔案 ▸ 告警、心跳與權限設定 ▸ 心跳與設備偵測 ▸ 現在偵測一次</b>），有回應的設備就會自動開始監控：補上設備回報的實體埠與埠號、把 IP 名稱改成設備名稱，並記一筆「開始 SNMP 監控」事件。</li>
+</ol>
+<ul>
+<li>原本圖上已有、名稱一樣的埠會直接對應；網段探索建立的「WAN」「ETH1」這類佔位埠，沒接線的會拿掉。已接線但對不上的埠會留著，事件裡會提醒你改成設備上的埠名稱（或重新掃描一次）。</li>
+<li>LLDP／CDP 的鄰居關係（誰接誰）仍然要用 <b>SNMP 掃描</b> 才會畫出來；自動偵測只負責「開始監控」。</li>
+<li>不想要的話，在同一個設定頁取消勾選「自動偵測 SNMP」。</li>
+</ul>
 
 <h3 id="e-srv">監控服務與即時流量</h3>
 <figure class="mid"><img src="manual/app-g2.jpg" alt="監控服務分頁" loading="lazy"></figure>
@@ -570,7 +582,7 @@ __VENDORS__
 <figure><img src="manual/seen.jpg" alt="網路上的設備" loading="lazy"></figure>
 <ul>
 <li>資料來源：路由器、防火牆、L3 Switch 的 ARP 表（有 SNMP 的話，每 10 分鐘讀一次）、SSH 監控路由器的用戶端清單，以及 netmap.exe 那台電腦自己的 ARP 表。</li>
-<li>第一次讀到的那批當作原本就在；之後出現的才算 <b>新加入</b>，同一台 IP 改變會記成 <b>IP 變更</b>。要收到通知，在告警設定勾「新設備加入網路」。</li>
+<li>每個來源（每台路由器、Switch）第一次讀到的那批當作原本就在；之後出現的才算 <b>新加入</b>，同一台 IP 改變會記成 <b>IP 變更</b>。要收到通知，在告警設定勾「新設備加入網路」。</li>
 <li><b>不在圖上</b>：圖上沒有這個 MAC 或 IP 的設備，按 <b>加到圖上</b> 會建一台終端設備（名稱、廠牌、IP、MAC 自動帶入），再接線或設成無線即可。</li>
 <li><b>很久沒出現</b>：超過設定的時數（預設 24 小時）沒看到。圖上有填 MAC 的設備很久沒出現時可以發通知，適合盤點壞掉或被搬走的設備。</li>
 <li>手機常用「隨機 MAC」（廠牌顯示「隨機 MAC」），換個 Wi-Fi 或過一段時間 MAC 就會變，可能被當成新設備。</li>

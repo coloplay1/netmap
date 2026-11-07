@@ -1,8 +1,8 @@
 {
- "web": "3.1.0",
- "exe": "1.9.0",
+ "web": "3.1.1",
+ "exe": "1.9.1",
  "date": "2026-11-07",
- "title": "心跳告警、歷史版本、權限、線標、多頁面、光纖束",
+ "title": "自動偵測 SNMP",
  "download": "https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe",
  "notes": "https://coloplay1.github.io/netmap/manual.html#changelog"
 }
