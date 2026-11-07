@@ -25,7 +25,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.8.0"
+VERSION = "1.8.1"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -329,11 +329,12 @@ class Poller:
     def targets(s):
         out = []
         for d in s.store.project.get("devices", []):
-            if d.get("monitor") is False: continue
             if (d.get("sshmon") or {}).get("host"):
                 out.append((d, "ssh://" + d["sshmon"]["host"])); continue
+            # 跑 netmap.exe 的這台電腦：直接讀網卡，不需要 SNMP（網段探索建立的設備即使標成不監控也照樣讀）
             if not (d.get("snmp") or {}).get("host") and d.get("ip") and s.store.settings.get("monitor_self", True) and d["ip"] in self_ips():
-                out.append((d, "local://" + d["ip"])); continue      # 跑 netmap.exe 的這台電腦：直接讀網卡，不需要 SNMP
+                out.append((d, "local://" + d["ip"])); continue
+            if d.get("monitor") is False: continue
             host = (d.get("snmp") or {}).get("host") or (d.get("ip") if d.get("type") in MONITOR_TYPES else "")
             host = (host or "").strip()
             if host and re.match(r"^[\w.\-]+(:\d+)?$", host): out.append((d, host))
