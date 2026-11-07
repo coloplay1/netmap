@@ -49,9 +49,12 @@ jobs:
         working-directory: tools/netmap-snmp
         run: |
           python -c "import time,tempfile,netmap_flow as F,netmap_vendors as V; c=F.FlowCollector(tempfile.mkdtemp(),19055,19343); print(c.start()); [F.send_test('127.0.0.1',19343 if k=='sflow' else 19055,k) for k in ('v5','v9','ipfix','sflow')]; time.sleep(1.5); st=c.status(); print([(e['addr'],e['fmt'],e['flows']) for e in st['exporters']]); t=c.top(60); print(len(t['hosts']),t['total']); assert len(t['hosts'])>=5 and t['total']['rx']>0; c.stop(); assert len(V.VENDORS)>20; print('vendors',len(V.VENDORS)); import netmap_server as S; n=S.local_nics(); print('nics',list(n)); assert n; print('self ips',S.self_ips())"
+      - name: Self-test ping, alerts, history and permissions
+        working-directory: tools/netmap-snmp
+        run: python selftest_ops.py
       - name: Build netmap.exe (window app)
         working-directory: tools/netmap-snmp
-        run: pyinstaller --onefile --windowed --name netmap --icon netmap.ico --collect-all pysnmp --add-data "web/index.html;web" --add-data "netmap.ico;." --add-data "netmap.png;." --add-data "oui.json.gz;." --hidden-import paramiko --hidden-import netmap_collect --hidden-import netmap_sshmon --hidden-import netmap_flow --hidden-import netmap_vendors --hidden-import psutil netmap_app.py
+        run: pyinstaller --onefile --windowed --name netmap --icon netmap.ico --collect-all pysnmp --add-data "web/index.html;web" --add-data "netmap.ico;." --add-data "netmap.png;." --add-data "oui.json.gz;." --hidden-import paramiko --hidden-import netmap_collect --hidden-import netmap_sshmon --hidden-import netmap_flow --hidden-import netmap_vendors --hidden-import netmap_alert --hidden-import psutil netmap_app.py
       - name: Build netmap-snmp.exe (command line)
         working-directory: tools/netmap-snmp
         run: pyinstaller --onefile --console --name netmap-snmp --icon netmap.ico --collect-all pysnmp --add-data "oui.json.gz;." netmap_snmp.py

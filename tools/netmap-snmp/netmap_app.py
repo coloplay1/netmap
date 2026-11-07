@@ -399,7 +399,7 @@ class App:
         ttk.Label(r1, text="詳細紀錄保留（天）").pack(side="left"); ttk.Spinbox(r1, from_=1, to=90, textvariable=s.v_keep, width=5).pack(side="left", padx=(6, 0))
         ttk.Label(r1, text="（MRTG 流量圖另外保存約 2 年）", style="Muted.TLabel").pack(side="left", padx=(6, 0))
         r2 = ttk.Frame(cfg); r2.pack(fill="x", pady=(8, 0))
-        ttk.Checkbutton(r2, text="允許內網其他電腦編輯圖（不勾＝其他電腦只能看）", variable=s.v_lan, command=s.save_service_cfg).pack(side="left")
+        ttk.Checkbutton(r2, text="允許內網其他電腦編輯圖（不勾＝只能看；設了管理密碼就要先登入）", variable=s.v_lan, command=s.save_service_cfg).pack(side="left")
         ttk.Checkbutton(r2, text="讓線上版網頁偵測到這個程式", variable=s.v_detect, command=s.save_service_cfg).pack(side="left", padx=(18, 0))
         ttk.Label(r2, text="（只回答版本與網頁埠，只限這台電腦）", style="Muted.TLabel").pack(side="left", padx=(4, 0))
         r3 = ttk.Frame(cfg); r3.pack(fill="x", pady=(4, 0))
@@ -413,7 +413,7 @@ class App:
         s.v_svcfoot = tk.StringVar(value="尚未輪詢"); ttk.Label(fr, textvariable=s.v_svcfoot, style="Muted.TLabel", wraplength=840).pack(side="bottom", anchor="w", pady=(6, 0))
         cols = ("name", "host", "state", "ports", "traffic")
         s.tree = ttk.Treeview(fr, columns=cols, show="headings", height=8)
-        for k, t, w in (("name", "設備", 200), ("host", "監控方式／位址", 170), ("state", "狀態", 110), ("ports", "埠（上線／離線）", 140), ("traffic", "最忙的埠", 240)):
+        for k, t, w in (("name", "設備", 200), ("host", "監控方式／位址", 170), ("state", "狀態", 190), ("ports", "埠（上線／離線）", 140), ("traffic", "最忙的埠", 200)):
             s.tree.heading(k, text=t); s.tree.column(k, width=w, anchor="w")
         s.tree.pack(fill="both", expand=True, pady=(10, 0))
         s.tree.tag_configure("down", foreground="#b42318"); s.tree.tag_configure("up", foreground="#1a7f37")
@@ -542,6 +542,8 @@ class App:
                     l.bind("<Button-1>", lambda e, u=u: webbrowser.open(u))
                 ttk.Button(s.url_box, text="複製", command=lambda: (s.root.clipboard_clear(), s.root.clipboard_append(s.service.urls()[0]))).pack(side="left")
                 ttk.Button(s.url_box, text="流量圖（MRTG）", command=lambda: webbrowser.open(s.local_url() + "#mrtg=all")).pack(side="left", padx=(8, 0))
+                ttk.Button(s.url_box, text="告警、密碼與檢視連結…", command=lambda: webbrowser.open(s.local_url() + "#settings=1")).pack(side="left", padx=(8, 0))
+                ttk.Button(s.url_box, text="事件", command=lambda: webbrowser.open(s.local_url() + "#events=1")).pack(side="left", padx=(8, 0))
             else:
                 ttk.Label(s.url_box, text="（服務未啟動）", style="Muted.TLabel").pack(side="left")
             stat = s.service.poller.status; devs = {d["id"]: d for d in s.store.project.get("devices", [])}
@@ -557,6 +559,9 @@ class App:
                 if busy and busy.get("util") is not None:
                     bt = f"{busy['util']:.0%}　↓{fmt_bps(busy.get('in'))} ↑{fmt_bps(busy.get('out'))}"
                 state = "等待輪詢" if not ds else ("正常" if ds["up"] else ds.get("err") or "沒有回應")
+                pg = s.service.pinger.snapshot().get(d["id"])
+                if pg and pg.get("rtt") is not None: state += f"　Ping {pg['rtt']:.0f} ms"
+                elif pg and pg.get("st") == "down": state += "　Ping 不通"
                 shown = ("SSH " + host[6:]) if host.startswith("ssh://") else ("本機網卡 " + host[8:]) if host.startswith("local://") else ("SNMP " + host)
                 s.tree.insert("", "end", iid=d["id"], values=(d.get("name", ""), shown, state, f"{upn} ／ {dn}" if ps else "—", bt), tags=(("up" if ds and ds["up"] else "down") if ds else (),))
             sel = [i for i in keep if s.tree.exists(i)]

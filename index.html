@@ -1045,6 +1045,81 @@ svg.wires .cab.lv-down .vis{stroke:var(--danger)!important;stroke-dasharray:3 6!
 .helplinks{display:flex;gap:8px;margin-top:10px}.helplinks a{text-decoration:none;color:inherit}
 
 .actions a.btn,.dlrow a.btn{text-decoration:none;color:var(--ink)}.actions a.btn.primary,.dlrow a.btn.primary{color:#fff}
+/* ---- 3.1 additions ---- */
+.c-warn{color:var(--warn)}.c-none{color:var(--muted)}
+#hint.pvb button+button{margin-left:6px}
+.pagebar{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:30;display:flex;gap:4px;align-items:center;padding:4px;border-radius:999px;background:var(--panel-a);border:1px solid var(--line);box-shadow:0 6px 18px rgba(0,0,0,.18);max-width:calc(100% - 40px);overflow-x:auto;scrollbar-width:none}
+.pagebar button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:12.5px;font-weight:700;padding:5px 12px;border-radius:999px;cursor:pointer;white-space:nowrap;display:inline-flex;gap:6px;align-items:center}
+.pagebar button:hover{background:var(--soft);color:var(--ink)}
+.pagebar .pgtab.on{background:var(--accent);color:var(--on-accent)}
+.pagebar .pgtab small{font-size:10.5px;opacity:.75;font-weight:700}
+.pagebar .pgadd{color:var(--accent)}
+.pgtag{display:inline-block;margin-left:6px;font-size:10.5px;font-weight:800;padding:0 7px;border-radius:999px;background:var(--accent-soft);color:var(--accent);vertical-align:1px}
+.pglist{display:flex;flex-direction:column;gap:6px;margin:10px 0}.pgrow{display:flex;gap:6px;align-items:center}.pgrow input{flex:1;min-width:0}.pgrow small{color:var(--muted);white-space:nowrap}
+#wires .offpg{cursor:pointer;pointer-events:all}
+#wires .offpg rect{fill:var(--panel);stroke:var(--accent);stroke-width:1.5}
+#wires .offpg text{fill:var(--ink);font-size:11.5px;font-weight:700;font-family:var(--f-body);stroke:none}
+#wires .offpg .oparr{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#wires .offpg:hover rect,#wires .offpg.hot rect{fill:var(--accent-soft)}
+#wires .offstub{fill:none;stroke:var(--accent);stroke-width:2;stroke-dasharray:4 4;opacity:.8}
+#wires .offstub.hot{stroke-width:3;opacity:1}
+#wires .bundle .vis{stroke-width:var(--w);stroke-linecap:round;opacity:.92}
+#wires .bundle .bstub{fill:none;stroke-width:1.6;opacity:.55}
+#wires .bundle.trunk .core{fill:none;stroke:rgba(255,255,255,.55);stroke-width:1.2;stroke-dasharray:1 5;stroke-linecap:round;pointer-events:none}
+#wires .bundle.dim{opacity:.25}#wires .bundle.hot .vis{filter:drop-shadow(0 0 4px var(--accent))}
+#wires .bundle{cursor:pointer}
+#wires .bundle .hit{stroke-width:calc(var(--w) + 12px)}
+#wires .blbl{cursor:pointer;pointer-events:all}
+#wires .blbl rect{stroke:var(--line2)}
+.btbl{width:100%;border-collapse:collapse;font-size:12.5px;min-width:0}.btbl th{text-align:left;font-size:11px;color:var(--muted);font-weight:700;padding:6px 8px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel)}
+.btbl td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}.btbl td small{display:block;color:var(--muted);font-size:11px}.btbl tr[data-pickc]{cursor:pointer}.btbl tr[data-pickc]:hover td{background:var(--soft)}
+.tblwrap{max-height:min(56vh,520px);overflow:auto;border:1px solid var(--line);border-radius:10px;margin:8px 0}
+.btbl .tube{color:var(--muted);font-size:11px}
+.fdot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:-1px;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.tkrow{display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;text-align:left;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:6px 0;color:var(--ink);cursor:pointer;font:inherit}
+.tkrow b{font-size:13px}.tkrow small{color:var(--muted);font-size:11.5px}
+.pdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-left:5px;vertical-align:1px;box-shadow:0 0 0 2px var(--bg)}
+.pdot.ok{background:var(--ok)}.pdot.warn{background:var(--warn)}.pdot.bad{background:var(--danger);animation:pdblink 1.4s infinite}.pdot.none{background:var(--muted)}
+@keyframes pdblink{50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.pdot.bad{animation:none}}
+.dlabel .pdot{margin:0 6px 0 0;vertical-align:1px}
+.pspark{margin-top:8px}.devev{margin-top:8px}.devev .label{display:block;margin-bottom:4px}
+.evbtn{position:relative;padding:0 9px}.evbtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.evbtn b{position:absolute;top:-5px;right:-5px;min-width:16px;height:16px;border-radius:8px;background:var(--danger);color:#fff;font-size:10px;line-height:16px;text-align:center;padding:0 4px;display:none}
+.evbtn.has b{display:block}
+.evlist{max-height:min(60vh,560px);overflow:auto;margin:10px 0;border:1px solid var(--line);border-radius:10px}
+.evrow{display:grid;grid-template-columns:10px 1fr auto;gap:10px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line);font-size:13px}
+.evrow:last-child{border-bottom:0}.evrow i{width:9px;height:9px;border-radius:50%}.evrow small{color:var(--muted);font-size:11.5px;white-space:nowrap}
+.evrow[data-evdev]{cursor:pointer}.evrow[data-evdev]:hover{background:var(--soft)}
+.devev .evrow{padding:5px 0;font-size:12px;border-bottom:0}
+.evseg{margin-top:6px;flex-wrap:wrap}
+.settabs{margin:8px 0 12px}.settabs button[aria-selected="true"]{background:var(--accent);color:var(--on-accent)}
+.stab .label{display:block;margin:12px 0 6px}
+.checkrow.big{font-weight:700;margin:6px 0}
+.chrow{display:grid;grid-template-columns:auto 1fr auto auto auto;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:10px;margin-bottom:6px}
+.chrow small{display:block;color:var(--muted);font-size:11.5px}
+.vlink{display:flex;gap:6px;margin:4px 0}.vlink input{flex:1;min-width:0;font-family:ui-monospace,Consolas,monospace;font-size:12px}
+.revlist{max-height:min(58vh,560px);overflow:auto;display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.revrow{border:1px solid var(--line);border-radius:10px;padding:8px 12px}.revrow.cur{border-color:var(--accent)}
+.revrow .rh{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}.revrow .rh span{font-size:12.5px}.revrow .rh small{color:var(--muted)}
+.revrow .rs{font-size:13px;margin:3px 0}.revrow .ra{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.revdet{margin:2px 0 0;padding-left:18px;font-size:12px;color:var(--muted)}
+.field.rowin{max-width:320px}
+.btbl.seen tr.gone td{opacity:.7}.btbl .onmap{color:var(--accent)!important}
+#ppick{position:fixed;z-index:200;background:var(--panel);border:1px solid var(--line2);border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.35);padding:10px 12px 12px;max-width:calc(100vw - 16px);overflow-x:auto}
+#ppick .pph{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}#ppick .pph small{color:var(--muted);font-size:11.5px}
+#ppick .ppx{margin-left:auto;border:0;background:transparent;color:var(--muted);font-size:20px;line-height:1;cursor:pointer;padding:0 4px}
+#ppick .pprow{display:flex;gap:8px;align-items:center;margin-top:4px}#ppick .pprow>span{font-size:11px;color:var(--muted);font-weight:700;width:30px;flex:none}
+#ppick .pprow>div{display:flex;gap:4px}
+#ppick [data-pp]{min-width:38px;height:38px;border-radius:8px;border:1.5px solid var(--line2);background:var(--soft);color:var(--ink);font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;padding:0 6px}
+#ppick [data-pp].used{border-color:var(--c);box-shadow:inset 0 -4px 0 var(--c)}
+#ppick [data-pp].hit{outline:2px solid var(--accent);outline-offset:1px}
+#ppick [data-pp]:hover,#ppick [data-pp]:focus-visible{background:var(--accent);color:var(--on-accent)}
+#bAuth{margin-right:4px}
+.modal .field input,.modal .field select,.modal .field textarea{box-sizing:border-box}
+#chType,#lbEnc,.vlink input,.pgrow input{height:34px;border:1px solid var(--line);background:var(--soft);color:var(--ink);border-radius:10px;padding:0 10px;font:inherit;font-size:13px;box-sizing:border-box}
+#chType:focus,#lbEnc:focus,.pgrow input:focus{outline:none;border-color:var(--accent)}
+@media (max-width:700px){.chrow{grid-template-columns:auto 1fr;}.pagebar{bottom:auto;top:calc(118px + env(safe-area-inset-top,0px))}}
 </style>
 </head>
 <body>
@@ -1052,7 +1127,7 @@ svg.wires .cab.lv-down .vis{stroke:var(--danger)!important;stroke-dasharray:3 6!
 <div class="banner" id="banner" hidden></div>
 <div class="main" id="main">
   <div class="stagewrap" id="stagewrap">
-    <div class="stage" id="stage"><div class="sizer" id="sizer"><div class="canvas" id="canvas"><svg class="wires" id="wires"></svg><div id="devs"></div><svg class="tmp" id="tmp"></svg><svg class="pairh" id="pairhint" aria-hidden="true"></svg></div></div></div>
+    <div class="pagebar" id="pagebar" hidden></div><div class="stage" id="stage"><div class="sizer" id="sizer"><div class="canvas" id="canvas"><svg class="wires" id="wires"></svg><div id="devs"></div><svg class="tmp" id="tmp"></svg><svg class="pairh" id="pairhint" aria-hidden="true"></svg></div></div></div>
     <aside class="left fl hud" id="left" aria-label="設備"><div class="phd"><span class="grip" data-grip="left" title="拖曳移動" aria-label="拖曳移動設備列">⋮⋮</span><button class="pcol" data-pcol="left" title="收合 / 展開" aria-label="收合或展開設備列">–</button></div><span class="plabel"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>設備</span><div class="pal" id="types"></div></aside>
     <div class="legend fl hud" id="legend" hidden></div>
     <div class="emptyc fl" id="emptyc" hidden><b>畫布是空的</b><span>從左側把設備拖進來，或</span><div class="actions"><button class="btn primary" id="eStart">開始頁：新增 / 匯入 / 範例</button></div></div>
@@ -1065,7 +1140,7 @@ svg.wires .cab.lv-down .vis{stroke:var(--danger)!important;stroke-dasharray:3 6!
         <div class="popwrap"><button class="dbtn" data-popbtn="popColor" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="8" cy="10" r="1.3"/><circle cx="12" cy="7.5" r="1.3"/><circle cx="16" cy="10" r="1.3"/><path d="M12 21a3 3 0 0 1 0-6h2"/></svg>線色</button>
           <div class="pop up" id="popColor" hidden><span class="label">線條顏色</span><div id="cableLegend" class="clg"></div><div class="seg" role="group" aria-label="線條顏色"><button data-cmode="custom">自訂</button><button data-cmode="type">依線材</button><button data-cmode="vlan">依 VLAN</button></div><p class="hint">依線材：單模光纖黃、多模水藍、DAC 粗黑、Console 淺藍虛線。依 VLAN：Trunk 為深灰虛線。</p></div></div>
         <div class="popwrap"><button class="dbtn" data-popbtn="popRoute" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><path d="M4 20h6V8h10"/><circle cx="4" cy="20" r="1.5"/><circle cx="20" cy="8" r="1.5"/></svg>走線</button>
-          <div class="pop up" id="popRoute" hidden><span class="label">走線方式</span><div class="seg" role="group" aria-label="走線方式"><button data-route="curve">曲線</button><button data-route="ortho">直角（自動分道）</button></div><span class="label">排列</span><button class="btn" id="bLayout"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="6" rx="1.5"/><rect x="14" y="3" width="7" height="6" rx="1.5"/><rect x="8.5" y="15" width="7" height="6" rx="1.5"/><path d="M6.5 9v3h11V9M12 12v3"/></svg>依連線自動排列設備</button></div></div>
+          <div class="pop up" id="popRoute" hidden><span class="label">走線方式</span><div class="seg" role="group" aria-label="走線方式"><button data-route="curve">曲線</button><button data-route="ortho">直角（自動分道）</button></div><label class="tog"><input type="checkbox" id="optBundle">平行線收成一條（同一對設備 2 條以上）</label><label class="tog"><input type="checkbox" id="optPick">埠太小時點一下放大選埠（48 埠設備、縮小畫面、平板）</label><span class="label">排列</span><button class="btn" id="bLayout"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="6" rx="1.5"/><rect x="14" y="3" width="7" height="6" rx="1.5"/><rect x="8.5" y="15" width="7" height="6" rx="1.5"/><path d="M6.5 9v3h11V9M12 12v3"/></svg>依連線自動排列設備</button></div></div>
         <div class="popwrap"><button class="dbtn" data-popbtn="popView" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>顯示圖層</button>
           <div class="pop up" id="popView" hidden>
             <span class="label">線路顯示</span>
@@ -1118,7 +1193,7 @@ svg.wires .cab.lv-down .vis{stroke:var(--danger)!important;stroke-dasharray:3 6!
   <div class="tmid">
     <label class="searchbox"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg><input class="search" id="q" type="search" placeholder="搜尋設備、IP 或線號…" aria-label="搜尋"><span class="qcount" id="qcount" hidden><span id="qn"></span><button type="button" id="qfocus">對焦</button></span></label>
   </div>
-  <div class="tright"><span class="livechip" id="liveChip" hidden></span><button class="livebtn" id="bMrtg" hidden title="MRTG 流量圖：每個埠的日／週／月／年流量" aria-label="流量圖"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg><span class="lt">流量圖</span></button>
+  <div class="tright"><span class="livechip" id="liveChip" hidden></span><button class="livebtn" id="bMrtg" hidden title="MRTG 流量圖：每個埠的日／週／月／年流量" aria-label="流量圖"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg><span class="lt">流量圖</span></button><button class="livebtn evbtn" id="bEvents" hidden title="事件紀錄：斷線、恢復、新設備" aria-label="事件紀錄"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg><b id="evBadge"></b></button><button class="btn sm" id="bAuth" hidden>登入</button>
     <div class="seg modeseg" role="group" aria-label="模式"><button id="mEdit" aria-pressed="true" title="可以接線、移動、修改"><i class="dot"></i>編輯</button><button id="mRo" aria-pressed="false" title="只能查線，不會誤觸拔線"><svg class="i" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>唯讀</button></div>
     <div class="popwrap"><button class="ibtn" data-popbtn="popPanels" aria-expanded="false" title="面板：顯示、收合、重設位置" aria-label="面板設定"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 4v16M3 15h5"/></svg></button>
       <div class="pop" id="popPanels" hidden><span class="label">顯示的面板</span><div class="togs" id="panelToggles" style="grid-template-columns:1fr"></div><span class="label">屬性面板</span><label class="tog"><input type="checkbox" id="autoDrawer">點設備時自動開啟</label><p class="hint">拖曳面板上的 ⋮⋮ 可以移動位置，按 – 收合。</p><button class="btn sm" id="panelReset">重設所有面板位置</button></div></div>
@@ -1139,6 +1214,13 @@ svg.wires .cab.lv-down .vis{stroke:var(--danger)!important;stroke-dasharray:3 6!
         <button data-file="lldp">匯入 LLDP / CDP 鄰居表…</button>
         <button data-file="share">分享連結 / QR Code…</button>
         <button data-file="jsonText">JSON 文字匯入 / 匯出…</button>
+        <hr>
+        <button data-file="history">歷史版本／還原…</button>
+        <button data-file="page">新增頁面（樓層、機房、分公司）…</button>
+        <button data-file="labels">線標列印（A4 / P-touch）…</button>
+        <button data-file="seen" data-srvonly hidden>網路上的設備（新加入／離線）…</button>
+        <button data-file="events" data-srvonly hidden>事件紀錄…</button>
+        <button data-file="settings" data-srvonly hidden>告警、心跳與權限設定…</button>
       </div></div></div>
     <input type="file" id="fileIn" accept=".json,application/json" hidden>
   </div>
@@ -1418,8 +1500,9 @@ const PUBLIC_URL='https://coloplay1.github.io/netmap/';
 /*VENDORS*/const VENDOR_GUIDE={"vendors":[{"id":"sonicwall","name":"SonicWall","kind":"防火牆（SonicOS 7）","match":["sonicwall"],"snmp":["Device ▸ Settings ▸ SNMP：勾選 Enable SNMP，在 View 設定唯讀 community「{COMM}」（或建立 SNMPv3 使用者）。","Network ▸ System ▸ Interfaces：編輯 LAN 介面（例如 X0），在 Management 勾選 SNMP，允許從內網查詢。","存取規則若有限制，允許 {IP} 連到防火牆的 UDP 161。"],"flow":"IPFIX（建議）／NetFlow v9／v5","flow_steps":["Device ▸ AppFlow ▸ Flow Reporting ▸ Settings：Report Connections 選 All（或 Interface-based 只報指定介面）。","External Collector 分頁：勾選「Send Flows and Real-Time Data To External Collector」（可能需要重新開機）。","External Flow Reporting Format 選 IPFIX，External Collector's IP 填 {IP}，Port 填 {NF}。","按 Generate ALL Templates 產生範本，再按 Accept。"],"doc":"https://www.sonicwall.com/support/technical-documentation/docs/sonicos-7-1-appflow_device/Content/appflow-d-flow-reporting-user-config-netflow-v10.htm"},{"id":"fortinet","name":"Fortinet FortiGate","kind":"防火牆（FortiOS）","match":["fortinet","fortigate","fortiswitch"],"snmp":["System ▸ SNMP：開啟 SNMP Agent，新增 SNMP v1/v2c community「{COMM}」，Hosts 加入 {IP}，只勾 Accept queries（或用 SNMPv3）。","Network ▸ Interfaces：編輯 LAN 介面，Administrative Access 勾選 SNMP。"],"snmp_cli":"config system snmp sysinfo\n    set status enable\nend\nconfig system snmp community\n    edit 1\n        set name \"{COMM}\"\n        config hosts\n            edit 1\n                set ip {IP} 255.255.255.255\n            next\n        end\n        set trap-v1-status disable\n        set trap-v2c-status disable\n    next\nend","flow":"NetFlow v9（一筆含雙向流量）","flow_steps":["只能用 CLI 設定（FortiOS 7.4.2 以後可設多個收集器）。","在 LAN 介面開啟取樣（netflow-sampler）。舊版 FortiOS 是 config system netflow 底下直接 set collector-ip。"],"flow_cli":"config system netflow\n    config collectors\n        edit 1\n            set collector-ip {IP}\n            set collector-port {NF}\n        next\n    end\nend\nconfig system interface\n    edit \"internal\"\n        set netflow-sampler both\n    next\nend","doc":"https://docs.fortinet.com/document/fortigate/7.4.0/new-features/840728"},{"id":"cisco","name":"Cisco Catalyst／IOS","kind":"交換器、路由器（IOS／IOS-XE）","match":["cisco","catalyst"],"snmp":["用 ACL 限定只有 {IP} 能查詢，並開啟 LLDP（CDP 預設已開）。"],"snmp_cli":"ip access-list standard NETMAP\n permit host {IP}\nsnmp-server community {COMM} RO NETMAP\nlldp run","flow":"Flexible NetFlow v9（路由器、Catalyst 9300／9400 等；部分入門款交換器不支援）","flow_steps":["在連接內網的介面套用 flow monitor（ingress）。"],"flow_cli":"flow exporter NETMAP\n destination {IP}\n transport udp {NF}\n export-protocol netflow-v9\nflow monitor NETMAP-MON\n exporter NETMAP\n record netflow ipv4 original-input\ninterface GigabitEthernet0/1\n ip flow monitor NETMAP-MON input"},{"id":"meraki","name":"Cisco Meraki","kind":"MX 防火牆、MS 交換器","match":["meraki"],"snmp":["Organization ▸ Settings：開啟 SNMP（這是雲端的 SNMP，netmap 讀不到埠流量）。","要讓 netmap 直接讀設備：Network-wide ▸ General ▸ Reporting 開啟 SNMP，設定 community「{COMM}」，並允許 {IP}。"],"flow":"NetFlow v9（MX）","flow_steps":["Network-wide ▸ Configure ▸ General ▸ Reporting：NetFlow traffic reporting 選 Enabled。","NetFlow collector IP 填 {IP}，port 填 {NF}，儲存。","MX 只匯出經過路由或 NAT 的流量，同一個 VLAN 裡互傳的流量不會出現。"],"doc":"https://documentation.meraki.com/MX/Monitoring_and_Reporting/NetFlow_Overview"},{"id":"mikrotik","name":"MikroTik RouterOS","kind":"路由器、交換器","match":["mikrotik","routerboard"],"snmp":["IP ▸ SNMP：Enabled 打勾；Communities 改成「{COMM}」，Addresses 填 {IP}/32，只開 Read Access。"],"snmp_cli":"/snmp set enabled=yes\n/snmp community set [find default=yes] name={COMM} addresses={IP}/32 read-access=yes write-access=no","flow":"NetFlow v9／IPFIX（Traffic Flow）","flow_steps":["IP ▸ Traffic Flow：Enabled 打勾，Interfaces 選 all。","Targets 新增：Dst. Address {IP}、Port {NF}、Version 9（或 IPFIX）。"],"flow_cli":"/ip traffic-flow set enabled=yes interfaces=all\n/ip traffic-flow target add dst-address={IP} port={NF} version=9","doc":"https://manual.mikrotik.com/docs/diagnostics-monitoring-and-troubleshooting/traffic-flow/"},{"id":"ubiquiti","name":"Ubiquiti UniFi","kind":"閘道器、交換器、AP","match":["ubiquiti","unifi","ubnt"],"snmp":["UniFi Network：Settings ▸ System（或 Settings ▸ Network 依版本）找到 SNMP，開啟 SNMPv1/v2c 並設定 community「{COMM}」。","UniFi 交換器與 AP 也會套用同一組設定。"],"flow":"IPFIX（UniFi Network 9.1 以後的閘道器）","flow_steps":["Settings ▸ CyberSecure ▸ Traffic Logging：開啟 NetFlow（IPFIX）。","收集器填 {IP}，埠 {NF}。"],"doc":"https://help.ui.com/hc/en-us/articles/32201256219799"},{"id":"edgerouter","name":"Ubiquiti EdgeRouter","kind":"路由器（EdgeOS）","match":["edgerouter","edgeos"],"snmp":["System ▸ SNMP 開啟並設定 community，或用 CLI。"],"snmp_cli":"configure\nset service snmp community {COMM} authorization ro\nset service snmp community {COMM} client {IP}\ncommit ; save","flow":"NetFlow v9","flow_cli":"configure\nset system flow-accounting interface eth1\nset system flow-accounting netflow version 9\nset system flow-accounting netflow server {IP} port {NF}\ncommit ; save","flow_steps":["把 eth1 換成連接內網的介面。"]},{"id":"pfsense","name":"pfSense","kind":"防火牆","match":["pfsense","netgate"],"snmp":["Services ▸ SNMP：Enable，Read Community String 填「{COMM}」，Bind Interfaces 選 LAN。"],"flow":"NetFlow v9／IPFIX（softflowd 套件）","flow_steps":["System ▸ Package Manager 安裝 softflowd。","Services ▸ softflowd：Interface 選 LAN，Destination Host 填 {IP}，Port {NF}，NetFlow version 選 9 或 IPFIX，儲存。"]},{"id":"opnsense","name":"OPNsense","kind":"防火牆","match":["opnsense","deciso"],"snmp":["System ▸ Firmware ▸ Plugins 安裝 os-net-snmp。","Services ▸ Net-SNMP：Enable，community 填「{COMM}」。"],"flow":"NetFlow v5／v9（內建）","flow_steps":["Reporting ▸ NetFlow：Interfaces 選 LAN（可多選）。","WAN 介面若也選了，放進 Egress only 避免重複計算。","Version 選 v9，Destinations 輸入 {IP}:{NF} 後按 Enter，套用。"],"doc":"https://docs.opnsense.org/manual/how-tos/netflow_exporter.html"},{"id":"sophos","name":"Sophos Firewall","kind":"防火牆（SFOS／XGS）","match":["sophos"],"snmp":["System services ▸ SNMP（或 Administration ▸ SNMP）：開啟 Agent，新增 community「{COMM}」，Manager IP 填 {IP}，只給查詢權限。","Administration ▸ Device access：LAN zone 勾選 SNMP。"],"flow":"NetFlow v5","flow_steps":["System ▸ Administration ▸ Netflow：Add，Netflow server IP 填 {IP}，port {NF}，儲存。","只會匯出有開記錄的規則：Rules and policies ▸ Firewall rules，要統計的規則開啟 Log firewall traffic。","NetFlow v5 沒有 IPv6。"],"doc":"https://www.avanet.com/en/kb/sophos-firewall-netflow-monitoring/"},{"id":"paloalto","name":"Palo Alto Networks","kind":"防火牆（PAN-OS）","match":["palo alto","paloalto"],"snmp":["Device ▸ Setup ▸ Operations ▸ SNMP Setup：選 V2c 填 community「{COMM}」（或 V3）。","Network ▸ Network Profiles ▸ Interface Mgmt：建立允許 SNMP 的設定檔並套到 LAN 介面，Permitted IP 加 {IP}。"],"flow":"NetFlow v9","flow_steps":["Device ▸ Server Profiles ▸ NetFlow：新增，Server 填 {IP}、Port {NF}。","Network ▸ Interfaces：編輯 LAN 介面 ▸ Advanced ▸ NetFlow Profile 選剛才的設定，Commit。"]},{"id":"checkpoint","name":"Check Point","kind":"防火牆（Gaia）","match":["check point","checkpoint"],"snmp":["Gaia Portal ▸ System Management ▸ SNMP：開啟 SNMP Agent，Version 選 v2/v3，Read Only Community 填「{COMM}」。"],"flow":"NetFlow v9／IPFIX","flow_steps":["Gaia Portal ▸ Network Management ▸ NetFlow Export：新增收集器 {IP}、Port {NF}，格式選 NetFlow V9 或 IPFIX。"]},{"id":"juniper","name":"Juniper","kind":"交換器（EX）、防火牆（SRX）","match":["juniper","junos"],"snmp":["只允許 {IP} 查詢。"],"snmp_cli":"set snmp community {COMM} authorization read-only\nset snmp community {COMM} clients {IP}/32\nset protocols lldp interface all\ncommit","flow":"sFlow（EX 交換器）；SRX 用 J-Flow v9／IPFIX","flow_steps":["EX 交換器：在上行與要觀察的介面開 sFlow。"],"flow_cli":"set protocols sflow collector {IP} udp-port {SF}\nset protocols sflow sample-rate ingress 1024\nset protocols sflow interfaces ge-0/0/0\ncommit"},{"id":"aruba","name":"HPE Aruba","kind":"交換器（AOS-S／AOS-CX）","match":["aruba","hpe","procurve"],"snmp":["AOS-S（2530／2930 等）："],"snmp_cli":"snmp-server community \"{COMM}\" operator restricted\nsnmp-server host {IP} community \"{COMM}\"\nlldp run","flow":"sFlow","flow_steps":["AOS-S：設定 sFlow 收集器並在各埠開啟取樣。AOS-CX：sflow collector {IP} 後 sflow enable。"],"flow_cli":"sflow 1 destination {IP} {SF}\ninterface 1-24 sflow 1 sampling 1024\ninterface 1-24 sflow 1 polling 30"},{"id":"h3c","name":"H3C／HPE Comware","kind":"交換器、路由器","match":["h3c","comware"],"snmp":["只允許唯讀查詢。"],"snmp_cli":"snmp-agent\nsnmp-agent sys-info version v2c\nsnmp-agent community read {COMM}\nlldp global enable","flow":"sFlow（交換器）／NetStream（路由器，相當於 NetFlow）","flow_cli":"sflow agent ip <交換器管理IP>\nsflow collector 1 ip {IP} port {SF}\ninterface GigabitEthernet1/0/1\n sflow sampling-rate 4096\n sflow flow collector 1","flow_steps":["在要觀察的埠（例如上行埠）開啟 sFlow 取樣。"]},{"id":"huawei","name":"華為 Huawei","kind":"交換器、路由器、防火牆","match":["huawei"],"snmp":["只允許唯讀查詢。"],"snmp_cli":"snmp-agent\nsnmp-agent sys-info version v2c\nsnmp-agent community read cipher {COMM}\nlldp enable","flow":"sFlow（交換器）／NetStream（路由器、防火牆）","flow_cli":"sflow agent ip <交換器管理IP>\nsflow collector 1 ip {IP} udp-port {SF}\ninterface GigabitEthernet0/0/1\n sflow sampling collector 1\n sflow sampling rate 4096","flow_steps":["在要觀察的埠開啟 sFlow 取樣。"]},{"id":"ruckus","name":"Ruckus ICX","kind":"交換器","match":["ruckus","brocade"],"snmp":["只允許唯讀查詢。"],"snmp_cli":"snmp-server community {COMM} ro\nlldp run","flow":"sFlow","flow_cli":"sflow destination {IP} {SF}\nsflow enable\ninterface ethernet 1/1/1\n sflow forwarding","flow_steps":["在要觀察的埠開啟 sflow forwarding。"]},{"id":"tplink","name":"TP-Link Omada／JetStream","kind":"交換器、閘道器","match":["tp-link","tplink","omada"],"snmp":["單機管理：Maintenance ▸ SNMP ▸ Global Config 開啟，Community 新增「{COMM}」唯讀。","Omada 控制器：Settings ▸ Services ▸ SNMP 開啟並設定 community，會套用到所有設備。"],"flow":"部分 JetStream L2+／L3 交換器支援 sFlow；Omada 閘道器目前沒有 NetFlow","flow_steps":["支援 sFlow 的機型：Maintenance ▸ sFlow，Collector 填 {IP}、Port {SF}，再到 Sampler 在上行埠開啟取樣。"]},{"id":"zyxel","name":"Zyxel","kind":"防火牆（USG FLEX／ATP）、交換器","match":["zyxel"],"snmp":["防火牆：System ▸ SNMP 開啟，設定 Get Community「{COMM}」，Service Control 只允許 LAN。","交換器：Management ▸ SNMP（或 Advanced Application ▸ SNMP）設定唯讀 community。"],"flow":"多數機型沒有 NetFlow／sFlow；可以看埠流量（SNMP）","flow_steps":["沒有流量匯出的話，「誰在用」可以改看上游防火牆或支援 sFlow 的交換器。"]},{"id":"draytek","name":"DrayTek Vigor","kind":"路由器","match":["draytek","vigor"],"snmp":["System Maintenance ▸ SNMP：Enable SNMP Agent，Get Community 填「{COMM}」，Manager Host IP 填 {IP}。"],"flow":"沒有 NetFlow／sFlow","flow_steps":["可以看 WAN／LAN 埠流量（SNMP）；要知道誰在用，請改用支援流量匯出的設備。"]},{"id":"netgear","name":"NETGEAR","kind":"網管交換器","match":["netgear"],"snmp":["System ▸ SNMP ▸ SNMP V1/V2 ▸ Community Configuration：新增唯讀 community「{COMM}」，IP 填 {IP}。"],"flow":"部分 M4300／M4350 等支援 sFlow","flow_steps":["Monitoring ▸ sFlow：Receiver 填 {IP}、Port {SF}，在上行埠設定 Sampler。"]},{"id":"dlink","name":"D-Link","kind":"網管交換器","match":["d-link","dlink"],"snmp":["Management ▸ SNMP Settings：SNMP Global State 開啟，Community 新增「{COMM}」read only。"],"flow":"DGS-3000 以上等系列支援 sFlow","flow_steps":["支援的機型：sFlow ▸ Collector 填 {IP}、Port {SF}，並在埠上開啟 Flow Sampler。"]},{"id":"synology","name":"Synology NAS","kind":"NAS","match":["synology"],"snmp":["控制台 ▸ 終端機 & SNMP ▸ SNMP：啟動 SNMP 服務，勾選 SNMPv1/v2c，community 填「{COMM}」。","也可以改用「加入 SSH 設備…」讀流量（控制台 ▸ 終端機 開啟 SSH）。"],"flow":"沒有流量匯出","flow_steps":[]},{"id":"asus","name":"ASUS 家用路由器","kind":"家用路由器","match":["asus"],"snmp":["多數機型沒有 SNMP，請改用 netmap.exe「監控服務 ▸ 加入 SSH 設備…」。","開 SSH：系統管理 ▸ 系統設定 ▸ 啟用 SSH 選「只限 LAN」。測完不用時記得關閉。"],"flow":"沒有流量匯出","flow_steps":[]},{"id":"windows","name":"Windows 電腦／伺服器","kind":"電腦","match":["microsoft","windows"],"snmp":["設定 ▸ 系統 ▸ 選用功能 ▸ 新增「簡易網路管理通訊協定（SNMP）」。","服務（services.msc）▸ SNMP Service ▸ 安全性：新增唯讀 community「{COMM}」，「接受來自這些主機」加入 {IP}。"],"flow":"沒有流量匯出","flow_steps":[]},{"id":"linux","name":"Linux 主機","kind":"伺服器","match":["linux","ubuntu","debian","red hat","centos"],"snmp":["最簡單：用 netmap.exe「加入 SSH 設備…」讀流量，不用裝東西。","或安裝 snmpd，在 /etc/snmp/snmpd.conf 加入 rocommunity {COMM} {IP}，重新啟動 snmpd。"],"flow":"可安裝 softflowd 匯出 NetFlow","flow_cli":"sudo apt install softflowd\nsudo softflowd -i eth0 -n {IP}:{NF} -v 9"}],"common":{"snmp_tip":"建議所有設備用同一組唯讀 community（例如「{COMM}」）或同一組 SNMPv3 帳密，並只允許 netmap.exe 那台電腦（{IP}）查詢。不要用 public，也不要開寫入權限。","flow_tip":"流量匯出只要開在一台設備上就夠了（通常是防火牆，在 LAN 介面開）。同一台設備的同一份流量若在多個介面都匯出，可能會重複計算。"}};/*VENDORS_END*/
 const MANUAL_URL=PUBLIC_URL+'manual.html';
 /* 版本紀錄：最新在最前面。exe = netmap.exe 的版本 */
-const APP_VERSION='3.0.1',EXE_VERSION='1.8.1';
+const APP_VERSION='3.1.0',EXE_VERSION='1.9.0';
 const CHANGELOG=[
+ {v:'3.1',exe:'1.9.0',d:'2026-11-07',t:'心跳告警、歷史版本、權限、線標、多頁面、光纖束',i:['Ping 心跳：圖上所有有 IP 的設備都有綠／黃／紅燈號，斷線、延遲變高一眼看到；設備屬性看延遲曲線與最近事件','告警通知：設備斷線、主幹埠離線、新設備加入時送到 Telegram、Discord、Slack、Teams、LINE（Messaging API）、Email 或自訂 Webhook，同一段時間的事件合併成一則','事件紀錄：斷線、恢復、埠離線、新設備都記下來（保留 180 天），右上角鈴鐺顯示未讀','歷史版本：每次修改記下是誰、改了什麼，可以預覽舊版本再一鍵還原；線上版也會在這台瀏覽器自動留版本','管理密碼與檢視連結：其他電腦要登入才能編輯；可以產生只能看的連結或 QR Code 給主管、同仁','線標列印：A4 標籤紙（含 QR Code，掃了打開那條線）或匯出 Brother P-touch Editor 用的 CSV','網路上的設備：從路由器、防火牆的 ARP 表整理出新加入、很久沒出現、不在圖上的設備，一鍵加到圖上','多張圖（頁面）：樓層、機房、分公司分開畫，跨頁面的線顯示連接標籤，點一下跳過去；查線照樣整條走完','光纖收容箱與光纖束：一條多芯光纜一次建立，每一芯標 TIA-598 色碼，畫成一條粗線，點開看每一芯接到哪裡','平行線收成一條：同一對設備之間的多條線（例如 LACP）可以收成一條粗線','48 埠設備在縮小畫面或平板上點埠時，會放大成一排大按鈕讓你選，不會點錯']},
  {v:'3.0.1',exe:'1.8.1',d:'2026-11-07',t:'修正：網段探索建立的本機沒有流量',i:['用網段探索建立的設備預設不輪詢，連帶讓跑 netmap.exe 的那台電腦也讀不到流量；現在本機一定會讀網卡流量']},
  {v:'3.0',exe:'1.8.0',d:'2026-11-07',t:'右側分頁、無線連線、抓出 Wi-Fi 設備',i:['右側分成「設備資訊」與「網路流量」兩個分頁，分頁上的燈號顯示監控狀態；埠也分成「埠設定」與「網路流量」','新增無線連線：手機、筆電可設成用 Wi-Fi 連到 AP 或路由器（2.4G／5G／6G），畫成虛線並標頻段，查線、故障查線、影響範圍都會經過','用 SSH 監控的路由器會列出連在它上面的設備（有線／無線、頻段、名稱、訊號），一鍵把無線設備套用到圖上','設備的編輯／刪除按鈕移到名稱下方，不再擋住埠與線','新增「手機」設備種類']},
  {v:'2.9.3',exe:'1.7.3',d:'2026-11-07',t:'數字鍵盤可以輸入「.」',i:['netmap.exe 所有輸入框都能用鍵盤右邊數字鍵的「.」輸入 IP']},
@@ -1485,17 +1568,17 @@ function addDev(type,o){const T=TYPES[type];const sp=o.n==null?SPECS[o.model]:nu
   const d={id:uid('d'),type,name:o.name,brand:o.brand||'',model:o.model||'',ip:o.ip||'',mac:o.mac||'',gw:o.gw||'',loc:o.loc||'',note:o.note||'',rack:o.rack||'',u:o.u||'',uh:o.uh||'',
     variant:type==='sw'?(o.variant||'l2m'):undefined,kind:type==='end'?(o.kind||'PC 桌機'):undefined,x:o.x||0,y:o.y||0,
     ports:newPorts(type,o.n??(sp?sp.n:T.ports),o.sfp??(sp?(sp.sfp||0):T.sfp))};
-  if(sp&&sp.poe)applyPoe(d,sp.poe);S.devices.push(d);return d}
+  if(sp&&sp.poe)applyPoe(d,sp.poe);if(S.pages&&S.pages.length>1)d.page=curPage();S.devices.push(d);return d}
 function layersOf(d){const T=TYPES[d.type];return T.variants?T.variants[d.variant||'l2m'].layers:T.layers}
 function range(ls){const a=Math.min(...ls),b=Math.max(...ls);return a===b?'L'+a:`L${a}–L${b}`}
-function typeName(d){const T=TYPES[d.type];if(T.variants)return T.variants[d.variant||'l2m'].n;if(d.type==='end')return d.kind||T.n;return T.n}
+function typeName(d){const T=TYPES[d.type];if(d.type==='patch'&&d.fiber)return'光纖收容箱';if(T.variants)return T.variants[d.variant||'l2m'].n;if(d.type==='end')return d.kind||T.n;return T.n}
 function iconOf(d){return d.type==='end'?(KICON[d.kind]||KICON['其他']):TICON[d.type]}
 function tc(type){return`var(--t-${type})`}
 function brandKw(b){const m=BMETA[b];return m?[m.zh,...m.kw].join(' '):''}
 const RACK_END=['伺服器','NAS','NVR 錄影主機','ISP 數據機'];
 function rackable(d){return['fw','router','sw','hub','patch'].includes(d.type)||(d.type==='end'&&RACK_END.includes(d.kind))}
 function uhOf(d){return +d.uh||((d.type==='end'&&(d.kind==='伺服器'||d.kind==='NAS'))?2:1)}
-function normalize(o){o.racks=Array.isArray(o.racks)?o.racks:[];o.faults=Array.isArray(o.faults)?o.faults.filter(f=>f&&f.id&&f.start).map(f=>Object.assign({items:{},note:'',closed:null},f,{items:f.items&&typeof f.items==='object'?f.items:{}})):[];
+function normalize(o){o.racks=Array.isArray(o.racks)?o.racks:[];o.pages=Array.isArray(o.pages)?o.pages.filter(p=>p&&p.id!=null):[];o.trunks=Array.isArray(o.trunks)?o.trunks.filter(t=>t&&t.id):[];o.faults=Array.isArray(o.faults)?o.faults.filter(f=>f&&f.id&&f.start).map(f=>Object.assign({items:{},note:'',closed:null},f,{items:f.items&&typeof f.items==='object'?f.items:{}})):[];
   o.devices.forEach(d=>{d.ports.forEach(p=>{if(!p.kind)p.kind='rj45';p.poe=!!p.poe;if(!p.mode)p.mode='access'});
     ['brand','model','ip','mac','gw','loc','note','rack','u','uh'].forEach(k=>{if(d[k]==null)d[k]=''});if(d.type==='sw'&&!d.variant)d.variant='l2m';if(d.type==='end'&&!d.kind)d.kind='PC 桌機';
     if(!d.rack&&rackable(d)){const m=/\b(R\d+)\s*[-‐ ]?\s*U\s*(\d+)/i.exec(d.loc||'');if(m){d.rack=m[1].toUpperCase();d.u=+m[2]}}
@@ -1617,17 +1700,17 @@ function sample(){buildTpl(TEMPLATES[0])}
 function tplStats(t){const keep=S;const o=buildTpl(t);S=keep;return{d:o.devices.length,c:o.cables.length}}
 
 /* ---------- auto layout: columns by hop distance from the internet edge ---------- */
-function autoLayout(){I=idx();renderCanvas();
-  const sz={};S.devices.forEach(d=>{const el=document.querySelector(`.dev[data-dev="${d.id}"]`);sz[d.id]={w:el?el.offsetWidth:220,h:el?el.offsetHeight:120}});
-  const adj={};S.devices.forEach(d=>adj[d.id]=new Set());
-  S.cables.forEach(c=>{const a=I.owner[c.a],b=I.owner[c.b];if(a&&b&&a!==b){adj[a.id].add(b.id);adj[b.id].add(a.id)}});
+function autoLayout(){I=idx();renderCanvas();const DV=S.devices.filter(onPage);
+  const sz={};DV.forEach(d=>{const el=document.querySelector(`.dev[data-dev="${d.id}"]`);sz[d.id]={w:el?el.offsetWidth:220,h:el?el.offsetHeight:120}});
+  const adj={};DV.forEach(d=>adj[d.id]=new Set());
+  S.cables.forEach(c=>{const a=I.owner[c.a],b=I.owner[c.b];if(a&&b&&a!==b&&adj[a.id]&&adj[b.id]){adj[a.id].add(b.id);adj[b.id].add(a.id)}});
   const rank=d=>d.type==='end'&&d.kind==='ISP 數據機'?0:d.type==='fw'?1:d.type==='router'?2:(d.type==='sw'&&d.variant==='l3')?3:d.type==='sw'?4:9;
   const depth={};
-  [...S.devices].sort((a,b)=>rank(a)-rank(b)).forEach(r=>{if(depth[r.id]!=null||!adj[r.id].size)return;depth[r.id]=0;const q=[r.id];
+  [...DV].sort((a,b)=>rank(a)-rank(b)).forEach(r=>{if(depth[r.id]!=null||!adj[r.id].size)return;depth[r.id]=0;const q=[r.id];
     while(q.length){const id=q.shift();adj[id].forEach(n=>{if(depth[n]==null){depth[n]=depth[id]+1;q.push(n)}})}});
   let maxD=-1;Object.values(depth).forEach(v=>maxD=Math.max(maxD,v));
-  S.devices.forEach(d=>{if(depth[d.id]==null)depth[d.id]=maxD+1});
-  const cols=[];S.devices.forEach(d=>{(cols[depth[d.id]]=cols[depth[d.id]]||[]).push(d)});
+  DV.forEach(d=>{if(depth[d.id]==null)depth[d.id]=maxD+1});
+  const cols=[];DV.forEach(d=>{(cols[depth[d.id]]=cols[depth[d.id]]||[]).push(d)});
   const maxW=Math.max(900,((stage.clientWidth||1300)-140)/ui.zoom-60);
   let x=110,y=100,rowH=0,inRow=0,prevSingle=false;const cx={},want={};
   cols.forEach((col,k)=>{if(!col)return;
@@ -1685,8 +1768,8 @@ function openWelcome(canContinue){
 /* keep a margin so the floating device bar and top bar never cover a fresh layout */
 function padLayout(){if(!S.devices.length)return;const mx=Math.min(...S.devices.map(d=>d.x)),my=Math.min(...S.devices.map(d=>d.y));const tb=document.querySelector('header.top'),tbB=tb?tb.getBoundingClientRect().bottom:70;const dx=Math.max(0,170-mx),dy=Math.max(0,Math.max(130,tbB/.6)-my);if(!dx&&!dy)return;S.devices.forEach(d=>{d.x+=dx;d.y+=dy});S.cables.forEach(c=>(c.wps||[]).forEach(w=>{w.x+=dx;w.y+=dy}))}
 function applyTpl(id){if(!canEdit())return;const t=[...TEMPLATES,...STARTS].find(x=>x.id===id);if(!t)return;ui.shared=false;$('banner').hidden=true;ui.multi.clear();
-  const had=S.devices.length>0;if(had)snap();
-  buildTpl(t);ui.sel=null;ui.pending=null;ui.layer=null;renderLayerChips();
+  const had=S.devices.length>0;if(had){localRevTick(true,'套用範本前的版本');snap()}
+  buildTpl(t);ui.page=null;ui.sel=null;ui.pending=null;ui.layer=null;renderLayerChips();
   if(ui.view!=='map')setView('map');
   autoLayout();padLayout();save();renderAll();ui.autoPending=true;stage.scrollTo({left:PAD,top:PAD});if(S.devices.length&&innerWidth>600)requestAnimationFrame(()=>fitTo(devBox(),1));
   toast(id==='blank'?'已建立空白畫面，從左側點設備開始':`已載入「${t.name}」`,had)}
@@ -1695,7 +1778,7 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 let lastSaved=null;
 function load(){S={devices:[],cables:[],racks:[],faults:[]};if(window.NETMAP_SERVER){S=normalize(Object.assign({devices:[],cables:[],racks:[],faults:[]},window.NETMAP_SERVER.project||{}));return S.devices.length>0}try{const r=localStorage.getItem(KEY);if(r){const o=normalize(JSON.parse(r));if(o.devices.length){lastSaved=o;try{localStorage.setItem(KEY+'-backup',r)}catch(e){}return true}}}catch(e){}return false}
 
-function save(){if(SRV){srvSave();return}if(ui.shared)return;if(lastSaved&&!S.devices.length)return;lastSaved=null;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function save(){if(ui.preview)return;if(SRV){srvSave();return}if(ui.shared)return;if(lastSaved&&!S.devices.length)return;lastSaved=null;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}clearTimeout(ui.revT);ui.revT=setTimeout(()=>localRevTick(false),3000)}
 
 /* ---------- undo ---------- */
 function snap(){ui.autoPending=false;undoS.push(JSON.stringify(S));if(undoS.length>100)undoS.shift();redoS=[];syncUR()}
@@ -1811,22 +1894,22 @@ function showPair(pb){const p=I.ports[pb.dataset.port];if(!p||!p.pair){clearPair
   $('pairhint').innerHTML=`<path d="M${f.x-12},${f.y} H${x} V${k.y} H${k.x-12}"/><circle cx="${x}" cy="${(f.y+k.y)/2}" r="2.5"/>`}
 function renderCanvas(){I=idx();prepFault();ui.match=computeMatches();clearPair();ui.pcIdx={};S.cables.forEach((c,i)=>ui.pcIdx[c.id]=i);
   const total=S.devices.reduce((a,d)=>a+d.ports.length,0);
-  $('stat').textContent=`${S.devices.length} 台設備 · ${S.cables.length} 條線 · ${total} 埠`;
+  $('stat').textContent=`${S.devices.length} 台設備 · ${S.cables.length} 條線 · ${total} 埠${multiPage()?` · ${S.pages.length} 頁`:''}`;renderPages();
   const tr=traceSet(),m=ui.match,L=prefs.layers;
   $('qcount').hidden=!m;if(m)$('qn').textContent=m.count?`${m.count} 筆`:'沒有結果';
-  $('devs').innerHTML=S.devices.map(d=>{const ls=layersOf(d);
+  $('devs').innerHTML=S.devices.filter(onPage).map(d=>{const ls=layersOf(d);
     const cls=['dev'];if(ui.sel&&ui.sel.dev===d.id)cls.push('sel');if(tr.devs.has(d.id)||(m&&m.devs.has(d.id)))cls.push('trace');if(m&&!m.lit.has(d.id))cls.push('faded');if(ui.layer&&!ls.includes(ui.layer))cls.push('dimmed');if(ui.popId===d.id)cls.push('popin');
     const sub=(L.brand&&[d.brand,d.model].filter(Boolean).join(' '))||typeName(d);
     const foot=[L.ip&&d.ip,L.mac&&d.mac&&'MAC '+d.mac,L.gw&&d.gw&&'GW '+d.gw,L.loc&&locText(d)].filter(Boolean).join(' · ');
-    const view=viewOf(d);cls.push(view);{const fc=fClass('dev:'+d.id);if(fc)cls.push(fc);if(ui.affected&&ui.affected.has(d.id))cls.push('affected');const ld=liveDev(d.id);if(ld&&!ld.up)cls.push('ldevdown')}
+    const view=viewOf(d);cls.push(view);{const fc=fClass('dev:'+d.id);if(fc)cls.push(fc);if(ui.affected&&ui.affected.has(d.id))cls.push('affected');const ld=liveDev(d.id);const pg=liveOn()&&pingOf(d);if((ld&&!ld.up)||(pg&&pg.st==='down'))cls.push('ldevdown')}
     let tags='';if(view==='icon'){const cs=d.ports.map(p=>I.cab[p.id]).filter(c=>c&&!wireShown(c)&&!tr.cabs.has(c.id));if(cs.length)tags=`<div class="ctags">${cs.slice(0,6).map(c=>`<span class="ctag" style="--k:${pairCol(c)}">${esc(c.label||'線')}</span>`).join('')}${cs.length>6?`<span class="ctag more">+${cs.length-6}</span>`:''}</div>`}
-    const lb=(()=>{const ld=liveDev(d.id);return ld&&!ld.up?`<span class="lbadge" title="SNMP：${esc(ld.err||'沒有回應')}（設備可能離線，或 SNMP 沒開）">無回應</span>`:''})();
+    const lb=(()=>{const ld=liveDev(d.id),pg=liveOn()&&pingOf(d);if(pg&&pg.st==='down')return`<span class="lbadge" title="Ping 不通 ${tDur(Date.now()/1000-pg.since)}${ld&&!ld.up?'；SNMP：'+esc(ld.err||'沒有回應'):''}">斷線</span>`;return ld&&!ld.up?`<span class="lbadge" title="SNMP：${esc(ld.err||'沒有回應')}（設備可能離線，或 SNMP 沒開）${pg&&pg.st!=='down'&&pg.st!=='wait'?'；Ping 正常':''}">${pg&&(pg.st==='up'||pg.st==='slow')?'SNMP 無回應':'無回應'}</span>`:''})()+pingDot(d);
     const lbl=`<div class="dlabel">${lb}<b>${esc(d.name)}</b><small>${esc(sub)}${d.wifi&&d.wifi.ap?' · '+wifiPill(d):''}</small></div>${foot?`<div class="foot">${esc(foot)}</div>`:''}${tags}`;
     const hact=`<span class="hact"><button data-act="edit" data-id="${d.id}" title="編輯" aria-label="編輯 ${esc(d.name)}">${ICON.edit}</button><button class="del" data-act="del" data-id="${d.id}" title="刪除" aria-label="刪除 ${esc(d.name)}">${ICON.del}</button></span>`;
     if(view==='icon')return`<div class="${cls.join(' ')}" data-dev="${d.id}" style="left:${d.x}px;top:${d.y}px;--tc:${tc(d.type)}"><div class="ico" data-drag="${d.id}" title="拖曳移動，雙擊展開網路埠">${devArt(d)}</div>${lbl}${hact}</div>`;
     return`<div class="${cls.join(' ')}" data-dev="${d.id}" style="left:${d.x}px;top:${d.y}px;--tc:${tc(d.type)}"><div class="plate" data-drag="${d.id}" title="拖曳移動，雙擊收成圖示"><div class="pleft"><span class="tile">${iconOf(d)}</span><span class="leds"><i></i><i></i></span></div><div class="body">${portsHTML(d,tr,m)}</div></div>${lbl}${hact}</div>`}).join('');
   ui.popId=null;
-  let mx=0,my=0;S.devices.forEach(d=>{mx=Math.max(mx,d.x);my=Math.max(my,d.y)});S.cables.forEach(c=>(c.wps||[]).forEach(w=>{mx=Math.max(mx,w.x);my=Math.max(my,w.y)}));
+  let mx=0,my=0;S.devices.filter(onPage).forEach(d=>{mx=Math.max(mx,d.x);my=Math.max(my,d.y)});S.cables.forEach(c=>(c.wps||[]).forEach(w=>{mx=Math.max(mx,w.x);my=Math.max(my,w.y)}));
   ui.cw=Math.max(1800,mx+700);ui.ch=Math.max(1200,my+500);
   $('canvas').style.width=ui.cw+'px';$('canvas').style.height=ui.ch+'px';sizeStage();
   $('canvas').classList.toggle('pendmode',!!ui.pending);
@@ -1906,14 +1989,14 @@ function cableStyle(c){const mode=prefs.colorMode;let color=c.color,w=3,dash='';
 /* a run punched down on the back of a patch panel or into the wall side of a seat jack is permanent in-wall cabling */
 function fixedRun(c){const pa=I.ports[c.a],pb=I.ports[c.b];if(!pa||!pb)return false;const oa=I.owner[c.a],ob=I.owner[c.b];
   const wall=(o,p)=>p.side===1&&(o.type==='patch'||o.type==='seat');return wall(oa,pa)||wall(ob,pb)}
-function drawWires(){peekDev=null;const tr=traceSet(),m=ui.match,R=devRects(),lanes={};computeRunVlans();let h='';
-  S.cables.forEach(c=>{const g=wirePath(c,R,lanes);if(!g)return;const st=cableStyle(c);const cls=['cab'];
+function drawWires(){peekDev=null;const tr=traceSet(),m=ui.match,R=devRects(),lanes={};computeRunVlans();let h='';const BG=bundleGroups(tr),inB=new Set();Object.values(BG).forEach(a=>a.forEach(c=>inB.add(c.id)));
+  S.cables.forEach(c=>{if(inB.has(c.id))return;const g=wirePath(c,R,lanes);if(!g)return;const st=cableStyle(c);const cls=['cab'];
     if(tr.active)cls.push(tr.cabs.has(c.id)?'hot':'dim');else if(m&&!(m.cabs.has(c.id)||(m.lit.has(I.owner[c.a].id)&&m.lit.has(I.owner[c.b].id))))cls.push('faded');
     if(!wireShown(c))cls.push('off');if(tr.dev)cls.push('fromdev');{const fc=fClass('cable:'+c.id);if(fc)cls.push(fc)}
     {const lc=liveCable(c);if(lc)cls.push('lv-'+lc.lvl)}if(tr.dir&&tr.dir[c.id]===c.b)cls.push('rev');
     if(link&&link.cable===c)cls.push('moving');if(ui.sel&&ui.sel.cable===c.id)cls.push('selc');
     h+=`<g class="${cls.join(' ')}" data-cable="${c.id}" data-da="${I.owner[c.a].id}" data-db="${I.owner[c.b].id}" style="--w:${st.w}px">${tr.cabs.has(c.id)?`<path class="halo" d="${g.d}" stroke="${st.color}"/>`:''}<path class="vis" id="w-${c.id}" d="${g.d}" stroke="${st.color}"${st.dash?` stroke-dasharray="${st.dash}"`:''}/><path class="hit" d="${g.d}"/></g>`});
-  h+=wifiLinksSVG(tr,R);
+  h+=wifiLinksSVG(tr,R)+bundlesSVG(BG,R,tr)+offPageSVG(tr,R);
   $('wires').innerHTML=h+'<g id="deco"></g>';
   const L=prefs.layers;let dh='';const placed=[],devB=Object.values(R).map(r=>({x:(r.l+r.r)/2,y:(r.t+r.b)/2,w:r.r-r.l,h:r.b-r.t}));
   const freeAt=(x,y,w,h,dv)=>![...placed,...(dv?devB:[])].some(b=>x-w/2<b.x+b.w/2+4&&x+w/2>b.x-b.w/2-4&&y-h/2<b.y+b.h/2+3&&y+h/2>b.y-b.h/2-3);
@@ -1941,7 +2024,7 @@ function drawWires(){peekDev=null;const tr=traceSet(),m=ui.match,R=devRects(),la
       if(!freeAt(p.x,p.y,16,16)){let ok=false;for(const d of [18,-18,32,-32,46,-46]){const t=at+d;if(t<12||t>len-12)continue;const pp=el.getPointAtLength(t);if(freeAt(pp.x,pp.y,16,16)){at=t;p=pp;ok=true;break}}if(!ok)continue}
       placed.push({x:p.x,y:p.y,w:14,h:14});const q=el.getPointAtLength(Math.min(len,at+2));const ang=Math.atan2(q.y-p.y,q.x-p.x)*180/Math.PI+(fwd?0:180);
       dh+=`<g class="flowarr" transform="translate(${p.x},${p.y}) rotate(${ang})"><path d="M-7,-8 L7,0 L-7,8 L-3.5,0 Z" fill="${col}"/></g>`}})}
-  $('deco').innerHTML=dh;renderLegend();renderCtx()}
+  $('deco').innerHTML=dh+bundleBadges(BG);renderLegend();renderCtx()}
 function renderLegend(){const el=$('legend');const mode=prefs.colorMode;
   const line=(c,w,dash)=>`<svg viewBox="0 0 26 8" style="width:22px;height:8px;margin-right:5px;vertical-align:0"><path d="M2 4H24" stroke="${c}" stroke-width="${w}" stroke-linecap="round"${dash?` stroke-dasharray="${dash}"`:''}/></svg>`;
   const L=[['L1 實體','patch','配線架、資訊座、Hub'],['L2 交換','sw','Switch、無線 AP'],['L3 路由','router','路由器、L3 Switch'],['L3–L7 防火牆','fw','防火牆'],['L1–L7 終端','end','電腦、伺服器、印表機']];
@@ -1953,6 +2036,7 @@ function renderLegend(){const el=$('legend');const mode=prefs.colorMode;
   $('cableLegend').innerHTML=h}
 function renderEmpty(){const e=$('emptyc');if(e)e.hidden=S.devices.length>0||ui.view!=='map'}
 function renderHint(){renderEmpty();const el=$('hint');el.className='';
+  if(ui.preview){el.className='warnb pvb';el.innerHTML=`預覽 #${ui.preview.rev}（${tFmt(ui.preview.ts)}）· 只能看 <button id="pvRest">還原這個版本</button><button id="pvBack">回到目前版本</button>`;$('pvBack').onclick=endPreview;$('pvRest').onclick=()=>restoreRev(ui.preview.rev,ui.preview.j);return}
   if(ui.ro){el.className='warnb';el.innerHTML=`唯讀模式：點埠可查整條路徑 <button id="hUnlock">解除</button>`}
   else if(ui.pending){el.className='act';el.innerHTML=`從 <b>${esc(pname(ui.pending))}</b> 出發，點要接過去的埠 <button id="hCancel">取消</button>`}
   else if(link&&link.active){el.className='act';el.innerHTML=`${link.cable?'拖到新的埠放開，就把線改插過去':'拖到另一個空的埠放開，就接上線'} · Esc 取消`}
@@ -2026,11 +2110,12 @@ function peekHTML(s){I=I||idx();let a='',b='';
   else if(s.port){const p=I.ports[s.port],d=I.owner[s.port];if(!p)return'';a=`${d.name} · 埠 ${p.label}`;const c=I.cab[p.id];b=c?`線 ${c.label||''} ${c.type||''}`:'未接線'}
   else if(s.cable){const c=S.cables.find(x=>x.id===s.cable);if(!c)return'';a=`線 ${c.label||''}`;b=[c.type,c.speed,c.len?c.len+' m':''].filter(Boolean).join(' · ')}
   return`<div class="pk"><b>${esc(a)}</b><span>${esc(b)}</span></div><div class="pkhint">⌃ 往上拉或點這裡，展開設定</div>`}
-function liveDevHTML(d){const NET=['fw','router','sw','hub','ap'].includes(d.type),vg=vendorFor(d);
+function liveDevHTML(d){return pingCardHTML(d)+liveDevHTML0(d)}
+function liveDevHTML0(d){const NET=['fw','router','sw','hub','ap'].includes(d.type),vg=vendorFor(d);
   if(!SRV)return NET||d.ip?`<div class="card"><span class="label">即時狀態與流量圖</span><p class="hint">${location.protocol==='file:'||/github\.io$|claude\./.test(location.hostname)?'這是線上版網頁，沒有監控資料。':''}要看流量，請在 netmap.exe 啟動「監控服務」，再用它提供的網址（例如 <code>http://${esc(d.type==='end'&&d.ip&&/^\d/.test(d.ip)?d.ip:'netmap 那台電腦的 IP')}:8080</code>）開啟這張圖。${NET?'網管設備要開 SNMP；':''}跑 netmap.exe 的那台電腦會自動監控自己。<a href="${MANUAL_URL}#e-srv" target="_blank" rel="noopener">怎麼設定？</a>${vg&&NET?` · <a href="#" data-vguide="${vg.id}">${esc(vg.name)} 怎麼開 SNMP</a>`:''}</p></div>`:'';
   if(!NET&&!d.sshmon&&!(d.snmp&&d.snmp.host)&&!(ui.live&&ui.live.devices[d.id])){if(!d.ip)return'';
     const me=(SRV.self_ips||[]),isMe=me.includes(d.ip);
-    return`<div class="card"><span class="label">即時狀態</span><p class="hint">${isMe?`這台就是跑 netmap.exe 的電腦，會自動讀它的網卡流量；下一次輪詢（每 ${SRV.interval||60} 秒）後就會顯示。`:`這台沒有被監控。${me.length?`跑 netmap.exe 的電腦 IP 是 <b>${esc(me.join('、'))}</b>，如果就是這台，請把 IP 改成一樣。`:''}其他電腦可以看防火牆送來的流量紀錄（流量圖 ▸ 誰在用），或在它身上開 SNMP。`}</p></div>`}const ld=ui.live&&ui.live.devices[d.id];const ps=d.ports.map(p=>ui.live&&ui.live.ports[p.id]).filter(Boolean);
+    return`<div class="card"><span class="label">即時狀態</span><p class="hint">${isMe?`這台就是跑 netmap.exe 的電腦，會自動讀它的網卡流量；下一次輪詢（每 ${SRV.interval||60} 秒）後就會顯示。`:`這台沒有流量資料${pingOf(d)?'（Ping 心跳只看通不通，在上面）':''}。${me.length?`跑 netmap.exe 的電腦 IP 是 <b>${esc(me.join('、'))}</b>，如果就是這台，請把 IP 改成一樣。`:''}其他電腦可以看防火牆送來的流量紀錄（流量圖 ▸ 誰在用），或在它身上開 SNMP。`}</p></div>`}const ld=ui.live&&ui.live.devices[d.id];const ps=d.ports.map(p=>ui.live&&ui.live.ports[p.id]).filter(Boolean);
   if(!ld&&!ps.length)return`<div class="card"><span class="label">即時狀態</span><p class="hint">${d.ip||(d.snmp&&d.snmp.host)||d.sshmon?'等待監控服務輪詢…':'填上 IP（或用 netmap.exe 掃描）後，監控服務就會讀取這台設備。'}</p>${ld?`<div class="dspark" data-dspark="${d.id}">${(ui.spark&&ui.spark[d.id]&&ui.spark[d.id].html)||'<span class="hint">載入今日流量…</span>'}</div>`:''}<button class="livebtn lcmrtg" data-devtraffic="${d.id}"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg>這台設備的流量圖與狀態</button>${ld&&!ld.up&&vendorFor(d)?`<p class="devguide"><a href="#" data-vguide="${vendorFor(d).id}">${esc(vendorFor(d).name)} 怎麼開 SNMP／允許查詢？</a></p>`:''}</div>`;
   const up=ps.filter(p=>p.up).length,dn=ps.filter(p=>p.up===false).length,busy=ps.filter(p=>p.util!=null||p.in!=null).sort((a,b)=>(b.util??-1)-(a.util??-1)||((b.in||0)+(b.out||0))-((a.in||0)+(a.out||0)))[0];
   return`<div class="card"><span class="label">即時狀態 <small>${ld?(ld.up?`<b class="c-ok">${ld.via==='ssh'?'SSH':ld.via==='local'?'本機網卡':'SNMP'} 正常</b>`:`<b class="c-bad">${esc(ld.err||'沒有回應')}</b>`):''}</small></span><div class="lnums"><div><small>上線埠</small><b>${up}</b></div><div><small>離線埠</small><b class="${dn?'c-bad':''}">${dn}</b></div><div><small>最忙</small><b>${busy?(busy.util!=null?Math.round(busy.util*100)+'%':'—'):'—'}</b></div><div><small>流量</small><b>${busy?'↓'+fmtBps(busy.in)+' ↑'+fmtBps(busy.out):'—'}</b></div></div>${ld?`<div class="dspark" data-dspark="${d.id}">${(ui.spark&&ui.spark[d.id]&&ui.spark[d.id].html)||'<span class="hint">載入今日流量…</span>'}</div>`:''}<button class="livebtn lcmrtg" data-devtraffic="${d.id}"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg>這台設備的流量圖與狀態</button>${ld&&!ld.up&&vendorFor(d)?`<p class="devguide"><a href="#" data-vguide="${vendorFor(d).id}">${esc(vendorFor(d).name)} 怎麼開 SNMP／允許查詢？</a></p>`:''}</div>`}
@@ -2049,9 +2134,10 @@ function inspDev(el,d){const T=TYPES[d.type];const ls=layersOf(d);const used=d.p
   <div id="bnote">${brandNote(d)}</div>
   ${T.ip?`<div class="row2">${inp('IP','d.ip',d.ip,'192.168.1.x')}${inp('Gateway','d.gw',d.gw,'192.168.1.1')}</div>${inp('MAC','d.mac',d.mac,'AA:BB:CC:DD:EE:FF')}`:''}
   ${inp('位置','d.loc',d.loc,'3F 業務部')}
+  ${multiPage()?sel('所在頁面','d.page',pageOf(d),S.pages.map(p=>[p.id,p.name])):''}
   ${rackable(d)?`<div class="row3">${sel('機櫃','d.rack',d.rack,[['','未上架'],...S.racks.map(r=>[r.name,r.name+'（'+r.size+'U）'])])}${inp('U 位（底部）','d.u',d.u,'—','number')}${sel('高度','d.uh',uhOf(d),[[1,'1U'],[2,'2U'],[3,'3U'],[4,'4U']])}</div>`:''}
   <div class="field"><label class="label" for="f-d-note">備註</label><textarea id="f-d-note" data-f="d.note" rows="2" placeholder="序號、保固、管理帳號放哪裡…">${esc(d.note)}</textarea></div></div>
-  ${wifiCardHTML(d)}<div class="card"><span class="label">埠位配置${sp?` · ${esc(d.model)} 規格 ${specText(sp)}`:''}</span>
+  ${wifiCardHTML(d)}${fiberCardHTML(d)}<div class="card"><span class="label">埠位配置${sp?` · ${esc(d.model)} 規格 ${specText(sp)}`:''}</span>
   <div class="chips">${(PRESETS[d.type]||[]).map((p,i)=>`<button class="chipbtn" data-preset="${i}" title="${T.pass?'每埠前後各一':''}">${specText(p)}</button>`).join('')}${sp?`<button class="chipbtn" data-preset="spec">套用 ${esc(d.model)} 規格</button>`:''}</div>
   <div class="row2"><div class="field"><label class="label" for="pc-main">${T.pass?'埠數（前後各一）':'網路埠數'}</label><input id="pc-main" type="number" min="1" max="96" value="${nMain}"></div>
   ${!T.pass&&d.type!=='end'&&d.type!=='hub'?`<div class="field"><label class="label" for="pc-sfp">SFP 光纖埠</label><input id="pc-sfp" type="number" min="0" max="8" value="${nSfp}"></div>`:''}</div>
@@ -2068,7 +2154,7 @@ function inspPort(el,pid){const p=I.ports[pid],d=I.owner[pid],c=I.cab[pid],steps
   el.innerHTML=`<div class="ihead"><span class="tile">${iconOf(d)}</span><div style="min-width:0"><div class="kicker"><span class="pill">網路埠</span>${c?`<span class="pill" style="background:color-mix(in srgb,${cableStyle(c).color} 22%,transparent);color:var(--ink)">已接線</span>`:'<span class="pill">未接線</span>'}${p.poe?'<span class="pill" style="color:var(--warn)">PoE</span>':''}${p.lag?`<span class="pill">${esc(p.lag)}</span>`:''}</div><h2>${esc(d.name)} · ${esc(pshort(pid))}</h2></div></div>
   <div class="card"><span class="label">完整路徑${A!==B?' · '+esc(I.owner[A].name)+' ↔ '+esc(I.owner[B].name):''}</span>
   <ol class="chain">${steps.map((x,i)=>{const last=i===steps.length-1;const rail=`<span class="rail"><span class="node"></span>${last?'':'<span class="seg-line"></span>'}</span>`;
-    if(x.k==='port'){const pp=I.ports[x.p];return`<li class="${x.start?'start':''}">${rail}<div class="hop"><b>${esc(I.owner[x.p].name)}</b><div class="mono">埠 ${esc(pshort(x.p))}${pp.mode==='trunk'?' · Trunk':pp.vlan?' · VLAN '+esc(pp.vlan):''}${pp.poe?' · PoE':''}${pp.lag?' · '+esc(pp.lag):''}${pp.note?' · '+esc(pp.note):''}</div></div></li>`}
+    if(x.k==='port'){const pp=I.ports[x.p];return`<li class="${x.start?'start':''}">${rail}<div class="hop"><b>${esc(I.owner[x.p].name)}</b>${pgTag(I.owner[x.p])}<div class="mono">埠 ${esc(pshort(x.p))}${pp.mode==='trunk'?' · Trunk':pp.vlan?' · VLAN '+esc(pp.vlan):''}${pp.poe?' · PoE':''}${pp.lag?' · '+esc(pp.lag):''}${pp.note?' · '+esc(pp.note):''}</div></div></li>`}
     if(x.k==='cable')return`<li class="cable" style="--c:${cableStyle(x.c).color}">${rail}<div class="hop">線號 <b>${esc(x.c.label)}</b>${x.c.type?' · '+esc(x.c.type):''}${x.c.speed?' · '+esc(x.c.speed):''}${x.c.len?' · '+esc(x.c.len)+' m':''}</div></li>`;
     return`<li class="inner">${rail}<div class="hop">穿過${TYPES[x.d.type].n}（${x.d.type==='patch'?'正面跳線 ⇄ 背面固定線':'桌面 ⇄ 牆內'}）</div></li>`}).join('')}</ol>
   ${c?'':'<p class="hint">這個埠還沒接線。直接從它拖曳到另一個埠，或按下方按鈕再點目標埠。</p>'}</div>
@@ -2078,7 +2164,7 @@ function inspPort(el,pid){const p=I.ports[pid],d=I.owner[pid],c=I.cab[pid],steps
   ${p.mode==='trunk'?inp('Tagged VLAN','p.tagged',p.tagged||'','例：10,20,30'):''}
   <div class="row2"><div class="field"><label class="label" for="f-p-lag">LACP 群組</label><input id="f-p-lag" data-f="p.lag" value="${esc(p.lag||'')}" placeholder="例：Po1" list="lagList"><datalist id="lagList">${lags.map(g=>`<option value="${esc(g)}">`).join('')}</datalist></div>
   ${sw&&p.kind==='rj45'?`<label class="checkrow" style="align-self:end;padding-bottom:8px"><input type="checkbox" data-f="p.poe" ${p.poe?'checked':''}> PoE 供電</label>`:'<span></span>'}</div>
-  ${inp('備註','p.note',p.note||'','例：分機 301、Gi1/0/2')}</div>
+  ${inp('備註','p.note',p.note||'','例：分機 301、Gi1/0/2')}${SRV&&!TYPES[d.type].pass?sel('離線告警','p.alert',p.alert===true?'on':p.alert===false?'off':(p.alert||''),[['','自動（接到網路設備、伺服器的主幹埠才通知）'],['on','一定通知'],['off','不通知']]):''}</div>
   <div class="actions">${c?`<button class="btn" data-ia="gocable" data-nav="1">編輯這條線</button><button class="btn danger" data-ia="unplug">拔除線</button>`:`<button class="btn primary" data-ia="pend">選擇要接到的埠</button>`}<button class="btn" data-ia="godev" data-nav="1">設備設定</button></div>
   <p class="hint">Shift + 點其他埠可以多選，一次設定 LACP、PoE 或 VLAN。</p>`;
 }
@@ -2098,7 +2184,7 @@ function inspCable(el,c){const st=cableStyle(c);
   <div class="row2">${sel('線材','c.type',c.type||'Cat6',CABLE_TYPES.map(t=>[t,t]))}${sel('速率','c.speed',c.speed||'',SPEEDS.map(s=>[s,s||'—']))}</div>
   <div class="row2">${sel('方向 / 流量','c.dir',c.dir||'none',[['none','不標示'],['ab','A → B'],['ba','B → A'],['both','雙向 ⇄']])}${inp('長度 (m)','c.len',c.len||'','—','number')}</div>
   <div class="field"><span class="label">顏色${prefs.colorMode!=='custom'?'（目前依'+(prefs.colorMode==='type'?'線材':'VLAN')+'自動上色，切回「自訂」才會用這個顏色）':''}</span><div class="swatches">${COLORS.map(([n,v])=>`<button data-color="${v}" title="${n}" aria-label="${n}色" aria-pressed="${c.color===v}" style="background:${v}"></button>`).join('')}</div></div></div>
-  <div class="card"><span class="label">走線錨點 · ${(c.wps||[]).length} 個</span><p class="hint">在線上<b>雙擊</b>新增錨點，拖曳錨點把線拉到走線槽，雙擊錨點刪除。搭配「顯示 ▸ 直角」走線最整齊。</p>${(c.wps||[]).length?'<div class="actions"><button class="btn" data-ia="clearwp">清除錨點</button></div>':''}</div>
+  ${(()=>{const t=trunkOf(c);if(!t)return'';const ci=coreInfo(c.core||1);return`<div class="card"><span class="label">光纖束</span><button class="tkrow" data-tkopen="${t.id}"><i class="fdot" style="background:${ci.color}"></i><b>${esc(t.name||'光纖束')} 第 ${c.core} 芯（${ci.name}${t.n>12?'，第 '+ci.tube+' 管':''}）</b><small>${t.n} 芯 ${t.type==='MM'?'多模':'單模'} · 看整束每一芯</small></button></div>`})()}<div class="card"><span class="label">走線錨點 · ${(c.wps||[]).length} 個</span><p class="hint">在線上<b>雙擊</b>新增錨點，拖曳錨點把線拉到走線槽，雙擊錨點刪除。搭配「顯示 ▸ 直角」走線最整齊。</p>${(c.wps||[]).length?'<div class="actions"><button class="btn" data-ia="clearwp">清除錨點</button></div>':''}</div>
   <div class="actions"><button class="btn" data-ia="trace" data-nav="1">追蹤整條路徑</button><button class="btn danger" data-ia="delcable">${si(ICON.del)} 拔除</button></div>`}
 function curObj(pref){const s=ui.sel;if(!s)return null;if(pref==='d'&&s.dev)return S.devices.find(x=>x.id===s.dev);if(pref==='p'&&s.port)return I.ports[s.port];if(pref==='c'&&s.cable)return S.cables.find(x=>x.id===s.cable);return null}
 function setField(f,val){if(ui.ro)return null;const[pref,key]=f.split('.');const o=curObj(pref);if(!o)return null;if(!ui.fieldSnapped){snap();ui.fieldSnapped=true}
@@ -2225,7 +2311,7 @@ function freeSpot(){const R=Object.values(devRects()),z=ui.zoom;const vx=(stage.
 function addNew(type,pos,kind){if(!canEdit())return;if(ui.view!=='map')setView('map');const T=TYPES[type];const p=pos||freeSpot();snap();
   const count=S.devices.filter(d=>d.type===type&&(!kind||d.kind===kind)).length+1;const nn=String(count).padStart(2,'0');
   const name=type==='seat'?`座位 ${nn}`:type==='end'?(kind==='伺服器'?`SRV-${nn}`:kind?`${kind.split(' ')[0]}-${nn}`:`PC-${nn}`):`${T.t}-${nn}`;
-  const d=addDev(type,{name,kind,x:Math.max(10,Math.round(p.x/10)*10),y:Math.max(10,Math.round(p.y/10)*10)});normalize(S);ui.sel={dev:d.id};ui.multi.clear();ui.focus='d.name';ui.layer=null;ui.popId=d.id;save();toast('已加入 '+name+'，可在右側改名稱與廠牌',true);
+  const d=addDev(type,{name:type==='patch'&&kind==='fdp'?`FDP-${String(S.devices.filter(x=>x.fiber).length+1).padStart(2,'0')}`:name,kind:type==='end'?kind:undefined,x:Math.max(10,Math.round(p.x/10)*10),y:Math.max(10,Math.round(p.y/10)*10)});if(type==='patch'&&kind==='fdp')makeFdp(d);normalize(S);ui.sel={dev:d.id};ui.multi.clear();ui.focus='d.name';ui.layer=null;ui.popId=d.id;save();toast('已加入 '+name+'，可在右側改名稱與廠牌',true);
   renderLayerChips();renderAll();if(p.off)stage.scrollTo({top:PAD+d.y*ui.zoom-120,behavior:'smooth'})}
 
 /* ---------- table ---------- */
@@ -2296,7 +2382,7 @@ function openImage(){if(ui.view!=='map')setView('map');const go=()=>{const r=top
   $('iPng').onclick=()=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=r.W*2;c.height=r.H*2;const x=c.getContext('2d');x.scale(2,2);x.drawImage(img,0,0);c.toBlob(b=>{if(b){download(`netmap-${stamp()}.png`,'image/png',b);toast('已下載 PNG')}else toast('PNG 產生失敗，請改用 SVG')},'image/png')};img.onerror=()=>toast('PNG 產生失敗，請改用 SVG');img.src=url}};
   requestAnimationFrame(()=>requestAnimationFrame(go))}
 function projectJSON(){return JSON.stringify(Object.assign({app:'netmap',version:3,savedAt:new Date().toISOString()},S),null,1)}
-function loadProject(o,msg){if(!o||!Array.isArray(o.devices)||!Array.isArray(o.cables))throw new Error('format');snap();S=normalize({devices:o.devices,cables:o.cables,racks:o.racks||[],faults:o.faults||[]});ui.fault=null;ui.sim=null;ui.fopen=false;ui.sel=null;ui.pending=null;ui.multi.clear();
+function loadProject(o,msg){if(!o||!Array.isArray(o.devices)||!Array.isArray(o.cables))throw new Error('format');localRevTick(true,'匯入前的版本');snap();S=normalize({devices:o.devices,cables:o.cables,racks:o.racks||[],faults:o.faults||[],pages:o.pages||[],trunks:o.trunks||[]});ui.fault=null;ui.page=null;ui.sim=null;ui.fopen=false;ui.sel=null;ui.pending=null;ui.multi.clear();
   const auto=o.layout==='auto'||(S.devices.length>1&&S.devices.every(d=>!d.x&&!d.y));if(ui.view!=='map'&&auto)setView('map');
   save();I=idx();renderAll();if(auto){autoLayout();padLayout();save();renderAll();requestAnimationFrame(()=>fitTo(devBox(),1))}
   toast(o.source&&/snmp/i.test(o.source)?`${msg}：${S.devices.length} 台設備、${S.cables.length} 條線，配線架與資訊座請手動補上`:msg,true)}
@@ -2371,7 +2457,7 @@ function openLLDP(){if(!canEdit())return;const locals=S.devices.filter(d=>['sw',
 
 /* ---------- share / QR ---------- */
 function shareBase(){if(SRV)return location.origin+'/';return/github\.io$/.test(location.hostname)?location.origin+location.pathname:PUBLIC_URL}
-function shareURL(o){const ps=new URLSearchParams();if(o.dev)ps.set('dev',o.dev);if(o.ro)ps.set('ro','1');if(o.data&&window.LZString)ps.set('p',LZString.compressToEncodedURIComponent(JSON.stringify({devices:S.devices,cables:S.cables,racks:S.racks,faults:S.faults})));if(ui.fault)ps.set('fault',ui.fault);return shareBase()+'#'+ps.toString()}
+function shareURL(o){const ps=new URLSearchParams();if(o.dev)ps.set('dev',o.dev);if(o.ro)ps.set('ro','1');if(o.data&&window.LZString)ps.set('p',LZString.compressToEncodedURIComponent(JSON.stringify(projData())));if(ui.fault)ps.set('fault',ui.fault);return shareBase()+'#'+ps.toString()}
 function qrSVG(text){if(!window.qrcode)return null;try{const q=qrcode(0,'L');q.addData(text);q.make();return q.createSvgTag({cellSize:4,margin:2,scalable:true})}catch(e){return null}}
 function openShare(d){const title=d?`設備連結：${d.name}`:'分享整份配置';
   modal(`<h2>${esc(title)}</h2><p class="hint">${d?'貼在實體機櫃或設備上，掃描後直接打開這台設備的接線圖。':'把整份配置做成一個網址，對方不用匯入檔案就能查看。'}</p>
@@ -2491,7 +2577,7 @@ canvas.addEventListener('pointerdown',e=>{if(e.button!==0)return;
   if(e.target.closest('[data-act]'))return;
   const wp=e.target.closest('[data-wp]');if(wp&&!ui.ro){e.preventDefault();const[cid,i]=wp.dataset.wp.split(':');wpd={c:S.cables.find(c=>c.id===cid),i:+i,moved:false};return}
   const pb=e.target.closest('.port');
-  if(pb){if(!ui.ro)e.preventDefault();link={from:pb.dataset.port,sx:e.clientX,sy:e.clientY,active:false,mod:e.shiftKey||e.ctrlKey||e.metaKey};return}
+  if(pb){if(!ui.ro)e.preventDefault();link={from:pb.dataset.port,sx:e.clientX,sy:e.clientY,active:false,mod:e.shiftKey||e.ctrlKey||e.metaKey,touch:e.pointerType!=='mouse'};return}
   const h=e.target.closest('[data-drag]');
   if(h){if(!ui.ro)e.preventDefault();const d=S.devices.find(x=>x.id===h.dataset.drag);drag={d,sx:e.clientX,sy:e.clientY,ox:d.x,oy:d.y,moved:false,el:h.closest('.dev')};return}
   if(e.shiftKey&&!e.target.closest('.dev')){e.preventDefault();const p=toCanvas(e);const box=document.createElement('div');box.className='mq';canvas.appendChild(box);mq={x0:p.x,y0:p.y,box};return}
@@ -2534,7 +2620,9 @@ document.addEventListener('pointerup',e=>{
     const sel=S.devices.flatMap(d=>d.ports).filter(p=>{const c=center(p.id);return c&&c.x>=l&&c.x<=r&&c.y>=t&&c.y<=b}).map(p=>p.id);
     ui.multi=new Set(sel);ui.sel=sel.length===1?{port:sel[0]}:null;if(sel.length===1)ui.multi.clear();renderAll();if(sel.length>1)toast(`已框選 ${sel.length} 個埠`);return}
   if(link){const L=link;link=null;const t=L.active?portAt(e.clientX,e.clientY,L.from):null;endLinkUI();
-    if(!L.active){portClick(L.from,L.mod)}else{if(!t||t===L.from){renderAll();return}connect(L.from,t)}return}
+    if(!L.active){if(!L.mod&&!ui.pending&&densePick(L.from,L.touch)){openPortPicker(I.owner[L.from],L.from,pid=>portClick(pid,false),{x:e.clientX,y:e.clientY});return}
+      if(ui.pending&&!L.mod&&densePick(L.from,L.touch)){const from=ui.pending;openPortPicker(I.owner[L.from],L.from,pid=>connect(from,pid),{x:e.clientX,y:e.clientY},`把 ${pname(from)} 接到 ${I.owner[L.from].name} 的哪一埠？`);return}portClick(L.from,L.mod)}
+    else{if(!t||t===L.from){renderAll();return}if(I.owner[t]&&I.owner[t].id!==I.owner[L.from].id&&densePick(t,L.touch)){const from=L.from;renderAll();openPortPicker(I.owner[t],t,pid=>connect(from,pid),{x:e.clientX,y:e.clientY},`把 ${pname(from)} 接到 ${I.owner[t].name} 的哪一埠？`);return}connect(L.from,t)}return}
   if(drag){const D=drag;drag=null;canvas.classList.remove('dragging');if(!D.moved){const now=Date.now();if(lastDev.id===D.d.id&&now-lastDev.t<450){lastDev={};toggleView(D.d);return}lastDev={id:D.d.id,t:now};if(ui.fpick){startFault(D.d.id);return}ui.sel={dev:D.d.id};ui.multi.clear();renderAll()}else{save();renderCanvas()}}
 });
 document.addEventListener('pointercancel',()=>{if(pdrag){if(pdrag.ghost)pdrag.ghost.remove();pdrag=null}if(pan){pan=null;canvas.classList.remove('panning')}if(link){link=null;endLinkUI();renderAll()}if(drag){drag=null;canvas.classList.remove('dragging');save();renderCanvas()}if(mq){mq.box.remove();mq=null}wpd=null;
@@ -2597,7 +2685,7 @@ document.querySelectorAll('[data-popbtn]').forEach(b=>b.onclick=e=>{e.stopPropag
 document.addEventListener('click',e=>{if(!e.target.closest('.popwrap')){document.querySelectorAll('.popwrap>.pop').forEach(x=>x.hidden=true);document.querySelectorAll('[data-popbtn]').forEach(x=>x.setAttribute('aria-expanded','false'))}});
 function renderViewPop(){const wm=$('wireMode');if(wm)wm.querySelectorAll('[data-wm]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.wm===prefs.wireMode));
   $('layerToggles').innerHTML=LAYERS.map(([k,n])=>`<label class="tog"><input type="checkbox" data-layer="${k}" ${prefs.layers[k]?'checked':''}>${n}</label>`).join('');
-  document.querySelectorAll('[data-cmode]').forEach(b=>b.setAttribute('aria-pressed',prefs.colorMode===b.dataset.cmode));document.querySelectorAll('[data-route]').forEach(b=>b.setAttribute('aria-pressed',prefs.route===b.dataset.route))}
+  document.querySelectorAll('[data-cmode]').forEach(b=>b.setAttribute('aria-pressed',prefs.colorMode===b.dataset.cmode));document.querySelectorAll('[data-route]').forEach(b=>b.setAttribute('aria-pressed',prefs.route===b.dataset.route));if($('optBundle'))$('optBundle').checked=!!prefs.bundle;if($('optPick'))$('optPick').checked=!prefs.noPick}
 document.addEventListener('click',e=>{const cm=e.target.closest('[data-cmode]'),rt=e.target.closest('[data-route]');if(cm)prefs.colorMode=cm.dataset.cmode;if(rt)prefs.route=rt.dataset.route;if(cm||rt){savePrefs();renderViewPop();renderAll()}});
 $('wireMode').addEventListener('click',e=>{const b=e.target.closest('[data-wm]');if(!b)return;prefs.wireMode=b.dataset.wm;savePrefs();renderViewPop();renderAll();
   toast({main:'只顯示設備之間的主幹線路，終端線以色標配對',all:'顯示全部線路',none:'隱藏線路，兩端以色標配對'}[prefs.wireMode])});
@@ -2612,6 +2700,7 @@ $('popFile').addEventListener('click',e=>{const b=e.target.closest('[data-file]'
   if(a==='image')openImage();
   if(a==='lldp')openLLDP();
   if(a==='share')openShare(null);
+  if(a==='history')openHistory();if(a==='page')addPage();if(a==='labels')openLabels();if(a==='seen')openSeen();if(a==='events')openEvents();if(a==='settings')openSettings();
   if(a==='jsonText')openJsonText()});
 function openJsonText(){let old=null,bk=null;try{old=localStorage.getItem(OLDKEY);bk=localStorage.getItem(KEY+'-backup')}catch(e){}
   modal(`<h2>JSON 文字匯入 / 匯出</h2><p class="hint">複製下方 JSON 備份或交給同事；要還原，貼上後按「匯入」。也可以用「檔案 ▸ 下載專案檔」存成 .json。</p>
@@ -2713,7 +2802,7 @@ stage.addEventListener('pointermove',e=>{lastPtr={clientX:e.clientX,clientY:e.cl
 function openAddMenu(pt,useFree){if(!canEdit()||ui.view!=='map')return;const m=$('addmenu'),wr=$('stagewrap').getBoundingClientRect();m.dataset.free=useFree?'1':'';
   if(!pt||pt.clientX<wr.left||pt.clientX>wr.right||pt.clientY<wr.top||pt.clientY>wr.bottom)pt={clientX:wr.left+wr.width/2,clientY:wr.top+wr.height/3};
   const cp=toCanvas(pt);m.dataset.x=cp.x;m.dataset.y=cp.y;
-  m.innerHTML=`<span class="amt">${useFree?'加入設備':'在這裡加入設備'}</span>`+Object.entries(TYPES).map(([k,T])=>`<button role="menuitem" data-add="${k}" style="--tc:${tc(k)}"><span class="tile">${k==='end'?KICON['PC 桌機']:TICON[k]}</span>${T.n}</button>`).join('')+['伺服器','印表機','IP Phone','IP Cam','NAS'].map(k=>`<button role="menuitem" data-add="end" data-kind="${k}" style="--tc:${tc('end')}"><span class="tile">${KICON[k]}</span>${k}</button>`).join('');
+  m.innerHTML=`<span class="amt">${useFree?'加入設備':'在這裡加入設備'}</span>`+Object.entries(TYPES).map(([k,T])=>`<button role="menuitem" data-add="${k}" style="--tc:${tc(k)}"><span class="tile">${k==='end'?KICON['PC 桌機']:TICON[k]}</span>${T.n}</button>`).join('')+`<button role="menuitem" data-add="patch" data-kind="fdp" style="--tc:${tc('patch')}"><span class="tile">${TICON.patch}</span>光纖收容箱</button>`+['伺服器','印表機','IP Phone','IP Cam','NAS'].map(k=>`<button role="menuitem" data-add="end" data-kind="${k}" style="--tc:${tc('end')}"><span class="tile">${KICON[k]}</span>${k}</button>`).join('');
   m.hidden=false;const x=Math.max(8,Math.min(wr.width-m.offsetWidth-8,pt.clientX-wr.left)),y=Math.max(8,Math.min(wr.height-m.offsetHeight-8,pt.clientY-wr.top));m.style.left=x+'px';m.style.top=y+'px';m.querySelector('button').focus()}
 $('addmenu').addEventListener('click',e=>{const b=e.target.closest('[data-add]');if(!b)return;const m=$('addmenu');m.hidden=true;addNew(b.dataset.add,m.dataset.free?null:{x:+m.dataset.x-20,y:+m.dataset.y-20},b.dataset.kind||undefined)});
 $('addmenu').addEventListener('keydown',e=>{const bs=[...$('addmenu').querySelectorAll('button')];const i=bs.indexOf(document.activeElement);if(e.key==='ArrowDown'||e.key==='ArrowRight'){e.preventDefault();bs[(i+1)%bs.length].focus()}if(e.key==='ArrowUp'||e.key==='ArrowLeft'){e.preventDefault();bs[(i-1+bs.length)%bs.length].focus()}});
@@ -2795,18 +2884,18 @@ function liveCable(c){if(!liveOn())return null;const a=ui.live.ports[c.a],b=ui.l
 let srvSaveT=0,srvSaving=false,srvDirty=false;
 function srvSave(){if(!SRV||!SRV.edit)return;srvDirty=true;clearTimeout(srvSaveT);srvSaveT=setTimeout(srvFlush,700)}
 async function srvFlush(){if(srvSaving){srvSaveT=setTimeout(srvFlush,400);return}srvSaving=true;srvDirty=false;
-  try{const r=await fetch('/api/project',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({rev:ui.srvRev,project:{devices:S.devices,cables:S.cables,racks:S.racks,faults:S.faults}})});
+  try{const hd={'Content-Type':'application/json','X-Netmap':'1'};if(prefs.myName)hd['X-Netmap-User']=encodeURIComponent(prefs.myName);const r=await fetch('/api/project',{method:'PUT',headers:hd,body:JSON.stringify({rev:ui.srvRev,project:projData()})});
     const j=await r.json().catch(()=>({}));
     if(r.ok){ui.srvRev=j.rev;setLiveChip()}
     else if(r.status===409){S=normalize(j.project);ui.srvRev=j.rev;I=idx();renderAll();toast('其他人剛更新了這張圖，已載入最新版本；請再做一次剛才的修改')}
-    else if(r.status===403){toast(j.error||'這台電腦只能檢視')}
+    else if(r.status===403){toast(j.error||'這台電腦只能檢視')}else if(r.status===401){toast('需要重新登入');setTimeout(()=>location.reload(),1500)}
     else toast('儲存到監控服務失敗，稍後會再試');}
   catch(e){toast('連不到監控服務，修改還沒存檔');srvDirty=true}
   finally{srvSaving=false}}
 function busy(){return!!(drag||link||pan||mq||wpd||pdrag||rdrag||(document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)&&$('canvas').contains(document.activeElement)))}
 async function livePoll(){if(!SRV)return;
   try{const r=await fetch('/api/status',{cache:'no-store'});const j=await r.json();ui.live=j;ui.liveErr=false;
-    if(j.rev!==ui.srvRev&&!srvDirty&&!srvSaving&&!busy()){const p=await (await fetch('/api/project',{cache:'no-store'})).json();if(p.rev!==ui.srvRev){S=normalize(p.project);ui.srvRev=p.rev;I=idx();renderAll();placeIfNeeded()}}
+    evCheck(j);if(j.rev!==ui.srvRev&&!srvDirty&&!srvSaving&&!busy()&&!ui.preview){const p=await (await fetch('/api/project',{cache:'no-store'})).json();if(p.rev!==ui.srvRev){S=normalize(p.project);ui.srvRev=p.rev;I=idx();renderAll();placeIfNeeded()}}
     else if(ui.view==='map'&&!busy())renderCanvas();
     refreshLiveCard();ui.dtRefresh&&ui.dtRefresh();ui.wlRefresh&&ui.wlRefresh();flowRefresh().then(()=>{if(ui.flow&&ui.flow.t!==ui.flowDrawn){ui.flowDrawn=ui.flow.t;if(ui.sel&&!$('modalRoot').innerHTML&&!($('insp').contains(document.activeElement)&&/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)))renderInsp()}})}
   catch(e){ui.liveErr=true}
@@ -2982,7 +3071,7 @@ function wireWifiCard(el,d){el.querySelectorAll('[data-wfm]').forEach(b=>b.oncli
   const ss=el.querySelector('#wfSsid');if(ss){ss.onfocus=()=>snap();ss.oninput=()=>{d.wifi.ssid=ss.value.trim();save()}}}
 
 /* ======================= 右側分頁：設備資訊／網路流量 ======================= */
-function devState(d){const ld=ui.live&&ui.live.devices[d.id];return ld?(ld.up?'ok':'bad'):flowRate(d)?'ok':'none'}
+function devState(d){const ld=ui.live&&ui.live.devices[d.id],pg=pingOf(d);if(pg&&pg.st==='down')return'bad';return ld?(ld.up?'ok':'bad'):(pg&&pg.st!=='wait')||flowRate(d)?'ok':'none'}
 function portState(pid){const L=livePort(pid);return L?(L.up===false?'bad':'ok'):'none'}
 function devPortsHTML(d){if(!SRV)return'';const rows=d.ports.map(p=>({p,L:ui.live&&ui.live.ports[p.id]})).filter(x=>x.L);if(rows.length<2)return'';
   return`<div class="card"><span class="label">每個埠 <small>點一列看日／週／月／年圖</small></span>${rows.map(({p,L})=>`<div class="prow" data-mrtg="${p.id}"><span class="dot ${L.up?'up':L.up===false?'down':''}"></span><b>埠 ${esc(p.label)}</b><small>${L.in!=null?`↓${fmtBps(L.in)} ↑${fmtBps(L.out)}${L.util!=null?' · '+Math.round(L.util*100)+'%':''}`:L.up===false?'離線':'—'}</small></div>`).join('')}</div>`}
@@ -3023,7 +3112,7 @@ function drawerTabs(el,kind,x){const st=kind==='dev'?devState(x):portState(x);co
   const fl=document.createElement('div');fl.className='itab';fl.dataset.itab='flow';fl.innerHTML=kind==='dev'?devFlowTab(x):portFlowTab(x);
   el.append(bar,info,fl);
   const set=t=>{bar.querySelectorAll('button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.itabbtn===t)));info.hidden=t!=='info';fl.hidden=t!=='flow';
-    if(t==='flow'&&SRV){if(kind==='port')loadChart(x);else loadDevSpark(x.id)}};
+    if(t==='flow'&&SRV){if(kind==='port')loadChart(x);else{loadDevSpark(x.id);loadPingSpark(x.id)}}};
   bar.querySelectorAll('button').forEach(b=>b.onclick=()=>{prefs[key]=b.dataset.itabbtn;savePrefs();set(b.dataset.itabbtn)});
   if(kind==='dev'){wireWifiCard(el,x);fl.querySelectorAll('[data-cfilt]').forEach(b=>b.onclick=()=>{ui.cfilt=b.dataset.cfilt;renderInsp()});fl.querySelectorAll('[data-applycl]').forEach(b=>b.onclick=()=>applyClients(b.dataset.applycl))}
   set(tab)}
@@ -3296,25 +3385,402 @@ function initFault(){
     if(e.target.id==='fCloseNote'){const f=curFault();if(f){f.note=e.target.value.trim();save()}}});
 }
 
+/* ======================= 3.1：頁面、光纖束、平行線收合、心跳告警、事件、歷史版本、權限、線標、網路上的設備、高密度選埠 ======================= */
+function projData(){const o={devices:S.devices,cables:S.cables,racks:S.racks,faults:S.faults};if(S.pages&&S.pages.length)o.pages=S.pages;if(S.trunks&&S.trunks.length)o.trunks=S.trunks;return o}
+async function api(path,opt){opt=opt||{};const h={'X-Netmap':'1'};if(opt.body!=null)h['Content-Type']='application/json';if(prefs.myName)h['X-Netmap-User']=encodeURIComponent(prefs.myName);
+  const r=await fetch(path,{method:opt.method||(opt.body!=null?'POST':'GET'),headers:h,body:opt.body!=null?JSON.stringify(opt.body):undefined,cache:'no-store'});
+  const j=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(j.error||('HTTP '+r.status));e.status=r.status;e.data=j;throw e}return j}
+const tAgo=ts=>{if(!ts)return'—';const s=Math.max(0,Date.now()/1000-ts);return s<60?'剛剛':s<3600?Math.floor(s/60)+' 分鐘前':s<86400?Math.floor(s/3600)+' 小時前':Math.floor(s/86400)+' 天前'};
+const tFmt=ts=>ts?new Date(ts*1000).toLocaleString('zh-TW',{hour12:false,month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
+const tDur=s=>{s=Math.max(0,Math.round(s||0));return s<60?s+' 秒':s<3600?Math.floor(s/60)+' 分鐘':s<86400?Math.floor(s/3600)+' 小時 '+Math.floor(s%3600/60)+' 分':Math.floor(s/86400)+' 天 '+Math.floor(s%86400/3600)+' 小時'};
+const normMac=m=>{const h=String(m||'').replace(/[^0-9a-f]/gi,'').toLowerCase();return h.length===12?h.match(/../g).join(':'):''};
+
+/* ---------- 多張圖（頁面）與跨圖連接 ---------- */
+function pageList(){return S.pages&&S.pages.length?S.pages:[{id:'',name:'主圖'}]}
+function multiPage(){return!!(S.pages&&S.pages.length>1)}
+function pageOf(d){const L=pageList();return L.some(p=>p.id===d.page)?d.page:L[0].id}
+function curPage(){const L=pageList();const id=ui.page!=null?ui.page:prefs.page;return L.some(p=>p.id===id)?id:L[0].id}
+function onPage(d){return!multiPage()||pageOf(d)===curPage()}
+function pageName(id){const p=pageList().find(p=>p.id===id);return p?p.name:''}
+function pgTag(d){return multiPage()&&pageOf(d)!==curPage()?`<span class="pgtag">${esc(pageName(pageOf(d)))}</span>`:''}
+function setPage(id,sel){ui.page=id;prefs.page=id;savePrefs();ui.sel=sel||null;ui.multi.clear();ui.pending=null;if(ui.view!=='map')setView('map');renderAll();
+  requestAnimationFrame(()=>{const did=sel&&(sel.dev||(sel.port&&I.owner[sel.port]&&I.owner[sel.port].id));const b=did?devBox(new Set([did])):devBox();if(b)fitTo(b,did?1.1:1)})}
+function renderPages(){const el=$('pagebar');if(!el)return;const L=pageList(),cur=curPage();const cnt=id=>S.devices.filter(d=>pageOf(d)===id).length;
+  el.hidden=ui.view!=='map'||!multiPage();if(el.hidden){el.innerHTML='';return}
+  el.innerHTML=(multiPage()?L.map(p=>`<button class="pgtab${p.id===cur?' on':''}" data-page="${esc(p.id)}" aria-pressed="${p.id===cur}" title="${esc(p.name)}：${cnt(p.id)} 台設備${p.id===cur&&!ui.ro?'；雙擊改名':''}">${esc(p.name)}<small>${cnt(p.id)}</small></button>`).join(''):'')
+   +(ui.ro?'':`<button class="pgadd" data-pageadd title="新增一張圖（樓層、機房、分公司），跨圖的線會顯示連接標籤">＋ ${multiPage()?'':'分頁'}</button>`)+(multiPage()&&!ui.ro?`<button class="pgmenu" data-pagemenu title="管理頁面" aria-label="管理頁面">⋯</button>`:'')}
+function ensurePages(){if(!S.pages||!S.pages.length){S.pages=[{id:uid('pg'),name:'主圖'}];const f=S.pages[0].id;S.devices.forEach(d=>{d.page=f})}
+  else{const f=S.pages[0].id;S.devices.forEach(d=>{if(!S.pages.some(p=>p.id===d.page))d.page=f})}}
+function addPage(){if(!canEdit())return;
+  modal(`<h2>新增頁面</h2><p class="hint">一張圖放一個樓層、機房或分公司。跨頁面的線不用重畫：兩邊都會顯示「→ 對面頁面」的連接標籤，點一下就跳過去；查線、故障查線照樣整條走完。</p>
+  <div class="field"><label class="label" for="pgName">頁面名稱</label><input id="pgName" placeholder="例：2F 辦公室、B1 機房、台中分公司" maxlength="30"></div>
+  ${!multiPage()?`<div class="field"><label class="label" for="pgFirst">目前這張圖的名稱</label><input id="pgFirst" value="${esc(pageList()[0].name)}" maxlength="30"></div>`:''}
+  <div class="actions"><button class="btn primary" id="pgOk">新增</button><button class="btn" data-close>取消</button></div>`);
+  $('pgName').focus();const go=()=>{const n=$('pgName').value.trim()||`第 ${pageList().length+1} 頁`;snap();ensurePages();if($('pgFirst'))S.pages[0].name=$('pgFirst').value.trim()||'主圖';
+    const p={id:uid('pg'),name:n};S.pages.push(p);save();closeModal();setPage(p.id);toast(`已新增頁面「${n}」。把設備拖進來，或在設備屬性改「所在頁面」。`,true)};
+  $('pgOk').onclick=go;$('pgName').onkeydown=e=>{if(e.key==='Enter')go()}}
+function openPages(){if(!multiPage())return;const L=S.pages;
+  modal(`<h2>管理頁面</h2><p class="hint">改名稱、調整順序。刪除頁面時，上面的設備會搬到你選的頁面。</p>
+  <div class="pglist">${L.map((p,i)=>`<div class="pgrow"><input data-pgname="${p.id}" value="${esc(p.name)}" maxlength="30" aria-label="頁面名稱"><small>${S.devices.filter(d=>pageOf(d)===p.id).length} 台</small>
+    <button class="btn sm" data-pgup="${i}" ${i?'':'disabled'} title="往前" aria-label="往前">↑</button><button class="btn sm" data-pgdn="${i}" ${i<L.length-1?'':'disabled'} title="往後" aria-label="往後">↓</button><button class="btn sm danger" data-pgdel="${p.id}">刪除</button></div>`).join('')}</div>
+  <div class="actions"><button class="btn primary" data-close>完成</button></div>`);
+  const box=$('mod');
+  box.addEventListener('change',e=>{const id=e.target.dataset.pgname;if(id==null)return;const p=S.pages.find(x=>x.id===id);if(p){snap();p.name=e.target.value.trim()||p.name;save();renderPages()}});
+  box.addEventListener('click',e=>{const u=e.target.closest('[data-pgup],[data-pgdn]');if(u){const i=+(u.dataset.pgup??u.dataset.pgdn),j=u.dataset.pgup!=null?i-1:i+1;snap();[S.pages[i],S.pages[j]]=[S.pages[j],S.pages[i]];save();renderPages();openPages();return}
+    const dl=e.target.closest('[data-pgdel]');if(dl){const id=dl.dataset.pgdel,others=S.pages.filter(p=>p.id!==id),n=S.devices.filter(d=>pageOf(d)===id).length;
+      if(!n){snap();S.pages=others;if(S.pages.length<2){S.pages=S.pages.length?S.pages:[];}save();renderAll();openPages()||closeModal();return}
+      modal(`<h2>刪除頁面「${esc(pageName(id))}」</h2><p class="hint">這頁有 ${n} 台設備，要搬到哪一頁？（線路都會保留）</p><div class="field"><label class="label" for="pgTo">搬到</label><select id="pgTo">${others.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('')}</select></div>
+        <div class="actions"><button class="btn danger" id="pgDelOk">刪除頁面並搬移設備</button><button class="btn" data-close>取消</button></div>`);
+      $('pgDelOk').onclick=()=>{const to=$('pgTo').value;snap();S.devices.forEach(d=>{if(pageOf(d)===id)d.page=to});S.pages=others;save();closeModal();setPage(to);toast('已刪除頁面',true)}}})}
+/* 跨頁面的線：在這頁畫一小段線，接到「→ 對面頁面」的標籤 */
+let _mctx=null;function textW(t,px,wt){if(!_mctx){_mctx=document.createElement('canvas').getContext('2d')}_mctx.font=`${wt||700} ${px||11.5}px ${getComputedStyle(document.body).fontFamily}`;return _mctx.measureText(t).width}
+function offPageSVG(tr,R){if(!multiPage())return'';const cur=curPage();const G={};
+  S.cables.forEach(c=>{const da=I.owner[c.a],db=I.owner[c.b];if(!da||!db)return;const ia=pageOf(da)===cur,ib=pageOf(db)===cur;if(ia===ib)return;
+    const here=ia?c.a:c.b,there=ia?c.b:c.a,hd=ia?da:db,od=ia?db:da;const k=hd.id+'>'+pageOf(od);(G[k]=G[k]||{hd,pg:pageOf(od),list:[]}).list.push({c,here,there,od})});
+  let h='';const placed=Object.values(R).map(r=>({l:r.l-4,r:r.r+4,t:r.t-2,b:r.b+2}));
+  const hit=b=>placed.some(q=>b.l<q.r&&b.r>q.l&&b.t<q.b&&b.b>q.t);
+  /* 找一個不和設備、其他標籤重疊的位置：沿著離開設備的方向一格一格往外推 */
+  const spot=(x,y,w,dir)=>{for(let i=0;i<14;i++){const dy=dir==='u'?-i*26:dir==='d'?i*26:(i%2?1:-1)*Math.ceil(i/2)*26;const ox=dir==='r'?x:x-w/2,oy=(dir==='u'?y-22:dir==='d'?y:y-11)+dy;const bx={l:ox,r:ox+w,t:oy,b:oy+22};if(!hit(bx)){placed.push(bx);return bx}}const bx={l:dir==='r'?x:x-w/2,r:(dir==='r'?x:x-w/2)+w,t:y,b:y+22};placed.push(bx);return bx};
+  const flag=(bx,txt,data,hot)=>`<g class="offpg${hot?' hot':''}" ${data} transform="translate(${bx.l},${bx.t})"><title>${esc(txt)}：點一下跳到那一頁</title><rect width="${bx.r-bx.l}" height="22" rx="11"/><path d="M10 7l4 4-4 4" class="oparr"/><text x="21" y="15">${esc(txt)}</text></g>`;
+  Object.values(G).forEach(g=>{const r=R[g.hd.id];if(!r)return;const many=g.list.length>2;const hot=g.list.some(x=>tr.cabs.has(x.c.id));
+    if(many){const pts=g.list.map(x=>center(x.here)).filter(Boolean);if(!pts.length)return;const names=[...new Set(g.list.map(x=>x.od.name))];
+      const txt=`${pageName(g.pg)}：${g.list.length} 條（${names.slice(0,2).join('、')}${names.length>2?'…':''}）`;const w=textW(txt)+30;const bx=spot((r.l+r.r)/2,r.b+16,w,'d');const fx=(bx.l+bx.r)/2;
+      pts.forEach(p=>{h+=`<path class="offstub${hot?' hot':''}" d="${roundPath([p,{x:p.x,y:Math.max(p.y,r.pb)+10},{x:fx,y:Math.max(p.y,r.pb)+10},{x:fx,y:bx.t}],6)}"/>`});
+      h+=flag(bx,txt,`data-offpg="${g.list[0].c.id}" data-offside="${g.list[0].there}"`,hot);return}
+    g.list.forEach(x=>{const a=center(x.here);if(!a)return;const pd=portDir(x.here);let e,dir;
+      if(pd&&pd.dir==='up'){e={x:a.x,y:r.t-14};dir='u'}else if(pd&&pd.dir==='down'){e={x:a.x,y:r.b+14};dir='d'}else{e={x:r.r+26,y:a.y};dir='r'}
+      const txt=`${pageName(g.pg)}：${x.od.name} ${pshort(x.there)}`;const w=textW(txt)+30;const bx=spot(e.x,e.y,w,dir);const cl=tr.cabs.has(x.c.id);
+      const end=dir==='r'?{x:bx.l,y:(bx.t+bx.b)/2}:{x:Math.min(Math.max(a.x,bx.l+12),bx.r-12),y:dir==='u'?bx.b:bx.t};
+      h+=`<path class="offstub${cl?' hot':''}" d="${dir==='r'?roundPath([a,{x:r.r+10,y:a.y},{x:r.r+10,y:end.y},end],6):roundPath([a,{x:a.x,y:(a.y+end.y)/2},{x:end.x,y:(a.y+end.y)/2},end],6)}" stroke="${cableStyle(x.c).color}"/>`;
+      h+=flag(bx,txt,`data-offpg="${x.c.id}" data-offside="${x.there}"`,cl)})});
+  return h}
+function goOffPage(pid){const d=I.owner[pid];if(!d)return;setPage(pageOf(d),{port:pid});toast(`已跳到「${pageName(pageOf(d))}」：${d.name}`)}
+
+/* ---------- 光纖收容箱、光纖束（芯數）與平行線收合 ---------- */
+const FIBER_COLORS=[['藍','#1F6FD1'],['橘','#F08A24'],['綠','#2E9E4F'],['棕','#8B5A2B'],['灰','#8A939C'],['白','#E9ECEF'],['紅','#D7362F'],['黑','#2B2B2B'],['黃','#E8C21C'],['紫','#7E4BC4'],['粉紅','#E57FB0'],['水藍','#3FC1D0']];
+function coreInfo(n){const i=(n-1)%12,t=Math.floor((n-1)/12);return{name:FIBER_COLORS[i][0],color:FIBER_COLORS[i][1],tube:t+1,tubeName:FIBER_COLORS[t%12][0]}}
+function trunkOf(c){return c&&c.trunk?(S.trunks||[]).find(t=>t.id===c.trunk)||null:null}
+function trunkCables(t){return S.cables.filter(c=>c.trunk===t.id).sort((a,b)=>(a.core||0)-(b.core||0))}
+function makeFdp(d){d.fiber=true;d.ports.forEach(p=>p.kind='sfp');return d}
+function bundleKey(c){const t=trunkOf(c);if(t)return'T:'+t.id;if(!prefs.bundle)return null;const a=I.owner[c.a],b=I.owner[c.b];if(!a||!b||a.id===b.id)return null;return'P:'+(a.id<b.id?a.id+'|'+b.id:b.id+'|'+a.id)}
+function bundleGroups(tr){const G={};S.cables.forEach(c=>{const k=bundleKey(c);if(!k)return;if((ui.sel&&ui.sel.cable===c.id)||(tr.cabs.has(c.id)&&!(ui.sel&&ui.sel.dev))||!wireShown(c)||(link&&link.cable===c))return;
+    const da=I.owner[c.a],db=I.owner[c.b];if(!onPage(da)||!onPage(db))return;(G[k]=G[k]||[]).push(c)});
+  const out={};for(const k in G)if(G[k].length>=2||k[0]==='T')out[k]=G[k];return out}
+const bid=k=>'bw-'+k.replace(/[^\w-]/g,'_');
+function bundlesSVG(BG,R,tr){let h='';
+  for(const k in BG){const cs=BG[k];const da=I.owner[cs[0].a].id,db=I.owner[cs[0].b].id;const A=[],B=[];
+    cs.forEach(c=>{const pa=I.owner[c.a].id===da?c.a:c.b,pb=pa===c.a?c.b:c.a;const a=center(pa),b=center(pb);if(a&&b){A.push({p:a,id:pa});B.push({p:b,id:pb})}});if(!A.length)continue;
+    const avg=P=>({x:P.reduce((s,q)=>s+q.p.x,0)/P.length,y:P.reduce((s,q)=>s+q.p.y,0)/P.length});const ca=avg(A),cb=avg(B);
+    /* 收束點放在朝向對方設備的那一側；埠在另一側的線先沿機身繞過來，不穿過面板 */
+    const side=(r,o)=>!r?'d':o.y>r.b+6?'d':o.y<r.t-6?'u':o.x>r.r?'r':'l';
+    const anchor=(c,r,sd)=>!r?c:sd==='d'?{x:c.x,y:r.b+14}:sd==='u'?{x:c.x,y:r.t-14}:sd==='r'?{x:r.r+16,y:c.y}:{x:r.l-16,y:c.y};
+    const sa=side(R[da],cb),sb=side(R[db],ca);const pa=anchor(ca,R[da],sa),pb=anchor(cb,R[db],sb);const t=k[0]==='T'?trunkOf(cs[0]):null;
+    const cols=[...new Set(cs.map(c=>cableStyle(c).color))];const col=t?(TYPE_STYLE[cs[0].type]||TYPE_STYLE['光纖 單模']).c:cols.length===1?cols[0]:'#7D8794';
+    const w=Math.min(13,3.5+cs.length*.7);const d=prefs.route==='ortho'?roundPath([pa,{x:pa.x,y:(pa.y+pb.y)/2},{x:pb.x,y:(pa.y+pb.y)/2},pb],10):curve(pa,pb);
+    const stub=(q,an,r,sd)=>{const pd=portDir(q.id);let P;
+      if(r&&pd&&(sd==='d'||sd==='u')&&((pd.dir==='up')!==(sd==='u'))){const ey=pd.dir==='up'?r.t-8:r.pb+8,sx=an.x>=(r.l+r.r)/2?r.r+10:r.l-10;P=[q.p,{x:q.p.x,y:ey},{x:sx,y:ey},{x:sx,y:an.y},an]}
+      else if(r&&(sd==='l'||sd==='r')){const ey=pd?(pd.dir==='up'?r.t-8:r.pb+8):q.p.y;P=[q.p,{x:q.p.x,y:ey},{x:an.x,y:ey},an]}
+      else P=[q.p,{x:q.p.x,y:an.y},an];return`<path class="bstub" d="${roundPath(P,6)}" stroke="${col}"/>`};
+    const lc=cs.map(liveCable).filter(Boolean);const lv=lc.some(x=>x.lvl==='down')?'down':lc.some(x=>x.lvl==='hi')?'hi':lc.some(x=>x.lvl==='mid')?'mid':lc.length?'lo':'';
+    const hot=cs.some(c=>tr.cabs.has(c.id));h+=`<g class="cab bundle${t?' trunk':''}${tr.active?(hot?' hot':' dim'):''}${lv?' lv-'+lv:''}" data-bundle="${esc(k)}" style="--w:${w}px">${A.map(q=>stub(q,pa,R[da],sa)).join('')}${B.map(q=>stub(q,pb,R[db],sb)).join('')}<path class="vis" id="${bid(k)}" d="${d}" stroke="${col}"/>${t?`<path class="core" d="${d}"/>`:''}<path class="hit" d="${d}"/></g>`}
+  return h}
+function bundleBadges(BG){let h='';for(const k in BG){const el=document.getElementById(bid(k));if(!el)continue;let len=0;try{len=el.getTotalLength()}catch(e){}if(!len)continue;const m=el.getPointAtLength(len/2);const cs=BG[k];const t=k[0]==='T'?trunkOf(cs[0]):null;
+    const lag=[...new Set(cs.map(c=>I.ports[c.a].lag||I.ports[c.b].lag).filter(Boolean))];
+    const txt=t?`${t.name||'光纖束'} · ${t.n} 芯 · 用 ${trunkCables(t).filter(c=>{const pa=I.ports[c.a],pb=I.ports[c.b];return(pa&&pa.pair&&I.cab[pa.pair])||(pb&&pb.pair&&I.cab[pb.pair])}).length}`:`${cs.length} 條${lag.length?' · '+lag.join('、'):''}`;
+    const w=[...txt].reduce((a,ch)=>a+(ch.charCodeAt(0)>255?11.5:6.6),0)+18;
+    h+=`<g class="lbl blbl" data-bundle="${esc(k)}" transform="translate(${m.x},${m.y})"><title>點一下看這${t?'束光纖的每一芯':'幾條線'}</title><rect x="${-w/2}" y="-10" width="${w}" height="20" rx="10"/><text x="0" y="4" text-anchor="middle">${esc(txt)}</text></g>`}
+  return h}
+function openBundle(k){I=idx();const cs=k[0]==='T'?trunkCables((S.trunks||[]).find(t=>'T:'+t.id===k)||{}):S.cables.filter(c=>bundleKey(c)===k);if(!cs.length)return;const t=k[0]==='T'?trunkOf(cs[0]):null;
+  const far=c=>{const pa=I.ports[c.a];const fa=pa&&pa.pair&&I.cab[pa.pair];const pb=I.ports[c.b];const fb=pb&&pb.pair&&I.cab[pb.pair];
+    const end=(pid)=>{const tt=trace(pid).filter(x=>x.k==='port');const o=tt[0].p===pid?tt[tt.length-1].p:tt[0].p;return o!==pid?pname(o):''};return{a:fa?end(pa.pair):'',b:fb?end(pb.pair):''}};
+  modal(`<h2>${t?esc(t.name||'光纖束'):`${esc(I.owner[cs[0].a].name)} ⇄ ${esc(I.owner[cs[0].b].name)}`} <small class="hint">${t?`${t.n} 芯 ${esc(t.type==='MM'?'多模':'單模')}${t.len?' · '+esc(t.len)+' m':''}`:cs.length+' 條平行線'}</small></h2>
+  ${t?`<p class="hint">${esc(I.owner[cs[0].a].name)}（背面）⇄ ${esc(I.owner[cs[0].b].name)}（背面）。芯色依 TIA-598 標準；每 12 芯一管。點任一列選取那一芯，畫布會單獨畫出來並追蹤整條路徑。</p>`:'<p class="hint">這幾條線接在同一對設備之間，畫布上收成一條粗線。點一列可以單獨選取那條線。在「顯示」選單可以關閉「平行線收成一條」。</p>'}
+  <div class="tblwrap"><table class="btbl"><thead><tr>${t?'<th>芯</th><th>色</th>':''}<th>線號</th><th>${esc(I.owner[cs[0].a].name)}</th><th>${esc(I.owner[cs[0].b].name)}</th>${t?'<th>跳線接到</th>':'<th>線材</th>'}</tr></thead><tbody>
+  ${cs.map(c=>{const ci=t&&c.core?coreInfo(c.core):null;const f=t?far(c):null;return`<tr data-pickc="${c.id}" tabindex="0">${t?`<td>${c.core||''}</td><td><i class="fdot" style="background:${ci?ci.color:'#999'}"></i>${ci?esc(ci.name)+(t.n>12?`<span class="tube">・第 ${ci.tube} 管（${esc(ci.tubeName)}）</span>`:''):''}</td>`:''}<td>${esc(c.label||'')}</td><td>${esc(pshort(I.owner[c.a].id===I.owner[cs[0].a].id?c.a:c.b))}</td><td>${esc(pshort(I.owner[c.a].id===I.owner[cs[0].a].id?c.b:c.a))}</td>${t?`<td><small>${esc([f.a,f.b].filter(Boolean).join(' ⇄ ')||'—（備用）')}</small></td>`:`<td>${esc(c.type||'')}</td>`}</tr>`}).join('')}</tbody></table></div>
+  <div class="actions">${t&&!ui.ro?`<button class="btn" id="tkEdit">修改名稱／長度</button><button class="btn danger" id="tkDel">刪除整束</button>`:''}<button class="btn" data-close style="margin-left:auto">關閉</button></div>`,true);
+  $('mod').addEventListener('click',e=>{const r=e.target.closest('[data-pickc]');if(!r)return;closeModal();ui.sel={cable:r.dataset.pickc};ui.multi.clear();renderAll()});
+  if($('tkDel'))$('tkDel').onclick=()=>{if(!canEdit())return;snap();const ids=new Set(cs.map(c=>c.id));S.cables=S.cables.filter(c=>!ids.has(c.id));S.trunks=S.trunks.filter(x=>x.id!==t.id);save();closeModal();renderAll();toast(`已刪除光纖束（${ids.size} 芯）`,true)};
+  if($('tkEdit'))$('tkEdit').onclick=()=>{modal(`<h2>光纖束</h2><div class="row2"><div class="field"><label class="label" for="tkN">名稱</label><input id="tkN" value="${esc(t.name||'')}"></div><div class="field"><label class="label" for="tkL">長度 (m)</label><input id="tkL" type="number" value="${esc(t.len||'')}"></div></div>
+    <div class="actions"><button class="btn primary" id="tkOk">儲存</button><button class="btn" data-close>取消</button></div>`);$('tkOk').onclick=()=>{snap();t.name=$('tkN').value.trim();t.len=$('tkL').value;trunkCables(t).forEach(c=>{c.len=t.len;c.label=(t.name||'F')+'-'+c.core});save();closeModal();renderAll()}}}
+function openTrunkNew(d){if(!canEdit())return;const others=S.devices.filter(x=>x.id!==d.id&&x.type==='patch');
+  if(!others.length){toast('先在另一端加一台配線架或光纖收容箱，再建立光纖束');return}
+  const freeBack=x=>x.ports.filter(p=>p.side===1&&!I.cab[p.id]).length;
+  modal(`<h2>建立光纖束</h2><p class="hint">一條多芯光纜（例如 24 芯單模）從「${esc(d.name)}」背面拉到另一台收容箱背面。會依序把兩邊背面的空埠一對一接起來，每一芯標上 TIA-598 色碼；埠不夠會自動加。</p>
+  <div class="field"><label class="label" for="tkTo">另一端</label><select id="tkTo">${others.map(x=>`<option value="${x.id}">${esc(x.name)}${pgTag(x)?'（'+esc(pageName(pageOf(x)))+'）':''} · 背面空 ${freeBack(x)} 埠</option>`).join('')}</select></div>
+  <div class="row3"><div class="field"><label class="label" for="tkCnt">芯數</label><select id="tkCnt">${[2,4,6,8,12,24,36,48,72,96].map(n=>`<option ${n===12?'selected':''}>${n}</option>`).join('')}</select></div>
+  <div class="field"><label class="label" for="tkType">光纖</label><select id="tkType"><option value="SM">單模 SM</option><option value="MM">多模 MM</option></select></div><div class="field"><label class="label" for="tkLen">長度 (m)</label><input id="tkLen" type="number" placeholder="—"></div></div>
+  <div class="field"><label class="label" for="tkName">名稱（線號開頭）</label><input id="tkName" value="F${String(((S.trunks||[]).length+1)).padStart(2,'0')}"></div>
+  <div class="actions"><button class="btn primary" id="tkMake">建立</button><button class="btn" data-close>取消</button></div>`);
+  $('tkMake').onclick=()=>{const o=S.devices.find(x=>x.id===$('tkTo').value);const n=+$('tkCnt').value,type=$('tkType').value,name=$('tkName').value.trim()||'F';if(!o)return;snap();I=idx();
+    const grow=x=>{const need=n-freeBack(x);if(need<=0)return;const base=x.ports.filter(p=>p.side===0).length;for(let i=0;i<need;i++){const pr=pairPorts(base+i);if(x.fiber)pr.forEach(p=>p.kind='sfp');x.ports.push(...pr)}};
+    grow(d);grow(o);I=idx();const fa=d.ports.filter(p=>p.side===1&&!I.cab[p.id]).slice(0,n),fb=o.ports.filter(p=>p.side===1&&!I.cab[p.id]).slice(0,n);
+    const t={id:uid('t'),name,n,type,len:$('tkLen').value,a:d.id,b:o.id};(S.trunks=S.trunks||[]).push(t);
+    for(let i=0;i<n;i++){const ci=coreInfo(i+1);S.cables.push({id:uid('c'),a:fa[i].id,b:fb[i].id,label:`${name}-${i+1}`,color:ci.color,type:type==='MM'?'光纖 多模':'光纖 單模',len:t.len,dir:'none',speed:'',wps:[],trunk:t.id,core:i+1})}
+    save();closeModal();I=idx();renderAll();toast(`已建立 ${name}：${n} 芯，${d.name} ⇄ ${o.name}`,true)}}
+function fiberCardHTML(d){if(d.type!=='patch')return'';const ts=(S.trunks||[]).filter(t=>t.a===d.id||t.b===d.id);
+  return`<div class="card"><span class="label">光纖</span><label class="checkrow"><input type="checkbox" data-fdp="${d.id}" ${d.fiber?'checked':''}> 這是光纖收容箱（FDP／ODF，LC 接頭）</label>
+  ${ts.map(t=>{const o=S.devices.find(x=>x.id===(t.a===d.id?t.b:t.a));return`<button class="tkrow" data-tkopen="${t.id}"><i class="fdot" style="background:${(TYPE_STYLE[t.type==='MM'?'光纖 多模':'光纖 單模']||{}).c}"></i><b>${esc(t.name||'光纖束')}</b><small>${t.n} 芯 ${t.type==='MM'?'多模':'單模'} → ${esc(o?o.name:'?')}${o&&pgTag(o)?'（'+esc(pageName(pageOf(o)))+'）':''}</small></button>`}).join('')}
+  ${ui.ro?'':`<div class="actions"><button class="btn sm" data-tknew="${d.id}">＋ 建立光纖束（多芯光纜）</button></div>`}</div>`}
+
+/* ---------- 心跳（Ping） ---------- */
+function pingOf(d){return SRV&&ui.live&&ui.live.ping?ui.live.ping[d.id]||null:null}
+const PST={up:['正常','ok'],slow:['延遲高','warn'],down:['斷線','bad'],wait:['確認中','none']};
+function pingDot(d){const p=liveOn()&&pingOf(d);if(!p)return'';const s=PST[p.st]||PST.wait;
+  return`<i class="pdot ${s[1]}" title="Ping ${s[0]}${p.rtt!=null?' · '+Math.round(p.rtt)+' ms':''}${p.st==='down'?' · '+tDur(Date.now()/1000-p.since):''}"></i>`}
+function pingCardHTML(d){if(!SRV||!d.ip||TYPES[d.type].pass)return'';const p=pingOf(d);const on=!ui.live||ui.live.ping_on!==false;
+  if(d.ping===false)return`<div class="card"><span class="label">心跳（Ping）</span><p class="hint">這台設定成不 Ping。</p>${ui.ro?'':`<label class="checkrow"><input type="checkbox" data-noping="${d.id}" checked> 這台不要 Ping（會休眠的筆電、手機）</label>`}</div>`;
+  if(!on)return'';
+  if(!p)return`<div class="card"><span class="label">心跳（Ping）</span><p class="hint">等待第一次 Ping…</p></div>`;
+  const s=PST[p.st]||PST.wait;
+  return`<div class="card pingcard"><span class="label">心跳（Ping） <small><b class="c-${s[1]}">${s[0]}</b>${p.st!=='wait'?` · ${p.st==='down'?'已斷線':'持續'} ${tDur(Date.now()/1000-p.since)}`:''}</small></span>
+    <div class="lnums"><div><small>延遲</small><b>${p.rtt!=null?Math.round(p.rtt*10)/10+' ms':'—'}</b></div><div><small>平均</small><b>${p.avg!=null?p.avg+' ms':'—'}</b></div><div><small>遺失（1 小時）</small><b class="${p.loss>0?'c-warn':''}">${p.loss!=null?p.loss+'%':'—'}</b></div></div>
+    <div class="pspark" data-pspark="${d.id}"><span class="hint">載入最近一小時…</span></div><div class="devev" data-devev="${d.id}"></div>
+    ${ui.ro?'':`<label class="checkrow"><input type="checkbox" data-noping="${d.id}"> 這台不要 Ping（會休眠的筆電、手機）</label>`}</div>`}
+async function loadPingSpark(id){const box=document.querySelector(`[data-pspark="${id}"]`);if(!box)return;
+  try{const j=await api('/api/pinghist?id='+encodeURIComponent(id));const H=j.hist||[];if(H.length<2){box.innerHTML='<span class="hint">幾次 Ping 之後就會出現曲線。</span>';return}
+    const W=300,Hh=54,t0=H[0][0],t1=H[H.length-1][0]||t0+1,mx=Math.max(5,...H.map(x=>x[1]||0))*1.15;const X=t=>((t-t0)/Math.max(1,t1-t0))*W,Y=v=>Hh-3-(v/mx)*(Hh-8);
+    let dpath='',pen=false;H.forEach(([t,v])=>{if(v==null){pen=false;return}dpath+=(pen?'L':'M')+X(t).toFixed(1)+','+Y(v).toFixed(1);pen=true});
+    const lost=H.filter(x=>x[1]==null).map(x=>`<rect x="${(X(x[0])-1.5).toFixed(1)}" y="0" width="3" height="${Hh}" class="ldn"/>`).join('');
+    const tl=t=>new Date(t*1000).toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',hour12:false});
+    box.innerHTML=`<svg viewBox="0 0 ${W} ${Hh}" class="lsvg" role="img" aria-label="最近的 Ping 延遲">${lost}<path d="${dpath}" class="lin"/></svg><div class="laxis"><span>${tl(t0)}</span><span class="lk">${H.some(x=>x[1]!=null)?`${esc(j.ip||'')} 延遲（ms）最高 ${Math.round(Math.max(...H.map(x=>x[1]||0)))}`:`${esc(j.ip||'')} 全部沒有回應`}${lost&&H.some(x=>x[1]!=null)?' · 紅色＝沒回應':''}</span><span>${tl(t1)}</span></div>`}
+  catch(e){box.innerHTML='<span class="hint">讀不到 Ping 紀錄</span>'}
+  const ev=document.querySelector(`[data-devev="${id}"]`);if(ev){try{const j=await api('/api/events?limit=5&dev='+encodeURIComponent(id));ev.innerHTML=j.events.length?`<span class="label">最近事件</span>${j.events.map(evRow).join('')}`:''}catch(e){}}}
+
+/* ---------- 事件 ---------- */
+const EVIC={bad:'#D9443A',warn:'#D9921C',ok:'#2E9E4F',info:'#3B7DD8'};
+function evRow(e){return`<div class="evrow ${e.level}" ${e.dev?`data-evdev="${esc(e.dev)}"`:''}><i style="background:${EVIC[e.level]||'#999'}"></i><span>${esc(String(e.text).replace(/^[\u{1F300}-\u{1FAFF}\u2600-\u27BF]\uFE0F?\s*/u,''))}</span><small title="${tFmt(e.ts)}">${tAgo(e.ts)}</small></div>`}
+async function evCheck(j){if(!SRV||!j||!j.ev)return;if(prefs.evSeen==null){prefs.evSeen=j.ev;savePrefs()}if(ui.evLast==null)ui.evLast=prefs.evSeen;
+  if(j.ev>ui.evLast){try{const r=await api('/api/events?since='+ui.evLast+'&limit=50');ui.evLast=j.ev;const bad=r.events.filter(e=>e.level==='bad');if(bad.length&&!$('modalRoot').innerHTML)toast(bad.length===1?bad[0].text:`${bad.length} 則異常：${bad[0].text}…`)}catch(e){}}
+  const b=$('bEvents');if(b){b.hidden=false;const n=j.ev-(prefs.evSeen||0);b.classList.toggle('has',n>0);$('evBadge').textContent=n>0?(n>99?'99+':n):''}}
+async function openEvents(){let f=ui.evf||'all';let list=[];
+  const draw=()=>{const L=list.filter(e=>f==='all'||(f==='bad'&&(e.level==='bad'||e.level==='warn'))||(f==='ok'&&e.level==='ok')||(f==='new'&&['newdev','ipchange','gone','back'].includes(e.kind)));
+    $('evList').innerHTML=L.length?L.map(evRow).join(''):'<p class="hint">沒有事件。斷線、恢復、主幹埠離線、新設備加入都會記在這裡（保留 180 天）。</p>';
+    document.querySelectorAll('[data-evf]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.evf===f)))};
+  modal(`<h2>事件紀錄</h2><div class="seg evseg" role="group"><button data-evf="all">全部</button><button data-evf="bad">異常</button><button data-evf="ok">恢復</button><button data-evf="new">設備異動</button></div>
+    <div class="evlist" id="evList"><p class="hint">載入中…</p></div>
+    <div class="actions"><button class="btn" id="evCsv">下載 CSV</button>${SRV&&SRV.admin?'<button class="btn" id="evSet">告警通知設定…</button>':''}<button class="btn" data-close style="margin-left:auto">關閉</button></div>`,true);
+  $('mod').addEventListener('click',e=>{const b=e.target.closest('[data-evf]');if(b){f=ui.evf=b.dataset.evf;draw();return}const r=e.target.closest('[data-evdev]');if(r&&S.devices.some(d=>d.id===r.dataset.evdev)){const d=S.devices.find(x=>x.id===r.dataset.evdev);closeModal();if(!onPage(d))setPage(pageOf(d),{dev:d.id});else{ui.sel={dev:d.id};ui.detail=d.id;renderAll();fitTo(devBox(new Set([d.id])),1.1)}}});
+  if($('evSet'))$('evSet').onclick=()=>openSettings('alert');
+  $('evCsv').onclick=()=>download(`事件-${stamp()}.csv`,'text/csv','﻿'+csv([['時間','等級','事件'],...list.map(e=>[new Date(e.ts*1000).toLocaleString('zh-TW',{hour12:false}),e.level,e.text])]));
+  try{list=(await api('/api/events?limit=1000')).events;if(list.length){prefs.evSeen=Math.max(prefs.evSeen||0,list[0].id);savePrefs();ui.evLast=Math.max(ui.evLast||0,list[0].id);evCheck(ui.live)}draw()}catch(e){$('evList').innerHTML=`<p class="hint">讀不到事件：${esc(e.message)}</p>`}}
+
+/* ---------- 告警、心跳與權限設定（管理員） ---------- */
+const EV_TOG=[['down','設備斷線（Ping 不通）',1],['recover','恢復也通知',1],['port','主幹埠離線（接到 Switch、AP、伺服器的埠）',1],['snmp','SNMP／SSH 沒有回應',0],['slow','延遲變高',0],['newdev','新設備加入網路、IP 變更',0],['gone','圖上的設備很久沒出現',0]];
+async function openSettings(tab){if(!SRV)return;if(!SRV.admin){openLogin();return}
+  let C;try{C=await api('/api/settings')}catch(e){toast('讀不到設定：'+e.message);return}
+  tab=tab||ui.setTab||'alert';
+  const chanHTML=ch=>{const T=C.channel_types[ch.type]||{name:ch.type};const L=ch.last;return`<div class="chrow" data-chid="${esc(ch.id)}"><label class="sw"><input type="checkbox" data-chon ${ch.on!==false?'checked':''} aria-label="啟用 ${esc(ch.name)}"></label><div><b>${esc(ch.name||T.name)}</b><small>${esc(T.name)}${L?` · ${L.ok?'<span class="c-ok">上次成功</span>':'<span class="c-bad">上次失敗：'+esc(L.err||'')+'</span>'} ${tAgo(L.ts)}`:''}</small></div><button class="btn sm" data-chtest>測試</button><button class="btn sm" data-chedit>編輯</button><button class="btn sm danger" data-chdel aria-label="刪除">刪除</button></div>`};
+  const A=C.alerts,P=C.auth;
+  modal(`<h2>監控服務設定 <small class="hint">v${esc(SRV.version||'')} · ${esc(SRV.host||'')}</small></h2>
+  <div class="seg settabs" role="tablist"><button data-stab="alert">告警通知</button><button data-stab="ping">心跳與設備偵測</button><button data-stab="auth">權限與檢視連結</button></div>
+  <div class="stab" data-st="alert">
+    <label class="checkrow big"><input type="checkbox" id="aOn" ${A.enabled?'checked':''}> 開啟告警通知</label>
+    <div class="field"><label class="label" for="aSite">地點名稱（顯示在訊息開頭，方便管好幾個地方）</label><input id="aSite" value="${esc(A.site||'')}" placeholder="例：台北總公司" maxlength="40"></div>
+    <span class="label">要通知的事件</span><div class="togs">${EV_TOG.map(([k,n,dflt])=>`<label class="tog"><input type="checkbox" data-aon="${k}" ${(A.on[k]??dflt)?'checked':''}>${n}</label>`).join('')}</div>
+    <p class="hint">同一段時間（20 秒）內的事件會合併成一則訊息，整台 Switch 斷線時不會洗版。</p>
+    <span class="label">通知管道</span><div id="chList">${A.channels.map(chanHTML).join('')||'<p class="hint">還沒有通知管道。</p>'}</div>
+    <div class="actions"><select id="chType" aria-label="通知管道類型">${Object.entries(C.channel_types).map(([k,v])=>`<option value="${k}">${esc(v.name)}</option>`).join('')}</select><button class="btn" id="chAdd">＋ 新增通知管道</button></div>
+    <p class="hint">LINE Notify 已在 2025 年 3 月停止服務；要送到 LINE 請用 LINE 官方帳號的 Messaging API。<a href="${MANUAL_URL}#e-alert" target="_blank" rel="noopener">各管道怎麼取得 Token／Webhook？</a></p>
+  </div>
+  <div class="stab" data-st="ping">
+    <label class="checkrow big"><input type="checkbox" id="pOn" ${C.ping_enabled?'checked':''}> Ping 圖上所有有 IP 的設備</label>
+    <div class="row3"><div class="field"><label class="label" for="pInt">每隔（秒）</label><input id="pInt" type="number" min="5" value="${C.ping_interval}"></div><div class="field"><label class="label" for="pFail">連續失敗幾次算斷線</label><input id="pFail" type="number" min="1" max="20" value="${C.ping_fails}"></div><div class="field"><label class="label" for="pSlow">延遲超過（ms）算偏高</label><input id="pSlow" type="number" min="10" value="${C.ping_slow_ms}"></div></div>
+    <p class="hint">目前使用：${esc(C.ping_method)}。設備擋 ICMP 時會改試 TCP 連線（對方回應拒絕也算在線）。配線架、資訊座不會 Ping；個別設備可以在屬性面板的「網路流量」分頁關掉。</p>
+    <label class="checkrow big"><input type="checkbox" id="iOn" ${C.inv_enabled?'checked':''}> 記錄網路上出現的設備（新加入／很久沒出現）</label>
+    <div class="row2"><div class="field"><label class="label" for="iGone">多久沒出現算「很久沒出現」（小時）</label><input id="iGone" type="number" min="1" value="${C.inv_gone_hours}"></div><span></span></div>
+    <p class="hint">資料來源：路由器、防火牆、L3 Switch 的 ARP 表（SNMP，每 10 分鐘）、SSH 路由器的用戶端清單，以及跑 netmap.exe 這台電腦自己的 ARP 表。</p>
+  </div>
+  <div class="stab" data-st="auth">
+    <span class="label">管理密碼</span><p class="hint">${P.has_password?'<b class="c-ok">已設定。</b>其他電腦要登入才能編輯圖、改設定。':'還沒設定。設定後，其他電腦要輸入密碼才能編輯圖、改設定；服務主機本身不用密碼。'}</p>
+    <div class="row2"><div class="field"><label class="label" for="pw1">${P.has_password?'新的密碼':'密碼'}（至少 6 個字）</label><input id="pw1" type="password" autocomplete="new-password"></div><div class="field"><label class="label" for="pw2">再輸入一次</label><input id="pw2" type="password" autocomplete="new-password"></div></div>
+    <div class="actions"><button class="btn" id="pwSet">${P.has_password?'變更密碼':'設定密碼'}</button>${P.has_password?'<button class="btn danger" id="pwClear">移除密碼</button>':''}</div>
+    <label class="checkrow"><input type="checkbox" id="lanEdit" ${P.lan_edit?'checked':''}> 允許內網其他電腦編輯圖${P.has_password?'（已設密碼：登入後才能編輯）':'（不需登入）'}</label>
+    <span class="label" style="margin-top:14px">檢視連結</span>
+    <label class="checkrow"><input type="checkbox" id="viewReq" ${P.view_required?'checked':''}> 沒有連結或密碼就不能看（不勾＝內網任何人打開網址都能看）</label>
+    <div id="vLinks">${P.view_links.length?P.view_links.map(u=>`<div class="vlink"><input readonly value="${esc(u)}" aria-label="檢視連結"><button class="btn sm" data-vcopy="${esc(u)}">複製</button><button class="btn sm" data-vqr="${esc(u)}">QR</button></div>`).join(''):'<p class="hint">還沒有檢視連結。</p>'}</div>
+    <div class="actions"><button class="btn" id="vNew">${P.view_links.length?'重新產生（舊連結失效）':'產生檢視連結'}</button>${P.view_links.length?'<button class="btn danger" id="vClear">停用連結</button>':''}</div>
+    <p class="hint">拿到檢視連結的人只能看、不能改。服務是內網的 HTTP 連線，請不要直接開放到網際網路；要從外面看，請走公司的 VPN。</p>
+  </div>
+  <div class="actions"><button class="btn primary" id="setSave">儲存</button><button class="btn" data-close>關閉</button></div>`,true);
+  const box=$('mod');const showTab=t=>{ui.setTab=t;box.querySelectorAll('[data-stab]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.stab===t)));box.querySelectorAll('.stab').forEach(x=>x.hidden=x.dataset.st!==t)};showTab(tab);
+  const collect=()=>({ping_enabled:$('pOn').checked,ping_interval:$('pInt').value,ping_fails:$('pFail').value,ping_slow_ms:$('pSlow').value,inv_enabled:$('iOn').checked,inv_gone_hours:$('iGone').value,
+    lan_edit:$('lanEdit').checked,view_required:$('viewReq').checked,alerts:{enabled:$('aOn').checked,site:$('aSite').value,on:Object.fromEntries([...box.querySelectorAll('[data-aon]')].map(x=>[x.dataset.aon,x.checked])),
+      channels:A.channels.map(ch=>Object.assign({},ch,{on:(box.querySelector(`[data-chid="${CSS.escape(ch.id)}"] [data-chon]`)||{}).checked!==false}))}});
+  const put=async(extra,msg)=>{try{const body=Object.assign(collect(),extra||{});const r=await api('/api/settings',{method:'PUT',body});C=r;toast(msg||'已儲存設定');openSettings(ui.setTab);return r}catch(e){toast('沒有儲存：'+e.message);return null}};
+  box.addEventListener('click',async e=>{const t=e.target;
+    if(t.dataset.stab){showTab(t.dataset.stab);return}
+    const row=t.closest('[data-chid]');const ch=row&&A.channels.find(c=>c.id===row.dataset.chid);
+    if(t.hasAttribute('data-chdel')&&ch){A.channels=A.channels.filter(c=>c!==ch);put({},'已刪除通知管道');return}
+    if(t.hasAttribute('data-chedit')&&ch){editChannel(C,ch,A,collect());return}
+    if(t.hasAttribute('data-chtest')&&ch){t.disabled=true;t.textContent='送出中…';const sm=row.querySelector('small');try{const r=await api('/api/alerts/test',{body:{id:ch.id}});const err=r.results[ch.id];toast(err?'測試失敗：'+err:'測試訊息已送出，請到 '+ch.name+' 查看');sm.innerHTML=esc((C.channel_types[ch.type]||{}).name||'')+' · '+(err?'<span class="c-bad">測試失敗：'+esc(err)+'</span>':'<span class="c-ok">測試成功</span>')}catch(x){toast('測試失敗：'+x.message)}t.disabled=false;t.textContent='測試';return}
+    if(t.dataset.vcopy){copyText(t.dataset.vcopy);return}
+    if(t.dataset.vqr){const svg=qrSVG(t.dataset.vqr);modal(`<h2>檢視連結 QR Code</h2><div class="qrbox"><div class="qrimg">${svg||'<p class="hint">QR 元件沒有載入</p>'}</div><div class="urlbox"><textarea readonly>${esc(t.dataset.vqr)}</textarea><p class="hint">用手機掃描就能看圖（同一個內網）。</p></div></div><div class="actions"><button class="btn" id="qrBack">返回</button></div>`,true);$('qrBack').onclick=()=>openSettings('auth');return}});
+  $('chAdd').onclick=()=>editChannel(C,{id:'',type:$('chType').value,name:'',on:true,secret:{}},A,collect());
+  $('setSave').onclick=()=>put();
+  $('pwSet').onclick=()=>{const a=$('pw1').value,b=$('pw2').value;if(a.length<6){toast('密碼至少 6 個字');return}if(a!==b){toast('兩次輸入的密碼不一樣');return}put({password:{new:a}},'已設定管理密碼')};
+  if($('pwClear'))$('pwClear').onclick=()=>put({password:{clear:true}},'已移除管理密碼');
+  $('vNew').onclick=()=>put({regen_token:true},'已產生新的檢視連結');if($('vClear'))$('vClear').onclick=()=>put({clear_token:true,view_required:false},'已停用檢視連結')}
+function editChannel(C,ch,A,form){const T=C.channel_types[ch.type];const isNew=!ch.id;
+  const HELP={telegram:'在 Telegram 找 @BotFather 建立機器人取得 Token；把機器人加進群組後，用 @userinfobot 或 getUpdates 查 Chat ID（群組是負數）。',discord:'頻道設定 ▸ 整合 ▸ Webhook ▸ 新增，複製 Webhook 網址。',slack:'Slack App 開啟 Incoming Webhooks，選頻道後複製網址。',teams:'在 Teams 頻道建立 Workflows「收到 Webhook 要求時張貼到頻道」，複製網址（舊的 Office 365 連接器已停用）。',line:'在 LINE Developers 建立 Messaging API 頻道，發行 Channel access token；收件者 ID 是使用者 ID（U 開頭）或群組 ID（C 開頭）。免費方案每月有則數上限。',email:'Gmail 請用「應用程式密碼」，主機 smtp.gmail.com、連接埠 587、STARTTLS。',webhook:'送出 JSON：{source, title, text, events:[…]}，可以接到自己的系統或 n8n、Make。'};
+  modal(`<h2>${isNew?'新增':'編輯'}通知管道 · ${esc(T.name)}</h2><p class="hint">${HELP[ch.type]||''}</p>
+  <div class="field"><label class="label" for="chName">名稱</label><input id="chName" value="${esc(ch.name||T.name)}" maxlength="40"></div>
+  ${T.fields.map(([f,l,sec])=>f==='tls'?`<div class="field"><label class="label" for="cf-${f}">${esc(l)}</label><select id="cf-${f}" data-cf="${f}">${[['starttls','STARTTLS（587）'],['ssl','SSL／TLS（465）'],['none','不加密（25）']].map(([v,n])=>`<option value="${v}" ${(ch[f]||'starttls')===v?'selected':''}>${n}</option>`).join('')}</select></div>`
+    :`<div class="field"><label class="label" for="cf-${f}">${esc(l)}</label><input id="cf-${f}" data-cf="${f}" ${sec?'type="password" autocomplete="off"':''} value="${sec?'':esc(ch[f]||'')}" placeholder="${sec&&ch.secret&&ch.secret[f]?'已設定（留空＝不變）':''}"></div>`).join('')}
+  <div class="actions"><button class="btn primary" id="chOk">${isNew?'新增':'儲存'}</button><button class="btn" id="chBack">取消</button></div>`);
+  $('chBack').onclick=()=>openSettings('alert');
+  $('chOk').onclick=()=>{const o={id:ch.id||'',type:ch.type,name:$('chName').value.trim()||T.name,on:ch.on!==false};document.querySelectorAll('[data-cf]').forEach(x=>{const v=x.value.trim();const sec=T.fields.find(f=>f[0]===x.dataset.cf)[2];if(sec){if(v)o[x.dataset.cf]=v}else o[x.dataset.cf]=v});
+    const list=isNew?[...A.channels,o]:A.channels.map(c=>c===ch?o:c);A.channels=list;ui.setTab='alert';
+    api('/api/settings',{method:'PUT',body:Object.assign({},form,{alerts:Object.assign({},form.alerts,{channels:list})})}).then(()=>{toast(isNew?'已新增，按「測試」確認能收到':'已儲存');openSettings('alert')}).catch(e=>toast('沒有儲存：'+e.message))}}
+function openLogin(){modal(`<h2>管理員登入</h2><p class="hint">登入後可以編輯圖、還原版本、修改告警與權限設定。</p><div class="field"><label class="label" for="lgPw">管理密碼</label><input id="lgPw" type="password" autocomplete="current-password"></div><p class="hint c-bad" id="lgErr"></p>
+  <div class="actions"><button class="btn primary" id="lgOk">登入</button><button class="btn" data-close>取消</button></div>`);$('lgPw').focus();
+  const go=async()=>{try{await api('/api/login',{body:{password:$('lgPw').value}});location.reload()}catch(e){$('lgErr').textContent=e.message}};$('lgOk').onclick=go;$('lgPw').onkeydown=e=>{if(e.key==='Enter')go()}}
+function renderAuthBtn(){const b=$('bAuth');if(!b||!SRV)return;const show=SRV.auth&&!SRV.local;b.hidden=!show;if(!show)return;
+  b.textContent=SRV.login?'登出':'登入';b.title=SRV.login?'登出管理員':'管理員登入：登入後可以編輯';b.onclick=async()=>{if(SRV.login){await api('/api/logout',{body:{}}).catch(()=>{});location.reload()}else openLogin()}}
+
+/* ---------- 歷史版本與還原 ---------- */
+const LREV='netmap-revs';
+function jsDiff(a,b){const by=l=>Object.fromEntries((l||[]).map(x=>[x.id,x]));const da=by(a.devices),db=by(b.devices),ca=by(a.cables),cb=by(b.cables);const strip=(o,ks)=>{const c=Object.assign({},o);ks.forEach(k=>delete c[k]);return JSON.stringify(c)};
+  const add=Object.keys(db).filter(k=>!da[k]).map(k=>db[k].name),del=Object.keys(da).filter(k=>!db[k]).map(k=>da[k].name);let mod=[],moved=0;
+  Object.keys(db).forEach(k=>{if(da[k]&&JSON.stringify(da[k])!==JSON.stringify(db[k])){if(strip(da[k],['x','y'])===strip(db[k],['x','y']))moved++;else mod.push(db[k].name)}});
+  const cadd=Object.keys(cb).filter(k=>!ca[k]).map(k=>cb[k].label),cdel=Object.keys(ca).filter(k=>!cb[k]).map(k=>ca[k].label);let cmod=[];Object.keys(cb).forEach(k=>{if(ca[k]&&strip(ca[k],['wps'])!==strip(cb[k],['wps']))cmod.push(cb[k].label);else if(ca[k]&&JSON.stringify(ca[k])!==JSON.stringify(cb[k]))moved++});
+  const P=[];const f=(n,v,w,names)=>{if(n)P.push(`${v}${w} ${n}`+(names.filter(Boolean).length?`（${names.filter(Boolean).slice(0,3).join('、')}${n>3?'…':''}）`:''))};
+  f(add.length,'新增','設備',add);f(del.length,'刪除','設備',del);f(mod.length,'修改','設備',mod);f(cadd.length,'接上','線',cadd);f(cdel.length,'拔掉','線',cdel);f(cmod.length,'修改','線',cmod);if(moved)P.push('調整版面');
+  return{text:P.join('、')||'沒有變更',devices:{add,del,mod},cables:{add:cadd,del:cdel,mod:cmod}}}
+function localRevs(){try{return JSON.parse(localStorage.getItem(LREV)||'[]')}catch(e){return[]}}
+function localRevTick(force,why){if(SRV||ui.shared||ui.preview||!window.LZString||!S.devices.length)return;const L=localRevs();const last=L[L.length-1];const now=Date.now();
+  if(!force&&last&&now-last.t<5*60e3)return;const cur=JSON.stringify(projData());let prev=null;try{prev=last?JSON.parse(LZString.decompressFromUTF16(last.d)):null}catch(e){}
+  if(prev&&JSON.stringify(prev)===cur)return;const sum=why||(prev?jsDiff(prev,JSON.parse(cur)).text:'第一個版本');L.push({t:now,s:sum,d:LZString.compressToUTF16(cur)});while(L.length>40)L.shift();
+  for(let i=0;i<5;i++){try{localStorage.setItem(LREV,JSON.stringify(L));break}catch(e){L.splice(0,Math.max(1,Math.floor(L.length/4)))}}}
+async function openHistory(){let rows=[];const local=!SRV;
+  if(local){localRevTick(false);rows=localRevs().map((r,i,a)=>({rev:i+1,ts:Math.round(r.t/1000),who:'這台電腦',summary:r.s,current:i===a.length-1,_d:r.d})).reverse()}
+  else{try{const j=await api('/api/revs?limit=300');rows=j.revs}catch(e){toast('讀不到歷史版本：'+e.message);return}}
+  const det=r=>{const D=r.detail||{};const li=[];const L=(t,a)=>{if(a&&a.length)li.push(`<li>${t}：${a.slice(0,12).map(esc).join('、')}${a.length>12?'…':''}</li>`)};
+    if(D.devices){L('新增設備',D.devices.add);L('刪除設備',D.devices.del);L('修改設備',D.devices.mod)}if(D.cables){L('接上線',D.cables.add);L('拔掉線',D.cables.del);L('修改線',D.cables.mod)}return li.length?`<ul class="revdet">${li.join('')}</ul>`:''};
+  modal(`<h2>歷史版本</h2><p class="hint">${local?'這台瀏覽器每 5 分鐘（有修改時）自動留一個版本，最多 40 個；匯入或套用範本前也會先存一份。':'每次修改都會記錄是誰、改了什麼；同一個人 2 分鐘內的連續修改合併成一筆，最多保留 500 筆。'}「預覽」可以先看那個版本的圖，確定再還原；還原本身也會留紀錄，可以再改回來。</p>
+  ${!local?`<div class="field rowin"><label class="label" for="myName">你的名字（記在版本紀錄上）</label><input id="myName" value="${esc(prefs.myName||'')}" placeholder="例：小陳" maxlength="20"></div>`:''}
+  <div class="revlist">${rows.length?rows.map(r=>`<div class="revrow${r.current?' cur':''}"><div class="rh"><b>#${r.rev}</b><span>${tFmt(r.ts)}</span><small>${esc(r.who||'')}</small>${r.current?'<span class="pill">目前版本</span>':''}</div><div class="rs">${esc(r.summary||'')}</div>${det(r)}
+    ${r.current?'':`<div class="ra"><button class="btn sm" data-rprev="${r.rev}">預覽</button>${ui.ro&&!ui.preview?'':`<button class="btn sm" data-rrest="${r.rev}">還原這個版本</button>`}<button class="btn sm" data-rdl="${r.rev}">下載</button></div>`}</div>`).join(''):'<p class="hint">還沒有歷史版本。</p>'}</div>
+  <div class="actions"><button class="btn" data-close style="margin-left:auto">關閉</button></div>`,true);
+  if($('myName'))$('myName').onchange=e=>{prefs.myName=e.target.value.trim();savePrefs();toast('之後的修改會記上「'+(prefs.myName||'電腦 IP')+'」')};
+  const get=async rev=>{if(local){const r=rows.find(x=>x.rev===+rev);return{project:JSON.parse(LZString.decompressFromUTF16(r._d)),ts:r.ts}}return api('/api/revs/get?rev='+rev)};
+  $('mod').addEventListener('click',async e=>{const t=e.target;const rev=t.dataset.rprev||t.dataset.rrest||t.dataset.rdl;if(!rev)return;let j;try{j=await get(rev)}catch(x){toast('讀不到這個版本');return}
+    if(t.dataset.rdl){download(`netmap-#${rev}-${stamp()}.json`,'application/json',JSON.stringify(Object.assign({app:'netmap',version:3},j.project),null,1));return}
+    if(t.dataset.rprev){closeModal();startPreview(+rev,j);return}
+    if(t.dataset.rrest)restoreRev(+rev,j)})}
+function startPreview(rev,j){if(!ui.preview)ui.preview={rev,ts:j.ts,j,back:JSON.stringify(S),ro:ui.ro};else Object.assign(ui.preview,{rev,ts:j.ts,j});
+  S=normalize(Object.assign({devices:[],cables:[],racks:[],faults:[]},JSON.parse(JSON.stringify(j.project))));ui.ro=true;applyRoUI();syncUR();I=idx();ui.sel=null;renderAll();toast(`正在預覽 #${rev} 的版本`)}
+function endPreview(){const P=ui.preview;if(!P)return;ui.preview=null;S=JSON.parse(P.back);ui.ro=P.ro;applyRoUI();syncUR();I=idx();ui.sel=null;renderAll()}
+async function restoreRev(rev,j){if(ui.preview){const P=ui.preview;ui.preview=null;S=JSON.parse(P.back);ui.ro=P.ro;applyRoUI()}
+  if(ui.ro){toast('唯讀模式中，按上方「唯讀」解除後才能還原');renderAll();return}
+  if(SRV){try{const r=await api('/api/revs/restore',{body:{rev}});S=normalize(r.project);ui.srvRev=r.rev;closeModal();I=idx();ui.sel=null;renderAll();toast(`已還原到 #${rev}；如果還原錯了，可以在歷史版本再改回來`)}catch(e){toast('沒有還原：'+e.message)}return}
+  localRevTick(true,`還原前的版本`);snap();S=normalize(Object.assign({devices:[],cables:[],racks:[],faults:[]},j.project));save();closeModal();I=idx();ui.sel=null;renderAll();toast(`已還原到 #${rev}`,true)}
+
+/* ---------- 線標列印（Brother P-touch CSV、A4 標籤） ---------- */
+function cableLabelRows(scope){I=idx();let cs=S.cables;
+  if(scope==='page')cs=cs.filter(c=>onPage(I.owner[c.a])||onPage(I.owner[c.b]));
+  if(scope==='match'&&ui.match)cs=cs.filter(c=>ui.match.cabs.has(c.id)||(ui.match.lit.has(I.owner[c.a].id)&&ui.match.lit.has(I.owner[c.b].id)));
+  if(scope==='sel'){const ids=new Set();if(ui.sel&&ui.sel.cable)ids.add(ui.sel.cable);if(ui.sel&&ui.sel.port&&I.cab[ui.sel.port])ids.add(I.cab[ui.sel.port].id);ui.multi.forEach(p=>{if(I.cab[p])ids.add(I.cab[p].id)});if(ui.sel&&ui.sel.dev){const d=S.devices.find(x=>x.id===ui.sel.dev);d&&d.ports.forEach(p=>{if(I.cab[p.id])ids.add(I.cab[p.id].id)})}cs=cs.filter(c=>ids.has(c.id))}
+  const coll=new Intl.Collator('zh-Hant',{numeric:true});return cs.slice().sort((a,b)=>coll.compare(a.label||'',b.label||'')).map(c=>{const A=I.owner[c.a],B=I.owner[c.b];return{c,label:c.label||'',a:`${A.name} ${pshort(c.a)}`,b:`${B.name} ${pshort(c.b)}`,aloc:locText(A),bloc:locText(B),url:shareBase()+'#cable='+encodeURIComponent(c.id)}})}
+function openLabels(){const hasSel=!!(ui.sel||ui.multi.size),hasQ=!!ui.match;
+  modal(`<h2>線標列印</h2><p class="hint">每條線兩端各貼一張：線號＋兩端位置。可以直接印 A4 標籤紙，或匯出 CSV 給 Brother P-touch Editor（資料庫 ▸ 連線）排版列印。</p>
+  <div class="row2"><div class="field"><label class="label" for="lbScope">範圍</label><select id="lbScope"><option value="all">全部的線（${S.cables.length} 條）</option>${multiPage()?`<option value="page">目前頁面「${esc(pageName(curPage()))}」</option>`:''}${hasQ?'<option value="match">搜尋結果</option>':''}${hasSel?'<option value="sel" selected>目前選取的設備／埠／線</option>':''}</select></div>
+  <div class="field"><label class="label" for="lbFmt">A4 版面</label><select id="lbFmt"><option value="3x8">3 × 8（24 張，64 × 33.9 mm）</option><option value="2x7">2 × 7（14 張，99 × 38 mm）</option><option value="4x10">4 × 10（40 張，48.5 × 25.4 mm）</option></select></div></div>
+  <div class="togs"><label class="tog"><input type="checkbox" id="lbQr" ${window.qrcode?'checked':'disabled'}>QR Code（掃描打開這條線）</label><label class="tog"><input type="checkbox" id="lbLoc" checked>加上位置／機櫃</label><label class="tog"><input type="checkbox" id="lbTwo" checked>每條線印兩張（兩端各一）</label></div>
+  ${window.qrcode?'':'<p class="hint">QR 元件沒有載入（電腦沒有連上網際網路），標籤先不印 QR。</p>'}
+  <p class="hint" id="lbCount"></p>
+  <div class="actions"><button class="btn primary" id="lbPrint">預覽並列印 A4</button><button class="btn" id="lbCsv">下載 P-touch CSV</button><select id="lbEnc" aria-label="CSV 編碼"><option value="utf16">Unicode（UTF-16，P-touch 建議）</option><option value="utf8">UTF-8（Excel）</option></select><button class="btn" data-close style="margin-left:auto">關閉</button></div>`,true);
+  const cnt=()=>{const n=cableLabelRows($('lbScope').value).length;$('lbCount').textContent=`共 ${n} 條線、${n*($('lbTwo').checked?2:1)} 張標籤`};$('lbScope').onchange=cnt;$('lbTwo').onchange=cnt;cnt();
+  $('lbCsv').onclick=()=>{const R=cableLabelRows($('lbScope').value);if(!R.length){toast('這個範圍沒有線');return}
+    const rows=[['線號','A端','B端','A位置','B位置','線材','長度','QR']];R.forEach(r=>rows.push([r.label,r.a,r.b,r.aloc,r.bloc,r.c.type||'',r.c.len||'',r.url]));const text=csv(rows);
+    if($('lbEnc').value==='utf16'){const buf=new Uint8Array(2+text.length*2);buf[0]=0xFF;buf[1]=0xFE;for(let i=0;i<text.length;i++){const c=text.charCodeAt(i);buf[2+i*2]=c&255;buf[3+i*2]=c>>8}download(`線標-${stamp()}.csv`,'text/csv',new Blob([buf],{type:'text/csv'}))}
+    else download(`線標-${stamp()}.csv`,'text/csv','﻿'+text);toast('已下載線標 CSV')};
+  $('lbPrint').onclick=()=>{const R=cableLabelRows($('lbScope').value);if(!R.length){toast('這個範圍沒有線');return}const [cols,rows]=$('lbFmt').value.split('x').map(Number);const qr=$('lbQr').checked&&window.qrcode,loc=$('lbLoc').checked,two=$('lbTwo').checked;
+    const L=[];R.forEach(r=>{L.push({r,end:'A'});if(two)L.push({r,end:'B'})});const per=cols*rows;const pages=[];for(let i=0;i<L.length;i+=per)pages.push(L.slice(i,i+per));
+    const W=(210-14)/cols,H=(297-26)/rows;const svgq=u=>{try{const q=qrcode(0,'M');q.addData(u);q.make();return q.createSvgTag({cellSize:2,margin:0,scalable:true})}catch(e){return''}};
+    const cell=x=>{const r=x.r,me=x.end==='A'?r.a:r.b,ot=x.end==='A'?r.b:r.a,ml=x.end==='A'?r.aloc:r.bloc,ol=x.end==='A'?r.bloc:r.aloc;
+      return`<div class="lb">${qr?`<div class="q">${svgq(r.url)}</div>`:''}<div class="t"><b>${esc(r.label||'—')}</b><span class="me">${esc(me)}${loc&&ml?`<i>${esc(ml)}</i>`:''}</span><span class="ot">⇄ ${esc(ot)}${loc&&ol?`<i>${esc(ol)}</i>`:''}</span></div></div>`};
+    const html=`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><title>線標 ${stamp()}</title><style>@page{size:A4;margin:0}*{box-sizing:border-box}body{margin:0;font-family:system-ui,"Microsoft JhengHei",sans-serif;color:#000}
+      .pg{width:210mm;height:297mm;padding:13mm 7mm;display:grid;grid-template-columns:repeat(${cols},${W}mm);grid-auto-rows:${H}mm;page-break-after:always}
+      .lb{border:.2mm dashed #bbb;padding:${H<30?1.2:2}mm;display:flex;gap:2mm;align-items:center;overflow:hidden}.q{flex:0 0 auto;width:${Math.min(H-5,22)}mm;height:${Math.min(H-5,22)}mm}.q svg{width:100%;height:100%}
+      .t{min-width:0;display:flex;flex-direction:column;gap:.6mm;line-height:1.15}.t b{font-size:${H<30?11:14}pt;letter-spacing:.02em}.t span{font-size:${H<30?6.5:8}pt;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.t .ot{color:#444}.t i{font-style:normal;color:#666;margin-left:1.5mm}
+      .bar{position:fixed;top:8px;right:8px;font:13px system-ui;background:#fff;border:1px solid #ccc;border-radius:8px;padding:6px 10px}@media print{.bar{display:none}.lb{border-color:transparent}}</style></head><body><div class="bar">${L.length} 張 · ${pages.length} 頁 <button onclick="print()">列印</button></div>${pages.map(p=>`<div class="pg">${p.map(cell).join('')}</div>`).join('')}</body></html>`;
+    const w=window.open('','_blank');if(w){w.document.write(html);w.document.close();setTimeout(()=>{try{w.focus();w.print()}catch(e){}},400)}else{download(`線標-${stamp()}.html`,'text/html',html);toast('瀏覽器擋下新視窗，已改成下載 HTML，打開後列印')}}}
+
+/* ---------- 網路上的設備（新加入、很久沒出現） ---------- */
+async function openSeen(){let J;try{J=await api('/api/seen')}catch(e){toast('讀不到：'+e.message);return}
+  const now=Date.now()/1000,goneH=J.gone_hours||24;const byMac={},byIp={};S.devices.forEach(d=>{const m=normMac(d.mac);if(m)byMac[m]=d;if(d.ip)byIp[d.ip]=d});
+  const items=J.items.map(x=>Object.assign(x,{map:byMac[x.mac]||byIp[x.ip]||null,isNew:x.first&&now-x.first<7*86400,isGone:x.gone||now-x.last>goneH*3600}));
+  let f=ui.seenf||(items.some(x=>x.isNew)?'new':'off');
+  const draw=()=>{const L=items.filter(x=>f==='all'||(f==='new'&&x.isNew)||(f==='off'&&!x.map)||(f==='gone'&&x.isGone));
+    document.querySelectorAll('[data-sf]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.sf===f)));
+    $('seenList').innerHTML=L.length?`<table class="btbl seen"><thead><tr><th>名稱／廠牌</th><th>IP</th><th>MAC</th><th>第一次</th><th>最後出現</th><th>來源</th><th></th></tr></thead><tbody>${L.slice(0,500).map(x=>`<tr class="${x.isGone?'gone':''}">
+      <td><b>${esc(x.name||(x.map&&x.map.name)||'')}</b><small>${esc([x.vendor,x.wireless&&'無線'].filter(Boolean).join(' · '))}</small>${x.map?`<small class="onmap">圖上：${esc(x.map.name)}</small>`:''}</td><td class="mono">${esc(x.ip)}${x.ips.length>1?`<small>曾用 ${esc(x.ips.filter(i=>i!==x.ip).join('、'))}</small>`:''}</td><td class="mono">${esc(x.mac.toUpperCase())}</td>
+      <td>${x.first?tFmt(x.first):'<small>開始記錄前</small>'}</td><td>${x.isGone?'<b class="c-warn">':''}${tAgo(x.last)}${x.isGone?'</b>':''}</td><td><small>${esc(x.src||'')}${x.via?' · '+esc(x.via):''}</small></td>
+      <td>${!x.map&&!ui.ro?`<button class="btn sm" data-sadd="${esc(x.mac)}">加到圖上</button>`:''}${ui.ro?'':`<button class="btn sm" data-sforget="${esc(x.mac)}" title="從清單移除（下次看到會當作新設備）">忘記</button>`}</td></tr>`).join('')}</tbody></table>`:'<p class="hint">沒有符合的設備。</p>'};
+  modal(`<h2>網路上的設備 <small class="hint">${items.length} 台</small></h2><p class="hint">${J.enabled?'監控服務從路由器／防火牆的 ARP 表、路由器的用戶端清單與這台電腦的 ARP 表整理出來。第一次看到的那批當作原本就在，之後出現的才算「新加入」。':'這個功能已關閉（設定 ▸ 心跳與設備偵測）。'}</p>
+    <div class="seg evseg" role="group"><button data-sf="new">7 天內新加入 ${items.filter(x=>x.isNew).length}</button><button data-sf="off">不在圖上 ${items.filter(x=>!x.map).length}</button><button data-sf="gone">超過 ${goneH} 小時沒出現 ${items.filter(x=>x.isGone).length}</button><button data-sf="all">全部</button></div>
+    <div class="tblwrap" id="seenList"></div><div class="actions"><button class="btn" id="seenCsv">下載 CSV</button><button class="btn" data-close style="margin-left:auto">關閉</button></div>`,true);draw();
+  $('seenCsv').onclick=()=>download(`網路上的設備-${stamp()}.csv`,'text/csv','﻿'+csv([['名稱','廠牌','IP','MAC','第一次','最後出現','來源','圖上'],...items.map(x=>[x.name,x.vendor,x.ip,x.mac.toUpperCase(),x.first?new Date(x.first*1000).toLocaleString('zh-TW',{hour12:false}):'',new Date(x.last*1000).toLocaleString('zh-TW',{hour12:false}),x.src,x.map?x.map.name:''])]));
+  $('mod').addEventListener('click',async e=>{const b=e.target.closest('[data-sf]');if(b){f=ui.seenf=b.dataset.sf;draw();return}
+    const a=e.target.closest('[data-sadd]');if(a){if(!canEdit())return;const x=items.find(i=>i.mac===a.dataset.sadd);const src=S.devices.find(d=>d.name===x.src)||null;snap();const vn=x.vendor&&x.vendor!=='隨機 MAC'?x.vendor.split(/[ ,]/)[0]+'-'+String(x.ip).split('.').pop():'';const p=src?{x:src.x+60+Math.random()*200,y:src.y+180+Math.random()*80}:freeSpot();
+      const d=addDev('end',{name:x.name||vn||x.ip,kind:guessKind(x.name||x.vendor),ip:x.ip,mac:x.mac.toUpperCase(),note:`由「網路上的設備」加入（${x.src||''}）`,x:Math.round(p.x/10)*10,y:Math.round(p.y/10)*10,n:1});
+      if(multiPage())d.page=src?pageOf(src):curPage();save();x.map=d;draw();renderAll();toast(`已加入 ${d.name}，記得接上線或設成無線`,true);return}
+    const g=e.target.closest('[data-sforget]');if(g){try{await api('/api/seen/forget',{body:{macs:[g.dataset.sforget]}});items.splice(items.findIndex(i=>i.mac===g.dataset.sforget),1);draw()}catch(x){toast(x.message)}}})}
+
+/* ---------- 高密度設備：點擊放大選埠 ---------- */
+function densePick(pid,touch){const d=I.owner[pid];if(!d||prefs.noPick||viewOf(d)==='icon'||d.ports.length<(TYPES[d.type].pass?32:16))return false;return 28*ui.zoom<(touch?34:20)}
+function openPortPicker(d,hit,cb,pt,title){closePicker();const T=TYPES[d.type];const el=document.createElement('div');el.id='ppick';el.setAttribute('role','dialog');el.setAttribute('aria-label','選擇網路埠');
+  const btn=p=>{const c=I.cab[p.id];return`<button data-pp="${p.id}" class="${c?'used':''}${p.id===hit?' hit':''}" style="${c?'--c:'+cableStyle(c).color:''}" title="${esc(pname(p.id))}${c?' · 線 '+esc(c.label||''):' · 未接線'}">${esc(p.label)}</button>`};
+  let rows;if(T.pass)rows=[[T.sides[0],d.ports.filter(p=>p.side===0)],[T.sides[1],d.ports.filter(p=>p.side===1)]];else{const m=d.ports.filter(p=>p.kind!=='sfp'),s=d.ports.filter(p=>p.kind==='sfp');rows=[['',m.filter((p,i)=>i%2===0)],['',m.filter((p,i)=>i%2===1)]];if(s.length)rows.push(['SFP',s])}
+  el.innerHTML=`<div class="pph"><b>${esc(title||d.name)}</b><small>點選要${title?'接到':'查看'}的埠 · Esc 取消</small><button class="ppx" aria-label="關閉">×</button></div>${rows.filter(r=>r[1].length).map(([n,ps])=>`<div class="pprow">${n?`<span>${esc(n)}</span>`:''}<div>${ps.map(btn).join('')}</div></div>`).join('')}`;
+  document.body.appendChild(el);const r=el.getBoundingClientRect();el.style.left=Math.max(8,Math.min(innerWidth-r.width-8,pt.x-r.width/2))+'px';el.style.top=Math.max(8,Math.min(innerHeight-r.height-8,pt.y+18))+'px';
+  el.addEventListener('click',e=>{if(e.target.closest('.ppx')){closePicker();return}const b=e.target.closest('[data-pp]');if(!b)return;closePicker();cb(b.dataset.pp)});
+  const hb=el.querySelector('.hit');(hb||el.querySelector('[data-pp]')).focus();ui.picker=el}
+function closePicker(){if(ui.picker){ui.picker.remove();ui.picker=null}}
+document.addEventListener('pointerdown',e=>{if(ui.picker&&!e.target.closest('#ppick'))closePicker()},true);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&ui.picker){closePicker();e.stopPropagation()}},true);
+
+/* ---------- 事件接線 ---------- */
+document.addEventListener('click',e=>{
+  const pg=e.target.closest('[data-page]');if(pg&&pg.closest('#pagebar')){if(pg.dataset.page!==curPage())setPage(pg.dataset.page);return}
+  if(e.target.closest('[data-pageadd]')){addPage();return}if(e.target.closest('[data-pagemenu]')){openPages();return}
+  const tk=e.target.closest('[data-tkopen]');if(tk){openBundle('T:'+tk.dataset.tkopen);return}
+  const tn=e.target.closest('[data-tknew]');if(tn){const d=S.devices.find(x=>x.id===tn.dataset.tknew);if(d){I=idx();openTrunkNew(d)}return}});
+document.addEventListener('dblclick',e=>{const pg=e.target.closest('#pagebar [data-page]');if(!pg||ui.ro)return;const p=(S.pages||[]).find(x=>x.id===pg.dataset.page);if(!p)return;
+  modal(`<h2>頁面名稱</h2><div class="field"><input id="pgRen" value="${esc(p.name)}" maxlength="30" aria-label="頁面名稱"></div><div class="actions"><button class="btn primary" id="pgRenOk">儲存</button><button class="btn" data-close>取消</button></div>`);
+  $('pgRen').select();const ok=()=>{snap();p.name=$('pgRen').value.trim()||p.name;save();closeModal();renderPages()};$('pgRenOk').onclick=ok;$('pgRen').onkeydown=e=>{if(e.key==='Enter')ok()}});
+canvas.addEventListener('click',e=>{const o=e.target.closest('[data-offpg]');if(o){e.stopPropagation();goOffPage(o.dataset.offside);return}
+  const b=e.target.closest('[data-bundle]');if(b){e.stopPropagation();openBundle(b.dataset.bundle)}},true);
+insp.addEventListener('change',e=>{const t=e.target;
+  if(t.dataset.noping){const d=S.devices.find(x=>x.id===t.dataset.noping);if(!d||!canEdit())return;snap();if(t.checked)d.ping=false;else delete d.ping;save();renderInsp();toast(t.checked?`${d.name} 不再 Ping`:`${d.name} 恢復 Ping`)}
+  if(t.dataset.fdp){const d=S.devices.find(x=>x.id===t.dataset.fdp);if(!d||!canEdit())return;snap();d.fiber=t.checked;d.ports.forEach(p=>p.kind=t.checked?'sfp':'rj45');save();renderAll()}
+  if(t.dataset.f==='d.page'){renderPages();const d=curObj('d');if(d){toast(`已把 ${d.name} 移到「${pageName(pageOf(d))}」`,true);setTimeout(()=>setPage(pageOf(d),{dev:d.id}),50)}}});
+
 /* ---------- init ---------- */
-function readHash(){const h=location.hash.slice(1);if(!h||!h.includes('='))return null;const ps=new URLSearchParams(h);return{p:ps.get('p'),dev:ps.get('dev'),ro:ps.get('ro')==='1',fault:ps.get('fault'),mrtg:ps.get('mrtg')}}
+function readHash(){const h=location.hash.slice(1);if(!h||!h.includes('='))return null;const ps=new URLSearchParams(h);return{p:ps.get('p'),dev:ps.get('dev'),cable:ps.get('cable'),ro:ps.get('ro')==='1',fault:ps.get('fault'),mrtg:ps.get('mrtg'),settings:ps.get('settings'),events:ps.get('events'),history:ps.get('history')}}
 document.body.classList.toggle('light',prefs.skin==='light');
 const H=readHash();let hadSaved=false;
-if(H&&H.p&&window.LZString){try{const o=JSON.parse(LZString.decompressFromEncodedURIComponent(H.p));S=normalize({devices:o.devices,cables:o.cables,racks:o.racks||[],faults:o.faults||[]});ui.shared=true}catch(e){hadSaved=load()}}else hadSaved=load();
+if(H&&H.p&&window.LZString){try{const o=JSON.parse(LZString.decompressFromEncodedURIComponent(H.p));S=normalize({devices:o.devices,cables:o.cables,racks:o.racks||[],faults:o.faults||[],pages:o.pages||[],trunks:o.trunks||[]});ui.shared=true}catch(e){hadSaved=load()}}else hadSaved=load();
 I=idx();renderLeft();renderViewPop();syncUR();applyPanels();
 
 if(ui.shared){const bn=$('banner');bn.hidden=false;bn.innerHTML='你正在檢視分享的配置，修改不會存到這台電腦。<button id="bnSave">存成這台電腦的配置</button>';
   $('bnSave').onclick=()=>{ui.shared=false;save();bn.hidden=true;toast('已存到這台電腦')}}
 if(H&&H.ro){ui.ro=true;applyRoUI();syncUR()}
-if(H&&H.dev&&S.devices.some(d=>d.id===H.dev))ui.sel={dev:H.dev};
+if(H&&H.dev&&S.devices.some(d=>d.id===H.dev)){ui.sel={dev:H.dev};const d=S.devices.find(x=>x.id===H.dev);if(!onPage(d))ui.page=pageOf(d)}
+if(H&&H.cable&&S.cables.some(c=>c.id===H.cable)){I=idx();const c=S.cables.find(x=>x.id===H.cable);ui.sel={cable:c.id};ui.detail=c.id;if(!onPage(I.owner[c.a]))ui.page=pageOf(I.owner[c.a])}
 initFault();if(H&&H.fault&&S.faults.some(f=>f.id===H.fault)){ui.fault=H.fault;ui.fopen=true}
 renderAll();
 if(H&&H.dev&&ui.sel)requestAnimationFrame(()=>fitTo(devBox(new Set([H.dev])),1.1));
+if(H&&H.cable&&ui.sel&&ui.sel.cable){const c=S.cables.find(x=>x.id===ui.sel.cable);requestAnimationFrame(()=>fitTo(devBox(new Set([I.owner[c.a].id,I.owner[c.b].id].filter(id=>onPage(S.devices.find(d=>d.id===id))))),1.1))}
+document.querySelectorAll('[data-srvonly]').forEach(b=>b.hidden=!SRV);
+$('optBundle').onchange=e=>{prefs.bundle=e.target.checked;savePrefs();renderAll();toast(prefs.bundle?'同一對設備之間的平行線收成一條粗線，點它看每一條':'平行線分開畫')};$('optPick').onchange=e=>{prefs.noPick=!e.target.checked;savePrefs()};
 document.fonts&&document.fonts.ready.then(()=>{if(ui.autoPending){autoLayout();renderAll()}else drawWires()});
-if(SRV){if(!SRV.edit){ui.ro=true;applyRoUI();syncUR()}livePoll();$('bMrtg').hidden=false;$('bMrtg').onclick=()=>openMRTGIndex();
+if(SRV){if(!SRV.edit){ui.ro=true;applyRoUI();syncUR()}livePoll();$('bMrtg').hidden=false;$('bMrtg').onclick=()=>openMRTGIndex();$('bEvents').onclick=()=>openEvents();renderAuthBtn();
+  if(H&&H.settings)setTimeout(()=>openSettings(),60);if(H&&H.events)setTimeout(()=>openEvents(),60);
   if(H&&H.mrtg)setTimeout(()=>H.mrtg==='flow'?openFlowTop():H.mrtg.startsWith('flow:')?openFlowHost(H.mrtg.slice(5)):H.mrtg.startsWith('dev:')&&S.devices.some(x=>x.id===H.mrtg.slice(4))?openDevTraffic(H.mrtg.slice(4)):H.mrtg==='all'||!I.ports[H.mrtg]?openMRTGIndex():openMRTG(H.mrtg),50);
   if(S.devices.length){if(!placeIfNeeded())requestAnimationFrame(()=>fitTo(devBox(),1))}else if(!H){stage.scrollLeft=PAD;stage.scrollTop=PAD;openWelcome(true)}}
 else if(!H){stage.scrollLeft=PAD;stage.scrollTop=PAD;openWelcome(true)}
+if(H&&H.history)setTimeout(()=>openHistory(),80);
 </script>
 
 </body>

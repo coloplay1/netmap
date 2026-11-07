@@ -1,1 +1,8 @@
-{"web": "3.0.1", "exe": "1.8.1", "date": "2026-11-07", "title": "修正：網段探索建立的本機沒有流量", "download": "https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe", "notes": "https://coloplay1.github.io/netmap/manual.html#changelog"}
+{
+ "web": "3.1.0",
+ "exe": "1.9.0",
+ "date": "2026-11-07",
+ "title": "心跳告警、歷史版本、權限、線標、多頁面、光纖束",
+ "download": "https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe",
+ "notes": "https://coloplay1.github.io/netmap/manual.html#changelog"
+}

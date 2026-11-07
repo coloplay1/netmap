@@ -23,6 +23,11 @@ IT 用的網路線路對應工具：建立防火牆、路由器、Switch、Hub�
 - **搜尋對焦**：輸入線號、IP、設備或廠牌，自動縮放對焦並淡出無關設備
 - **唯讀模式與 QR Code**：現場查線不誤觸；整份配置或單一設備可產生網址與 QR Code
 - **匯出**：配線表 CSV、完整路徑 CSV、設備清單 CSV、拓樸圖 SVG／PNG、JSON 專案檔
+- **多張圖（頁面）**：樓層、機房、分公司分開畫，跨頁面的線顯示「→ 對面頁面」連接標籤，點一下跳過去；查線跨頁面走完整條
+- **光纖收容箱與光纖束**：一條 12／24／48 芯光纜一次建立，每一芯標 TIA-598 色碼，畫成一條粗線，點開看每一芯接到哪
+- **平行線收成一條**：同一對設備之間的多條線（LACP、備援）收成一條粗線；48 埠設備在縮小畫面或平板上點埠時放大選埠
+- **歷史版本**：預覽舊版本再一鍵還原；線上版也會在瀏覽器自動留版本
+- **線標列印**：A4 標籤紙（含 QR Code）或 Brother P-touch Editor CSV
 - **LLDP／CDP 匯入**：貼上 `show lldp neighbors`／`show cdp neighbors` 或 CSV 自動產生設備與連線
 
 資料存在瀏覽器（localStorage），可用「檔案」選單下載／開啟 JSON 專案檔備份。型號埠位依常見規格整理，實際請以原廠規格為準。
@@ -68,5 +73,9 @@ python netmap_snmp.py 10.0.0.1 -v 3 -u netmon -a SHA -A 認證密碼 -x AES -X �
   - SSH 流量監控：沒有 SNMP 的家用路由器（ASUS 自動辨識 WAN／LAN／Wi-Fi）、Linux、NAS、OpenWrt 用 SSH 讀 `/proc/net/dev`，一樣有即時流量與流量圖；帳密以 DPAPI 加密、記住主機金鑰
   - 誰在用流量：接收 NetFlow v5／v9、IPFIX、sFlow（UDP 2055／6343），每台電腦的下載／上傳排行、連去哪裡、用什麼服務，以及在路徑每一段佔多少；接在傻瓜 Switch 後的電腦也看得到
   - 各廠牌設定教學：SonicWall、FortiGate、Cisco、Meraki、MikroTik、UniFi、pfSense、OPNsense、Sophos、Palo Alto、Check Point、Juniper、Aruba、H3C、Huawei、Ruckus、TP-Link 等 26 種，怎麼開 SNMP 與流量匯出
-  - 預設只有服務主機能編輯，其他電腦唯讀（可在設定開放）
+  - Ping 心跳：所有有 IP 的設備都有綠／黃／紅燈號與延遲曲線，不需要 SNMP
+  - 告警通知：設備斷線、主幹埠離線、新設備加入時送到 Telegram、Discord、Slack、Teams、LINE（Messaging API）、Email 或自訂 Webhook；事件紀錄保留 180 天
+  - 歷史版本：每次修改記下是誰、改了什麼，可預覽再還原
+  - 網路上的設備：從 ARP 表與路由器用戶端清單找出新加入、很久沒出現、不在圖上的設備
+  - 權限：管理密碼（其他電腦登入後才能編輯）、只能看的檢視連結與 QR Code；預設只有服務主機能編輯
   - 帳密以 Windows DPAPI 加密保存；資料在 `%APPDATA%\netmap`

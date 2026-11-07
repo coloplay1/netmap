@@ -11,13 +11,18 @@ netmap 監控服務：在內網提供「機房線路對應圖」網頁，並定�
               GET  /api/mrtg/summary     所有埠最近 24 小時的流量摘要
               GET  /api/mrtg/device?id=..&view=day|week|month|year  一台設備所有埠的流量圖
               GET  /api/flow/status | /api/flow/top?min=60 | /api/flow/host?ip=..&min=60   流量明細（NetFlow／IPFIX／sFlow）
+              GET  /api/events  /api/pinghist?id=..  /api/seen  /api/revs  /api/revs/get?rev=..   事件、心跳、網路上的設備、歷史版本
+              POST /api/revs/restore  /api/login  /api/logout  /api/alerts/test  /api/seen/forget
+              GET|PUT /api/settings   告警、心跳、權限（管理員）
+  修改用的請求（POST／PUT）都要帶 X-Netmap: 1 標頭。
 """
-import base64, http.server, json, os, re, socket, sqlite3, sys, threading, time, urllib.parse
+import base64, hashlib, hmac, http.server, json, os, re, secrets, socket, sqlite3, sys, threading, time, urllib.parse, zlib
 from concurrent.futures import ThreadPoolExecutor
 
 import netmap_snmp as ns
 import netmap_sshmon as sm
 import netmap_flow as nf
+import netmap_alert as na
 
 APP = "netmap"
 # 主控台不是 UTF-8 時（英文版 Windows、輸出導到檔案）也不要因為中文訊息當掉
@@ -25,7 +30,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.8.1"
+VERSION = "1.9.0"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -118,12 +123,57 @@ DETECT_ORIGINS = {"https://coloplay1.github.io"}
 
 DEFAULT_SETTINGS = {"port": 8080, "interval": 60, "retention_days": 7, "lan_edit": False, "autostart": False, "autorun": True, "web_detect": False, "monitor_self": True,
                     "flow_enabled": False, "flow_port": 2055, "sflow_port": 6343,
+                    "ping_enabled": True, "ping_interval": 30, "ping_fails": 2, "ping_slow_ms": 200, "ping_timeout": 1.0,
+                    "alerts": {"enabled": False, "site": "", "on": {"down": True, "recover": True, "port": True, "slow": False, "snmp": False, "newdev": False, "gone": False}, "channels": []},
+                    "admin_hash": "", "view_token": "", "view_required": False, "inv_enabled": True, "inv_gone_hours": 24,
                     "snmp": {"version": "2c", "community": "", "user": "", "auth_proto": "SHA", "auth_key": "", "priv_proto": "AES", "priv_key": "",
                              "context": "", "port": 161, "timeout": 2.0, "retries": 1}}
 
+PROJECT_KEYS = ("devices", "cables", "racks", "faults", "pages", "trunks")
+
+def norm_mac(m):
+    h = re.sub(r"[^0-9a-fA-F]", "", str(m or "")).lower()
+    return ":".join(h[i:i + 2] for i in range(0, 12, 2)) if len(h) == 12 and h not in ("000000000000", "ffffffffffff") else ""
+
+def diff_projects(a, b):
+    """兩個版本的差異摘要：{"text": "...", "devices": {"add": [...], "del": [...], "mod": [...]}, "cables": {...}, "moved": n}"""
+    da = {d["id"]: d for d in a.get("devices", []) if isinstance(d, dict) and d.get("id")}
+    db = {d["id"]: d for d in b.get("devices", []) if isinstance(d, dict) and d.get("id")}
+    ca = {c["id"]: c for c in a.get("cables", []) if isinstance(c, dict) and c.get("id")}
+    cb = {c["id"]: c for c in b.get("cables", []) if isinstance(c, dict) and c.get("id")}
+    pname = {}
+    for dd in (da, db):
+        for d in dd.values():
+            for p in d.get("ports", []): pname[p.get("id")] = f"{d.get('name', '')} {p.get('label', '')}".strip()
+    cname = lambda c: (c.get("label") or "") + f"（{pname.get(c.get('a'), '?')} ↔ {pname.get(c.get('b'), '?')}）"
+    strip = lambda d, keys: {k: v for k, v in d.items() if k not in keys}
+    add = [db[k].get("name", "") for k in db if k not in da]; rem = [da[k].get("name", "") for k in da if k not in db]
+    mod, moved = [], 0
+    for k in db:
+        if k in da and da[k] != db[k]:
+            if strip(da[k], ("x", "y")) == strip(db[k], ("x", "y")): moved += 1
+            else: mod.append(db[k].get("name", ""))
+    cadd = [cname(cb[k]) for k in cb if k not in ca]; crem = [cname(ca[k]) for k in ca if k not in cb]
+    cmod, cmoved = [], 0
+    for k in cb:
+        if k in ca and ca[k] != cb[k]:
+            if strip(ca[k], ("wps",)) == strip(cb[k], ("wps",)): cmoved += 1
+            else: cmod.append(cname(cb[k]))
+    other = [k for k in ("racks", "faults", "pages", "trunks") if (a.get(k) or []) != (b.get(k) or [])]
+    parts = []
+    def P(n, verb, what, names):
+        if n: parts.append(f"{verb}{what} {n}" + (f"（{'、'.join(x for x in names[:3] if x)}{'…' if n > 3 else ''}）" if any(names[:3]) else ""))
+    P(len(add), "新增", "設備", add); P(len(rem), "刪除", "設備", rem); P(len(mod), "修改", "設備", mod)
+    P(len(cadd), "接上", "線", [c.split("（")[0] or c for c in cadd]); P(len(crem), "拔掉", "線", [c.split("（")[0] or c for c in crem]); P(len(cmod), "修改", "線", [c.split("（")[0] for c in cmod])
+    if moved or cmoved: parts.append("調整版面")
+    names = {"racks": "機櫃", "faults": "故障紀錄", "pages": "頁面", "trunks": "光纖束"}
+    if other: parts.append("修改" + "、".join(names[k] for k in other))
+    return {"text": "、".join(parts) or "沒有變更", "devices": {"add": add, "del": rem, "mod": mod}, "cables": {"add": cadd, "del": crem, "mod": cmod}, "moved": moved + cmoved, "other": other}
+
+
 class Store:
     def __init__(s, root=None):
-        s.dir = root or data_dir()
+        s.dir = root or data_dir(); os.makedirs(s.dir, exist_ok=True)
         s.lock = threading.RLock()
         s.settings = json.loads(json.dumps(DEFAULT_SETTINGS))
         p = os.path.join(s.dir, "settings.json")
@@ -146,7 +196,14 @@ class Store:
         s.db.execute("CREATE INDEX IF NOT EXISTS ix_samples ON samples(pid, ts)")
         # MRTG 式彙整：每個埠在 5 分鐘／30 分鐘／2 小時／1 天的平均與最大值，保存期比原始紀錄長
         s.db.execute("CREATE TABLE IF NOT EXISTS rollup(pid TEXT, res INTEGER, ts INTEGER, n INTEGER, sin REAL, sout REAL, xin REAL, xout REAL, upn INTEGER, spd REAL, PRIMARY KEY(pid, res, ts))")
+        # 事件（斷線／恢復／新設備…）、圖的歷史版本、網路上看過的設備
+        s.db.execute("CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, kind TEXT, level TEXT, dev TEXT, port TEXT, text TEXT, data TEXT)")
+        s.db.execute("CREATE INDEX IF NOT EXISTS ix_events ON events(ts)")
+        s.db.execute("CREATE TABLE IF NOT EXISTS revs(rev INTEGER PRIMARY KEY, ts INTEGER, who TEXT, summary TEXT, detail TEXT, data BLOB)")
+        s.db.execute("CREATE TABLE IF NOT EXISTS seen(mac TEXT PRIMARY KEY, ip TEXT, name TEXT, vendor TEXT, first INTEGER, last INTEGER, src TEXT, via TEXT, wireless INTEGER, gone INTEGER DEFAULT 0, ips TEXT)")
         s.db.commit()
+        if not s.db.execute("SELECT 1 FROM revs LIMIT 1").fetchone() and s.project.get("devices"):
+            s._add_rev(s.rev, s.project, None, "升級前的版本", int(time.time())); s.db.commit()
         if not s.db.execute("SELECT 1 FROM rollup LIMIT 1").fetchone() and s.db.execute("SELECT 1 FROM samples LIMIT 1").fetchone():
             for res, _ in ROLLUPS:   # 舊版升級：用現有的原始紀錄補出彙整
                 s.db.execute("INSERT OR REPLACE INTO rollup SELECT pid, ?, (ts/?)*?, COUNT(*), SUM(COALESCE(inb,0)), SUM(COALESCE(outb,0)), MAX(COALESCE(inb,0)), MAX(COALESCE(outb,0)), SUM(up), 0 "
@@ -214,10 +271,11 @@ class Store:
                        priv_key=unprotect(c.get("priv_key")) or None, context=c.get("context") or "", port=int(c.get("port") or 161),
                        timeout=float(c.get("timeout") or 2), retries=int(c.get("retries") if c.get("retries") is not None else 1))
 
-    def set_project(s, project, base_rev=None):
+    def set_project(s, project, base_rev=None, who="", note=None):
         with s.lock:
             if base_rev is not None and int(base_rev) != s.rev: return False
-            project = {k: project.get(k, []) for k in ("devices", "cables", "racks", "faults")}
+            project = {k: project.get(k, []) for k in PROJECT_KEYS}
+            before = s.project
             s.project = project; s.rev += 1
             tmp = os.path.join(s.dir, "project.json.tmp")
             json.dump({"rev": s.rev, "savedAt": time.strftime("%Y-%m-%dT%H:%M:%S"), "project": project}, open(tmp, "w", encoding="utf-8"), ensure_ascii=False)
@@ -225,7 +283,106 @@ class Store:
             if s.rev % 20 == 0:  # 定期留一份備份
                 bk = os.path.join(s.dir, "backup"); os.makedirs(bk, exist_ok=True)
                 json.dump(project, open(os.path.join(bk, f"project-{time.strftime('%Y%m%d-%H%M%S')}.json"), "w", encoding="utf-8"), ensure_ascii=False)
+            s._record_rev(before, project, who, note)
             return True
+
+    # ---------- 歷史版本 ----------
+    REV_MERGE_SECS = 120    # 同一個人連續修改（例如拖曳設備）合併成一筆
+    REV_KEEP = 500
+
+    def _add_rev(s, rev, project, who, summary, ts, detail=None):
+        s.db.execute("INSERT OR REPLACE INTO revs VALUES (?,?,?,?,?,?)", (rev, ts, who or "", summary, json.dumps(detail or {}, ensure_ascii=False),
+                                                                     zlib.compress(json.dumps(project, ensure_ascii=False).encode("utf-8"), 6)))
+
+    def _record_rev(s, before, after, who, note):
+        now = int(time.time())
+        last = s.db.execute("SELECT rev, ts, who, detail FROM revs ORDER BY rev DESC LIMIT 1").fetchone()
+        base = before
+        if last and not note and last[2] == (who or "") and now - last[1] < s.REV_MERGE_SECS:
+            prev = s.db.execute("SELECT data FROM revs WHERE rev < ? ORDER BY rev DESC LIMIT 1", (last[0],)).fetchone()
+            base = json.loads(zlib.decompress(prev[0])) if prev else {}
+            s.db.execute("DELETE FROM revs WHERE rev=?", (last[0],))
+        detail = diff_projects(base or {}, after)
+        s._add_rev(s.rev, after, who, note or detail["text"], now, detail)
+        n = s.db.execute("SELECT COUNT(*) FROM revs").fetchone()[0]
+        if n > s.REV_KEEP: s.db.execute("DELETE FROM revs WHERE rev IN (SELECT rev FROM revs ORDER BY rev LIMIT ?)", (n - s.REV_KEEP,))
+        s.db.commit()
+
+    def revs(s, limit=200):
+        with s.lock:
+            rows = s.db.execute("SELECT rev, ts, who, summary, detail FROM revs ORDER BY rev DESC LIMIT ?", (limit,)).fetchall()
+        return [{"rev": r[0], "ts": r[1], "who": r[2], "summary": r[3], "detail": json.loads(r[4] or "{}"), "current": r[0] == s.rev} for r in rows]
+
+    def rev_project(s, rev):
+        with s.lock:
+            r = s.db.execute("SELECT data, ts FROM revs WHERE rev=?", (int(rev),)).fetchone()
+        return (json.loads(zlib.decompress(r[0])), r[1]) if r else (None, None)
+
+    def restore(s, rev, who=""):
+        proj, ts = s.rev_project(rev)
+        if proj is None: return False
+        return s.set_project(proj, None, who, f"還原到 #{rev}（{time.strftime('%m/%d %H:%M', time.localtime(ts))} 的版本）")
+
+    # ---------- 事件 ----------
+    def add_event(s, ev):
+        text = na.event_line(ev)
+        with s.lock:
+            cur = s.db.execute("INSERT INTO events(ts, kind, level, dev, port, text, data) VALUES (?,?,?,?,?,?,?)",
+                               (int(ev.get("ts") or time.time()), ev["kind"], na.LEVEL.get(ev["kind"], "info"), ev.get("dev") or "", ev.get("port") or "", text,
+                                json.dumps(ev, ensure_ascii=False)))
+            s.db.commit(); return cur.lastrowid
+
+    def events(s, since_id=0, limit=200, dev=None):
+        q, a = "SELECT id, ts, kind, level, dev, port, text FROM events WHERE id > ?", [int(since_id or 0)]
+        if dev: q += " AND dev = ?"; a.append(dev)
+        with s.lock:
+            rows = s.db.execute(q + " ORDER BY id DESC LIMIT ?", a + [int(limit)]).fetchall()
+        return [{"id": r[0], "ts": r[1], "kind": r[2], "level": r[3], "dev": r[4], "port": r[5], "text": r[6]} for r in rows]
+
+    # ---------- 網路上看過的設備（新加入／離線） ----------
+    def seen_update(s, items, src):
+        """items: [{mac, ip, name, wireless, via}]。回傳事件清單（新設備、IP 變更）。第一次收到資料時當作基準，不發「新設備」。"""
+        now = int(time.time()); evs = []
+        with s.lock:
+            baseline = not s.db.execute("SELECT 1 FROM seen LIMIT 1").fetchone()
+            for it in items:
+                mac = norm_mac(it.get("mac"))
+                if not mac: continue
+                ip = it.get("ip") or ""; name = it.get("name") or ""
+                r = s.db.execute("SELECT ip, name, first, gone, ips FROM seen WHERE mac=?", (mac,)).fetchone()
+                if not r:
+                    vendor = ns.oui_vendor(mac.upper())
+                    s.db.execute("INSERT INTO seen VALUES (?,?,?,?,?,?,?,?,?,0,?)", (mac, ip, name, vendor, 0 if baseline else now, now, src, it.get("via") or "", 1 if it.get("wireless") else 0, ip))
+                    if not baseline: evs.append({"kind": "newdev", "mac": mac, "ip": ip, "name": name or vendor or mac, "ts": now, "detail": f"由 {src} 看到" if src else None})
+                else:
+                    ips = [x for x in (r[4] or "").split(",") if x]
+                    if ip and ip not in ips: ips = (ips + [ip])[-5:]
+                    if ip and r[0] and ip != r[0]: evs.append({"kind": "ipchange", "mac": mac, "ip": ip, "name": name or r[1] or mac, "ts": now, "detail": f"原本 {r[0]}"})
+                    s.db.execute("UPDATE seen SET ip=COALESCE(NULLIF(?,''), ip), name=COALESCE(NULLIF(?,''), name), last=?, src=?, via=COALESCE(NULLIF(?,''), via), wireless=?, gone=0, ips=? WHERE mac=?",
+                                 (ip, name, now, src, it.get("via") or "", 1 if it.get("wireless") else 0, ",".join(ips), mac))
+                    if r[3]: evs.append({"kind": "back", "mac": mac, "ip": ip, "name": name or r[1] or mac, "ts": now})
+            s.db.commit()
+        return evs
+
+    def seen_gone(s, hours, known_macs):
+        """圖上的設備（有 MAC）超過 hours 小時沒出現：發一次「很久沒出現」。"""
+        now = int(time.time()); evs = []
+        with s.lock:
+            for mac, ip, name, last in s.db.execute("SELECT mac, ip, name, last FROM seen WHERE gone=0 AND last < ?", (now - hours * 3600,)).fetchall():
+                s.db.execute("UPDATE seen SET gone=1 WHERE mac=?", (mac,))
+                if mac in known_macs: evs.append({"kind": "gone", "mac": mac, "ip": ip, "name": known_macs[mac] or name or mac, "ts": now, "detail": f"最後出現 {time.strftime('%m/%d %H:%M', time.localtime(last))}"})
+            s.db.commit()
+        return evs
+
+    def seen_list(s):
+        with s.lock:
+            rows = s.db.execute("SELECT mac, ip, name, vendor, first, last, src, via, wireless, gone, ips FROM seen ORDER BY last DESC").fetchall()
+        return [{"mac": r[0], "ip": r[1], "name": r[2], "vendor": r[3], "first": r[4], "last": r[5], "src": r[6], "via": r[7], "wireless": bool(r[8]), "gone": bool(r[9]),
+                 "ips": [x for x in (r[10] or "").split(",") if x]} for r in rows]
+
+    def seen_forget(s, macs):
+        with s.lock:
+            s.db.executemany("DELETE FROM seen WHERE mac=?", [(norm_mac(m),) for m in macs]); s.db.commit()
 
     def add_samples(s, rows, speeds=None):
         if not rows: return
@@ -281,6 +438,7 @@ class Store:
     def purge(s):
         with s.lock:
             now = int(time.time())
+            s.db.execute("DELETE FROM events WHERE ts < ?", (now - 180 * 86400,))
             s.db.execute("DELETE FROM samples WHERE ts < ?", (now - int(s.settings.get("retention_days", 7)) * 86400,))
             for res, keep in ROLLUPS: s.db.execute("DELETE FROM rollup WHERE res=? AND ts < ?", (res, now - keep))
             s.db.commit()
@@ -315,9 +473,39 @@ def too_fast(din, dout, dt_, speed):
     return bool(speed) and max(din, dout) * 8 / dt_ > speed * 1.5
 
 
+PASS_TYPES = {"patch", "seat"}
+INFRA_TYPES = {"fw", "router", "sw", "hub", "ap"}
+
+def far_ends(project):
+    """每個埠沿著線（穿過配線架、資訊座）走到底的另一端設備：{埠id: 設備}。"""
+    owner, port, cab = {}, {}, {}
+    for d in project.get("devices", []):
+        for p in d.get("ports", []): owner[p["id"]] = d; port[p["id"]] = p
+    for c in project.get("cables", []): cab[c.get("a")] = c; cab[c.get("b")] = c
+    out = {}
+    for pid in cab:
+        if pid not in owner: continue
+        cur, seen = pid, {pid}
+        for _ in range(64):
+            c = cab.get(cur)
+            if not c: break
+            nx = c["b"] if c.get("a") == cur else c.get("a")
+            if nx not in owner or nx in seen: break
+            seen.add(nx); cur = nx
+            d, p = owner[nx], port[nx]
+            if d.get("type") in PASS_TYPES and p.get("pair") and p["pair"] not in seen:
+                seen.add(p["pair"]); cur = p["pair"]; continue
+            break
+        if cur != pid and owner.get(cur) is not owner[pid]: out[pid] = owner[cur]
+    return out, owner, port
+
+
 class Poller:
-    def __init__(s, store, log=print):
+    def __init__(s, store, log=print, emit=None):
         s.store, s.log = store, log
+        s.emit = emit or (lambda ev: None)
+        s.arp = {}           # host → 上次讀 ARP 表的時間
+        s.inv_t = 0          # 上次整理「網路上的設備」的時間
         s.status = {"ts": 0, "devices": {}, "ports": {}}
         s.prev = {}          # (host, ifIndex) → (t, in, out, ierr, oerr)
         s.ifmaps = {}        # host → (time, {label → ifIndex})
@@ -465,6 +653,17 @@ class Poller:
                 res["ports"][pid] = st
                 if st["in"] is not None or st["up"] is not None:
                     res["rows"].append((int(t), pid, st["in"], st["out"], 1 if st["up"] else 0, st["ie"], st["oe"]))
+            # 路由器／防火牆／L3 Switch 的 ARP 表：每 10 分鐘讀一次，用來發現新加入、很久沒出現的設備
+            if s.store.settings.get("inv_enabled", True) and d.get("type") in ("router", "fw", "sw") and time.time() - s.arp.get(host, 0) > 600:
+                s.arp[host] = time.time()
+                try:
+                    arp = cli.walk(ns.ARP, max_rows=4000); items = []
+                    for o, v in arp.items():
+                        ipx = ".".join(o.split(".")[-4:]); mac = ns.mac_of(v)
+                        if mac and not ipx.startswith(("224.", "239.", "255.")) and not ipx.endswith(".255"): items.append({"mac": mac, "ip": ipx})
+                    res["inv"] = items
+                except Exception:
+                    pass
         except Exception as e:
             res["dev"]["err"] = "沒有回應" if "timeout" in str(e) or "no response" in str(e) else str(e)
         finally:
@@ -474,17 +673,60 @@ class Poller:
 
     def cycle(s):
         t0 = time.time(); opts = s.store.snmp_opts(); tg = s.targets()
-        devs, ports, rows = {}, {}, []
+        devs, ports, rows, inv = {}, {}, [], []
         if tg:
             with ThreadPoolExecutor(max_workers=min(16, len(tg))) as ex:
                 for (d, host), r in zip(tg, ex.map(lambda x: s.poll_ssh(x[0], x[1]) if x[1].startswith("ssh://") else s.poll_local(x[0], x[1]) if x[1].startswith("local://") else s.poll_device(x[0], x[1], opts), tg)):
                     devs[d["id"]] = {**r["dev"], "host": host}; ports.update(r["ports"]); rows += r["rows"]
+                    if r.get("inv"): inv.append((d.get("name") or host, r["inv"]))
+                    if host.startswith("ssh://") and r["dev"].get("clients") and r["dev"].get("clients_at", 0) > s.arp.get(host, 0):
+                        s.arp[host] = r["dev"]["clients_at"]
+                        inv.append((d.get("name") or host, [{"mac": c["mac"], "ip": c["ip"], "name": c.get("name"), "wireless": c.get("wireless"), "via": c.get("band") or c.get("iface")} for c in r["dev"]["clients"]]))
         s.store.add_samples(rows, {pid: p.get("speed") for pid, p in ports.items()})
+        old = s.status
         s.status = {"ts": int(time.time()), "devices": devs, "ports": ports}
+        try: s.transitions(old, s.status)
+        except Exception as e: s.log(f"事件判斷錯誤：{e}")
+        try: s.inventory(inv)
+        except Exception as e: s.log(f"設備清單錯誤：{e}")
         s.last_cycle = time.time(); s.cycle_secs = round(time.time() - t0, 2)
         down = [d for d in devs.values() if not d["up"]]
         s.log(f"輪詢完成：{len(devs)} 台設備（{len(down)} 台沒回應）、{len(ports)} 個埠，{s.cycle_secs} 秒")
         if int(t0) % 3600 < max(60, int(s.store.settings.get("interval", 60))): s.store.purge()
+
+    def transitions(s, old, new):
+        """和上一輪比：SNMP／SSH 設備沒回應、恢復；接到網路設備的埠（主幹）離線、恢復。"""
+        if not old.get("ts"): return
+        proj = s.store.project; byid = {d["id"]: d for d in proj.get("devices", [])}
+        far, owner, port = far_ends(proj)
+        for did, st in new["devices"].items():
+            o = old["devices"].get(did)
+            if not o or o.get("up") == st.get("up") or st.get("via") == "local": continue
+            d = byid.get(did) or {}
+            s.emit({"kind": "snmp_up" if st.get("up") else "snmp_down", "dev": did, "name": d.get("name", ""), "ip": d.get("ip", ""), "ts": new["ts"],
+                    "detail": None if st.get("up") else (st.get("err") or "沒有回應")})
+        for pid, st in new["ports"].items():
+            o = old["ports"].get(pid)
+            if not o or o.get("up") is None or st.get("up") is None or o["up"] == st["up"]: continue
+            p, d, fd = port.get(pid) or {}, owner.get(pid) or {}, far.get(pid)
+            if p.get("alert") in (False, "off"): continue
+            if not (p.get("alert") in (True, "on") or (fd and fd.get("type") in INFRA_TYPES) or (fd and fd.get("type") == "end" and fd.get("kind") in ("伺服器", "NAS", "NVR 錄影主機", "ISP 數據機"))): continue
+            s.emit({"kind": "port_up" if st["up"] else "port_down", "dev": d.get("id"), "port": pid, "name": d.get("name", ""), "port_name": f"埠 {p.get('label', '')}" + (f" → {fd.get('name')}" if fd else ""), "ts": new["ts"]})
+
+    def inventory(s, inv):
+        st = s.store.settings
+        if not st.get("inv_enabled", True): return
+        now = time.time()
+        if now - s.inv_t > 600:   # 這台電腦自己的 ARP 表
+            s.inv_t = now
+            try:
+                me = ns.arp_table()
+                if me: inv.append(("netmap 主機", [{"mac": m, "ip": ip} for ip, m in me.items()]))
+            except Exception: pass
+            known = {norm_mac(d.get("mac")): d.get("name", "") for d in s.store.project.get("devices", []) if norm_mac(d.get("mac"))}
+            for ev in s.store.seen_gone(int(st.get("inv_gone_hours") or 24), known): s.emit(ev)
+        for src, items in inv:
+            for ev in s.store.seen_update(items, src): s.emit(ev)
 
     def run(s):
         s.running = True
@@ -506,6 +748,59 @@ class Poller:
     def poke(s):
         s.ifmaps.clear(); s.wake.set()
 
+# ───────────────────────── 權限 ─────────────────────────
+def hash_pw(pw, salt=None, it=200_000):
+    salt = salt or secrets.token_hex(16)
+    return f"pbkdf2${it}${salt}${hashlib.pbkdf2_hmac('sha256', pw.encode('utf-8'), bytes.fromhex(salt), it).hex()}"
+
+def check_pw(pw, stored):
+    try:
+        _k, it, salt, h = stored.split("$")
+        return hmac.compare_digest(hashlib.pbkdf2_hmac("sha256", pw.encode("utf-8"), bytes.fromhex(salt), int(it)).hex(), h)
+    except Exception:
+        return False
+
+class Auth:
+    """管理員登入的 session（只存在記憶體，服務重開要重新登入）與登入失敗限制。"""
+    TTL = 12 * 3600
+    def __init__(s): s.sessions = {}; s.fails = {}; s.lock = threading.Lock()
+    def new(s):
+        t = secrets.token_urlsafe(24)
+        with s.lock: s.sessions[t] = time.time() + s.TTL
+        return t
+    def valid(s, t):
+        if not t: return False
+        with s.lock:
+            exp = s.sessions.get(t)
+            if not exp or exp < time.time(): s.sessions.pop(t, None); return False
+            s.sessions[t] = time.time() + s.TTL; return True
+    def drop(s, t=None):
+        with s.lock:
+            if t: s.sessions.pop(t, None)
+            else: s.sessions.clear()
+    def blocked(s, ip):
+        with s.lock:
+            f = [t for t in s.fails.get(ip, []) if t > time.time() - 600]; s.fails[ip] = f
+            return len(f) >= 5
+    def failed(s, ip):
+        with s.lock: s.fails.setdefault(ip, []).append(time.time())
+
+LOGIN_HTML = """<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>netmap 登入</title><style>
+:root{--bg:#F4F6F9;--card:#fff;--ink:#16202B;--mute:#5B6878;--line:#D9DFE7;--acc:#2563EB}
+@media (prefers-color-scheme:dark){:root{--bg:#0F141B;--card:#18202A;--ink:#E6EBF1;--mute:#9AA7B6;--line:#2A3441;--acc:#4F8BFF}}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Segoe UI","Microsoft JhengHei",sans-serif}
+form{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px 26px;width:min(360px,calc(100vw - 32px));box-sizing:border-box}
+h1{font-size:19px;margin:0 0 6px}p{color:var(--mute);margin:0 0 18px;font-size:13.5px}
+input{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:transparent;color:inherit;font:inherit}
+button{margin-top:12px;width:100%;padding:10px;border:0;border-radius:9px;background:var(--acc);color:#fff;font:inherit;font-weight:600;cursor:pointer}
+.err{color:#D9443A;font-size:13px;min-height:20px;margin-top:8px}</style></head><body>
+<form id="f"><h1>機房線路對應圖</h1><p>這個監控服務需要登入才能查看。沒有密碼的話，請向管理員要一個「檢視連結」。</p>
+<input type="password" id="pw" placeholder="管理密碼" autocomplete="current-password" autofocus aria-label="管理密碼"><button>登入</button><div class="err" id="e"></div></form>
+<script>document.getElementById('f').onsubmit=async e=>{e.preventDefault();const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json','X-Netmap':'1'},body:JSON.stringify({password:document.getElementById('pw').value})});
+if(r.ok)location.replace('/'+location.hash);else{const j=await r.json().catch(()=>({}));document.getElementById('e').textContent=j.error||'密碼不對'}}</script></body></html>"""
+
+
 # ───────────────────────── HTTP ─────────────────────────
 class Handler(http.server.BaseHTTPRequestHandler):
     server_version = f"netmap/{VERSION}"
@@ -519,8 +814,15 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if isinstance(body, (dict, list)): body = json.dumps(body, ensure_ascii=False).encode("utf-8")
         elif isinstance(body, str): body = body.encode("utf-8")
         s.send_response(code); s.send_header("Content-Type", ctype); s.send_header("Content-Length", str(len(body)))
-        for k, v in (extra or {}).items(): s.send_header(k, v)
-        s.send_header("Cache-Control", "no-store"); s.end_headers(); s.wfile.write(body)
+        for k, v in (extra or {}).items():
+            for vv in (v if isinstance(v, list) else [v]): s.send_header(k, vv)
+        s.send_header("Cache-Control", "no-store"); s.send_header("X-Content-Type-Options", "nosniff"); s.end_headers(); s.wfile.write(body)
+
+    def _cookie(s, name):
+        for part in (s.headers.get("Cookie") or "").split(";"):
+            k, _, v = part.strip().partition("=")
+            if k == name: return urllib.parse.unquote(v)
+        return ""
 
     def _detect_origin(s):
         """允許線上版偵測時，回傳可以放行的 Origin；否則 None。"""
@@ -528,76 +830,248 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if s.server.store.settings.get("web_detect") and o in DETECT_ORIGINS and s._local(): return o
         return None
 
+    # 權限：服務主機本身永遠是管理員；其他電腦要登入。沒設密碼時沿用「允許內網其他電腦編輯」。
+    def is_admin(s): return s._local() or s.server.auth.valid(s._cookie("nm_a"))
+    def can_edit(s):
+        st = s.server.store.settings
+        return s.is_admin() or (bool(st.get("lan_edit")) and not st.get("admin_hash"))
+    def view_ok(s, token=None):
+        st = s.server.store.settings
+        if s.is_admin() or not st.get("view_required"): return True
+        t = token or s._cookie("nm_v")
+        return bool(t and st.get("view_token") and hmac.compare_digest(t, st["view_token"]))
+    def who(s):
+        name = urllib.parse.unquote(s.headers.get("X-Netmap-User") or "")[:40].strip()
+        place = "服務主機" if s._local() else s.client_address[0]
+        return f"{name}（{place}）" if name else place
+
+    def body_json(s, limit=50 * 1024 * 1024):
+        n = int(s.headers.get("Content-Length") or 0)
+        if n > limit: raise ValueError("too large")
+        return json.loads(s.rfile.read(n).decode("utf-8") or "{}") if n else {}
+
     def do_OPTIONS(s):
         o = s._detect_origin()
         if not o or urllib.parse.urlparse(s.path).path != "/api/ping": return s._send(403, {"error": "forbidden"})
         s._send(204, b"", "text/plain", {"Access-Control-Allow-Origin": o, "Vary": "Origin", "Access-Control-Allow-Methods": "GET",
                                           "Access-Control-Allow-Private-Network": "true", "Access-Control-Max-Age": "600"})
 
-    def can_edit(s): return s._local() or bool(s.server.store.settings.get("lan_edit"))
-
     def do_GET(s):
-        st, po = s.server.store, s.server.poller
+        st, po, sv = s.server.store, s.server.poller, getattr(s.server, "service", None)
         u = urllib.parse.urlparse(s.path); q = urllib.parse.parse_qs(u.query)
-        if u.path in ("/", "/index.html"):
-            p = web_index()
-            if not p: return s._send(500, "找不到網頁檔（web/index.html）", "text/plain; charset=utf-8")
-            html = open(p, encoding="utf-8").read()
-            with st.lock: boot = {"rev": st.rev, "project": st.project, "interval": st.settings.get("interval", 60), "edit": s.can_edit(), "version": VERSION, "host": socket.gethostname(),
-                                      "self_ips": sorted(self_ips()) if st.settings.get("monitor_self", True) else []}
-            inj = "<script>window.NETMAP_SERVER=" + json.dumps(boot, ensure_ascii=False).replace("</", "<\\/") + ";</script>"
-            html = html.replace("</head>", inj + "\n</head>", 1)
-            return s._send(200, html, "text/html; charset=utf-8")
-        if u.path == "/api/project":
-            with st.lock: return s._send(200, {"rev": st.rev, "project": st.project})
-        if u.path == "/api/status":
-            stat = po.status
-            return s._send(200, {"rev": st.rev, "ts": stat.get("ts", 0), "interval": st.settings.get("interval", 60), "running": po.running,
-                                 "devices": stat.get("devices", {}), "ports": stat.get("ports", {}), "edit": s.can_edit()})
-        if u.path == "/api/history":
-            pid = (q.get("port") or [""])[0]; hours = float((q.get("hours") or ["24"])[0])
-            return s._send(200, {"port": pid, "points": st.history(pid, min(max(hours, 0.1), 24 * 31))})
-        if u.path == "/api/mrtg":
-            return s._send(200, st.mrtg((q.get("port") or [""])[0]))
-        if u.path.startswith("/api/flow/"):
-            sv = getattr(s.server, "service", None)
-            if not sv: return s._send(404, {"error": "flow not available"})
-            mins = max(5, min(60 * 24 * 31, int((q.get("min") or ["60"])[0] or 60))); exp = (q.get("exp") or ["auto"])[0]
-            if u.path == "/api/flow/status": return s._send(200, sv.flow_status())
-            if u.path == "/api/flow/top": return s._send(200, sv.flow.top(mins, exp))
-            if u.path == "/api/flow/host": return s._send(200, sv.flow.host((q.get("ip") or [""])[0], mins, exp))
-            return s._send(404, {"error": "not found"})
-        if u.path == "/api/mrtg/device":
-            return s._send(200, st.mrtg_device((q.get("id") or [""])[0], (q.get("view") or ["day"])[0]))
-        if u.path == "/api/mrtg/summary":
-            return s._send(200, {"ports": st.mrtg_summary()})
+        arg = lambda k, d="": (q.get(k) or [d])[0]
         if u.path == "/api/ping":
             o = s._detect_origin()
             if o: return s._send(200, {"ok": True, "version": VERSION, "port": st.settings.get("port"), "detect": True},
                                  extra={"Access-Control-Allow-Origin": o, "Vary": "Origin", "Access-Control-Allow-Private-Network": "true"})
             return s._send(200, {"ok": True, "version": VERSION})
+        if u.path in ("/", "/index.html"):
+            tok = arg("t")
+            if tok:   # 檢視連結：記在 cookie 裡，網址列不留 token
+                if s.view_ok(tok):
+                    return s._send(302, b"", "text/plain", {"Location": "/", "Set-Cookie": f"nm_v={urllib.parse.quote(tok)}; Path=/; Max-Age=31536000; HttpOnly; SameSite=Lax"})
+                return s._send(403, LOGIN_HTML.replace("請向管理員要一個「檢視連結」。", "這個檢視連結已經失效，請向管理員要新的連結。"), "text/html; charset=utf-8")
+            if not s.view_ok(): return s._send(401, LOGIN_HTML, "text/html; charset=utf-8")
+            p = web_index()
+            if not p: return s._send(500, "找不到網頁檔（web/index.html）", "text/plain; charset=utf-8")
+            html = open(p, encoding="utf-8").read()
+            with st.lock: boot = {"rev": st.rev, "project": st.project, "interval": st.settings.get("interval", 60), "edit": s.can_edit(), "version": VERSION, "host": socket.gethostname(),
+                                      "self_ips": sorted(self_ips()) if st.settings.get("monitor_self", True) else [],
+                                      "admin": s.is_admin(), "local": s._local(), "auth": bool(st.settings.get("admin_hash")), "login": s.server.auth.valid(s._cookie("nm_a"))}
+            inj = "<script>window.NETMAP_SERVER=" + json.dumps(boot, ensure_ascii=False).replace("</", "<\\/") + ";</script>"
+            html = html.replace("</head>", inj + "\n</head>", 1)
+            return s._send(200, html, "text/html; charset=utf-8")
+        if not u.path.startswith("/api/"): return s._send(404, {"error": "not found"})
+        if not s.view_ok(): return s._send(401, {"error": "需要登入或檢視連結"})
+        if u.path == "/api/project":
+            with st.lock: return s._send(200, {"rev": st.rev, "project": st.project})
+        if u.path == "/api/status":
+            stat = po.status
+            last_ev = st.events(0, 1)
+            return s._send(200, {"rev": st.rev, "ts": stat.get("ts", 0), "interval": st.settings.get("interval", 60), "running": po.running,
+                                 "devices": stat.get("devices", {}), "ports": stat.get("ports", {}), "edit": s.can_edit(), "admin": s.is_admin(),
+                                 "ping": sv.pinger.snapshot() if sv else {}, "ping_on": bool(st.settings.get("ping_enabled", True)),
+                                 "ev": last_ev[0]["id"] if last_ev else 0})
+        if u.path == "/api/pinghist":
+            snap = sv.pinger.snapshot(hist=True) if sv else {}
+            return s._send(200, snap.get(arg("id")) or {})
+        if u.path == "/api/events":
+            return s._send(200, {"events": st.events(arg("since", "0"), min(1000, int(arg("limit", "200") or 200)), arg("dev") or None)})
+        if u.path == "/api/revs":
+            return s._send(200, {"rev": st.rev, "revs": st.revs(min(500, int(arg("limit", "200") or 200)))})
+        if u.path == "/api/revs/get":
+            proj, ts = st.rev_project(arg("rev", "0") or 0)
+            return s._send(200, {"rev": int(arg("rev", "0") or 0), "ts": ts, "project": proj}) if proj is not None else s._send(404, {"error": "找不到這個版本"})
+        if u.path == "/api/seen":
+            return s._send(200, {"items": st.seen_list(), "enabled": bool(st.settings.get("inv_enabled", True)), "gone_hours": st.settings.get("inv_gone_hours", 24)})
+        if u.path == "/api/settings":
+            if not s.is_admin(): return s._send(403, {"error": "需要管理員權限"})
+            return s._send(200, sv.public_settings(s.headers.get("Host")) if sv else {})
+        if u.path == "/api/history":
+            pid = arg("port"); hours = float(arg("hours", "24"))
+            return s._send(200, {"port": pid, "points": st.history(pid, min(max(hours, 0.1), 24 * 31))})
+        if u.path == "/api/mrtg":
+            return s._send(200, st.mrtg(arg("port")))
+        if u.path.startswith("/api/flow/"):
+            if not sv: return s._send(404, {"error": "flow not available"})
+            mins = max(5, min(60 * 24 * 31, int(arg("min", "60") or 60))); exp = arg("exp", "auto")
+            if u.path == "/api/flow/status": return s._send(200, sv.flow_status())
+            if u.path == "/api/flow/top": return s._send(200, sv.flow.top(mins, exp))
+            if u.path == "/api/flow/host": return s._send(200, sv.flow.host(arg("ip"), mins, exp))
+            return s._send(404, {"error": "not found"})
+        if u.path == "/api/mrtg/device":
+            return s._send(200, st.mrtg_device(arg("id"), arg("view", "day")))
+        if u.path == "/api/mrtg/summary":
+            return s._send(200, {"ports": st.mrtg_summary()})
+        s._send(404, {"error": "not found"})
+
+    def _mutating(s):
+        """修改用的請求都要帶 X-Netmap 標頭（別的網站的表單或腳本帶不了，防 CSRF）。"""
+        if s.headers.get("X-Netmap") != "1": s._send(403, {"error": "missing header"}); return False
+        return True
+
+    def do_POST(s):
+        st, sv = s.server.store, getattr(s.server, "service", None)
+        path = urllib.parse.urlparse(s.path).path
+        if not s._mutating(): return
+        try: body = s.body_json(1024 * 1024)
+        except Exception: return s._send(400, {"error": "bad json"})
+        ip = s.client_address[0]
+        if path == "/api/login":
+            if s.server.auth.blocked(ip): return s._send(429, {"error": "嘗試太多次，請 10 分鐘後再試"})
+            h = st.settings.get("admin_hash")
+            if not h or not check_pw(str(body.get("password") or ""), h):
+                s.server.auth.failed(ip); time.sleep(0.6); return s._send(401, {"error": "密碼不對" if h else "還沒有設定管理密碼"})
+            t = s.server.auth.new()
+            return s._send(200, {"ok": True}, extra={"Set-Cookie": f"nm_a={t}; Path=/; HttpOnly; SameSite=Strict"})
+        if path == "/api/logout":
+            s.server.auth.drop(s._cookie("nm_a"))
+            return s._send(200, {"ok": True}, extra={"Set-Cookie": "nm_a=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict"})
+        if not s.view_ok(): return s._send(401, {"error": "需要登入"})
+        if path == "/api/revs/restore":
+            if not s.can_edit(): return s._send(403, {"error": "需要編輯權限"})
+            if not st.restore(body.get("rev"), s.who()): return s._send(404, {"error": "找不到這個版本"})
+            s.server.poller.ifmaps.clear()
+            with st.lock: return s._send(200, {"rev": st.rev, "project": st.project})
+        if path == "/api/seen/forget":
+            if not s.can_edit(): return s._send(403, {"error": "需要編輯權限"})
+            st.seen_forget(body.get("macs") or []); return s._send(200, {"ok": True})
+        if path == "/api/alerts/test":
+            if not s.is_admin(): return s._send(403, {"error": "需要管理員權限"})
+            if not sv: return s._send(500, {"error": "no service"})
+            res = sv.notifier.deliver([{"kind": "test", "name": "netmap", "ts": int(time.time()), "detail": f"來自 {socket.gethostname()}，通知設定正常"}], only=body.get("id"))
+            return s._send(200, {"results": res})
+        if path == "/api/ping/now":
+            if sv: sv.pinger.wake.set()
+            return s._send(200, {"ok": True})
         s._send(404, {"error": "not found"})
 
     def do_PUT(s):
-        st = s.server.store
-        if urllib.parse.urlparse(s.path).path != "/api/project": return s._send(404, {"error": "not found"})
-        if not s.can_edit(): return s._send(403, {"error": "這台電腦設定為只能在服務主機上編輯"})
-        n = int(s.headers.get("Content-Length") or 0)
-        if n > 50 * 1024 * 1024: return s._send(413, {"error": "too large"})
-        try: body = json.loads(s.rfile.read(n).decode("utf-8"))
+        st, sv = s.server.store, getattr(s.server, "service", None)
+        path = urllib.parse.urlparse(s.path).path
+        if not s._mutating(): return
+        if path == "/api/settings":
+            if not s.is_admin(): return s._send(403, {"error": "需要管理員權限"})
+            try: body = s.body_json(1024 * 1024)
+            except Exception: return s._send(400, {"error": "bad json"})
+            err = sv.update_settings(body) if sv else "no service"
+            if err: return s._send(400, {"error": err})
+            return s._send(200, sv.public_settings(s.headers.get("Host")))
+        if path != "/api/project": return s._send(404, {"error": "not found"})
+        if not s.can_edit(): return s._send(403, {"error": "需要管理員登入才能編輯" if st.settings.get("admin_hash") else "這台電腦設定為只能在服務主機上編輯"})
+        try: body = s.body_json()
+        except ValueError: return s._send(413, {"error": "too large"})
         except Exception: return s._send(400, {"error": "bad json"})
         proj = body.get("project")
         if not isinstance(proj, dict) or not isinstance(proj.get("devices"), list): return s._send(400, {"error": "bad project"})
-        if not st.set_project(proj, body.get("rev")):
+        if not st.set_project(proj, body.get("rev"), s.who()):
             with st.lock: return s._send(409, {"rev": st.rev, "project": st.project})
         s.server.poller.ifmaps.clear()
         s._send(200, {"rev": st.rev})
 
 class Service:
-    """監控服務：HTTP + 輪詢。GUI 與命令列共用。"""
+    """監控服務：HTTP + 輪詢 + 心跳 + 告警。GUI 與命令列共用。"""
     def __init__(s, store=None, log=print):
         s.store = store or Store(); s.log = log
-        s.poller = Poller(s.store, log); s.httpd = None; s.thread = None; s._flow = None
+        s.poller = Poller(s.store, log, emit=s.emit); s.httpd = None; s.thread = None; s._flow = None
+        s.auth = Auth()
+        s.notifier = na.Notifier(lambda: s.store.settings.get("alerts"), s.resolve_channel, log)
+        s.pinger = na.Pinger(lambda: s.store.project.get("devices", []), lambda: s.store.settings, s.emit, log)
+
+    # ---------- 事件與告警 ----------
+    def emit(s, ev):
+        try: s.store.add_event(ev)
+        except Exception as e: s.log(f"事件寫入失敗：{e}")
+        if ev["kind"] in ("down", "port_down", "newdev", "gone", "snmp_down"): s.log("事件：" + na.event_line(ev).split(" ", 1)[-1])
+        s.notifier.push(ev)
+
+    def resolve_channel(s, ch):
+        c = dict(ch)
+        for k in na.SECRET.get(ch.get("type"), ()): c[k] = unprotect(ch.get(k))
+        return c
+
+    def public_settings(s, host=None):
+        st = s.store.settings; a = st.get("alerts") or {}
+        chans = []
+        for ch in a.get("channels") or []:
+            c = {k: v for k, v in ch.items() if k not in na.SECRET.get(ch.get("type"), ())}
+            c["secret"] = {k: bool(ch.get(k)) for k in na.SECRET.get(ch.get("type"), ())}
+            c["last"] = s.notifier.results.get(ch.get("id"))
+            chans.append(c)
+        port = int(st.get("port", 8080)); tok = st.get("view_token") or ""
+        hosts = [h for h in [((host or "").split(":")[0])] if h and not h.startswith("127.") and h != "localhost"] + [ip for ip in local_ips()]
+        return {"ping_enabled": st.get("ping_enabled", True), "ping_interval": st.get("ping_interval", 30), "ping_fails": st.get("ping_fails", 2),
+                "ping_slow_ms": st.get("ping_slow_ms", 200), "ping_method": na.ping_method(),
+                "inv_enabled": st.get("inv_enabled", True), "inv_gone_hours": st.get("inv_gone_hours", 24),
+                "alerts": {"enabled": bool(a.get("enabled")), "site": a.get("site", ""), "on": a.get("on") or {}, "channels": chans},
+                "channel_types": {k: {"name": v["name"], "fields": [[f, l, sec] for f, l, sec in v["fields"]]} for k, v in na.CHANNELS.items()},
+                "auth": {"has_password": bool(st.get("admin_hash")), "view_required": bool(st.get("view_required")), "lan_edit": bool(st.get("lan_edit")),
+                         "view_links": [f"http://{h}:{port}/?t={tok}" for h in dict.fromkeys(hosts)] if tok else []}}
+
+    def update_settings(s, b):
+        st = s.store.settings
+        num = lambda v, lo, hi, d: max(lo, min(hi, int(float(v)))) if str(v).strip() not in ("", "None") else d
+        try:
+            if "ping_enabled" in b: st["ping_enabled"] = bool(b["ping_enabled"])
+            if "ping_interval" in b: st["ping_interval"] = num(b["ping_interval"], 5, 3600, 30)
+            if "ping_fails" in b: st["ping_fails"] = num(b["ping_fails"], 1, 20, 2)
+            if "ping_slow_ms" in b: st["ping_slow_ms"] = num(b["ping_slow_ms"], 10, 10000, 200)
+            if "inv_enabled" in b: st["inv_enabled"] = bool(b["inv_enabled"])
+            if "inv_gone_hours" in b: st["inv_gone_hours"] = num(b["inv_gone_hours"], 1, 24 * 90, 24)
+            if "lan_edit" in b: st["lan_edit"] = bool(b["lan_edit"])
+            if "view_required" in b: st["view_required"] = bool(b["view_required"])
+        except (TypeError, ValueError):
+            return "數字格式不對"
+        pw = b.get("password")
+        if isinstance(pw, dict):
+            if pw.get("clear"): st["admin_hash"] = ""; s.auth.drop()
+            elif pw.get("new") is not None:
+                if len(str(pw["new"])) < 6: return "管理密碼至少 6 個字"
+                st["admin_hash"] = hash_pw(str(pw["new"])); s.auth.drop()
+        if b.get("regen_token") or (st.get("view_required") and not st.get("view_token")): st["view_token"] = secrets.token_urlsafe(18)
+        if b.get("clear_token"): st["view_token"] = ""
+        if isinstance(b.get("alerts"), dict):
+            na_ = b["alerts"]; cur = st.setdefault("alerts", json.loads(json.dumps(DEFAULT_SETTINGS["alerts"])))
+            if "enabled" in na_: cur["enabled"] = bool(na_["enabled"])
+            if "site" in na_: cur["site"] = str(na_["site"])[:40]
+            if isinstance(na_.get("on"), dict): cur["on"] = {k: bool(v) for k, v in na_["on"].items()}
+            if isinstance(na_.get("channels"), list):
+                old = {c.get("id"): c for c in cur.get("channels") or []}; out = []
+                for c in na_["channels"]:
+                    t = c.get("type")
+                    if t not in na.CHANNELS: continue
+                    cid = c.get("id") or ns.nid("ch"); prev = old.get(cid) or {}
+                    o = {"id": cid, "type": t, "name": str(c.get("name") or na.CHANNELS[t]["name"])[:40], "on": c.get("on") is not False}
+                    for f, _l, sec in na.CHANNELS[t]["fields"]:
+                        if sec:
+                            v = c.get(f)
+                            o[f] = protect(str(v)) if v not in (None, "") else ("" if c.get("clear_" + f) else prev.get(f, ""))
+                        else: o[f] = str(c.get(f) or "")[:300]
+                    out.append(o)
+                cur["channels"] = out
+        s.store.save_settings()
+        s.pinger.wake.set()
+        return None
 
     # ---------- 流量明細（NetFlow／IPFIX／sFlow） ----------
     def known_ips(s):
@@ -629,14 +1103,15 @@ class Service:
         if s.httpd: return
         port = int(s.store.settings.get("port", 8080))
         httpd = http.server.ThreadingHTTPServer(("0.0.0.0", port), Handler)
-        httpd.daemon_threads = True; httpd.store = s.store; httpd.poller = s.poller
+        httpd.daemon_threads = True; httpd.store = s.store; httpd.poller = s.poller; httpd.auth = s.auth
+        httpd.service = s
         s.httpd = httpd; s.thread = threading.Thread(target=httpd.serve_forever, daemon=True, name="http"); s.thread.start()
-        s.poller.start(); httpd.service = s
+        s.poller.start(); s.pinger.start()
         s.log(f"服務已啟動：http://{local_ips()[0]}:{port}/")
         if s.store.settings.get("flow_enabled") and not (s._flow and s._flow.running): s.start_flow()
 
     def stop(s):
-        s.poller.stop(); s.stop_flow()
+        s.poller.stop(); s.pinger.stop(); s.stop_flow()
         if s.httpd:
             s.httpd.shutdown(); s.httpd.server_close(); s.httpd = None
         s.log("服務已停止")
@@ -644,6 +1119,9 @@ class Service:
     def urls(s):
         port = int(s.store.settings.get("port", 8080))
         return [f"http://{ip}:{port}/" for ip in local_ips()]
+
+    def settings_url(s, section="settings"):
+        return f"http://127.0.0.1:{int(s.store.settings.get('port', 8080))}/#{section}=1"
 
 def merge_snmp(project, scanned):
     """把掃描結果的 SNMP 對應（host / ifIndex）套到現有的圖上，不更動版面。回傳 (對到的設備數, 對到的埠數)。"""
@@ -667,8 +1145,21 @@ def main():
     ap = argparse.ArgumentParser(description="netmap 監控服務（無視窗模式）")
     ap.add_argument("--port", type=int); ap.add_argument("--interval", type=int); ap.add_argument("--data")
     ap.add_argument("--flow", action="store_true", help="同時接收 NetFlow／IPFIX（UDP 2055）與 sFlow（UDP 6343）")
+    ap.add_argument("--set-password", action="store_true", help="設定管理密碼（其他電腦要登入才能編輯、改設定）後結束")
+    ap.add_argument("--view-link", action="store_true", help="產生（或顯示）只能檢視的連結後結束")
     a = ap.parse_args()
     st = Store(a.data)
+    if a.set_password:
+        import getpass
+        pw = getpass.getpass("新的管理密碼（留空＝取消密碼）：")
+        if pw and len(pw) < 6: print("至少 6 個字"); return
+        if pw and getpass.getpass("再輸入一次：") != pw: print("兩次不一樣"); return
+        st.settings["admin_hash"] = hash_pw(pw) if pw else ""; st.save_settings(); print("已設定管理密碼" if pw else "已取消管理密碼"); return
+    if a.view_link:
+        if not st.settings.get("view_token"): st.settings["view_token"] = secrets.token_urlsafe(18); st.save_settings()
+        port = int(a.port or st.settings.get("port", 8080))
+        for ip in local_ips(): print(f"http://{ip}:{port}/?t={st.settings['view_token']}")
+        return
     if a.flow: st.settings["flow_enabled"] = True
     if a.port: st.settings["port"] = a.port
     if a.interval: st.settings["interval"] = a.interval
