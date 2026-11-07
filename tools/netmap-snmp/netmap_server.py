@@ -25,7 +25,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.7.0"
+VERSION = "1.7.1"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -82,6 +82,32 @@ def local_ips():
     except Exception: pass
     return sorted(ips) or ["127.0.0.1"]
 
+def local_nics():
+    """這台電腦的網卡：{名稱: {"ips": [...], "rx": 收到位元組, "tx": 送出位元組, "ie", "oe", "up", "speed"(bps)}}。需要 psutil（netmap.exe 已內含）。"""
+    try:
+        import psutil
+    except ImportError:
+        return None
+    addrs, io, st = psutil.net_if_addrs(), psutil.net_io_counters(pernic=True), psutil.net_if_stats()
+    out = {}
+    for name, c in io.items():
+        ips = [a.address.split("%")[0] for a in addrs.get(name, []) if a.family in (socket.AF_INET, socket.AF_INET6)]
+        x = st.get(name)
+        out[name] = {"ips": ips, "rx": c.bytes_recv, "tx": c.bytes_sent, "ie": c.errin, "oe": c.errout,
+                     "up": bool(x.isup) if x else None, "speed": (x.speed or 0) * 1_000_000 if x else 0}
+    return out
+
+
+_self_cache = [0.0, set()]
+def self_ips():
+    """這台電腦所有的 IP（給「自動監控自己」比對用），快取 60 秒。"""
+    if time.time() - _self_cache[0] > 60:
+        nics = local_nics()
+        ips = {ip for n in (nics or {}).values() for ip in n["ips"]} | set(local_ips())
+        _self_cache[0], _self_cache[1] = time.time(), {ip for ip in ips if not ip.startswith("127.") and ip != "::1"}
+    return _self_cache[1]
+
+
 # ───────────────────────── store ─────────────────────────
 # MRTG 的四種解析度：(每點秒數, 保存秒數) 與 (圖名, 圖上顯示的時間範圍)
 ROLLUPS = [(300, 3 * 86400), (1800, 14 * 86400), (7200, 62 * 86400), (86400, 800 * 86400)]
@@ -90,7 +116,7 @@ MRTG_VIEWS = [("day", 33 * 3600), ("week", 8 * 86400), ("month", 35 * 86400), ("
 # 線上版網頁偵測本機 netmap.exe：只有使用者勾選才開，只回答 /api/ping，只給這台電腦自己的瀏覽器
 DETECT_ORIGINS = {"https://coloplay1.github.io"}
 
-DEFAULT_SETTINGS = {"port": 8080, "interval": 60, "retention_days": 7, "lan_edit": False, "autostart": False, "autorun": True, "web_detect": False,
+DEFAULT_SETTINGS = {"port": 8080, "interval": 60, "retention_days": 7, "lan_edit": False, "autostart": False, "autorun": True, "web_detect": False, "monitor_self": True,
                     "flow_enabled": False, "flow_port": 2055, "sflow_port": 6343,
                     "snmp": {"version": "2c", "community": "", "user": "", "auth_proto": "SHA", "auth_key": "", "priv_proto": "AES", "priv_key": "",
                              "context": "", "port": 161, "timeout": 2.0, "retries": 1}}
@@ -305,6 +331,8 @@ class Poller:
             if d.get("monitor") is False: continue
             if (d.get("sshmon") or {}).get("host"):
                 out.append((d, "ssh://" + d["sshmon"]["host"])); continue
+            if not (d.get("snmp") or {}).get("host") and d.get("ip") and s.store.settings.get("monitor_self", True) and d["ip"] in self_ips():
+                out.append((d, "local://" + d["ip"])); continue      # 跑 netmap.exe 的這台電腦：直接讀網卡，不需要 SNMP
             host = (d.get("snmp") or {}).get("host") or (d.get("ip") if d.get("type") in MONITOR_TYPES else "")
             host = (host or "").strip()
             if host and re.match(r"^[\w.\-]+(:\d+)?$", host): out.append((d, host))
@@ -330,6 +358,27 @@ class Poller:
             ip, port = sm.split_host(key)
             L = s.links[key] = sm.SshLink(ip, port, c["user"], c["password"], c["hostkey"])
         return L
+
+    def poll_local(s, d, host):
+        ip = host[8:]; now = time.time(); res = {"dev": {"up": False, "err": "", "last": int(now), "via": "local"}, "ports": {}, "rows": []}
+        nics = local_nics()
+        if nics is None: res["dev"]["err"] = "讀不到這台電腦的網卡（缺少 psutil）"; return res
+        nic = next((n for n, v in nics.items() if ip in v["ips"]), None)
+        if not nic: res["dev"]["err"] = f"這台電腦目前沒有 {ip} 這個 IP"; return res
+        v = nics[nic]; res["dev"]["up"] = True; t = time.time()
+        ports = d.get("ports", []); cabled = {x for c in s.store.project.get("cables", []) for x in (c.get("a"), c.get("b"))}
+        p = next((q for q in ports if q.get("ifName") == nic), None) or next((q for q in ports if q["id"] in cabled), None) or (ports[0] if ports else None)
+        if not p: return res
+        k = (host, nic); prev = s.prev.get(k); s.prev[k] = (t, v["rx"], v["tx"], v["ie"], v["oe"])
+        rin = rout = None; die = doe = 0
+        if prev and t - prev[0] > 0.5:
+            dt_ = t - prev[0]; din, dout = counter_delta(v["rx"], prev[1], 2 ** 64), counter_delta(v["tx"], prev[2], 2 ** 64)
+            if din is not None and dout is not None and not too_fast(din, dout, dt_, v["speed"]):
+                rin, rout = din * 8 / dt_, dout * 8 / dt_; die, doe = max(0, v["ie"] - prev[3]), max(0, v["oe"] - prev[4])
+        res["ports"][p["id"]] = {"up": v["up"], "in": rin, "out": rout, "speed": v["speed"], "util": (max(rin or 0, rout or 0) / v["speed"]) if v["speed"] and rin is not None else None,
+                                 "ie": die, "oe": doe, "if": nic}
+        if rin is not None: res["rows"].append((int(t), p["id"], rin, rout, 1 if v["up"] is not False else 0, die, doe))
+        return res
 
     def poll_ssh(s, d, host):
         key = host[6:]; now = time.time(); res = {"dev": {"up": False, "err": "", "last": int(now), "via": "ssh"}, "ports": {}, "rows": []}
@@ -420,7 +469,7 @@ class Poller:
         devs, ports, rows = {}, {}, []
         if tg:
             with ThreadPoolExecutor(max_workers=min(16, len(tg))) as ex:
-                for (d, host), r in zip(tg, ex.map(lambda x: s.poll_ssh(x[0], x[1]) if x[1].startswith("ssh://") else s.poll_device(x[0], x[1], opts), tg)):
+                for (d, host), r in zip(tg, ex.map(lambda x: s.poll_ssh(x[0], x[1]) if x[1].startswith("ssh://") else s.poll_local(x[0], x[1]) if x[1].startswith("local://") else s.poll_device(x[0], x[1], opts), tg)):
                     devs[d["id"]] = {**r["dev"], "host": host}; ports.update(r["ports"]); rows += r["rows"]
         s.store.add_samples(rows, {pid: p.get("speed") for pid, p in ports.items()})
         s.status = {"ts": int(time.time()), "devices": devs, "ports": ports}

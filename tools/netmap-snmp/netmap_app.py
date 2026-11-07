@@ -534,7 +534,7 @@ class App:
                 if busy and busy.get("util") is not None:
                     bt = f"{busy['util']:.0%}　↓{fmt_bps(busy.get('in'))} ↑{fmt_bps(busy.get('out'))}"
                 state = "等待輪詢" if not ds else ("正常" if ds["up"] else ds.get("err") or "沒有回應")
-                shown = ("SSH " + host[6:]) if host.startswith("ssh://") else ("SNMP " + host)
+                shown = ("SSH " + host[6:]) if host.startswith("ssh://") else ("本機網卡 " + host[8:]) if host.startswith("local://") else ("SNMP " + host)
                 s.tree.insert("", "end", iid=d["id"], values=(d.get("name", ""), shown, state, f"{upn} ／ {dn}" if ps else "—", bt), tags=(("up" if ds and ds["up"] else "down") if ds else (),))
             sel = [i for i in keep if s.tree.exists(i)]
             if sel: s.tree.selection_set(sel)

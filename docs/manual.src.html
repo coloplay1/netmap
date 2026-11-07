@@ -334,6 +334,8 @@ details.vend{border:1px solid var(--line);border-radius:12px;padding:10px 14px;m
 <li>把畫面上的<b>網頁網址</b>（例如 <code>http://192.168.1.20:18090/</code>）給同一個內網的同事，用瀏覽器打開就能看到同一張圖。</li>
 <li>設定：網頁埠、輪詢間隔（秒）、流量紀錄保留天數；可勾選「允許內網其他電腦編輯圖」與「開啟程式時自動啟動服務」。</li>
 <li>下方表格列出每台設備的狀態、上線／離線的埠數與最忙的埠。</li>
+<li><b>跑 netmap.exe 的這台電腦會自動監控</b>：直接讀它自己的網卡流量，不需要 SNMP。只要圖上那台電腦的 IP 和它實際的 IP 一樣即可。</li>
+<li>點設備後，右側「即時狀態」卡片會顯示<b>今日流量縮圖</b>和今天的下載／上傳總量，點縮圖打開這台設備的流量圖。</li>
 </ol>
 <figure><img src="manual/live.jpg" alt="網頁上的即時流量" loading="lazy"><figcaption>監控模式下的網頁：線依使用率變色，線上顯示 ↓下載 ↑上傳。</figcaption></figure>
 <figure class="mid"><img src="manual/livechart.jpg" alt="埠的 24 小時流量曲線" loading="lazy"><figcaption>點埠可看到即時流量、使用率、錯誤數與 24 小時曲線。</figcaption></figure>
