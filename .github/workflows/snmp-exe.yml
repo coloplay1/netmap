@@ -45,9 +45,13 @@ jobs:
         working-directory: tools/netmap-snmp
         run: |
           python -c "import netmap_sshmon as m; c,si=m.parse_read('Inter-|\n face |\n  eth0: 100 1 0 0 0 0 0 0 200 2 0 0 0 0 0 0\n    lo: 5 1 0 0 0 0 0 0 5 1 0 0 0 0 0 0\n@@NETMAP@@\neth0 up 1000\nlo unknown\n'); print(c,si); assert c['eth0'][:2]==(100,200) and si['eth0']==(True,10**9); p=m.friendly_ports({'nv_wan0_ifname':'eth0'},c,si); print(p); assert p[0][1]=='WAN'"
+      - name: Self-test flow collector (NetFlow v5/v9, IPFIX, sFlow)
+        working-directory: tools/netmap-snmp
+        run: |
+          python -c "import time,tempfile,netmap_flow as F,netmap_vendors as V; c=F.FlowCollector(tempfile.mkdtemp(),19055,19343); print(c.start()); [F.send_test('127.0.0.1',19343 if k=='sflow' else 19055,k) for k in ('v5','v9','ipfix','sflow')]; time.sleep(1.5); st=c.status(); print([(e['addr'],e['fmt'],e['flows']) for e in st['exporters']]); t=c.top(60); print(len(t['hosts']),t['total']); assert len(t['hosts'])>=5 and t['total']['rx']>0; c.stop(); assert len(V.VENDORS)>20; print('vendors',len(V.VENDORS))"
       - name: Build netmap.exe (window app)
         working-directory: tools/netmap-snmp
-        run: pyinstaller --onefile --windowed --name netmap --icon netmap.ico --collect-all pysnmp --add-data "web/index.html;web" --add-data "netmap.ico;." --add-data "netmap.png;." --add-data "oui.json.gz;." --hidden-import paramiko --hidden-import netmap_collect --hidden-import netmap_sshmon netmap_app.py
+        run: pyinstaller --onefile --windowed --name netmap --icon netmap.ico --collect-all pysnmp --add-data "web/index.html;web" --add-data "netmap.ico;." --add-data "netmap.png;." --add-data "oui.json.gz;." --hidden-import paramiko --hidden-import netmap_collect --hidden-import netmap_sshmon --hidden-import netmap_flow --hidden-import netmap_vendors netmap_app.py
       - name: Build netmap-snmp.exe (command line)
         working-directory: tools/netmap-snmp
         run: pyinstaller --onefile --console --name netmap-snmp --icon netmap.ico --collect-all pysnmp --add-data "oui.json.gz;." netmap_snmp.py

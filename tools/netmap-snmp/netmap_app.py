@@ -16,9 +16,18 @@ import netmap_snmp as ns
 import netmap_server as srv
 import netmap_collect as col
 import netmap_sshmon as sm
+import netmap_flow as nf
+import netmap_vendors as vendors
 
 VERSION_URL = os.environ.get("NETMAP_VERSION_URL") or "https://coloplay1.github.io/netmap/version.json"
 DOWNLOAD_URL = "https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe"
+
+
+def human_bytes(n):
+    n = float(n or 0)
+    for u in ("B", "KB", "MB", "GB", "TB"):
+        if n < 1024 or u == "TB": return f"{n:.0f} {u}" if u == "B" else f"{n:.1f} {u}"
+        n /= 1024
 
 
 def newer(a, b):
@@ -108,7 +117,7 @@ class App:
 
         nb = ttk.Notebook(root); nb.pack(fill="both", expand=True, padx=12, pady=(4, 12)); s.nb = nb
         s.collector = None
-        s.build_scan(ttk.Frame(nb, padding=12)); s.build_service(ttk.Frame(nb, padding=12)); s.build_collect(ttk.Frame(nb, padding=12)); s.build_about(ttk.Frame(nb, padding=16))
+        s.build_scan(ttk.Frame(nb, padding=12)); s.build_service(ttk.Frame(nb, padding=12)); s.build_flow(ttk.Frame(nb, padding=12)); s.build_collect(ttk.Frame(nb, padding=12)); s.build_about(ttk.Frame(nb, padding=16))
         root.protocol("WM_DELETE_WINDOW", s.on_close)
         root.after(120, s.pump); root.after(1500, s.refresh_service)
         s.update_info = None
@@ -126,6 +135,7 @@ class App:
         mode = ttk.Frame(fr); mode.pack(fill="x", pady=(0, 8))
         ttk.Radiobutton(mode, text="SNMP 掃描（防火牆、網管 Switch，可畫出連線與流量）", value="snmp", variable=s.v_mode, command=s.sync_mode).pack(side="left")
         ttk.Radiobutton(mode, text="網段探索（不需要 SNMP，列出在線的設備）", value="disc", variable=s.v_mode, command=s.sync_mode).pack(side="left", padx=(18, 0))
+        ttk.Button(mode, text="各廠牌怎麼開 SNMP？", command=s.vendor_guide).pack(side="right")
         top = ttk.LabelFrame(fr, text="掃描目標", padding=10); top.pack(fill="x")
         s.v_targets = tk.StringVar(value=s.store.settings.get("last_targets", ""))
         e = ttk.Entry(top, textvariable=s.v_targets); e.pack(fill="x"); e.focus_set(); ascii_field(e, s.v_targets)
@@ -537,6 +547,106 @@ class App:
             s.root.after(4000, s.refresh_service)
 
     # ───────────── 收集樣本 ─────────────
+    # ───────────── 流量分析（誰在用） ─────────────
+    def build_flow(s, fr):
+        s.nb.add(fr, text="  誰在用流量  ")
+        st = s.store.settings
+        ttk.Label(fr, text="接收防火牆、路由器或交換器送來的流量紀錄（NetFlow v5／v9、IPFIX、sFlow），算出每台電腦用了多少流量、連去哪裡。"
+                           "接在傻瓜 Switch 後面的電腦也看得到。只接收，不會修改設備設定。", style="Muted.TLabel", wraplength=860).pack(anchor="w")
+        lf = ttk.LabelFrame(fr, text="① 接收設定", padding=10); lf.pack(fill="x", pady=(8, 0))
+        s.v_flow = tk.BooleanVar(value=bool(st.get("flow_enabled")))
+        s.v_nfport = tk.StringVar(value=str(st.get("flow_port", 2055))); s.v_sfport = tk.StringVar(value=str(st.get("sflow_port", 6343)))
+        r = ttk.Frame(lf); r.pack(fill="x")
+        ttk.Checkbutton(r, text="接收流量紀錄", variable=s.v_flow, command=s.apply_flow).pack(side="left")
+        ttk.Label(r, text="NetFlow／IPFIX UDP").pack(side="left", padx=(18, 4)); ascii_field(ttk.Entry(r, textvariable=s.v_nfport, width=7), s.v_nfport).pack(side="left")
+        ttk.Label(r, text="sFlow UDP").pack(side="left", padx=(14, 4)); ascii_field(ttk.Entry(r, textvariable=s.v_sfport, width=7), s.v_sfport).pack(side="left")
+        ttk.Button(r, text="套用", command=s.apply_flow).pack(side="left", padx=(10, 0))
+        r2 = ttk.Frame(lf); r2.pack(fill="x", pady=(8, 0))
+        ttk.Label(r2, text="把設備的收集器（Collector）設成：").pack(side="left")
+        s.v_flowdst = tk.StringVar(); ttk.Label(r2, textvariable=s.v_flowdst, foreground="#1d6fd8").pack(side="left")
+        r3 = ttk.Frame(lf); r3.pack(fill="x", pady=(8, 0))
+        ttk.Button(r3, text="各廠牌設定教學", style="Accent.TButton", command=s.vendor_guide).pack(side="left")
+        ttk.Button(r3, text="傳送測試資料", command=s.flow_test).pack(side="left", padx=(8, 0))
+        ttk.Button(r3, text="開啟流量排行", command=lambda: webbrowser.open(s.local_url() + "#flow")).pack(side="left", padx=(8, 0))
+        s.v_flowstat = tk.StringVar(value=""); ttk.Label(lf, textvariable=s.v_flowstat, style="Muted.TLabel", wraplength=840).pack(anchor="w", pady=(8, 0))
+        ttk.Label(fr, text="② 送資料過來的設備", style="Title.TLabel").pack(anchor="w", pady=(12, 0))
+        cols = ("addr", "fmt", "last", "flows", "bytes", "sampling")
+        s.ftree = ttk.Treeview(fr, columns=cols, show="headings", height=6)
+        for k, t, w in (("addr", "設備 IP", 170), ("fmt", "格式", 110), ("last", "最後收到", 110), ("flows", "流量紀錄", 100), ("bytes", "統計到的流量", 130), ("sampling", "取樣", 90)):
+            s.ftree.heading(k, text=t); s.ftree.column(k, width=w, anchor="w")
+        s.ftree.pack(fill="both", expand=True, pady=(6, 0))
+        ttk.Label(fr, text="提示：流量紀錄只要從一台設備送就夠了（通常是防火牆的 LAN 介面）。需要先在「監控服務」啟動服務，才能用瀏覽器看流量排行。",
+                  style="Muted.TLabel", wraplength=860).pack(anchor="w", pady=(6, 0))
+        if st.get("flow_enabled"): s.service.start_flow()
+        def tick():
+            try: s.refresh_flow()
+            finally: s.root.after(5000, tick)
+        tick()
+
+    def flow_ports(s):
+        try: return int(s.v_nfport.get() or 0), int(s.v_sfport.get() or 0)
+        except ValueError: return None
+
+    def apply_flow(s):
+        ports = s.flow_ports()
+        if not ports: messagebox.showwarning(TITLE, "埠要填數字。"); return
+        st = s.store.settings; st["flow_enabled"] = s.v_flow.get(); st["flow_port"], st["sflow_port"] = ports; s.store.save_settings()
+        s.service.stop_flow()
+        if st["flow_enabled"]: s.service.start_flow()
+        s.refresh_flow()
+
+    def refresh_flow(s):
+        if not hasattr(s, "ftree"): return
+        nfp, sfp = s.flow_ports() or (2055, 6343); ip = (srv.local_ips() or ["這台電腦的 IP"])[0]
+        s.v_flowdst.set(f"{ip}　NetFlow／IPFIX：UDP {nfp}　sFlow：UDP {sfp}")
+        st = s.service.flow_status() if (s.service._flow or s.store.settings.get("flow_enabled")) else {"running": False, "errors": {}, "exporters": []}
+        msg = ("接收中。" if st["running"] else "尚未開始接收（勾選「接收流量紀錄」）。") + "".join(f" {e}" for e in st["errors"].values())
+        if st["running"] and not st["exporters"]: msg += " 還沒有收到任何資料：請到設備上設定收集器，或按「傳送測試資料」測試。"
+        if any(e.get("waiting_template") for e in st["exporters"]): msg += " 有設備還沒送範本（template），收到後就會開始統計。"
+        s.v_flowstat.set(msg)
+        s.ftree.delete(*s.ftree.get_children())
+        for e in st["exporters"]:
+            addr = e["addr"].replace("#sflow", "")
+            last = time.strftime("%H:%M:%S", time.localtime(e["last"])) if e.get("last") else "—"
+            s.ftree.insert("", "end", values=(addr, e.get("fmt") or ("（之前收過）" if e.get("stored") else ""), last, f"{e.get('flows', 0):,}",
+                                              human_bytes(e.get("bytes", 0)), f"1:{e['sampling']}" if e.get("sampling", 0) > 1 else "不取樣" if e.get("fmt") else ""))
+
+    def flow_test(s):
+        if not s.service._flow or not s.service._flow.running:
+            if not messagebox.askyesno(TITLE, "還沒開始接收。要先勾選「接收流量紀錄」並開始接收嗎？"): return
+            s.v_flow.set(True); s.apply_flow()
+        nfp, _ = s.flow_ports() or (2055, 6343)
+        hosts = [d["ip"] for d in s.store.project.get("devices", []) if d.get("type") == "end" and d.get("ip")][:8] or None
+        n, b = nf.send_test("127.0.0.1", nfp, "ipfix", hosts=hosts)
+        s.write(f"已送出 {n} 個測試封包（模擬 {len(hosts or nf.TEST_HOSTS)} 台電腦、約 {human_bytes(b)} 的流量）。")
+        s.root.after(1500, lambda: (s.service.flow.flush(), s.refresh_flow()))
+        messagebox.showinfo(TITLE, "已送出測試資料。下方列表會出現 127.0.0.1，代表接收正常。\n\n在監控網頁按「流量圖 ▸ 誰在用」可以看到模擬的流量排行（測試資料之後會自然過期，不影響真實資料）。")
+
+    def vendor_guide(s, select=None):
+        dlg = tk.Toplevel(s.root); dlg.title("各廠牌設定教學"); dlg.geometry("900x600"); dlg.transient(s.root)
+        left = ttk.Frame(dlg, padding=(10, 10, 0, 10)); left.pack(side="left", fill="y")
+        ttk.Label(left, text="選擇廠牌").pack(anchor="w")
+        lw = ttk.Frame(left); lw.pack(fill="y", expand=True, pady=(4, 0))
+        lb = tk.Listbox(lw, width=24, height=28, exportselection=False, activestyle="none", relief="flat")
+        sb = ttk.Scrollbar(lw, orient="vertical", command=lb.yview); lb.configure(yscrollcommand=sb.set)
+        for v in vendors.VENDORS: lb.insert("end", v["name"])
+        lb.pack(side="left", fill="y", expand=True); sb.pack(side="left", fill="y")
+        right = ttk.Frame(dlg, padding=10); right.pack(side="left", fill="both", expand=True)
+        txt = ScrolledText(right, wrap="word", font=("Microsoft JhengHei UI", 10) if os.name == "nt" else ("Noto Sans CJK TC", 10), relief="flat")
+        txt.pack(fill="both", expand=True)
+        row = ttk.Frame(right); row.pack(fill="x", pady=(8, 0))
+        ip = (srv.local_ips() or ["（這台電腦的 IP）"])[0]; nfp, sfp = s.flow_ports() or (2055, 6343)
+        def show(_e=None):
+            i = (lb.curselection() or (0,))[0]; v = vendors.VENDORS[i]
+            txt.configure(state="normal"); txt.delete("1.0", "end"); txt.insert("1.0", vendors.render_text(v, ip=ip, nf=nfp, sf=sfp)); txt.configure(state="disabled")
+        def copy():
+            s.root.clipboard_clear(); s.root.clipboard_append(txt.get("1.0", "end").strip())
+        ttk.Button(row, text="複製內容", command=copy).pack(side="right")
+        ttk.Label(row, text=f"已代入這台電腦的 IP：{ip}", style="Muted.TLabel").pack(side="left")
+        lb.bind("<<ListboxSelect>>", show)
+        idx = next((i for i, v in enumerate(vendors.VENDORS) if select and v["id"] == select), 0)
+        lb.selection_set(idx); lb.see(idx); show()
+
     def build_collect(s, fr):
         s.nb.add(fr, text="  收集樣本  ")
         s.sample_dir = os.path.join(s.store.dir, "samples")

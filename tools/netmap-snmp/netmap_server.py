@@ -10,12 +10,14 @@ netmap 監控服務：在內網提供「機房線路對應圖」網頁，並定�
               GET  /api/mrtg?port=..     MRTG 式流量圖資料（日／週／月／年）
               GET  /api/mrtg/summary     所有埠最近 24 小時的流量摘要
               GET  /api/mrtg/device?id=..&view=day|week|month|year  一台設備所有埠的流量圖
+              GET  /api/flow/status | /api/flow/top?min=60 | /api/flow/host?ip=..&min=60   流量明細（NetFlow／IPFIX／sFlow）
 """
 import base64, http.server, json, os, re, socket, sqlite3, sys, threading, time, urllib.parse
 from concurrent.futures import ThreadPoolExecutor
 
 import netmap_snmp as ns
 import netmap_sshmon as sm
+import netmap_flow as nf
 
 APP = "netmap"
 # 主控台不是 UTF-8 時（英文版 Windows、輸出導到檔案）也不要因為中文訊息當掉
@@ -23,7 +25,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.6.0"
+VERSION = "1.7.0"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -89,6 +91,7 @@ MRTG_VIEWS = [("day", 33 * 3600), ("week", 8 * 86400), ("month", 35 * 86400), ("
 DETECT_ORIGINS = {"https://coloplay1.github.io"}
 
 DEFAULT_SETTINGS = {"port": 8080, "interval": 60, "retention_days": 7, "lan_edit": False, "autostart": False, "autorun": True, "web_detect": False,
+                    "flow_enabled": False, "flow_port": 2055, "sflow_port": 6343,
                     "snmp": {"version": "2c", "community": "", "user": "", "auth_proto": "SHA", "auth_key": "", "priv_proto": "AES", "priv_key": "",
                              "context": "", "port": 161, "timeout": 2.0, "retries": 1}}
 
@@ -498,6 +501,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
             return s._send(200, {"port": pid, "points": st.history(pid, min(max(hours, 0.1), 24 * 31))})
         if u.path == "/api/mrtg":
             return s._send(200, st.mrtg((q.get("port") or [""])[0]))
+        if u.path.startswith("/api/flow/"):
+            sv = getattr(s.server, "service", None)
+            if not sv: return s._send(404, {"error": "flow not available"})
+            mins = max(5, min(60 * 24 * 31, int((q.get("min") or ["60"])[0] or 60))); exp = (q.get("exp") or ["auto"])[0]
+            if u.path == "/api/flow/status": return s._send(200, sv.flow_status())
+            if u.path == "/api/flow/top": return s._send(200, sv.flow.top(mins, exp))
+            if u.path == "/api/flow/host": return s._send(200, sv.flow.host((q.get("ip") or [""])[0], mins, exp))
+            return s._send(404, {"error": "not found"})
         if u.path == "/api/mrtg/device":
             return s._send(200, st.mrtg_device((q.get("id") or [""])[0], (q.get("view") or ["day"])[0]))
         if u.path == "/api/mrtg/summary":
@@ -528,7 +539,30 @@ class Service:
     """監控服務：HTTP + 輪詢。GUI 與命令列共用。"""
     def __init__(s, store=None, log=print):
         s.store = store or Store(); s.log = log
-        s.poller = Poller(s.store, log); s.httpd = None; s.thread = None
+        s.poller = Poller(s.store, log); s.httpd = None; s.thread = None; s._flow = None
+
+    # ---------- 流量明細（NetFlow／IPFIX／sFlow） ----------
+    def known_ips(s):
+        return {d.get("ip") for d in s.store.project.get("devices", []) if d.get("ip")}
+
+    @property
+    def flow(s):
+        if s._flow is None:
+            st = s.store.settings
+            s._flow = nf.FlowCollector(s.store.dir, int(st.get("flow_port") or 2055), int(st.get("sflow_port") or 6343), known_ips=s.known_ips, log=s.log)
+        return s._flow
+
+    def start_flow(s):
+        st = s.store.settings; f = s.flow
+        f.ports = {"netflow": int(st.get("flow_port") or 0), "sflow": int(st.get("sflow_port") or 0)}
+        return f.start()
+
+    def stop_flow(s):
+        if s._flow and s._flow.running: s._flow.stop(); s.log("流量收集已停止")
+
+    def flow_status(s):
+        st = dict(s.flow.status()); st["enabled"] = bool(s.store.settings.get("flow_enabled")); st["collector_ips"] = local_ips()
+        return st
 
     @property
     def running(s): return s.httpd is not None
@@ -539,11 +573,12 @@ class Service:
         httpd = http.server.ThreadingHTTPServer(("0.0.0.0", port), Handler)
         httpd.daemon_threads = True; httpd.store = s.store; httpd.poller = s.poller
         s.httpd = httpd; s.thread = threading.Thread(target=httpd.serve_forever, daemon=True, name="http"); s.thread.start()
-        s.poller.start()
+        s.poller.start(); httpd.service = s
         s.log(f"服務已啟動：http://{local_ips()[0]}:{port}/")
+        if s.store.settings.get("flow_enabled") and not (s._flow and s._flow.running): s.start_flow()
 
     def stop(s):
-        s.poller.stop()
+        s.poller.stop(); s.stop_flow()
         if s.httpd:
             s.httpd.shutdown(); s.httpd.server_close(); s.httpd = None
         s.log("服務已停止")
@@ -573,8 +608,10 @@ def main():
     import argparse
     ap = argparse.ArgumentParser(description="netmap 監控服務（無視窗模式）")
     ap.add_argument("--port", type=int); ap.add_argument("--interval", type=int); ap.add_argument("--data")
+    ap.add_argument("--flow", action="store_true", help="同時接收 NetFlow／IPFIX（UDP 2055）與 sFlow（UDP 6343）")
     a = ap.parse_args()
     st = Store(a.data)
+    if a.flow: st.settings["flow_enabled"] = True
     if a.port: st.settings["port"] = a.port
     if a.interval: st.settings["interval"] = a.interval
     sv = Service(st); sv.start()

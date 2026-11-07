@@ -886,6 +886,39 @@ svg.wires .cab.fst-bad .vis,svg.wires .cab.fst-bad .halo{stroke:var(--bad)!impor
 .snmpget{font-size:12.5px;line-height:1.65;color:var(--muted);background:var(--soft);border-radius:12px;padding:10px 12px;margin-bottom:12px}.snmpget b{color:var(--ink);margin-right:6px}
 
 /* ---- p24: live monitoring ---- */
+/* 誰在用流量（NetFlow／IPFIX／sFlow） */
+.fltabs{display:inline-flex;gap:4px}
+.fltbl td .bar2{display:inline-flex;width:90px;height:7px;border-radius:4px;overflow:hidden;background:var(--soft);vertical-align:middle;margin-right:6px}
+.fltbl td .bar2 i{display:block;height:100%}.fltbl td .bar2 i.d{background:var(--mg-in)}.fltbl td .bar2 i.u{background:var(--mg-out)}
+.fltbl .rk{color:var(--muted);width:28px;text-align:right}
+.fltbl .unk{color:var(--muted);font-size:11.5px;border:1px dashed var(--line2);border-radius:5px;padding:0 5px;margin-left:6px}
+.flsum{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:4px 0 12px}
+.flsum div{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--soft)}.flsum small{display:block;color:var(--muted);font-size:11.5px}.flsum b{font-size:15px;font-variant-numeric:tabular-nums}
+.fl2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:12px}
+.fl2 h3{font-size:13.5px;margin:4px 0 6px}
+.flcard .lnums{margin-bottom:8px}
+.flshare{list-style:none;margin:6px 0 0;padding:0;font-size:12px}
+.flshare li{display:flex;align-items:center;gap:8px;padding:3px 0;border-top:1px dashed var(--line)}
+.flshare li span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
+.flshare li b{font-variant-numeric:tabular-nums}
+.flusers{list-style:none;margin:8px 0 0;padding:0;font-size:12.5px}
+.flusers li{display:flex;gap:8px;align-items:center;padding:4px 0;border-top:1px solid var(--line);cursor:pointer}
+.flusers li:hover{color:var(--accent)}.flusers li span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vg{display:grid;grid-template-columns:220px minmax(0,1fr);gap:14px;min-height:360px}
+.vg .vlist{border:1px solid var(--line);border-radius:12px;overflow:auto;max-height:min(60vh,560px);padding:4px}
+.vg .vlist button{display:block;width:100%;text-align:left;border:0;background:none;color:var(--ink);padding:7px 10px;border-radius:8px;font-size:13px}
+.vg .vlist button small{display:block;color:var(--muted);font-size:11px}
+.vg .vlist button[aria-pressed="true"]{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent);font-weight:700}
+.vg .vbody{overflow:auto;max-height:min(60vh,560px);padding-right:4px}
+.vg .vbody h3{font-size:15px;margin:2px 0 4px}.vg .vbody h4{font-size:13.5px;margin:14px 0 6px;display:flex;gap:8px;align-items:center}
+.vg .vbody h4 em{font-style:normal;font-size:11.5px;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:0 8px}
+.vg .vbody ol{margin:0;padding-left:1.3em;font-size:13px;line-height:1.7}
+.vg pre{position:relative;background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:12px/1.55 "JetBrains Mono",Consolas,monospace;overflow:auto;margin:6px 0 0;white-space:pre}
+.vg pre button{position:absolute;right:6px;top:6px}
+.vg .vtip{font-size:12px;color:var(--muted);line-height:1.7;margin-top:12px;border-top:1px solid var(--line);padding-top:8px}
+.vg .vsel{display:none}
+.devguide{font-size:12px;margin-top:6px}
+@media (max-width:760px){.vg{grid-template-columns:minmax(0,1fr)}.vg .vlist{display:none}.vg .vsel{display:block;margin-bottom:8px}.fl2{grid-template-columns:minmax(0,1fr)}.flsum{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* ---------- MRTG 流量圖 ---------- */
 body:not(.light){--mg-in:#22c55e;--mg-in-a:rgba(34,197,94,.45);--mg-out:#60a5fa;--mg-pin:#bbf7d0;--mg-pout:#f0abfc}
 :root{--mg-in:#16a34a;--mg-in-a:rgba(22,163,74,.55);--mg-out:#2563eb;--mg-pin:#065f46;--mg-pout:#c026d3;--mg-mid:#ef4444}
@@ -1353,10 +1386,12 @@ const SPEEDS=['','100M','1G','2.5G','5G','10G','25G','40G','100G'];
 const PAL=['#2F7DE1','#E0962A','#3DA35D','#8A5CE6','#E0574B','#13A69C','#D8679A','#7D8F2E','#B5651D','#5B6BD6'];
 const KEY='netmap-v2', OLDKEY='netmap-v1', PREFKEY='netmap-prefs';
 const PUBLIC_URL='https://coloplay1.github.io/netmap/';
+/*VENDORS*/const VENDOR_GUIDE={"vendors":[{"id":"sonicwall","name":"SonicWall","kind":"防火牆（SonicOS 7）","match":["sonicwall"],"snmp":["Device ▸ Settings ▸ SNMP：勾選 Enable SNMP，在 View 設定唯讀 community「{COMM}」（或建立 SNMPv3 使用者）。","Network ▸ System ▸ Interfaces：編輯 LAN 介面（例如 X0），在 Management 勾選 SNMP，允許從內網查詢。","存取規則若有限制，允許 {IP} 連到防火牆的 UDP 161。"],"flow":"IPFIX（建議）／NetFlow v9／v5","flow_steps":["Device ▸ AppFlow ▸ Flow Reporting ▸ Settings：Report Connections 選 All（或 Interface-based 只報指定介面）。","External Collector 分頁：勾選「Send Flows and Real-Time Data To External Collector」（可能需要重新開機）。","External Flow Reporting Format 選 IPFIX，External Collector's IP 填 {IP}，Port 填 {NF}。","按 Generate ALL Templates 產生範本，再按 Accept。"],"doc":"https://www.sonicwall.com/support/technical-documentation/docs/sonicos-7-1-appflow_device/Content/appflow-d-flow-reporting-user-config-netflow-v10.htm"},{"id":"fortinet","name":"Fortinet FortiGate","kind":"防火牆（FortiOS）","match":["fortinet","fortigate","fortiswitch"],"snmp":["System ▸ SNMP：開啟 SNMP Agent，新增 SNMP v1/v2c community「{COMM}」，Hosts 加入 {IP}，只勾 Accept queries（或用 SNMPv3）。","Network ▸ Interfaces：編輯 LAN 介面，Administrative Access 勾選 SNMP。"],"snmp_cli":"config system snmp sysinfo\n    set status enable\nend\nconfig system snmp community\n    edit 1\n        set name \"{COMM}\"\n        config hosts\n            edit 1\n                set ip {IP} 255.255.255.255\n            next\n        end\n        set trap-v1-status disable\n        set trap-v2c-status disable\n    next\nend","flow":"NetFlow v9（一筆含雙向流量）","flow_steps":["只能用 CLI 設定（FortiOS 7.4.2 以後可設多個收集器）。","在 LAN 介面開啟取樣（netflow-sampler）。舊版 FortiOS 是 config system netflow 底下直接 set collector-ip。"],"flow_cli":"config system netflow\n    config collectors\n        edit 1\n            set collector-ip {IP}\n            set collector-port {NF}\n        next\n    end\nend\nconfig system interface\n    edit \"internal\"\n        set netflow-sampler both\n    next\nend","doc":"https://docs.fortinet.com/document/fortigate/7.4.0/new-features/840728"},{"id":"cisco","name":"Cisco Catalyst／IOS","kind":"交換器、路由器（IOS／IOS-XE）","match":["cisco","catalyst"],"snmp":["用 ACL 限定只有 {IP} 能查詢，並開啟 LLDP（CDP 預設已開）。"],"snmp_cli":"ip access-list standard NETMAP\n permit host {IP}\nsnmp-server community {COMM} RO NETMAP\nlldp run","flow":"Flexible NetFlow v9（路由器、Catalyst 9300／9400 等；部分入門款交換器不支援）","flow_steps":["在連接內網的介面套用 flow monitor（ingress）。"],"flow_cli":"flow exporter NETMAP\n destination {IP}\n transport udp {NF}\n export-protocol netflow-v9\nflow monitor NETMAP-MON\n exporter NETMAP\n record netflow ipv4 original-input\ninterface GigabitEthernet0/1\n ip flow monitor NETMAP-MON input"},{"id":"meraki","name":"Cisco Meraki","kind":"MX 防火牆、MS 交換器","match":["meraki"],"snmp":["Organization ▸ Settings：開啟 SNMP（這是雲端的 SNMP，netmap 讀不到埠流量）。","要讓 netmap 直接讀設備：Network-wide ▸ General ▸ Reporting 開啟 SNMP，設定 community「{COMM}」，並允許 {IP}。"],"flow":"NetFlow v9（MX）","flow_steps":["Network-wide ▸ Configure ▸ General ▸ Reporting：NetFlow traffic reporting 選 Enabled。","NetFlow collector IP 填 {IP}，port 填 {NF}，儲存。","MX 只匯出經過路由或 NAT 的流量，同一個 VLAN 裡互傳的流量不會出現。"],"doc":"https://documentation.meraki.com/MX/Monitoring_and_Reporting/NetFlow_Overview"},{"id":"mikrotik","name":"MikroTik RouterOS","kind":"路由器、交換器","match":["mikrotik","routerboard"],"snmp":["IP ▸ SNMP：Enabled 打勾；Communities 改成「{COMM}」，Addresses 填 {IP}/32，只開 Read Access。"],"snmp_cli":"/snmp set enabled=yes\n/snmp community set [find default=yes] name={COMM} addresses={IP}/32 read-access=yes write-access=no","flow":"NetFlow v9／IPFIX（Traffic Flow）","flow_steps":["IP ▸ Traffic Flow：Enabled 打勾，Interfaces 選 all。","Targets 新增：Dst. Address {IP}、Port {NF}、Version 9（或 IPFIX）。"],"flow_cli":"/ip traffic-flow set enabled=yes interfaces=all\n/ip traffic-flow target add dst-address={IP} port={NF} version=9","doc":"https://manual.mikrotik.com/docs/diagnostics-monitoring-and-troubleshooting/traffic-flow/"},{"id":"ubiquiti","name":"Ubiquiti UniFi","kind":"閘道器、交換器、AP","match":["ubiquiti","unifi","ubnt"],"snmp":["UniFi Network：Settings ▸ System（或 Settings ▸ Network 依版本）找到 SNMP，開啟 SNMPv1/v2c 並設定 community「{COMM}」。","UniFi 交換器與 AP 也會套用同一組設定。"],"flow":"IPFIX（UniFi Network 9.1 以後的閘道器）","flow_steps":["Settings ▸ CyberSecure ▸ Traffic Logging：開啟 NetFlow（IPFIX）。","收集器填 {IP}，埠 {NF}。"],"doc":"https://help.ui.com/hc/en-us/articles/32201256219799"},{"id":"edgerouter","name":"Ubiquiti EdgeRouter","kind":"路由器（EdgeOS）","match":["edgerouter","edgeos"],"snmp":["System ▸ SNMP 開啟並設定 community，或用 CLI。"],"snmp_cli":"configure\nset service snmp community {COMM} authorization ro\nset service snmp community {COMM} client {IP}\ncommit ; save","flow":"NetFlow v9","flow_cli":"configure\nset system flow-accounting interface eth1\nset system flow-accounting netflow version 9\nset system flow-accounting netflow server {IP} port {NF}\ncommit ; save","flow_steps":["把 eth1 換成連接內網的介面。"]},{"id":"pfsense","name":"pfSense","kind":"防火牆","match":["pfsense","netgate"],"snmp":["Services ▸ SNMP：Enable，Read Community String 填「{COMM}」，Bind Interfaces 選 LAN。"],"flow":"NetFlow v9／IPFIX（softflowd 套件）","flow_steps":["System ▸ Package Manager 安裝 softflowd。","Services ▸ softflowd：Interface 選 LAN，Destination Host 填 {IP}，Port {NF}，NetFlow version 選 9 或 IPFIX，儲存。"]},{"id":"opnsense","name":"OPNsense","kind":"防火牆","match":["opnsense","deciso"],"snmp":["System ▸ Firmware ▸ Plugins 安裝 os-net-snmp。","Services ▸ Net-SNMP：Enable，community 填「{COMM}」。"],"flow":"NetFlow v5／v9（內建）","flow_steps":["Reporting ▸ NetFlow：Interfaces 選 LAN（可多選）。","WAN 介面若也選了，放進 Egress only 避免重複計算。","Version 選 v9，Destinations 輸入 {IP}:{NF} 後按 Enter，套用。"],"doc":"https://docs.opnsense.org/manual/how-tos/netflow_exporter.html"},{"id":"sophos","name":"Sophos Firewall","kind":"防火牆（SFOS／XGS）","match":["sophos"],"snmp":["System services ▸ SNMP（或 Administration ▸ SNMP）：開啟 Agent，新增 community「{COMM}」，Manager IP 填 {IP}，只給查詢權限。","Administration ▸ Device access：LAN zone 勾選 SNMP。"],"flow":"NetFlow v5","flow_steps":["System ▸ Administration ▸ Netflow：Add，Netflow server IP 填 {IP}，port {NF}，儲存。","只會匯出有開記錄的規則：Rules and policies ▸ Firewall rules，要統計的規則開啟 Log firewall traffic。","NetFlow v5 沒有 IPv6。"],"doc":"https://www.avanet.com/en/kb/sophos-firewall-netflow-monitoring/"},{"id":"paloalto","name":"Palo Alto Networks","kind":"防火牆（PAN-OS）","match":["palo alto","paloalto"],"snmp":["Device ▸ Setup ▸ Operations ▸ SNMP Setup：選 V2c 填 community「{COMM}」（或 V3）。","Network ▸ Network Profiles ▸ Interface Mgmt：建立允許 SNMP 的設定檔並套到 LAN 介面，Permitted IP 加 {IP}。"],"flow":"NetFlow v9","flow_steps":["Device ▸ Server Profiles ▸ NetFlow：新增，Server 填 {IP}、Port {NF}。","Network ▸ Interfaces：編輯 LAN 介面 ▸ Advanced ▸ NetFlow Profile 選剛才的設定，Commit。"]},{"id":"checkpoint","name":"Check Point","kind":"防火牆（Gaia）","match":["check point","checkpoint"],"snmp":["Gaia Portal ▸ System Management ▸ SNMP：開啟 SNMP Agent，Version 選 v2/v3，Read Only Community 填「{COMM}」。"],"flow":"NetFlow v9／IPFIX","flow_steps":["Gaia Portal ▸ Network Management ▸ NetFlow Export：新增收集器 {IP}、Port {NF}，格式選 NetFlow V9 或 IPFIX。"]},{"id":"juniper","name":"Juniper","kind":"交換器（EX）、防火牆（SRX）","match":["juniper","junos"],"snmp":["只允許 {IP} 查詢。"],"snmp_cli":"set snmp community {COMM} authorization read-only\nset snmp community {COMM} clients {IP}/32\nset protocols lldp interface all\ncommit","flow":"sFlow（EX 交換器）；SRX 用 J-Flow v9／IPFIX","flow_steps":["EX 交換器：在上行與要觀察的介面開 sFlow。"],"flow_cli":"set protocols sflow collector {IP} udp-port {SF}\nset protocols sflow sample-rate ingress 1024\nset protocols sflow interfaces ge-0/0/0\ncommit"},{"id":"aruba","name":"HPE Aruba","kind":"交換器（AOS-S／AOS-CX）","match":["aruba","hpe","procurve"],"snmp":["AOS-S（2530／2930 等）："],"snmp_cli":"snmp-server community \"{COMM}\" operator restricted\nsnmp-server host {IP} community \"{COMM}\"\nlldp run","flow":"sFlow","flow_steps":["AOS-S：設定 sFlow 收集器並在各埠開啟取樣。AOS-CX：sflow collector {IP} 後 sflow enable。"],"flow_cli":"sflow 1 destination {IP} {SF}\ninterface 1-24 sflow 1 sampling 1024\ninterface 1-24 sflow 1 polling 30"},{"id":"h3c","name":"H3C／HPE Comware","kind":"交換器、路由器","match":["h3c","comware"],"snmp":["只允許唯讀查詢。"],"snmp_cli":"snmp-agent\nsnmp-agent sys-info version v2c\nsnmp-agent community read {COMM}\nlldp global enable","flow":"sFlow（交換器）／NetStream（路由器，相當於 NetFlow）","flow_cli":"sflow agent ip <交換器管理IP>\nsflow collector 1 ip {IP} port {SF}\ninterface GigabitEthernet1/0/1\n sflow sampling-rate 4096\n sflow flow collector 1","flow_steps":["在要觀察的埠（例如上行埠）開啟 sFlow 取樣。"]},{"id":"huawei","name":"華為 Huawei","kind":"交換器、路由器、防火牆","match":["huawei"],"snmp":["只允許唯讀查詢。"],"snmp_cli":"snmp-agent\nsnmp-agent sys-info version v2c\nsnmp-agent community read cipher {COMM}\nlldp enable","flow":"sFlow（交換器）／NetStream（路由器、防火牆）","flow_cli":"sflow agent ip <交換器管理IP>\nsflow collector 1 ip {IP} udp-port {SF}\ninterface GigabitEthernet0/0/1\n sflow sampling collector 1\n sflow sampling rate 4096","flow_steps":["在要觀察的埠開啟 sFlow 取樣。"]},{"id":"ruckus","name":"Ruckus ICX","kind":"交換器","match":["ruckus","brocade"],"snmp":["只允許唯讀查詢。"],"snmp_cli":"snmp-server community {COMM} ro\nlldp run","flow":"sFlow","flow_cli":"sflow destination {IP} {SF}\nsflow enable\ninterface ethernet 1/1/1\n sflow forwarding","flow_steps":["在要觀察的埠開啟 sflow forwarding。"]},{"id":"tplink","name":"TP-Link Omada／JetStream","kind":"交換器、閘道器","match":["tp-link","tplink","omada"],"snmp":["單機管理：Maintenance ▸ SNMP ▸ Global Config 開啟，Community 新增「{COMM}」唯讀。","Omada 控制器：Settings ▸ Services ▸ SNMP 開啟並設定 community，會套用到所有設備。"],"flow":"部分 JetStream L2+／L3 交換器支援 sFlow；Omada 閘道器目前沒有 NetFlow","flow_steps":["支援 sFlow 的機型：Maintenance ▸ sFlow，Collector 填 {IP}、Port {SF}，再到 Sampler 在上行埠開啟取樣。"]},{"id":"zyxel","name":"Zyxel","kind":"防火牆（USG FLEX／ATP）、交換器","match":["zyxel"],"snmp":["防火牆：System ▸ SNMP 開啟，設定 Get Community「{COMM}」，Service Control 只允許 LAN。","交換器：Management ▸ SNMP（或 Advanced Application ▸ SNMP）設定唯讀 community。"],"flow":"多數機型沒有 NetFlow／sFlow；可以看埠流量（SNMP）","flow_steps":["沒有流量匯出的話，「誰在用」可以改看上游防火牆或支援 sFlow 的交換器。"]},{"id":"draytek","name":"DrayTek Vigor","kind":"路由器","match":["draytek","vigor"],"snmp":["System Maintenance ▸ SNMP：Enable SNMP Agent，Get Community 填「{COMM}」，Manager Host IP 填 {IP}。"],"flow":"沒有 NetFlow／sFlow","flow_steps":["可以看 WAN／LAN 埠流量（SNMP）；要知道誰在用，請改用支援流量匯出的設備。"]},{"id":"netgear","name":"NETGEAR","kind":"網管交換器","match":["netgear"],"snmp":["System ▸ SNMP ▸ SNMP V1/V2 ▸ Community Configuration：新增唯讀 community「{COMM}」，IP 填 {IP}。"],"flow":"部分 M4300／M4350 等支援 sFlow","flow_steps":["Monitoring ▸ sFlow：Receiver 填 {IP}、Port {SF}，在上行埠設定 Sampler。"]},{"id":"dlink","name":"D-Link","kind":"網管交換器","match":["d-link","dlink"],"snmp":["Management ▸ SNMP Settings：SNMP Global State 開啟，Community 新增「{COMM}」read only。"],"flow":"DGS-3000 以上等系列支援 sFlow","flow_steps":["支援的機型：sFlow ▸ Collector 填 {IP}、Port {SF}，並在埠上開啟 Flow Sampler。"]},{"id":"synology","name":"Synology NAS","kind":"NAS","match":["synology"],"snmp":["控制台 ▸ 終端機 & SNMP ▸ SNMP：啟動 SNMP 服務，勾選 SNMPv1/v2c，community 填「{COMM}」。","也可以改用「加入 SSH 設備…」讀流量（控制台 ▸ 終端機 開啟 SSH）。"],"flow":"沒有流量匯出","flow_steps":[]},{"id":"asus","name":"ASUS 家用路由器","kind":"家用路由器","match":["asus"],"snmp":["多數機型沒有 SNMP，請改用 netmap.exe「監控服務 ▸ 加入 SSH 設備…」。","開 SSH：系統管理 ▸ 系統設定 ▸ 啟用 SSH 選「只限 LAN」。測完不用時記得關閉。"],"flow":"沒有流量匯出","flow_steps":[]},{"id":"windows","name":"Windows 電腦／伺服器","kind":"電腦","match":["microsoft","windows"],"snmp":["設定 ▸ 系統 ▸ 選用功能 ▸ 新增「簡易網路管理通訊協定（SNMP）」。","服務（services.msc）▸ SNMP Service ▸ 安全性：新增唯讀 community「{COMM}」，「接受來自這些主機」加入 {IP}。"],"flow":"沒有流量匯出","flow_steps":[]},{"id":"linux","name":"Linux 主機","kind":"伺服器","match":["linux","ubuntu","debian","red hat","centos"],"snmp":["最簡單：用 netmap.exe「加入 SSH 設備…」讀流量，不用裝東西。","或安裝 snmpd，在 /etc/snmp/snmpd.conf 加入 rocommunity {COMM} {IP}，重新啟動 snmpd。"],"flow":"可安裝 softflowd 匯出 NetFlow","flow_cli":"sudo apt install softflowd\nsudo softflowd -i eth0 -n {IP}:{NF} -v 9"}],"common":{"snmp_tip":"建議所有設備用同一組唯讀 community（例如「{COMM}」）或同一組 SNMPv3 帳密，並只允許 netmap.exe 那台電腦（{IP}）查詢。不要用 public，也不要開寫入權限。","flow_tip":"流量匯出只要開在一台設備上就夠了（通常是防火牆，在 LAN 介面開）。同一台設備的同一份流量若在多個介面都匯出，可能會重複計算。"}};/*VENDORS_END*/
 const MANUAL_URL=PUBLIC_URL+'manual.html';
 /* 版本紀錄：最新在最前面。exe = netmap.exe 的版本 */
-const APP_VERSION='2.8',EXE_VERSION='1.6.0';
+const APP_VERSION='2.9',EXE_VERSION='1.7.0';
 const CHANGELOG=[
+ {v:'2.9',exe:'1.7.0',d:'2026-11-07',t:'誰在用流量與各廠牌設定教學',i:['netmap.exe 接收 NetFlow v5／v9、IPFIX、sFlow，算出每台電腦用了多少流量、連去哪裡、用什麼服務；接在傻瓜 Switch 後面的電腦也看得到','流量圖新增「誰在用」排行（15 分鐘／1 小時／24 小時／7 天），點一台看 33 小時曲線、服務與連線對象','點電腦看它在經過的每一段線上佔多少；點一個埠看這段線上的主要使用者','各廠牌設定教學：SonicWall、FortiGate、Cisco、Meraki、MikroTik、UniFi、pfSense、OPNsense、Sophos、Palo Alto 等 26 種，怎麼開 SNMP 與流量匯出']},
  {v:'2.8',exe:'1.6.0',d:'2026-11-07',t:'首頁分成網頁版與本地端',i:['開始頁先選用法：「網頁版」手動畫圖，「本地端 netmap.exe」自動掃描與監控，會記住上次的選擇','本地端分頁：功能介紹、三步開始與下載；從監控服務開啟時改顯示監控狀態、有問題的設備與流量圖入口','可偵測這台電腦是否開著 netmap.exe，一鍵切換到監控畫面（需在 netmap.exe 勾選允許，預設關閉）']},
  {v:'2.7',exe:'1.5.1',d:'2026-11-07',t:'設備流量圖與狀態',i:['點畫布上的設備，右側「即時狀態」卡片新增「這台設備的流量圖與狀態」按鈕','一次看這台設備的上下線、錯誤封包、最後輪詢時間，以及每個埠的日／週／月／年流量圖','從設備進入單埠詳細圖後，可以直接返回這台設備']},
  {v:'2.6',exe:'1.5.0',d:'2026-11-06',t:'SSH 流量監控',i:['沒有 SNMP 的設備（家用路由器、Linux、NAS、OpenWrt）可以改用 SSH 監控流量，一樣有即時流量與 MRTG 流量圖','ASUS 路由器自動辨識 WAN、LAN、2.4G、5G Wi-Fi','設備重開機、計數器歸零時不再出現假的流量尖峰','流量圖沒有資料時，直接說明原因與下一步']},
@@ -1662,7 +1697,7 @@ function wireShown(c){return prefs.wireMode==='all'||(prefs.wireMode==='main'&&i
 function runGraph(){const adj={};S.devices.forEach(d=>{if(TYPES[d.type].pass)return;d.ports.forEach(p=>{if(!I.cab[p.id])return;const t=trace(p.id);const ps=t.filter(x=>x.k==='port');const far=I.owner[ps[ps.length-1].p];
   if(!far||far.id===d.id||TYPES[far.type].pass)return;(adj[d.id]=adj[d.id]||[]).push({to:far.id,t})})});return adj}
 function rootRank(d){return d.type==='end'&&d.kind==='ISP 數據機'?0:d.type==='fw'?1:d.type==='router'?2:(d.type==='sw'&&d.variant==='l3')?3:d.type==='sw'?4:9}
-function upstream(d){const adj=runGraph();const ds=S.devices.filter(x=>adj[x.id]);if(!ds.length)return[];const best=Math.min(...ds.map(rootRank));if(best===9)return[];
+function upstream(d,adjIn){const adj=adjIn||runGraph();const ds=S.devices.filter(x=>adj[x.id]);if(!ds.length)return[];const best=Math.min(...ds.map(rootRank));if(best===9)return[];
   const dist={},q=ds.filter(x=>rootRank(x)===best).map(x=>x.id);q.forEach(id=>dist[id]=0);
   while(q.length){const id=q.shift();(adj[id]||[]).forEach(e=>{if(dist[e.to]==null){dist[e.to]=dist[id]+1;q.push(e.to)}})}
   let starts=[d.id];if(TYPES[d.type].pass){starts=[];d.ports.forEach(p=>{if(!I.cab[p.id])return;trace(p.id).filter(x=>x.k==='port').forEach(x=>{const o=I.owner[x.p];if(!TYPES[o.type].pass&&!starts.includes(o.id))starts.push(o.id)})})}
@@ -1954,10 +1989,10 @@ function peekHTML(s){I=I||idx();let a='',b='';
   else if(s.port){const p=I.ports[s.port],d=I.owner[s.port];if(!p)return'';a=`${d.name} · 埠 ${p.label}`;const c=I.cab[p.id];b=c?`線 ${c.label||''} ${c.type||''}`:'未接線'}
   else if(s.cable){const c=S.cables.find(x=>x.id===s.cable);if(!c)return'';a=`線 ${c.label||''}`;b=[c.type,c.speed,c.len?c.len+' m':''].filter(Boolean).join(' · ')}
   return`<div class="pk"><b>${esc(a)}</b><span>${esc(b)}</span></div><div class="pkhint">⌃ 往上拉或點這裡，展開設定</div>`}
-function liveDevHTML(d){if(!SRV)return['fw','router','sw','hub','ap'].includes(d.type)?`<div class="card"><span class="label">即時狀態與流量圖</span><p class="hint">在 netmap.exe 啟動「監控服務」，再用它提供的網址開啟這張圖，就能在這裡看到這台設備的上下線、每個埠的即時流量與 MRTG 流量圖。<a href="${MANUAL_URL}#e-srv" target="_blank" rel="noopener">怎麼設定？</a></p></div>`:'';const ld=ui.live&&ui.live.devices[d.id];const ps=d.ports.map(p=>ui.live&&ui.live.ports[p.id]).filter(Boolean);
-  if(!ld&&!ps.length)return`<div class="card"><span class="label">即時狀態</span><p class="hint">${d.ip||(d.snmp&&d.snmp.host)||d.sshmon?'等待監控服務輪詢…':'填上 IP（或用 netmap.exe 掃描）後，監控服務就會讀取這台設備。'}</p><button class="livebtn lcmrtg" data-devtraffic="${d.id}"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg>這台設備的流量圖與狀態</button></div>`;
+function liveDevHTML(d){if(SRV&&!['fw','router','sw','hub','ap'].includes(d.type)&&!d.sshmon&&!(d.snmp&&d.snmp.host)&&!(ui.live&&ui.live.devices[d.id]))return'';if(!SRV)return['fw','router','sw','hub','ap'].includes(d.type)?`<div class="card"><span class="label">即時狀態與流量圖</span><p class="hint">在 netmap.exe 啟動「監控服務」，再用它提供的網址開啟這張圖，就能在這裡看到這台設備的上下線、每個埠的即時流量與 MRTG 流量圖。<a href="${MANUAL_URL}#e-srv" target="_blank" rel="noopener">怎麼設定？</a>${vendorFor(d)?` · <a href="#" data-vguide="${vendorFor(d).id}">${esc(vendorFor(d).name)} 怎麼開 SNMP</a>`:''}</p></div>`:'';const ld=ui.live&&ui.live.devices[d.id];const ps=d.ports.map(p=>ui.live&&ui.live.ports[p.id]).filter(Boolean);
+  if(!ld&&!ps.length)return`<div class="card"><span class="label">即時狀態</span><p class="hint">${d.ip||(d.snmp&&d.snmp.host)||d.sshmon?'等待監控服務輪詢…':'填上 IP（或用 netmap.exe 掃描）後，監控服務就會讀取這台設備。'}</p><button class="livebtn lcmrtg" data-devtraffic="${d.id}"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg>這台設備的流量圖與狀態</button>${ld&&!ld.up&&vendorFor(d)?`<p class="devguide"><a href="#" data-vguide="${vendorFor(d).id}">${esc(vendorFor(d).name)} 怎麼開 SNMP／允許查詢？</a></p>`:''}</div>`;
   const up=ps.filter(p=>p.up).length,dn=ps.filter(p=>p.up===false).length,busy=ps.filter(p=>p.util!=null).sort((a,b)=>b.util-a.util)[0];
-  return`<div class="card"><span class="label">即時狀態 <small>${ld?(ld.up?`<b class="c-ok">${ld.via==='ssh'?'SSH':'SNMP'} 正常</b>`:`<b class="c-bad">${esc(ld.err||'沒有回應')}</b>`):''}</small></span><div class="lnums"><div><small>上線埠</small><b>${up}</b></div><div><small>離線埠</small><b class="${dn?'c-bad':''}">${dn}</b></div><div><small>最忙</small><b>${busy?Math.round(busy.util*100)+'%':'—'}</b></div><div><small>流量</small><b>${busy?'↓'+fmtBps(busy.in)+' ↑'+fmtBps(busy.out):'—'}</b></div></div><button class="livebtn lcmrtg" data-devtraffic="${d.id}"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg>這台設備的流量圖與狀態</button></div>`}
+  return`<div class="card"><span class="label">即時狀態 <small>${ld?(ld.up?`<b class="c-ok">${ld.via==='ssh'?'SSH':'SNMP'} 正常</b>`:`<b class="c-bad">${esc(ld.err||'沒有回應')}</b>`):''}</small></span><div class="lnums"><div><small>上線埠</small><b>${up}</b></div><div><small>離線埠</small><b class="${dn?'c-bad':''}">${dn}</b></div><div><small>最忙</small><b>${busy?Math.round(busy.util*100)+'%':'—'}</b></div><div><small>流量</small><b>${busy?'↓'+fmtBps(busy.in)+' ↑'+fmtBps(busy.out):'—'}</b></div></div><button class="livebtn lcmrtg" data-devtraffic="${d.id}"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg>這台設備的流量圖與狀態</button>${ld&&!ld.up&&vendorFor(d)?`<p class="devguide"><a href="#" data-vguide="${vendorFor(d).id}">${esc(vendorFor(d).name)} 怎麼開 SNMP／允許查詢？</a></p>`:''}</div>`}
 function inspDev(el,d){const T=TYPES[d.type];const ls=layersOf(d);const used=d.ports.filter(p=>I.cab[p.id]).length;
   el.style.setProperty('--tc',tc(d.type));
   const info=T.variants?T.variants[d.variant]:T;
@@ -1965,7 +2000,7 @@ function inspDev(el,d){const T=TYPES[d.type];const ls=layersOf(d);const used=d.p
   const hasList=!!BRANDS[d.type];const sp=SPECS[d.model];
   el.innerHTML=`<div class="ihead"><span class="tile">${iconOf(d)}</span><div style="min-width:0"><div class="kicker"><span class="pill">${esc(typeName(d))}</span><span class="pill lyr">OSI ${range(ls)}</span></div><h2>${esc(d.name)}</h2></div></div>
   <div class="sub">${esc([d.brand,d.model].filter(Boolean).join(' ')||'尚未填廠牌型號')}${d.ip?' · '+esc(d.ip):''} · ${used} / ${d.ports.length} 埠已接線${d.ports.some(p=>p.poe)?` · PoE ${d.ports.filter(p=>p.poe).length} 埠`:''}</div>
-  ${liveDevHTML(d)}<div class="card"><span class="label">設定</span>
+  ${liveDevHTML(d)}${flowDevHTML(d)}<div class="card"><span class="label">設定</span>
   ${inp('名稱','d.name',d.name)}
   ${T.variants?sel('類型','d.variant',d.variant,Object.entries(T.variants).map(([k,v])=>[k,v.n])):''}
   ${d.type==='end'?sel('種類','d.kind',d.kind,END_KINDS.map(k=>[k,k])):''}
@@ -2334,7 +2369,7 @@ function localIntroHTML(){const DL='<svg viewBox="0 0 24 24"><path d="M12 4v11M7
     <section class="wcol"><header><span class="wtile" style="--tc:var(--accent)"><svg class="i" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></span><div><h3>三步開始</h3><p>免安裝，下載後直接執行</p></div></header>
       <ol class="wsteps"><li>下載 netmap.exe<small>出現 SmartScreen 時按「其他資訊 ▸ 仍要執行」</small></li><li>掃描<small>輸入核心 Switch 的 IP 與 SNMP community；沒有 SNMP 就按「加入 SSH 設備…」</small></li><li>啟動監控服務<small>瀏覽器會打開監控畫面，把網址給同事就能一起看</small></li></ol>
       <div class="wdl"><a class="big" href="${SNMP_EXE}" target="_blank" rel="noopener">${DL}下載 netmap.exe v${EXE_VERSION}</a>
-        <div class="sub"><a href="${MANUAL_URL}#exe" target="_blank" rel="noopener">使用手冊</a><button data-wimp="snmp">詳細步驟</button><button data-wimp="scan">匯入掃描結果 .json</button><a href="${SNMP_ZIP}" target="_blank" rel="noopener">Python 版</a></div></div></section>
+        <div class="sub"><a href="${MANUAL_URL}#exe" target="_blank" rel="noopener">使用手冊</a><button data-wimp="snmp">詳細步驟</button><button data-vguide="">各廠牌設定教學</button><button data-wimp="scan">匯入掃描結果 .json</button><a href="${SNMP_ZIP}" target="_blank" rel="noopener">Python 版</a></div></div></section>
   </div>`}
 let wDetSeq=0;
 async function wDetect(){const box=$('wDet');if(!box)return;const seq=++wDetSeq;
@@ -2363,6 +2398,7 @@ function wLocalStatus(close){const el=$('wLocal');if(!el)return;const L=ui.live|
       <section class="wcol"><header><span class="wtile" style="--tc:var(--accent)"><svg class="i" viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg></span><div><h3>開始</h3><p>看圖、看流量</p></div></header>
         <button class="wrow" data-wl="map"><span class="tiles">${['fw','sw','ap'].map(tplIcon).join('')}</span><span class="wt"><b>開啟監控中的圖</b><small>${S.devices.length} 台設備 · ${S.cables.length} 條線，線的顏色代表使用率</small></span><span class="go">›</span></button>
         <button class="wrow" data-wl="mrtg"><span class="tiles"><span class="tile" style="--tc:var(--t-ap)"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg></span></span><span class="wt"><b>流量圖總覽</b><small>每個埠的日／週／月／年 MRTG 流量圖</small></span><span class="go">›</span></button>
+        <button class="wrow" data-wl="flow"><span class="tiles"><span class="tile" style="--tc:var(--t-sw)"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M16 11h5M16 15h5M16 7h5"/></svg></span></span><span class="wt"><b>誰在用流量</b><small>${flowHas()?'依流量排行每台電腦，看它連去哪裡':'需要防火牆送 NetFlow／IPFIX／sFlow 給 netmap.exe'}</small></span><span class="go">›</span></button>
         <button class="wrow" data-wl="fault"><span class="tiles"><span class="tile" style="--tc:var(--t-fw)"><svg viewBox="0 0 24 24"><path d="M12 3 2 20h20zM12 10v4M12 17v.5"/></svg></span></span><span class="wt"><b>故障查線</b><small>從有問題的設備一段段往網路入口檢查</small></span><span class="go">›</span></button></section>
       <section class="wcol wprob"><header><span class="wtile" style="--tc:${bad.length?'#ef4444':'#22c55e'}"><svg class="i" viewBox="0 0 24 24">${bad.length?'<path d="M12 8v5M12 16v.5"/><circle cx="12" cy="12" r="9"/>':'<path d="M5 12l5 5 9-10"/>'}</svg></span><div><h3>${bad.length?'需要注意':'一切正常'}</h3><p>${bad.length?'點設備看狀態與流量圖':mon.length?'所有設備都有回應':'還沒有監控的設備'}</p></div></header>
         ${bad.length?bad.slice(0,6).map(d=>`<button class="wrow" data-wdev="${d.id}">${ICON(d.type)}<span class="wt"><b>${esc(d.name)}</b><small>${esc(L.devices[d.id].err||'沒有回應')}</small></span><span class="go">›</span></button>`).join('')+(bad.length>6?`<p class="wnote">還有 ${bad.length-6} 台…</p>`:'')
@@ -2370,7 +2406,7 @@ function wLocalStatus(close){const el=$('wLocal');if(!el)return;const L=ui.live|
         :`<p class="wnote" style="margin:0 2px">在 netmap.exe 用「SNMP 掃描」掃描後設為監控的圖；沒有 SNMP 的家用路由器、Linux、NAS 在「監控服務」按「加入 SSH 設備…」。</p>`}</section>
     </div>`;
   el.querySelectorAll('[data-wl]').forEach(b=>b.onclick=()=>{const k=b.dataset.wl;close();ui.wlRefresh=null;
-    if(k==='map'){if(S.devices.length)requestAnimationFrame(()=>fitTo(devBox(),1))}else if(k==='mrtg')openMRTGIndex();else if(k==='fault'){const fb=$('bFault');fb&&fb.click()}});
+    if(k==='map'){if(S.devices.length)requestAnimationFrame(()=>fitTo(devBox(),1))}else if(k==='mrtg')openMRTGIndex();else if(k==='flow')openFlowTop();else if(k==='fault'){const fb=$('bFault');fb&&fb.click()}});
   el.querySelectorAll('[data-wdev]').forEach(b=>b.onclick=()=>{const id=b.dataset.wdev;close();ui.wlRefresh=null;ui.sel={dev:id};renderAll();openDevTraffic(id)})}
 function versionStrip(){const fresh=prefs.seenVersion!==APP_VERSION;const L=CHANGELOG[0];
   return`<div class="vstrip"><span class="vtag">v${APP_VERSION}</span><span class="vtxt">${fresh?'<b>新版本：</b>':''}${esc(L.t)}（${L.d}）</span>
@@ -2731,7 +2767,7 @@ async function livePoll(){if(!SRV)return;
   try{const r=await fetch('/api/status',{cache:'no-store'});const j=await r.json();ui.live=j;ui.liveErr=false;
     if(j.rev!==ui.srvRev&&!srvDirty&&!srvSaving&&!busy()){const p=await (await fetch('/api/project',{cache:'no-store'})).json();if(p.rev!==ui.srvRev){S=normalize(p.project);ui.srvRev=p.rev;I=idx();renderAll();placeIfNeeded()}}
     else if(ui.view==='map'&&!busy())renderCanvas();
-    refreshLiveCard();ui.dtRefresh&&ui.dtRefresh();ui.wlRefresh&&ui.wlRefresh()}
+    refreshLiveCard();ui.dtRefresh&&ui.dtRefresh();ui.wlRefresh&&ui.wlRefresh();flowRefresh().then(()=>{if(ui.flow&&ui.flow.t!==ui.flowDrawn){ui.flowDrawn=ui.flow.t;if(ui.sel&&!$('modalRoot').innerHTML&&!($('insp').contains(document.activeElement)&&/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)))renderInsp()}})}
   catch(e){ui.liveErr=true}
   setLiveChip();setTimeout(livePoll,Math.max(5000,Math.min(30000,((ui.live&&ui.live.interval)||60)*500)))}
 function setLiveChip(){const el=$('liveChip');if(!el||!SRV)return;el.hidden=false;const L=ui.live;
@@ -2742,11 +2778,12 @@ function setLiveChip(){const el=$('liveChip');if(!el||!SRV)return;el.hidden=fals
   el.title=`監控服務 v${SRV.version||''}（${SRV.host||''}）：${dv.length} 台設備、${off} 台沒回應、${pd} 個埠離線；每 ${L.interval||60} 秒更新${SRV.edit?'':'。這台電腦只能檢視。'}`}
 /* port detail: live numbers + 24h chart */
 function liveCardHTML(pid){const L=livePort(pid);if(!SRV)return'';
-  if(!L)return`<div class="card livecard" data-livepid="${pid}"><span class="label">即時流量</span><p class="hint">監控服務還沒有這個埠的資料。請確認設備 IP 正確、SNMP 帳密與服務一致；配線架、資訊座的埠不會有資料。</p></div>`;
+  if(!L){const fu=flowPortHTML(pid);const o=I.owner[pid];if(fu&&o&&!['fw','router','sw','hub','ap'].includes(o.type))return`<div class="card livecard" data-livepid="${pid}"><span class="label">誰在用這段線</span>${fu}</div>`;
+    return`<div class="card livecard" data-livepid="${pid}"><span class="label">即時流量</span><p class="hint">${o&&['fw','router','sw','ap'].includes(o.type)?'監控服務還沒有這個埠的資料。請確認設備 IP 正確、SNMP 帳密與服務一致。':'這個埠沒有 SNMP 資料（配線架、資訊座、傻瓜 Switch 與電腦本身不會有）。'}</p>${fu}</div>`}
   return`<div class="card livecard" data-livepid="${pid}"><span class="label">即時流量 <small>${L.up===false?'<b class="c-bad">離線</b>':L.up?'<b class="c-ok">上線</b>':''}</small></span>
     <div class="lnums"><div><small>下載（進）</small><b>${fmtBps(L.in)}</b></div><div><small>上傳（出）</small><b>${fmtBps(L.out)}</b></div><div><small>使用率</small><b>${L.util==null?'—':Math.round(L.util*100)+'%'}</b></div><div><small>速率</small><b>${L.speed?fmtBps(L.speed):'—'}</b></div></div>
     ${(L.ie||L.oe)?`<p class="lerr">⚠ 這次輪詢有錯誤封包：進 ${L.ie}、出 ${L.oe}</p>`:''}
-    <div class="lchart" id="lchart-${pid}"><span class="hint">載入 24 小時紀錄…</span></div>
+    <div class="lchart" id="lchart-${pid}"><span class="hint">載入 24 小時紀錄…</span></div>${flowPortHTML(pid)}
     <button class="livebtn lcmrtg" data-mrtg="${pid}"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg>MRTG 流量圖（日／週／月／年）</button></div>`}
 async function loadChart(pid){const box=document.getElementById('lchart-'+pid);if(!box)return;
   try{const j=await (await fetch('/api/history?port='+encodeURIComponent(pid)+'&hours=24',{cache:'no-store'})).json();const P=j.points||[];
@@ -2820,11 +2857,12 @@ function mgSpark(sp,speed){if(!sp||sp.length<2)return'<span class="sub">—</spa
   const X=t=>(t-t0)/(t1-t0)*W,Y=v=>H-1-v/mx*(H-3);
   return`<svg class="mgspark mgsvg" viewBox="0 0 ${W} ${H}"><path class="ain" d="M0,${H}L${sp.map(p=>X(p[0]).toFixed(1)+','+Y(p[1]).toFixed(1)).join('L')}L${W},${H}Z"/><path class="lout" d="M${sp.map(p=>X(p[0]).toFixed(1)+','+Y(p[2]).toFixed(1)).join('L')}"/></svg>`}
 async function openMRTGIndex(){ui.mrtg='all';ui.mgFrom=null;setMgHash('all');
-  modal(`<div class="mghead"><h2>流量圖</h2><span class="sp"></span><span class="mgsub" style="margin:0">最近 24 小時 · 點一列看日／週／月／年圖</span></div>
+  await flowRefresh();
+  modal(`<div class="mghead"><h2>流量圖</h2>${flTabs('mrtg')}<span class="sp"></span><span class="mgsub" style="margin:0">最近 24 小時 · 點一列看日／週／月／年圖</span></div>
     <div class="mgtools"><input id="mgQ" placeholder="篩選設備或埠…" autocomplete="off"><label class="mgtog"><input type="checkbox" id="mgIdle">隱藏沒有流量的埠</label></div>
     <div class="mglist" id="mgList"><div class="mgempty">載入中…</div></div>
     <div class="actions"><button class="btn" data-close style="margin-left:auto">關閉</button></div>`,true);
-  $('mod').querySelector('.mcard').classList.add('mrtgm');
+  $('mod').querySelector('.mcard').classList.add('mrtgm');flTabsWire();
   const close=$('mod').onclick;$('mod').onclick=e=>{if(e.target.id==='mod'||e.target.closest('[data-close]')){ui.mrtg=null;setMgHash(null)}close(e)};
   let j;try{j=await (await fetch('/api/mrtg/summary',{cache:'no-store'})).json()}catch(e){$('mgList').innerHTML='<div class="mgempty">讀不到監控服務的紀錄</div>';return}
   if(ui.mrtg!=='all'||!$('mgList'))return;
@@ -2848,6 +2886,103 @@ async function openMRTGIndex(){ui.mrtg='all';ui.mgFrom=null;setMgHash('all');
   $('mgQ').oninput=draw;$('mgIdle').onchange=()=>{prefs.mgIdle=$('mgIdle').checked;savePrefs();draw()};draw()}
 function setMgHash(v){try{const h=v?'#mrtg='+encodeURIComponent(v):'';if(location.hash!==h)history.replaceState(null,'',location.pathname+location.search+h)}catch(e){}}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-mrtg]');if(b){e.preventDefault();openMRTG(b.dataset.mrtg)}});
+/* ======================= 各廠牌設定教學 ======================= */
+function vendorFor(d){const b=((d&&d.brand)||'').toLowerCase();if(!b)return null;return VENDOR_GUIDE.vendors.find(v=>v.match.some(m=>b.includes(m)))||null}
+function vgFill(t){const st=ui.flow&&ui.flow.status,ip=SRV&&!/^(127\.|localhost$)/.test(location.hostname)?location.hostname:'（netmap.exe 那台電腦的 IP）';
+  return esc(t).replaceAll('{IP}',`<b>${esc(ip)}</b>`).replaceAll('{NF}',String(st&&st.ports&&st.ports.netflow||2055)).replaceAll('{SF}',String(st&&st.ports&&st.ports.sflow||6343)).replaceAll('{COMM}','netmap-ro')}
+function vgCli(t){return`<pre>${vgFill(t)}<button class="btn sm" data-vgcopy>複製</button></pre>`}
+function openVendorGuide(id){const V=VENDOR_GUIDE.vendors;let cur=V.find(v=>v.id===id)||V[0];
+  modal(`<h2>各廠牌設定教學</h2><p class="hint">怎麼開 SNMP（自動畫圖、埠流量）與流量匯出（誰在用）。選單位置依韌體版本可能略有不同。</p>
+    <div class="vg"><div class="vlist" role="listbox">${V.map(v=>`<button data-vg="${v.id}" aria-pressed="${v.id===cur.id}"><span>${esc(v.name)}</span><small>${esc(v.kind)}</small></button>`).join('')}</div>
+    <div><select class="vsel in" id="vgSel">${V.map(v=>`<option value="${v.id}"${v.id===cur.id?' selected':''}>${esc(v.name)}</option>`).join('')}</select><div class="vbody" id="vgBody"></div></div></div>
+    <div class="actions"><button class="btn" data-close style="margin-left:auto">關閉</button></div>`,true);
+  $('mod').querySelector('.mcard').classList.add('mrtgm');
+  const draw=()=>{const v=cur;$('vgBody').innerHTML=`<h3>${esc(v.name)} <small style="color:var(--muted);font-weight:500">${esc(v.kind)}</small></h3>
+    <h4>① 開啟 SNMP <em>自動畫圖、埠流量</em></h4><ol>${(v.snmp||[]).map(t=>`<li>${vgFill(t)}</li>`).join('')}</ol>${v.snmp_cli?vgCli(v.snmp_cli):''}
+    <h4>② 流量匯出 <em>${esc(v.flow||'')}</em></h4>${(v.flow_steps||[]).length?`<ol>${v.flow_steps.map(t=>`<li>${vgFill(t)}</li>`).join('')}</ol>`:''}${v.flow_cli?vgCli(v.flow_cli):''}
+    ${v.doc?`<p style="font-size:12px;margin:10px 0 0"><a href="${esc(v.doc)}" target="_blank" rel="noopener">原廠說明 ↗</a></p>`:''}
+    <div class="vtip">※ ${vgFill(VENDOR_GUIDE.common.snmp_tip)}<br>※ ${vgFill(VENDOR_GUIDE.common.flow_tip)}</div>`;
+    $('vgBody').querySelectorAll('[data-vgcopy]').forEach(b=>b.onclick=()=>{const t=b.parentElement.textContent.replace(/複製$/,'');navigator.clipboard&&navigator.clipboard.writeText(t).then(()=>toast('已複製')).catch(()=>{})});
+    $('mod').querySelectorAll('[data-vg]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.vg===v.id)));$('vgSel').value=v.id;$('vgBody').scrollTop=0};
+  $('mod').querySelectorAll('[data-vg]').forEach(b=>b.onclick=()=>{cur=V.find(v=>v.id===b.dataset.vg);draw()});
+  $('vgSel').onchange=e=>{cur=V.find(v=>v.id===e.target.value);draw()};
+  draw();const on=$('mod').querySelector('[data-vg][aria-pressed="true"]');on&&on.scrollIntoView({block:'nearest'})}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-vguide]');if(b){e.preventDefault();openVendorGuide(b.dataset.vguide)}});
+
+/* ======================= 誰在用流量（NetFlow／IPFIX／sFlow） ======================= */
+const FL_WIN=[[15,'15 分鐘'],[60,'1 小時'],[1440,'24 小時'],[10080,'7 天']];
+const fmtBytes=n=>{n=+n||0;const u=['B','KB','MB','GB','TB'];let i=0;while(n>=1024&&i<4){n/=1024;i++}return(i?n.toFixed(n<10?1:0):n)+' '+u[i]};
+function flowHas(){return!!(SRV&&ui.flow&&ui.flow.status&&(ui.flow.status.running||ui.flow.status.exporters.length))}
+function devByIp(ip){return S.devices.find(d=>d.ip===ip)}
+async function flowRefresh(force){if(!SRV)return;const now=Date.now();if(!force&&ui.flow&&now-ui.flow.t<55000)return;
+  try{const st=await (await fetch('/api/flow/status',{cache:'no-store'})).json();const f={t:now,status:st,byIp:{},top:null,users:{},paths:{}};
+    if(st.running||st.exporters.length){const top=await (await fetch('/api/flow/top?min=15',{cache:'no-store'})).json();f.top=top;
+      top.hosts.forEach(h=>f.byIp[h.ip]={rx:h.rx*8/top.seconds,tx:h.tx*8/top.seconds,rxB:h.rx,txB:h.tx});
+      /* 每台電腦經過哪些埠：之後點埠就知道誰在用這段線 */
+      const adj=runGraph();S.devices.forEach(d=>{const r=d.ip&&f.byIp[d.ip];if(!r)return;const ps=upstream(d,adj).filter(x=>x.k==='port').map(x=>x.p);
+        f.paths[d.id]=ps;ps.forEach(p=>{(f.users[p]=f.users[p]||[]).push(d.id)})})}
+    ui.flow=f}catch(e){ui.flow=ui.flow||{t:now,status:{running:false,exporters:[],ports:{}},byIp:{},users:{},paths:{}}}}
+function flowRate(d){return d&&d.ip&&ui.flow&&ui.flow.byIp[d.ip]}
+function flowDevHTML(d){if(!flowHas())return'';const r=flowRate(d);
+  if(!d.ip)return'';
+  if(!r)return['end','ap'].includes(d.type)?`<div class="card flcard"><span class="label">上網流量（誰在用）</span><p class="hint">最近 15 分鐘沒有 ${esc(d.ip)} 的流量紀錄。</p><button class="livebtn lcmrtg" data-flowhost="${esc(d.ip)}">查看較長時間的紀錄</button></div>`:'';
+  const top=ui.flow.top,rank=top.hosts.findIndex(h=>h.ip===d.ip)+1;
+  const hops=(ui.flow.paths[d.id]||[]).map(p=>({p,L:ui.live&&ui.live.ports[p]})).filter(x=>x.L&&x.L.in!=null);
+  const seen=new Set(),sh=[];hops.forEach(x=>{const c=I.cab[x.p];const k=c?c.id:x.p;if(seen.has(k))return;seen.add(k);const tot=(x.L.in||0)+(x.L.out||0);if(tot>0)sh.push({p:x.p,pct:Math.min(100,(r.rx+r.tx)/tot*100)})});
+  return`<div class="card flcard"><span class="label">上網流量（誰在用）<small>最近 15 分鐘平均</small></span>
+    <div class="lnums"><div><small>下載</small><b>${fmtBps(r.rx)}</b></div><div><small>上傳</small><b>${fmtBps(r.tx)}</b></div><div><small>排名</small><b>${rank?`第 ${rank} 名`:'—'}</b></div><div><small>共</small><b>${top.hosts.length} 台</b></div></div>
+    ${sh.length?`<small class="hint">在經過的每一段線上，這台約佔：</small><ul class="flshare">${sh.slice(0,6).map(x=>`<li><span>${esc(I.owner[x.p].name)} 埠 ${esc(pshort(x.p))}</span><b>${x.pct<1?'<1':Math.round(x.pct)}%</b></li>`).join('')}</ul>`:''}
+    <button class="livebtn lcmrtg" data-flowhost="${esc(d.ip)}"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg>流量明細：連去哪裡、用什麼服務</button></div>`}
+function flowPortHTML(pid){if(!flowHas())return'';const us=(ui.flow.users[pid]||[]).map(id=>S.devices.find(d=>d.id===id)).filter(Boolean).map(d=>({d,r:flowRate(d)})).filter(x=>x.r).sort((a,b)=>(b.r.rx+b.r.tx)-(a.r.rx+a.r.tx));
+  if(!us.length)return'';const L=livePort(pid),tot=L?(L.in||0)+(L.out||0):0;
+  return`<small class="hint" style="display:block;margin-top:8px">這段線上的主要使用者（最近 15 分鐘）</small><ul class="flusers">${us.slice(0,5).map(({d,r})=>`<li data-flowhost="${esc(d.ip)}"><span>${esc(d.name)}</span><b>↓${fmtBps(r.rx)} ↑${fmtBps(r.tx)}</b>${tot?`<small>${Math.min(100,Math.round((r.rx+r.tx)/tot*100))}%</small>`:''}</li>`).join('')}</ul>`}
+function flTabs(on){return flowHas()?`<div class="seg fltabs" role="tablist"><button data-fltab="mrtg" aria-pressed="${on==='mrtg'}">埠流量圖</button><button data-fltab="flow" aria-pressed="${on==='flow'}">誰在用</button></div>`:''}
+function flTabsWire(){$('mod').querySelectorAll('[data-fltab]').forEach(b=>b.onclick=()=>b.dataset.fltab==='flow'?openFlowTop():openMRTGIndex())}
+async function openFlowTop(win){win=win||prefs.flWin||60;ui.mrtg='flow';ui.mgFrom=null;setMgHash('flow');await flowRefresh();
+  modal(`<div class="mghead"><h2>誰在用流量</h2>${flTabs('flow')}<span class="sp"></span><div class="seg" role="group" aria-label="時間範圍">${FL_WIN.map(([m,t])=>`<button data-flwin="${m}" aria-pressed="${m==win}">${t}</button>`).join('')}</div></div>
+    <p class="mgsub" id="flSub">載入中…</p><div class="flsum" id="flSum"></div>
+    <div class="mgtools"><input id="flQ" placeholder="篩選設備名稱或 IP…" autocomplete="off"><select class="in" id="flExp" hidden></select></div>
+    <div class="mglist" id="flList"><div class="mgempty">載入中…</div></div>
+    <div class="actions"><button class="btn" data-vguide="${esc((vendorFor(S.devices.find(d=>d.type==='fw'))||{}).id||'')}">各廠牌設定教學</button><button class="btn" data-close style="margin-left:auto">關閉</button></div>`,true);
+  $('mod').querySelector('.mcard').classList.add('mrtgm');flTabsWire();
+  $('mod').querySelectorAll('[data-flwin]').forEach(b=>b.onclick=()=>{prefs.flWin=+b.dataset.flwin;savePrefs();openFlowTop(+b.dataset.flwin)});
+  const st=ui.flow&&ui.flow.status;
+  if(!st||(!st.running&&!st.exporters.length)){$('flSub').textContent='';$('flSum').remove();$('flList').innerHTML=`<div class="mgempty"><b>還沒有開始接收流量紀錄。</b><br>在 netmap.exe「誰在用流量」分頁勾選「接收流量紀錄」，再到防火牆（或路由器、支援 sFlow 的交換器）把 NetFlow／IPFIX 收集器設成 netmap.exe 那台電腦（UDP 2055，sFlow 用 6343）。<br>不知道怎麼設？按左下角「各廠牌設定教學」。</div>`;return}
+  let j;const exp=prefs.flExp||'auto';try{j=await (await fetch(`/api/flow/top?min=${win}&exp=${encodeURIComponent(exp)}`,{cache:'no-store'})).json()}catch(e){$('flList').innerHTML='<div class="mgempty">讀不到監控服務的紀錄</div>';return}
+  if(ui.mrtg!=='flow'||!$('flList'))return;
+  if(j.exporters.length>1){const se=$('flExp');se.hidden=false;se.innerHTML=j.exporters.map(x=>`<option value="${esc(x)}"${x===j.exp?' selected':''}>來源：${esc(x.replace('#sflow',' (sFlow)'))}</option>`).join('');se.onchange=()=>{prefs.flExp=se.value;savePrefs();openFlowTop(win)}}
+  const sec=j.seconds,tot=j.total.rx+j.total.tx;
+  $('flSub').innerHTML=`資料來源：<b>${esc((j.exp||'—').replace('#sflow',' (sFlow)'))}</b>　·　平均速率＝這段時間的總量 ÷ 時間　·　點一列看這台連去哪裡`;
+  $('flSum').innerHTML=`<div><small>總下載</small><b>${fmtBytes(j.total.rx)}</b></div><div><small>總上傳</small><b>${fmtBytes(j.total.tx)}</b></div><div><small>平均速率</small><b>↓${fmtBps(j.total.rx*8/sec)} ↑${fmtBps(j.total.tx*8/sec)}</b></div><div><small>有流量的設備</small><b>${j.hosts.length} 台</b></div>`;
+  const draw=()=>{const q=norm($('flQ').value);const rows=j.hosts.map((h,i)=>({h,i,d:devByIp(h.ip)})).filter(x=>!q||norm((x.d?x.d.name:'')+' '+x.h.ip).includes(q));
+    if(!j.hosts.length){$('flList').innerHTML='<div class="mgempty">這段時間沒有收到流量紀錄。可以在 netmap.exe 按「傳送測試資料」確認接收正常。</div>';return}
+    const mx=Math.max(1,...j.hosts.map(h=>h.rx+h.tx));
+    $('flList').innerHTML=`<table class="fltbl"><thead><tr><th class="rk">#</th><th>設備</th><th>下載／上傳</th><th>總量</th><th class="hide-s">平均速率</th><th class="hide-s">占比</th></tr></thead><tbody>${rows.slice(0,300).map(({h,i,d})=>`<tr data-flip="${esc(h.ip)}"><td class="rk">${i+1}</td><td>${d?`<span class="dv">${esc(d.name)}</span> <span class="sub">${esc(h.ip)}</span>`:`${esc(h.ip)}<span class="unk">不在圖上</span>`}</td>
+      <td><span class="bar2"><i class="d" style="width:${(h.rx/mx*100).toFixed(1)}%"></i><i class="u" style="width:${(h.tx/mx*100).toFixed(1)}%"></i></span>↓${fmtBytes(h.rx)} ↑${fmtBytes(h.tx)}</td><td>${fmtBytes(h.rx+h.tx)}</td><td class="hide-s">↓${fmtBps(h.rx*8/sec)} ↑${fmtBps(h.tx*8/sec)}</td><td class="hide-s">${tot?((h.rx+h.tx)/tot*100).toFixed(1):0}%</td></tr>`).join('')}</tbody></table>`;
+    $('flList').querySelectorAll('tr[data-flip]').forEach(tr=>tr.onclick=()=>openFlowHost(tr.dataset.flip,win))};
+  $('flQ').oninput=draw;draw()}
+async function openFlowHost(ip,win){win=win||prefs.flWin||60;ui.mrtg='flow:'+ip;setMgHash('flow:'+ip);const d=devByIp(ip);
+  modal(`<div class="mghead"><button class="btn sm" id="flBack">‹ 誰在用</button><h2>${esc(d?d.name:ip)}</h2><span class="sp"></span><div class="seg" role="group">${FL_WIN.map(([m,t])=>`<button data-flwin="${m}" aria-pressed="${m==win}">${t}</button>`).join('')}</div></div>
+    <p class="mgsub">${esc([d?typeName(d):'不在圖上的設備',ip,d&&[d.brand,d.model].filter(Boolean).join(' ')].filter(Boolean).join(' · '))}</p>
+    <div class="flsum" id="fhSum"></div><div class="mggraph"><h3>最近 33 小時<small>5 分鐘平均 · 綠色＝下載、藍線＝上傳</small></h3><div id="fhChart"><div class="mgempty">載入中…</div></div></div>
+    <div class="fl2"><div><h3>用什麼服務</h3><div class="mglist" id="fhSvc"></div></div><div><h3>連去哪裡</h3><div class="mglist" id="fhPeer"></div></div></div>
+    <div class="actions">${d?`<button class="btn" id="fhLocate">在圖上標出這台</button>`:''}<button class="btn" data-close style="margin-left:auto">關閉</button></div>`,true);
+  $('mod').querySelector('.mcard').classList.add('mrtgm');
+  $('flBack').onclick=()=>openFlowTop(win);
+  $('mod').querySelectorAll('[data-flwin]').forEach(b=>b.onclick=()=>{prefs.flWin=+b.dataset.flwin;savePrefs();openFlowHost(ip,+b.dataset.flwin)});
+  if(d)$('fhLocate').onclick=()=>{closeModal();ui.sel={dev:d.id};renderAll();const b=devBox&&devBox([d]);try{fitTo(devBox(),1)}catch(e){}};
+  let j;try{j=await (await fetch(`/api/flow/host?ip=${encodeURIComponent(ip)}&min=${win}&exp=${encodeURIComponent(prefs.flExp||'auto')}`,{cache:'no-store'})).json()}catch(e){$('fhChart').innerHTML='<div class="mgempty">讀不到監控服務的紀錄</div>';return}
+  if(ui.mrtg!=='flow:'+ip||!$('fhChart'))return;
+  const rx=j.total?j.total.rx:j.services.reduce((a,x)=>a+x.rx,0),tx=j.total?j.total.tx:j.services.reduce((a,x)=>a+x.tx,0),sec=j.seconds;
+  $('fhSum').innerHTML=`<div><small>下載</small><b>${fmtBytes(rx)}</b></div><div><small>上傳</small><b>${fmtBytes(tx)}</b></div><div><small>平均速率</small><b>↓${fmtBps(rx*8/sec)} ↑${fmtBps(tx*8/sec)}</b></div><div><small>連線對象</small><b>${j.peers.filter(p=>p.peer).length}${j.peers.length>=40?'+':''}</b></div>`;
+  const gw=Math.round(Math.max(330,Math.min(900,($('fhChart').clientWidth||720)-6)));
+  $('fhChart').innerHTML=mgSVG(j.series,j.now,false,'bps',0,gw)+mgStats(j.series,0).replace('流入','下載').replace('流出','上傳');
+  const tbl=(rows,cols)=>rows.length?`<table class="fltbl"><tbody>${rows.map(cols).join('')}</tbody></table>`:'<div class="mgempty">沒有紀錄</div>';
+  const tt=Math.max(1,j.services.reduce((a,x)=>a+x.rx+x.tx,0));
+  $('fhSvc').innerHTML=tbl(j.services,x=>`<tr><td>${esc(x.service)}</td><td>↓${fmtBytes(x.rx)} ↑${fmtBytes(x.tx)}</td><td>${((x.rx+x.tx)/tt*100).toFixed(1)}%</td></tr>`);
+  $('fhPeer').innerHTML=tbl(j.peers,x=>{const pd=x.peer&&devByIp(x.peer);return`<tr${pd?` data-flip="${esc(x.peer)}" style="cursor:pointer"`:''}><td>${x.peer?(pd?`<span class="dv">${esc(pd.name)}</span> <span class="sub">${esc(x.peer)}</span>`:`${esc(x.peer)}${x.local?' <span class="sub">內網</span>':''}`):'其他（較小的連線）'}</td><td>${esc(x.service)}</td><td>↓${fmtBytes(x.rx)} ↑${fmtBytes(x.tx)}</td></tr>`});
+  $('fhPeer').querySelectorAll('tr[data-flip]').forEach(tr=>tr.onclick=()=>openFlowHost(tr.dataset.flip,win))}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-flowhost]');if(b){e.preventDefault();openFlowHost(b.dataset.flowhost)}});
 /* ---- 單一設備的流量圖與狀態 ---- */
 async function openDevTraffic(id,view){const d=S.devices.find(x=>x.id===id);if(!d)return;view=view||prefs.dtView||'day';
   ui.mrtg='dev:'+id;ui.mgFrom=id;setMgHash('dev:'+id);
@@ -3039,7 +3174,7 @@ renderAll();
 if(H&&H.dev&&ui.sel)requestAnimationFrame(()=>fitTo(devBox(new Set([H.dev])),1.1));
 document.fonts&&document.fonts.ready.then(()=>{if(ui.autoPending){autoLayout();renderAll()}else drawWires()});
 if(SRV){if(!SRV.edit){ui.ro=true;applyRoUI();syncUR()}livePoll();$('bMrtg').hidden=false;$('bMrtg').onclick=()=>openMRTGIndex();
-  if(H&&H.mrtg)setTimeout(()=>H.mrtg.startsWith('dev:')&&S.devices.some(x=>x.id===H.mrtg.slice(4))?openDevTraffic(H.mrtg.slice(4)):H.mrtg==='all'||!I.ports[H.mrtg]?openMRTGIndex():openMRTG(H.mrtg),50);
+  if(H&&H.mrtg)setTimeout(()=>H.mrtg==='flow'?openFlowTop():H.mrtg.startsWith('flow:')?openFlowHost(H.mrtg.slice(5)):H.mrtg.startsWith('dev:')&&S.devices.some(x=>x.id===H.mrtg.slice(4))?openDevTraffic(H.mrtg.slice(4)):H.mrtg==='all'||!I.ports[H.mrtg]?openMRTGIndex():openMRTG(H.mrtg),50);
   if(S.devices.length){if(!placeIfNeeded())requestAnimationFrame(()=>fitTo(devBox(),1))}else if(!H){stage.scrollLeft=PAD;stage.scrollTop=PAD;openWelcome(true)}}
 else if(!H){stage.scrollLeft=PAD;stage.scrollTop=PAD;openWelcome(true)}
 </script>

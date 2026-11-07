@@ -75,6 +75,7 @@ th{color:var(--ink2);font-weight:600;font-size:13px;white-space:nowrap}
 .clog .tag.new{background:var(--acc);color:#fff}
 .clog ul{margin:4px 0 0}
 .dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:middle;margin-right:4px}
+details.vend{border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:8px 0}details.vend summary{cursor:pointer}details.vend[open]{background:var(--code)}details.vend pre{background:var(--panel)}
 #lb{position:fixed;inset:0;background:rgba(2,6,23,.85);display:none;align-items:center;justify-content:center;z-index:50;padding:20px;cursor:zoom-out}
 #lb.on{display:flex}#lb img{max-width:100%;max-height:100%;border-radius:10px}
 .foot{color:var(--ink2);font-size:13px;text-align:center;margin-top:30px}
@@ -96,7 +97,7 @@ th{color:var(--ink2);font-weight:600;font-size:13px;white-space:nowrap}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="8 8 240 240" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22C3EE"/><stop offset="1" stop-color="#2563EB"/></linearGradient></defs><rect x="8" y="8" width="240" height="240" rx="58" fill="url(#g)"/><rect x="52" y="52" width="152" height="50" rx="14" fill="#fff"/><rect x="74" y="68" width="22" height="18" rx="4" fill="#2563EB"/><rect x="117" y="68" width="22" height="18" rx="4" fill="#F59E0B"/><rect x="160" y="68" width="22" height="18" rx="4" fill="#2563EB"/><path d="M128 102v34M80 170v-20a14 14 0 0 1 14-14h68a14 14 0 0 1 14 14v20" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/><rect x="56" y="170" width="48" height="36" rx="10" fill="#fff"/><rect x="152" y="170" width="48" height="36" rx="10" fill="#F59E0B"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v2.8 · netmap.exe v1.6.0</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v2.9 · netmap.exe v1.7.0</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -117,7 +118,7 @@ th{color:var(--ink2);font-weight:600;font-size:13px;white-space:nowrap}
 <li><a href="#fault">8. 故障查線</a></li>
 <li><a href="#save">9. 儲存、匯出與分享</a></li>
 <li><a href="#exe">10. netmap.exe（Windows 程式）</a>
-  <ol><li><a href="#e-install">下載與第一次開啟</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-detect">從線上版切換</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-ssh">SSH 流量監控</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
+  <ol><li><a href="#e-install">下載與第一次開啟</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-detect">從線上版切換</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-ssh">SSH 流量監控</a></li><li><a href="#e-flow">誰在用流量</a></li><li><a href="#e-vendor">各廠牌設定教學</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
 <li><a href="#mobile">11. 手機操作</a></li>
 <li><a href="#keys">12. 快捷鍵</a></li>
 <li><a href="#faq">13. 常見問題</a></li>
@@ -132,7 +133,7 @@ th{color:var(--ink2);font-weight:600;font-size:13px;white-space:nowrap}
   <div class="row">
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
-    <a class="btn ghost" href="#changelog">最新更新：v2.8</a>
+    <a class="btn ghost" href="#changelog">最新更新：v2.9</a>
   </div>
 </div>
 
@@ -403,6 +404,138 @@ th{color:var(--ink2);font-weight:600;font-size:13px;white-space:nowrap}
 </ul>
 <div class="note"><b>⚠️</b>要長期監控就要讓 SSH 一直開著，請確認只開在 LAN、使用夠強的密碼。不再監控時，在「監控服務」的列表點選這台設備，按 <b>移除 SSH 監控</b>（會刪除保存的帳密），並關閉路由器的 SSH。</div>
 
+<h3 id="e-flow">誰在用流量（NetFlow／IPFIX／sFlow）</h3>
+<p>SNMP 只能看到每個埠的<b>總量</b>。要知道「是誰在用、連去哪裡」，需要防火牆（或路由器、交換器）把每條連線的摘要送給 netmap.exe，這就是 NetFlow、IPFIX、sFlow。大多數防火牆和網管設備都支援其中一種，netmap.exe 全部都收。</p>
+<div class="grid2">
+  <div class="card"><h4>看得到</h4><p>每台電腦的下載／上傳量與排行、連去哪些 IP、用什麼服務（HTTPS、Zoom、檔案分享…）、在路徑每一段線上佔多少。接在傻瓜 Switch 後面的電腦也看得到，因為防火牆是用 IP 認人。</p></div>
+  <div class="card"><h4>看不到</h4><p>沒經過送資料那台設備的流量。防火牆送的話，同一個網段裡電腦之間互傳（例如對同網段的 NAS）不會出現；這部分看交換器的埠流量。</p></div>
+</div>
+<figure class="mid"><img src="manual/app-flow.jpg" alt="netmap.exe 誰在用流量分頁" loading="lazy"></figure>
+<ol class="steps">
+<li>netmap.exe「<b>誰在用流量</b>」分頁勾選 <b>接收流量紀錄</b>。預設 NetFlow／IPFIX 用 UDP 2055、sFlow 用 UDP 6343，Windows 防火牆詢問時按允許。</li>
+<li>到防火牆把收集器（Collector）設成畫面上顯示的這台電腦 IP 與埠。各廠牌怎麼設，按 <b>各廠牌設定教學</b>（見下一節）。</li>
+<li>幾分鐘內，下方的列表會出現防火牆的 IP，代表開始收到資料。還沒設定設備也可以先按 <b>傳送測試資料</b> 試試看。</li>
+<li>確認「監控服務」已啟動，在監控網頁按右上角 <b>流量圖</b> ▸ <b>誰在用</b>。</li>
+</ol>
+<figure><img src="manual/flow-top.jpg" alt="誰在用流量排行" loading="lazy"><figcaption>誰在用：依流量排行每台設備，可切換 15 分鐘、1 小時、24 小時、7 天。不在圖上的 IP 會標「不在圖上」。</figcaption></figure>
+<figure><img src="manual/flow-host.jpg" alt="一台電腦的流量明細" loading="lazy"><figcaption>點一台：最近 33 小時的下載／上傳曲線、用什麼服務、連去哪裡。</figcaption></figure>
+<div class="grid2" style="align-items:start">
+<figure class="narrow" style="margin:6px 0"><img src="manual/flow-drawer.jpg" alt="設備屬性裡的上網流量" loading="lazy"></figure>
+<ul>
+<li><b>點畫布上的電腦</b>：右側會多一張「上網流量（誰在用）」卡片，顯示最近 15 分鐘的下載、上傳、排名，以及它在經過的每一段線上約佔多少（需要那一段的 Switch 有 SNMP）。</li>
+<li><b>點一個埠</b>（打開詳細）：顯示「這段線上的主要使用者」，頻寬滿載時一眼就知道是誰。</li>
+<li>設備是用 <b>IP</b> 對應的：圖上的電腦要填 IP 才對得起來。用 DHCP 的電腦建議在路由器設定保留 IP。</li>
+<li>資料每 5 分鐘一筆；每台設備的流量保存 31 天，連線明細保存 3 天。</li>
+</ul></div>
+<div class="note"><b>⚠️</b>流量匯出只要開在<b>一台</b>設備上（通常是防火牆的 LAN 介面）。同一份流量在多台設備或多個介面都匯出時，數字會變成兩倍。有多台設備送資料時，畫面上可以選「來源」。</div>
+
+<h3 id="e-vendor">各廠牌設定教學</h3>
+<p>netmap.exe 的「掃描」分頁（各廠牌怎麼開 SNMP？）、「誰在用流量」分頁，以及網頁開始頁的本地端分頁、流量排行，都可以打開設定教學。netmap.exe 裡會自動代入這台電腦的 IP，指令可以直接複製。</p>
+<figure><img src="manual/vendor-guide.jpg" alt="各廠牌設定教學" loading="lazy"></figure>
+<p>以下是目前收錄的廠牌（{IP} 代表 netmap.exe 那台電腦的 IP，選單位置依韌體版本可能略有不同）：</p>
+<details class="vend"><summary><b>SonicWall</b> <span style="color:var(--ink2);font-size:13px">防火牆（SonicOS 7） · 流量匯出：IPFIX（建議）／NetFlow v9／v5</span></summary><p><b>開啟 SNMP</b></p><ol><li>Device ▸ Settings ▸ SNMP：勾選 Enable SNMP，在 View 設定唯讀 community「netmap-ro」（或建立 SNMPv3 使用者）。</li><li>Network ▸ System ▸ Interfaces：編輯 LAN 介面（例如 X0），在 Management 勾選 SNMP，允許從內網查詢。</li><li>存取規則若有限制，允許 <b>{IP}</b> 連到防火牆的 UDP 161。</li></ol><p><b>流量匯出</b></p><ol><li>Device ▸ AppFlow ▸ Flow Reporting ▸ Settings：Report Connections 選 All（或 Interface-based 只報指定介面）。</li><li>External Collector 分頁：勾選「Send Flows and Real-Time Data To External Collector」（可能需要重新開機）。</li><li>External Flow Reporting Format 選 IPFIX，External Collector&#x27;s IP 填 <b>{IP}</b>，Port 填 2055。</li><li>按 Generate ALL Templates 產生範本，再按 Accept。</li></ol><p style="font-size:13px"><a href="https://www.sonicwall.com/support/technical-documentation/docs/sonicos-7-1-appflow_device/Content/appflow-d-flow-reporting-user-config-netflow-v10.htm" target="_blank" rel="noopener">原廠說明 ↗</a></p></details>
+<details class="vend"><summary><b>Fortinet FortiGate</b> <span style="color:var(--ink2);font-size:13px">防火牆（FortiOS） · 流量匯出：NetFlow v9（一筆含雙向流量）</span></summary><p><b>開啟 SNMP</b></p><ol><li>System ▸ SNMP：開啟 SNMP Agent，新增 SNMP v1/v2c community「netmap-ro」，Hosts 加入 <b>{IP}</b>，只勾 Accept queries（或用 SNMPv3）。</li><li>Network ▸ Interfaces：編輯 LAN 介面，Administrative Access 勾選 SNMP。</li></ol><pre>config system snmp sysinfo
+    set status enable
+end
+config system snmp community
+    edit 1
+        set name &quot;netmap-ro&quot;
+        config hosts
+            edit 1
+                set ip <b>{IP}</b> 255.255.255.255
+            next
+        end
+        set trap-v1-status disable
+        set trap-v2c-status disable
+    next
+end</pre><p><b>流量匯出</b></p><ol><li>只能用 CLI 設定（FortiOS 7.4.2 以後可設多個收集器）。</li><li>在 LAN 介面開啟取樣（netflow-sampler）。舊版 FortiOS 是 config system netflow 底下直接 set collector-ip。</li></ol><pre>config system netflow
+    config collectors
+        edit 1
+            set collector-ip <b>{IP}</b>
+            set collector-port 2055
+        next
+    end
+end
+config system interface
+    edit &quot;internal&quot;
+        set netflow-sampler both
+    next
+end</pre><p style="font-size:13px"><a href="https://docs.fortinet.com/document/fortigate/7.4.0/new-features/840728" target="_blank" rel="noopener">原廠說明 ↗</a></p></details>
+<details class="vend"><summary><b>Cisco Catalyst／IOS</b> <span style="color:var(--ink2);font-size:13px">交換器、路由器（IOS／IOS-XE） · 流量匯出：Flexible NetFlow v9（路由器、Catalyst 9300／9400 等；部分入門款交換器不支援）</span></summary><p><b>開啟 SNMP</b></p><ol><li>用 ACL 限定只有 <b>{IP}</b> 能查詢，並開啟 LLDP（CDP 預設已開）。</li></ol><pre>ip access-list standard NETMAP
+ permit host <b>{IP}</b>
+snmp-server community netmap-ro RO NETMAP
+lldp run</pre><p><b>流量匯出</b></p><ol><li>在連接內網的介面套用 flow monitor（ingress）。</li></ol><pre>flow exporter NETMAP
+ destination <b>{IP}</b>
+ transport udp 2055
+ export-protocol netflow-v9
+flow monitor NETMAP-MON
+ exporter NETMAP
+ record netflow ipv4 original-input
+interface GigabitEthernet0/1
+ ip flow monitor NETMAP-MON input</pre></details>
+<details class="vend"><summary><b>Cisco Meraki</b> <span style="color:var(--ink2);font-size:13px">MX 防火牆、MS 交換器 · 流量匯出：NetFlow v9（MX）</span></summary><p><b>開啟 SNMP</b></p><ol><li>Organization ▸ Settings：開啟 SNMP（這是雲端的 SNMP，netmap 讀不到埠流量）。</li><li>要讓 netmap 直接讀設備：Network-wide ▸ General ▸ Reporting 開啟 SNMP，設定 community「netmap-ro」，並允許 <b>{IP}</b>。</li></ol><p><b>流量匯出</b></p><ol><li>Network-wide ▸ Configure ▸ General ▸ Reporting：NetFlow traffic reporting 選 Enabled。</li><li>NetFlow collector IP 填 <b>{IP}</b>，port 填 2055，儲存。</li><li>MX 只匯出經過路由或 NAT 的流量，同一個 VLAN 裡互傳的流量不會出現。</li></ol><p style="font-size:13px"><a href="https://documentation.meraki.com/MX/Monitoring_and_Reporting/NetFlow_Overview" target="_blank" rel="noopener">原廠說明 ↗</a></p></details>
+<details class="vend"><summary><b>MikroTik RouterOS</b> <span style="color:var(--ink2);font-size:13px">路由器、交換器 · 流量匯出：NetFlow v9／IPFIX（Traffic Flow）</span></summary><p><b>開啟 SNMP</b></p><ol><li>IP ▸ SNMP：Enabled 打勾；Communities 改成「netmap-ro」，Addresses 填 <b>{IP}</b>/32，只開 Read Access。</li></ol><pre>/snmp set enabled=yes
+/snmp community set [find default=yes] name=netmap-ro addresses=<b>{IP}</b>/32 read-access=yes write-access=no</pre><p><b>流量匯出</b></p><ol><li>IP ▸ Traffic Flow：Enabled 打勾，Interfaces 選 all。</li><li>Targets 新增：Dst. Address <b>{IP}</b>、Port 2055、Version 9（或 IPFIX）。</li></ol><pre>/ip traffic-flow set enabled=yes interfaces=all
+/ip traffic-flow target add dst-address=<b>{IP}</b> port=2055 version=9</pre><p style="font-size:13px"><a href="https://manual.mikrotik.com/docs/diagnostics-monitoring-and-troubleshooting/traffic-flow/" target="_blank" rel="noopener">原廠說明 ↗</a></p></details>
+<details class="vend"><summary><b>Ubiquiti UniFi</b> <span style="color:var(--ink2);font-size:13px">閘道器、交換器、AP · 流量匯出：IPFIX（UniFi Network 9.1 以後的閘道器）</span></summary><p><b>開啟 SNMP</b></p><ol><li>UniFi Network：Settings ▸ System（或 Settings ▸ Network 依版本）找到 SNMP，開啟 SNMPv1/v2c 並設定 community「netmap-ro」。</li><li>UniFi 交換器與 AP 也會套用同一組設定。</li></ol><p><b>流量匯出</b></p><ol><li>Settings ▸ CyberSecure ▸ Traffic Logging：開啟 NetFlow（IPFIX）。</li><li>收集器填 <b>{IP}</b>，埠 2055。</li></ol><p style="font-size:13px"><a href="https://help.ui.com/hc/en-us/articles/32201256219799" target="_blank" rel="noopener">原廠說明 ↗</a></p></details>
+<details class="vend"><summary><b>Ubiquiti EdgeRouter</b> <span style="color:var(--ink2);font-size:13px">路由器（EdgeOS） · 流量匯出：NetFlow v9</span></summary><p><b>開啟 SNMP</b></p><ol><li>System ▸ SNMP 開啟並設定 community，或用 CLI。</li></ol><pre>configure
+set service snmp community netmap-ro authorization ro
+set service snmp community netmap-ro client <b>{IP}</b>
+commit ; save</pre><p><b>流量匯出</b></p><ol><li>把 eth1 換成連接內網的介面。</li></ol><pre>configure
+set system flow-accounting interface eth1
+set system flow-accounting netflow version 9
+set system flow-accounting netflow server <b>{IP}</b> port 2055
+commit ; save</pre></details>
+<details class="vend"><summary><b>pfSense</b> <span style="color:var(--ink2);font-size:13px">防火牆 · 流量匯出：NetFlow v9／IPFIX（softflowd 套件）</span></summary><p><b>開啟 SNMP</b></p><ol><li>Services ▸ SNMP：Enable，Read Community String 填「netmap-ro」，Bind Interfaces 選 LAN。</li></ol><p><b>流量匯出</b></p><ol><li>System ▸ Package Manager 安裝 softflowd。</li><li>Services ▸ softflowd：Interface 選 LAN，Destination Host 填 <b>{IP}</b>，Port 2055，NetFlow version 選 9 或 IPFIX，儲存。</li></ol></details>
+<details class="vend"><summary><b>OPNsense</b> <span style="color:var(--ink2);font-size:13px">防火牆 · 流量匯出：NetFlow v5／v9（內建）</span></summary><p><b>開啟 SNMP</b></p><ol><li>System ▸ Firmware ▸ Plugins 安裝 os-net-snmp。</li><li>Services ▸ Net-SNMP：Enable，community 填「netmap-ro」。</li></ol><p><b>流量匯出</b></p><ol><li>Reporting ▸ NetFlow：Interfaces 選 LAN（可多選）。</li><li>WAN 介面若也選了，放進 Egress only 避免重複計算。</li><li>Version 選 v9，Destinations 輸入 <b>{IP}</b>:2055 後按 Enter，套用。</li></ol><p style="font-size:13px"><a href="https://docs.opnsense.org/manual/how-tos/netflow_exporter.html" target="_blank" rel="noopener">原廠說明 ↗</a></p></details>
+<details class="vend"><summary><b>Sophos Firewall</b> <span style="color:var(--ink2);font-size:13px">防火牆（SFOS／XGS） · 流量匯出：NetFlow v5</span></summary><p><b>開啟 SNMP</b></p><ol><li>System services ▸ SNMP（或 Administration ▸ SNMP）：開啟 Agent，新增 community「netmap-ro」，Manager IP 填 <b>{IP}</b>，只給查詢權限。</li><li>Administration ▸ Device access：LAN zone 勾選 SNMP。</li></ol><p><b>流量匯出</b></p><ol><li>System ▸ Administration ▸ Netflow：Add，Netflow server IP 填 <b>{IP}</b>，port 2055，儲存。</li><li>只會匯出有開記錄的規則：Rules and policies ▸ Firewall rules，要統計的規則開啟 Log firewall traffic。</li><li>NetFlow v5 沒有 IPv6。</li></ol><p style="font-size:13px"><a href="https://www.avanet.com/en/kb/sophos-firewall-netflow-monitoring/" target="_blank" rel="noopener">原廠說明 ↗</a></p></details>
+<details class="vend"><summary><b>Palo Alto Networks</b> <span style="color:var(--ink2);font-size:13px">防火牆（PAN-OS） · 流量匯出：NetFlow v9</span></summary><p><b>開啟 SNMP</b></p><ol><li>Device ▸ Setup ▸ Operations ▸ SNMP Setup：選 V2c 填 community「netmap-ro」（或 V3）。</li><li>Network ▸ Network Profiles ▸ Interface Mgmt：建立允許 SNMP 的設定檔並套到 LAN 介面，Permitted IP 加 <b>{IP}</b>。</li></ol><p><b>流量匯出</b></p><ol><li>Device ▸ Server Profiles ▸ NetFlow：新增，Server 填 <b>{IP}</b>、Port 2055。</li><li>Network ▸ Interfaces：編輯 LAN 介面 ▸ Advanced ▸ NetFlow Profile 選剛才的設定，Commit。</li></ol></details>
+<details class="vend"><summary><b>Check Point</b> <span style="color:var(--ink2);font-size:13px">防火牆（Gaia） · 流量匯出：NetFlow v9／IPFIX</span></summary><p><b>開啟 SNMP</b></p><ol><li>Gaia Portal ▸ System Management ▸ SNMP：開啟 SNMP Agent，Version 選 v2/v3，Read Only Community 填「netmap-ro」。</li></ol><p><b>流量匯出</b></p><ol><li>Gaia Portal ▸ Network Management ▸ NetFlow Export：新增收集器 <b>{IP}</b>、Port 2055，格式選 NetFlow V9 或 IPFIX。</li></ol></details>
+<details class="vend"><summary><b>Juniper</b> <span style="color:var(--ink2);font-size:13px">交換器（EX）、防火牆（SRX） · 流量匯出：sFlow（EX 交換器）；SRX 用 J-Flow v9／IPFIX</span></summary><p><b>開啟 SNMP</b></p><ol><li>只允許 <b>{IP}</b> 查詢。</li></ol><pre>set snmp community netmap-ro authorization read-only
+set snmp community netmap-ro clients <b>{IP}</b>/32
+set protocols lldp interface all
+commit</pre><p><b>流量匯出</b></p><ol><li>EX 交換器：在上行與要觀察的介面開 sFlow。</li></ol><pre>set protocols sflow collector <b>{IP}</b> udp-port 6343
+set protocols sflow sample-rate ingress 1024
+set protocols sflow interfaces ge-0/0/0
+commit</pre></details>
+<details class="vend"><summary><b>HPE Aruba</b> <span style="color:var(--ink2);font-size:13px">交換器（AOS-S／AOS-CX） · 流量匯出：sFlow</span></summary><p><b>開啟 SNMP</b></p><ol><li>AOS-S（2530／2930 等）：</li></ol><pre>snmp-server community &quot;netmap-ro&quot; operator restricted
+snmp-server host <b>{IP}</b> community &quot;netmap-ro&quot;
+lldp run</pre><p><b>流量匯出</b></p><ol><li>AOS-S：設定 sFlow 收集器並在各埠開啟取樣。AOS-CX：sflow collector <b>{IP}</b> 後 sflow enable。</li></ol><pre>sflow 1 destination <b>{IP}</b> 6343
+interface 1-24 sflow 1 sampling 1024
+interface 1-24 sflow 1 polling 30</pre></details>
+<details class="vend"><summary><b>H3C／HPE Comware</b> <span style="color:var(--ink2);font-size:13px">交換器、路由器 · 流量匯出：sFlow（交換器）／NetStream（路由器，相當於 NetFlow）</span></summary><p><b>開啟 SNMP</b></p><ol><li>只允許唯讀查詢。</li></ol><pre>snmp-agent
+snmp-agent sys-info version v2c
+snmp-agent community read netmap-ro
+lldp global enable</pre><p><b>流量匯出</b></p><ol><li>在要觀察的埠（例如上行埠）開啟 sFlow 取樣。</li></ol><pre>sflow agent ip &lt;交換器管理IP&gt;
+sflow collector 1 ip <b>{IP}</b> port 6343
+interface GigabitEthernet1/0/1
+ sflow sampling-rate 4096
+ sflow flow collector 1</pre></details>
+<details class="vend"><summary><b>華為 Huawei</b> <span style="color:var(--ink2);font-size:13px">交換器、路由器、防火牆 · 流量匯出：sFlow（交換器）／NetStream（路由器、防火牆）</span></summary><p><b>開啟 SNMP</b></p><ol><li>只允許唯讀查詢。</li></ol><pre>snmp-agent
+snmp-agent sys-info version v2c
+snmp-agent community read cipher netmap-ro
+lldp enable</pre><p><b>流量匯出</b></p><ol><li>在要觀察的埠開啟 sFlow 取樣。</li></ol><pre>sflow agent ip &lt;交換器管理IP&gt;
+sflow collector 1 ip <b>{IP}</b> udp-port 6343
+interface GigabitEthernet0/0/1
+ sflow sampling collector 1
+ sflow sampling rate 4096</pre></details>
+<details class="vend"><summary><b>Ruckus ICX</b> <span style="color:var(--ink2);font-size:13px">交換器 · 流量匯出：sFlow</span></summary><p><b>開啟 SNMP</b></p><ol><li>只允許唯讀查詢。</li></ol><pre>snmp-server community netmap-ro ro
+lldp run</pre><p><b>流量匯出</b></p><ol><li>在要觀察的埠開啟 sflow forwarding。</li></ol><pre>sflow destination <b>{IP}</b> 6343
+sflow enable
+interface ethernet 1/1/1
+ sflow forwarding</pre></details>
+<details class="vend"><summary><b>TP-Link Omada／JetStream</b> <span style="color:var(--ink2);font-size:13px">交換器、閘道器 · 流量匯出：部分 JetStream L2+／L3 交換器支援 sFlow；Omada 閘道器目前沒有 NetFlow</span></summary><p><b>開啟 SNMP</b></p><ol><li>單機管理：Maintenance ▸ SNMP ▸ Global Config 開啟，Community 新增「netmap-ro」唯讀。</li><li>Omada 控制器：Settings ▸ Services ▸ SNMP 開啟並設定 community，會套用到所有設備。</li></ol><p><b>流量匯出</b></p><ol><li>支援 sFlow 的機型：Maintenance ▸ sFlow，Collector 填 <b>{IP}</b>、Port 6343，再到 Sampler 在上行埠開啟取樣。</li></ol></details>
+<details class="vend"><summary><b>Zyxel</b> <span style="color:var(--ink2);font-size:13px">防火牆（USG FLEX／ATP）、交換器 · 流量匯出：多數機型沒有 NetFlow／sFlow；可以看埠流量（SNMP）</span></summary><p><b>開啟 SNMP</b></p><ol><li>防火牆：System ▸ SNMP 開啟，設定 Get Community「netmap-ro」，Service Control 只允許 LAN。</li><li>交換器：Management ▸ SNMP（或 Advanced Application ▸ SNMP）設定唯讀 community。</li></ol><p><b>流量匯出</b></p><ol><li>沒有流量匯出的話，「誰在用」可以改看上游防火牆或支援 sFlow 的交換器。</li></ol></details>
+<details class="vend"><summary><b>DrayTek Vigor</b> <span style="color:var(--ink2);font-size:13px">路由器 · 流量匯出：沒有 NetFlow／sFlow</span></summary><p><b>開啟 SNMP</b></p><ol><li>System Maintenance ▸ SNMP：Enable SNMP Agent，Get Community 填「netmap-ro」，Manager Host IP 填 <b>{IP}</b>。</li></ol><p><b>流量匯出</b></p><ol><li>可以看 WAN／LAN 埠流量（SNMP）；要知道誰在用，請改用支援流量匯出的設備。</li></ol></details>
+<details class="vend"><summary><b>NETGEAR</b> <span style="color:var(--ink2);font-size:13px">網管交換器 · 流量匯出：部分 M4300／M4350 等支援 sFlow</span></summary><p><b>開啟 SNMP</b></p><ol><li>System ▸ SNMP ▸ SNMP V1/V2 ▸ Community Configuration：新增唯讀 community「netmap-ro」，IP 填 <b>{IP}</b>。</li></ol><p><b>流量匯出</b></p><ol><li>Monitoring ▸ sFlow：Receiver 填 <b>{IP}</b>、Port 6343，在上行埠設定 Sampler。</li></ol></details>
+<details class="vend"><summary><b>D-Link</b> <span style="color:var(--ink2);font-size:13px">網管交換器 · 流量匯出：DGS-3000 以上等系列支援 sFlow</span></summary><p><b>開啟 SNMP</b></p><ol><li>Management ▸ SNMP Settings：SNMP Global State 開啟，Community 新增「netmap-ro」read only。</li></ol><p><b>流量匯出</b></p><ol><li>支援的機型：sFlow ▸ Collector 填 <b>{IP}</b>、Port 6343，並在埠上開啟 Flow Sampler。</li></ol></details>
+<details class="vend"><summary><b>Synology NAS</b> <span style="color:var(--ink2);font-size:13px">NAS · 流量匯出：沒有流量匯出</span></summary><p><b>開啟 SNMP</b></p><ol><li>控制台 ▸ 終端機 &amp; SNMP ▸ SNMP：啟動 SNMP 服務，勾選 SNMPv1/v2c，community 填「netmap-ro」。</li><li>也可以改用「加入 SSH 設備…」讀流量（控制台 ▸ 終端機 開啟 SSH）。</li></ol></details>
+<details class="vend"><summary><b>ASUS 家用路由器</b> <span style="color:var(--ink2);font-size:13px">家用路由器 · 流量匯出：沒有流量匯出</span></summary><p><b>開啟 SNMP</b></p><ol><li>多數機型沒有 SNMP，請改用 netmap.exe「監控服務 ▸ 加入 SSH 設備…」。</li><li>開 SSH：系統管理 ▸ 系統設定 ▸ 啟用 SSH 選「只限 LAN」。測完不用時記得關閉。</li></ol></details>
+<details class="vend"><summary><b>Windows 電腦／伺服器</b> <span style="color:var(--ink2);font-size:13px">電腦 · 流量匯出：沒有流量匯出</span></summary><p><b>開啟 SNMP</b></p><ol><li>設定 ▸ 系統 ▸ 選用功能 ▸ 新增「簡易網路管理通訊協定（SNMP）」。</li><li>服務（services.msc）▸ SNMP Service ▸ 安全性：新增唯讀 community「netmap-ro」，「接受來自這些主機」加入 <b>{IP}</b>。</li></ol></details>
+<details class="vend"><summary><b>Linux 主機</b> <span style="color:var(--ink2);font-size:13px">伺服器 · 流量匯出：可安裝 softflowd 匯出 NetFlow</span></summary><p><b>開啟 SNMP</b></p><ol><li>最簡單：用 netmap.exe「加入 SSH 設備…」讀流量，不用裝東西。</li><li>或安裝 snmpd，在 /etc/snmp/snmpd.conf 加入 rocommunity netmap-ro <b>{IP}</b>，重新啟動 snmpd。</li></ol><p><b>流量匯出</b></p><pre>sudo apt install softflowd
+sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
+<div class="tip"><b>💡</b>建議所有設備用同一組唯讀 community（例如「netmap-ro」）或同一組 SNMPv3 帳密，並只允許 netmap.exe 那台電腦（<b>{IP}</b>）查詢。不要用 public，也不要開寫入權限。<br>流量匯出只要開在一台設備上就夠了（通常是防火牆，在 LAN 介面開）。同一台設備的同一份流量若在多個介面都匯出，可能會重複計算。</div>
+
 <h3 id="e-col">收集樣本（給 log 分析與設定檔備份開發用）</h3>
 <figure class="mid"><img src="manual/app-col.jpg" alt="收集樣本分頁" loading="lazy"></figure>
 <p>這個分頁是為了開發「log 分析告警」與「設定檔自動備份」而收集真實資料。只接收與讀取，不會修改設備設定。</p>
@@ -480,7 +613,8 @@ th{color:var(--ink2);font-weight:600;font-size:13px;white-space:nowrap}
 
 <section id="changelog">
 <h2><span class="n">14</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v2.8　首頁分成網頁版與本地端</b><span class="tag new">最新 · 2026-11-07</span><span class="tag">netmap.exe 1.6.0</span></div><ul><li>開始頁先選用法：「網頁版」手動畫圖，「本地端 netmap.exe」自動掃描與監控，會記住上次的選擇</li><li>本地端分頁：功能介紹、三步開始與下載；從監控服務開啟時改顯示監控狀態、有問題的設備與流量圖入口</li><li>可偵測這台電腦是否開著 netmap.exe，一鍵切換到監控畫面（需在 netmap.exe 勾選允許，預設關閉）</li></ul></div>
+<div class="clog"><div class="v"><b>v2.9　誰在用流量與各廠牌設定教學</b><span class="tag new">最新 · 2026-11-07</span><span class="tag">netmap.exe 1.7.0</span></div><ul><li>netmap.exe 接收 NetFlow v5／v9、IPFIX、sFlow，算出每台電腦用了多少流量、連去哪裡、用什麼服務；接在傻瓜 Switch 後面的電腦也看得到</li><li>流量圖新增「誰在用」排行（15 分鐘／1 小時／24 小時／7 天），點一台看 33 小時曲線、服務與連線對象</li><li>點電腦看它在經過的每一段線上佔多少；點一個埠看這段線上的主要使用者</li><li>各廠牌設定教學：SonicWall、FortiGate、Cisco、Meraki、MikroTik、UniFi、pfSense、OPNsense、Sophos、Palo Alto 等 26 種，怎麼開 SNMP 與流量匯出</li></ul></div>
+<div class="clog"><div class="v"><b>v2.8　首頁分成網頁版與本地端</b><span class="tag">2026-11-07</span><span class="tag">netmap.exe 1.6.0</span></div><ul><li>開始頁先選用法：「網頁版」手動畫圖，「本地端 netmap.exe」自動掃描與監控，會記住上次的選擇</li><li>本地端分頁：功能介紹、三步開始與下載；從監控服務開啟時改顯示監控狀態、有問題的設備與流量圖入口</li><li>可偵測這台電腦是否開著 netmap.exe，一鍵切換到監控畫面（需在 netmap.exe 勾選允許，預設關閉）</li></ul></div>
 <div class="clog"><div class="v"><b>v2.7　設備流量圖與狀態</b><span class="tag">2026-11-07</span><span class="tag">netmap.exe 1.5.1</span></div><ul><li>點畫布上的設備，右側「即時狀態」卡片新增「這台設備的流量圖與狀態」按鈕</li><li>一次看這台設備的上下線、錯誤封包、最後輪詢時間，以及每個埠的日／週／月／年流量圖</li><li>從設備進入單埠詳細圖後，可以直接返回這台設備</li></ul></div>
 <div class="clog"><div class="v"><b>v2.6　SSH 流量監控</b><span class="tag">2026-11-06</span><span class="tag">netmap.exe 1.5.0</span></div><ul><li>沒有 SNMP 的設備（家用路由器、Linux、NAS、OpenWrt）可以改用 SSH 監控流量，一樣有即時流量與 MRTG 流量圖</li><li>ASUS 路由器自動辨識 WAN、LAN、2.4G、5G Wi-Fi</li><li>設備重開機、計數器歸零時不再出現假的流量尖峰</li><li>流量圖沒有資料時，直接說明原因與下一步</li></ul></div>
 <div class="clog"><div class="v"><b>v2.5　MRTG 流量圖</b><span class="tag">2026-11-06</span><span class="tag">netmap.exe 1.4.0</span></div><ul><li>每個埠都有 MRTG 式的每日（5 分鐘）、每週（30 分鐘）、每月（2 小時）、每年（1 天）流量圖，列出最大／平均／目前值與使用率</li><li>流量圖總覽：所有埠最近 24 小時的小圖，可依最忙排序、篩選</li><li>可切換 bps／使用率 %、顯示尖峰，並匯出 CSV；流量圖資料保存約 2 年</li></ul></div>
@@ -499,7 +633,7 @@ th{color:var(--ink2);font-weight:600;font-size:13px;white-space:nowrap}
 <div class="clog"><div class="v"><b>v1.0　第一版</b><span class="tag">2026-11-06</span></div><ul><li>防火牆、Switch、配線架、資訊座埠對埠接線，點埠追蹤整條路徑</li><li>產業範例與自動排版</li></ul></div>
 </section>
 
-<p class="foot">機房線路對應圖 · 網頁 v2.8 · netmap.exe v1.6.0 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">機房線路對應圖 · 網頁 v2.9 · netmap.exe v1.7.0 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>
