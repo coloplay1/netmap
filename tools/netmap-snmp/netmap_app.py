@@ -908,6 +908,7 @@ def open_path(p):
 
 def main():
     if "--service" in sys.argv:
+        sys.argv = [a for a in sys.argv if a != "--service"]
         return srv.main()
     try:
         if os.name == "nt":
