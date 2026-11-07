@@ -25,7 +25,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.7.1"
+VERSION = "1.7.2"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -535,7 +535,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
             p = web_index()
             if not p: return s._send(500, "找不到網頁檔（web/index.html）", "text/plain; charset=utf-8")
             html = open(p, encoding="utf-8").read()
-            with st.lock: boot = {"rev": st.rev, "project": st.project, "interval": st.settings.get("interval", 60), "edit": s.can_edit(), "version": VERSION, "host": socket.gethostname()}
+            with st.lock: boot = {"rev": st.rev, "project": st.project, "interval": st.settings.get("interval", 60), "edit": s.can_edit(), "version": VERSION, "host": socket.gethostname(),
+                                      "self_ips": sorted(self_ips()) if st.settings.get("monitor_self", True) else []}
             inj = "<script>window.NETMAP_SERVER=" + json.dumps(boot, ensure_ascii=False).replace("</", "<\\/") + ";</script>"
             html = html.replace("</head>", inj + "\n</head>", 1)
             return s._send(200, html, "text/html; charset=utf-8")
