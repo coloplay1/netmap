@@ -362,8 +362,19 @@ code,td,li,p{overflow-wrap:anywhere}
 <li><b>範圍</b>：全部的線、目前頁面、搜尋結果，或目前選取的設備／埠／線（例如只印新接的那幾條）。</li>
 <li><b>預覽並列印 A4</b>：支援 3 × 8（24 張）、2 × 7（14 張）、4 × 10（40 張）的 A4 標籤紙。印之前先用白紙試印，對齊沒問題再放標籤紙。</li>
 <li><b>QR Code</b>：手機掃描會打開這張圖並選好那條線（線上版要那支手機先有同一份專案；用監控服務網址時同一個內網直接開）。</li>
-<li><b>下載 P-touch CSV</b>：給 Brother P-touch Editor 用。在 P-touch Editor 選 <b>檔案 ▸ 資料庫 ▸ 連線</b>，選這個 CSV，再把「線號」「A端」「B端」欄位拖到標籤版面。中文亂碼時改選 UTF-16（預設）或 UTF-8 重新下載。</li>
+<li><b>內容</b>：完整（含位置、機櫃），或精簡給窄標籤帶用：GigabitEthernet1/0/1 會縮成 Gi1/0/1，也可以限制每行最多 18 字（12mm 帶）或 24 字（18mm 帶）。</li>
+<li><b>旗標式</b>：A4 版面選「旗標式」，每張標籤分成左右兩半、內容一樣，沿中間虛線對折夾在線上，兩面都看得到線號。</li>
 </ul>
+<h4>標籤機（CSV）</h4>
+<figure><img src="manual/labels-csv.jpg" alt="標籤機 CSV 匯出" loading="lazy"><figcaption>選標籤機軟體，下方預覽前幾列。</figcaption></figure>
+<ul>
+<li><b>標籤機軟體</b>：Brother P-touch Editor、Epson Label Editor、DYMO Connect、Brady Workstation 或 Excel。選了之後編碼會自動設好（P-touch 用 UTF-16，其他用 UTF-8），下方也會說明在那套軟體裡怎麼匯入。中文變亂碼時改另一種編碼重新下載。</li>
+<li><b>每一列是一張標籤</b>（預設）：每條線兩列，分別是 A 端和 B 端，欄位有「線號、端、這端、對端、這端位置、對端位置、線材、長度、旗標、QR」。標籤軟體把「這端」「對端」拖到版面上，整批列印就是每條線兩端各一張。</li>
+<li><b>每一列是一條線</b>：A、B 端在同一列，適合自己在 Excel 整理。</li>
+<li>「旗標」欄是線號重複兩次（中間空白），給做旗標式標籤的版面用；「QR」欄是打開這條線的網址，可以在標籤軟體裡設成 QR Code 條碼。</li>
+</ul>
+<p class="hint">我們沒辦法每一台標籤機都實機測過；如果你的機型匯入有問題，回報給我們欄位或編碼的狀況就能調整。</p>
+
 </section>
 
 <section id="exe">
@@ -385,6 +396,8 @@ code,td,li,p{overflow-wrap:anywhere}
 <li><b>掃描目標</b>：填核心 Switch 的 IP 就夠了，程式會沿著 LLDP／CDP 找到其他設備。也可以輸入網段或範圍，用空白分隔，例如 <code>192.168.1.0/24 10.0.0.1-50</code>。</li>
 <li><b>SNMP 帳密</b>：選版本（v1／v2c／v3）。v2c 填唯讀的 community；v3 填使用者、驗證與加密密碼。勾「記住帳密」會用 Windows 帳號加密保存。</li>
 <li>選項：<b>沿著 LLDP／CDP 自動找鄰居</b>、<b>從 MAC 表推斷終端設備</b>、<b>建立沒掃到的鄰居</b>（AP、電話等沒開 SNMP 的設備）。</li>
+<li><b>聚合（LACP／Port-Channel）</b>會自動標出來：先讀標準的 LACP MIB，沒有的話改讀介面堆疊表（Cisco Port-channel、FortiGate aggregate、Linux bond 多半要靠這個）。一端讀得到、另一端沒回報時，會照對端補上同一個群組名稱，埠備註寫「聚合群組依對端推測」。</li>
+<li>兩台設備之間有好幾條線、但兩端都沒回報聚合時，不會自動合併（也可能是 STP 備援線），而是標成「可能是聚合」：點那個埠或那條粗線，按 <b>設成同一個聚合群組</b> 或 <b>不是聚合</b>。</li>
 <li>按 <b>開始掃描</b>。完成後會<b>自動在瀏覽器打開結果</b>。</li>
 <li>下方按鈕：<b>在網頁開啟結果</b>、<b>只把 SNMP 對應套到目前的圖</b>（保留你手動畫的位置，只補上 SNMP 資訊）、<b>另存 JSON</b>。</li>
 </ol>
@@ -406,6 +419,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <li>LLDP／CDP 的鄰居關係（誰接誰）仍然要用 <b>SNMP 掃描</b> 才會畫出來；自動偵測只負責「開始監控」。</li>
 <li>不想要的話，在同一個設定頁取消勾選「自動偵測 SNMP」。</li>
 </ul>
+<figure class="mid"><img src="manual/lag-hint.jpg" alt="可能是聚合的提示" loading="lazy"><figcaption>點埠時看到的提示：一鍵把兩端設成同一群組，或略過。</figcaption></figure>
 
 <h3 id="e-srv">監控服務與即時流量</h3>
 <figure class="mid"><img src="manual/app-g2.jpg" alt="監控服務分頁" loading="lazy"></figure>

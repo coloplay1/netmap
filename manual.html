@@ -100,7 +100,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="8 8 240 240" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22C3EE"/><stop offset="1" stop-color="#2563EB"/></linearGradient></defs><rect x="8" y="8" width="240" height="240" rx="58" fill="url(#g)"/><rect x="52" y="52" width="152" height="50" rx="14" fill="#fff"/><rect x="74" y="68" width="22" height="18" rx="4" fill="#2563EB"/><rect x="117" y="68" width="22" height="18" rx="4" fill="#F59E0B"/><rect x="160" y="68" width="22" height="18" rx="4" fill="#2563EB"/><path d="M128 102v34M80 170v-20a14 14 0 0 1 14-14h68a14 14 0 0 1 14 14v20" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/><rect x="56" y="170" width="48" height="36" rx="10" fill="#fff"/><rect x="152" y="170" width="48" height="36" rx="10" fill="#F59E0B"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v3.1.1 · netmap.exe v1.9.1</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v3.2.0 · netmap.exe v1.10.0</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -137,7 +137,7 @@ code,td,li,p{overflow-wrap:anywhere}
   <div class="row">
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
-    <a class="btn ghost" href="#changelog">最新更新：v3.1.1</a>
+    <a class="btn ghost" href="#changelog">最新更新：v3.2.0</a>
   </div>
 </div>
 
@@ -362,8 +362,19 @@ code,td,li,p{overflow-wrap:anywhere}
 <li><b>範圍</b>：全部的線、目前頁面、搜尋結果，或目前選取的設備／埠／線（例如只印新接的那幾條）。</li>
 <li><b>預覽並列印 A4</b>：支援 3 × 8（24 張）、2 × 7（14 張）、4 × 10（40 張）的 A4 標籤紙。印之前先用白紙試印，對齊沒問題再放標籤紙。</li>
 <li><b>QR Code</b>：手機掃描會打開這張圖並選好那條線（線上版要那支手機先有同一份專案；用監控服務網址時同一個內網直接開）。</li>
-<li><b>下載 P-touch CSV</b>：給 Brother P-touch Editor 用。在 P-touch Editor 選 <b>檔案 ▸ 資料庫 ▸ 連線</b>，選這個 CSV，再把「線號」「A端」「B端」欄位拖到標籤版面。中文亂碼時改選 UTF-16（預設）或 UTF-8 重新下載。</li>
+<li><b>內容</b>：完整（含位置、機櫃），或精簡給窄標籤帶用：GigabitEthernet1/0/1 會縮成 Gi1/0/1，也可以限制每行最多 18 字（12mm 帶）或 24 字（18mm 帶）。</li>
+<li><b>旗標式</b>：A4 版面選「旗標式」，每張標籤分成左右兩半、內容一樣，沿中間虛線對折夾在線上，兩面都看得到線號。</li>
 </ul>
+<h4>標籤機（CSV）</h4>
+<figure><img src="manual/labels-csv.jpg" alt="標籤機 CSV 匯出" loading="lazy"><figcaption>選標籤機軟體，下方預覽前幾列。</figcaption></figure>
+<ul>
+<li><b>標籤機軟體</b>：Brother P-touch Editor、Epson Label Editor、DYMO Connect、Brady Workstation 或 Excel。選了之後編碼會自動設好（P-touch 用 UTF-16，其他用 UTF-8），下方也會說明在那套軟體裡怎麼匯入。中文變亂碼時改另一種編碼重新下載。</li>
+<li><b>每一列是一張標籤</b>（預設）：每條線兩列，分別是 A 端和 B 端，欄位有「線號、端、這端、對端、這端位置、對端位置、線材、長度、旗標、QR」。標籤軟體把「這端」「對端」拖到版面上，整批列印就是每條線兩端各一張。</li>
+<li><b>每一列是一條線</b>：A、B 端在同一列，適合自己在 Excel 整理。</li>
+<li>「旗標」欄是線號重複兩次（中間空白），給做旗標式標籤的版面用；「QR」欄是打開這條線的網址，可以在標籤軟體裡設成 QR Code 條碼。</li>
+</ul>
+<p class="hint">我們沒辦法每一台標籤機都實機測過；如果你的機型匯入有問題，回報給我們欄位或編碼的狀況就能調整。</p>
+
 </section>
 
 <section id="exe">
@@ -385,6 +396,8 @@ code,td,li,p{overflow-wrap:anywhere}
 <li><b>掃描目標</b>：填核心 Switch 的 IP 就夠了，程式會沿著 LLDP／CDP 找到其他設備。也可以輸入網段或範圍，用空白分隔，例如 <code>192.168.1.0/24 10.0.0.1-50</code>。</li>
 <li><b>SNMP 帳密</b>：選版本（v1／v2c／v3）。v2c 填唯讀的 community；v3 填使用者、驗證與加密密碼。勾「記住帳密」會用 Windows 帳號加密保存。</li>
 <li>選項：<b>沿著 LLDP／CDP 自動找鄰居</b>、<b>從 MAC 表推斷終端設備</b>、<b>建立沒掃到的鄰居</b>（AP、電話等沒開 SNMP 的設備）。</li>
+<li><b>聚合（LACP／Port-Channel）</b>會自動標出來：先讀標準的 LACP MIB，沒有的話改讀介面堆疊表（Cisco Port-channel、FortiGate aggregate、Linux bond 多半要靠這個）。一端讀得到、另一端沒回報時，會照對端補上同一個群組名稱，埠備註寫「聚合群組依對端推測」。</li>
+<li>兩台設備之間有好幾條線、但兩端都沒回報聚合時，不會自動合併（也可能是 STP 備援線），而是標成「可能是聚合」：點那個埠或那條粗線，按 <b>設成同一個聚合群組</b> 或 <b>不是聚合</b>。</li>
 <li>按 <b>開始掃描</b>。完成後會<b>自動在瀏覽器打開結果</b>。</li>
 <li>下方按鈕：<b>在網頁開啟結果</b>、<b>只把 SNMP 對應套到目前的圖</b>（保留你手動畫的位置，只補上 SNMP 資訊）、<b>另存 JSON</b>。</li>
 </ol>
@@ -406,6 +419,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <li>LLDP／CDP 的鄰居關係（誰接誰）仍然要用 <b>SNMP 掃描</b> 才會畫出來；自動偵測只負責「開始監控」。</li>
 <li>不想要的話，在同一個設定頁取消勾選「自動偵測 SNMP」。</li>
 </ul>
+<figure class="mid"><img src="manual/lag-hint.jpg" alt="可能是聚合的提示" loading="lazy"><figcaption>點埠時看到的提示：一鍵把兩端設成同一群組，或略過。</figcaption></figure>
 
 <h3 id="e-srv">監控服務與即時流量</h3>
 <figure class="mid"><img src="manual/app-g2.jpg" alt="監控服務分頁" loading="lazy"></figure>
@@ -773,7 +787,8 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 
 <section id="changelog">
 <h2><span class="n">14</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v3.1.1　自動偵測 SNMP</b><span class="tag new">最新 · 2026-11-07</span><span class="tag">netmap.exe 1.9.1</span></div><ul><li>監控服務每小時用設定好的 SNMP 帳密，去試圖上還沒監控的網路設備、伺服器、NAS、NVR、印表機；有回應就自動開始監控並補上埠號，不用重新掃描</li><li>設定 ▸ 心跳與設備偵測 可以關閉，或按「現在偵測一次」</li></ul></div>
+<div class="clog"><div class="v"><b>v3.2　標籤機格式、聚合（LACP）自動判斷</b><span class="tag new">最新 · 2026-11-07</span><span class="tag">netmap.exe 1.10.0</span></div><ul><li>線標匯出可選 Brother P-touch Editor、Epson Label Editor、DYMO Connect、Brady Workstation：自動用合適的編碼，並說明匯入步驟</li><li>標籤 CSV 可以「一張標籤一列」（每條線兩列：A 端、B 端），標籤軟體直接整批印；可預覽前幾列</li><li>精簡內容給窄標籤帶：GigabitEthernet → Gi，可限制每行字數</li><li>A4 標籤新增旗標式：對折夾在線上，兩面都看得到線號</li><li>掃描時從 IF-MIB 介面堆疊表找聚合成員：不支援 LACP MIB 的 Cisco、FortiGate、Linux bond 也能標出 Port-Channel</li><li>一端已知是聚合、另一端沒回報時，依對端自動補上同一群組</li><li>兩端都不知道的平行線標成「可能是聚合」，點那條線或埠一鍵設定或略過（也可能是 STP 備援線）</li></ul></div>
+<div class="clog"><div class="v"><b>v3.1.1　自動偵測 SNMP</b><span class="tag">2026-11-07</span><span class="tag">netmap.exe 1.9.1</span></div><ul><li>監控服務每小時用設定好的 SNMP 帳密，去試圖上還沒監控的網路設備、伺服器、NAS、NVR、印表機；有回應就自動開始監控並補上埠號，不用重新掃描</li><li>設定 ▸ 心跳與設備偵測 可以關閉，或按「現在偵測一次」</li></ul></div>
 <div class="clog"><div class="v"><b>v3.1　心跳告警、歷史版本、權限、線標、多頁面、光纖束</b><span class="tag">2026-11-07</span><span class="tag">netmap.exe 1.9.0</span></div><ul><li>Ping 心跳：圖上所有有 IP 的設備都有綠／黃／紅燈號，斷線、延遲變高一眼看到；設備屬性看延遲曲線與最近事件</li><li>告警通知：設備斷線、主幹埠離線、新設備加入時送到 Telegram、Discord、Slack、Teams、LINE（Messaging API）、Email 或自訂 Webhook，同一段時間的事件合併成一則</li><li>事件紀錄：斷線、恢復、埠離線、新設備都記下來（保留 180 天），右上角鈴鐺顯示未讀</li><li>歷史版本：每次修改記下是誰、改了什麼，可以預覽舊版本再一鍵還原；線上版也會在這台瀏覽器自動留版本</li><li>管理密碼與檢視連結：其他電腦要登入才能編輯；可以產生只能看的連結或 QR Code 給主管、同仁</li><li>線標列印：A4 標籤紙（含 QR Code，掃了打開那條線）或匯出 Brother P-touch Editor 用的 CSV</li><li>網路上的設備：從路由器、防火牆的 ARP 表整理出新加入、很久沒出現、不在圖上的設備，一鍵加到圖上</li><li>多張圖（頁面）：樓層、機房、分公司分開畫，跨頁面的線顯示連接標籤，點一下跳過去；查線照樣整條走完</li><li>光纖收容箱與光纖束：一條多芯光纜一次建立，每一芯標 TIA-598 色碼，畫成一條粗線，點開看每一芯接到哪裡</li><li>平行線收成一條：同一對設備之間的多條線（例如 LACP）可以收成一條粗線</li><li>48 埠設備在縮小畫面或平板上點埠時，會放大成一排大按鈕讓你選，不會點錯</li></ul></div>
 <div class="clog"><div class="v"><b>v3.0.1　修正：網段探索建立的本機沒有流量</b><span class="tag">2026-11-07</span><span class="tag">netmap.exe 1.8.1</span></div><ul><li>用網段探索建立的設備預設不輪詢，連帶讓跑 netmap.exe 的那台電腦也讀不到流量；現在本機一定會讀網卡流量</li></ul></div>
 <div class="clog"><div class="v"><b>v3.0　右側分頁、無線連線、抓出 Wi-Fi 設備</b><span class="tag">2026-11-07</span><span class="tag">netmap.exe 1.8.0</span></div><ul><li>右側分成「設備資訊」與「網路流量」兩個分頁，分頁上的燈號顯示監控狀態；埠也分成「埠設定」與「網路流量」</li><li>新增無線連線：手機、筆電可設成用 Wi-Fi 連到 AP 或路由器（2.4G／5G／6G），畫成虛線並標頻段，查線、故障查線、影響範圍都會經過</li><li>用 SSH 監控的路由器會列出連在它上面的設備（有線／無線、頻段、名稱、訊號），一鍵把無線設備套用到圖上</li><li>設備的編輯／刪除按鈕移到名稱下方，不再擋住埠與線</li><li>新增「手機」設備種類</li></ul></div>
@@ -800,7 +815,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 <div class="clog"><div class="v"><b>v1.0　第一版</b><span class="tag">2026-11-06</span></div><ul><li>防火牆、Switch、配線架、資訊座埠對埠接線，點埠追蹤整條路徑</li><li>產業範例與自動排版</li></ul></div>
 </section>
 
-<p class="foot">機房線路對應圖 · 網頁 v3.1.1 · netmap.exe v1.9.1 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">機房線路對應圖 · 網頁 v3.2.0 · netmap.exe v1.10.0 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>

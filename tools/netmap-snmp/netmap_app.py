@@ -837,6 +837,9 @@ class App:
                     else:
                         s.v_scanstat.set(f"完成：{len(proj['devices'])} 台設備、{len(proj['cables'])} 條線（{secs:.1f} 秒）")
                         s.write(f"\n完成：{len(proj['devices'])} 台設備、{len(proj['cables'])} 條線。")
+                        lf, lh = proj.get("lagInfer") or (0, 0)
+                        if lf: s.write(f"聚合（LACP）：依對端補上 {lf} 個埠的群組。")
+                        if lh: s.write(f"有 {lh} 組平行線可能是聚合（也可能是備援線），請在網頁點那條粗線確認。")
                         for b in (s.btn_use, s.btn_merge, s.btn_save): b.configure(state="normal")
                         s.root.after(150, lambda: s.use_scan(auto=True))
         except queue.Empty:

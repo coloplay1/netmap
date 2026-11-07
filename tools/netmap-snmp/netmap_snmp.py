@@ -223,6 +223,7 @@ PVID = "1.3.6.1.2.1.17.7.1.4.5.1.1"
 VLAN_EGRESS, VLAN_UNTAGGED = "1.3.6.1.2.1.17.7.1.4.2.1.4", "1.3.6.1.2.1.17.7.1.4.2.1.5"
 POE_ADMIN = "1.3.6.1.2.1.105.1.1.1.3"
 LAG_ATTACHED = "1.2.840.10006.300.43.1.2.1.1.13"
+IF_STACK = "1.3.6.1.2.1.31.1.2.1.3"   # ifStackStatus：上層介面.下層介面（Port-channel → 成員埠）
 
 ENTERPRISE = {9: "Cisco", 12356: "Fortinet", 25461: "Palo Alto Networks", 8741: "SonicWall", 2636: "Juniper", 14823: "Aruba (HPE)",
               41112: "Ubiquiti", 11863: "TP-Link", 171: "D-Link", 4526: "Netgear", 890: "Zyxel", 14988: "MikroTik", 2011: "Huawei",
@@ -346,6 +347,8 @@ def collect(cli, host, want_fdb=True, log=print):
     d["tagged"] = tagged
     d["poe"] = {k: v for k, v in W(POE_ADMIN).items()}
     d["lag"] = {k: str(v) for k, v in W(LAG_ATTACHED).items() if v}
+    try: d["ifstack"] = [k for k, v in W(IF_STACK).items() if v in (1, None) or v == b"\x01"]
+    except Exception: d["ifstack"] = []
     # FDB + ARP
     d["fdb"] = {}
     if want_fdb:
@@ -434,6 +437,53 @@ def speed_txt(bps):
         if g >= v * 0.99: return t
     return "100M" if bps >= 99e6 else ""
 
+LAG_NAME_RE = re.compile(r"^(port-?channel|po\d|ae\d|bond|agg|aggregate|lag|trk|team|be\d|bundle-ether|eth-trunk|link-?agg)", re.I)
+
+def lag_short(n):
+    m = re.match(r"^(port-?channel|bundle-ether|eth-trunk|aggregate|link-?agg|bond|team|trk|ae|po|be|agg|lag)\s*-?(\d+)$", (n or "").strip(), re.I)
+    if not m: return short_if(n or "")
+    pre = {"port-channel": "Po", "portchannel": "Po", "bundle-ether": "BE", "eth-trunk": "Eth-Trunk", "aggregate": "agg", "linkagg": "agg", "link-agg": "agg"}.get(m.group(1).lower(), m.group(1))
+    return f"{pre}{m.group(2)}"
+
+def stack_lags(dv):
+    """IEEE8023-LAG-MIB 沒有資料的設備（很多 Cisco、FortiGate、Linux bond）改從 IF-MIB 的介面堆疊表找聚合成員。"""
+    out = {}
+    ifs = dv.get("ifs", {})
+    for k in dv.get("ifstack", []):
+        hi, _, lo = str(k).partition(".")
+        if hi in ("0", "") or lo in ("0", "") or hi not in ifs or lo not in ifs: continue
+        H, L = ifs[hi], ifs[lo]
+        if (H.get("type") == 161 or LAG_NAME_RE.match(H.get("name") or "")) and is_phys(L):
+            out[lo] = lag_short(H["name"]) or f"Po{hi}"
+    return out
+
+def infer_lags(project, infra=("fw", "router", "sw", "hub", "ap")):
+    """同一對設備之間有 2 條以上的線：
+       一端已知是聚合、另一端不知道 → 另一端照對端的群組名稱標上（LACP 兩端都要設，才會通）；
+       兩端都不知道 → 只標「可能是聚合」（也可能是 STP 備援線），讓使用者確認。回傳 (補上的埠數, 待確認的組數)。"""
+    owner, port = {}, {}
+    for d in project["devices"]:
+        for p in d.get("ports", []): owner[p["id"]] = d; port[p["id"]] = p
+    groups = {}
+    for c in project["cables"]:
+        a, b = owner.get(c["a"]), owner.get(c["b"])
+        if not a or not b or a is b or a.get("type") not in infra or b.get("type") not in infra: continue
+        if a["id"] > b["id"]: a, b, pa, pb = b, a, c["b"], c["a"]
+        else: pa, pb = c["a"], c["b"]
+        groups.setdefault((a["id"], b["id"]), []).append((port[pa], port[pb]))
+    filled = hinted = 0; n = 0
+    for (aid, bid), links in groups.items():
+        if len(links) < 2: continue
+        for x, y in links:   # 一端在聚合群組裡、另一端沒標：照對端補上
+            for k, q in ((x, y), (y, x)):
+                if k["lag"] and not q["lag"] and sum(1 for a2, b2 in links if (a2 if k is x else b2)["lag"] == k["lag"]) >= 2:
+                    q["lag"] = k["lag"]; q["note"] = (q.get("note", "") + " 聚合群組依對端推測").strip(); filled += 1
+        un = [(x, y) for x, y in links if not x["lag"] and not y["lag"]]
+        if len(un) >= 2:
+            n += 1; hinted += 1
+            for x, y in un: x["lagHint"] = y["lagHint"] = f"H{n}"
+    return filled, hinted
+
 def build(devs, extra_lldp=True, fdb=True, max_macs_per_port=4):
     project = {"app": "netmap", "version": 3, "source": f"netmap-snmp {VERSION}", "savedAt": dt.datetime.now().isoformat(timespec="seconds"),
                "layout": "auto", "devices": [], "cables": [], "racks": [], "faults": []}
@@ -465,7 +515,8 @@ def build(devs, extra_lldp=True, fdb=True, max_macs_per_port=4):
         bif = {v: k for k, v in dv.get("bridge_if", {}).items()}  # ifIndex → bridge port
         lagname = {}
         for ifi, agg in dv.get("lag", {}).items():
-            if agg != ifi and agg in dv["ifs"]: lagname[ifi] = short_if(dv["ifs"][agg]["name"]) or f"Po{agg}"
+            if agg != ifi and agg in dv["ifs"]: lagname[ifi] = lag_short(dv["ifs"][agg]["name"]) or f"Po{agg}"
+        lagname.update({k: v for k, v in stack_lags(dv).items() if k not in lagname})
         phys = sorted([(k, v) for k, v in dv["ifs"].items() if is_phys(v)], key=lambda kv: int(kv[0]))
         poe_on = {k.split(".")[-1] for k, v in dv.get("poe", {}).items() if v == 1}
         for ifi, i in phys:
@@ -551,6 +602,8 @@ def build(devs, extra_lldp=True, fdb=True, max_macs_per_port=4):
                 rp = ghost(dev_id.split("(")[0], n.get("platform", ""), set(), n.get("mgmt", ""), n.get("port", ""))
             add_cable(lp, rp, speed=speed_txt(dv["ifs"].get(n["ifIndex"], {}).get("speed", 0)))
             linked_if.add(lp)
+    # 2b) 聚合（LACP）：一端已知就補另一端；兩端都不知道的平行線標成「可能是聚合」
+    project["lagInfer"] = infer_lags(project)
     # 3) MAC table → end devices on access ports
     if fdb:
         arp = {}
@@ -959,6 +1012,8 @@ def main(argv=None):
             json.dump(devs, f, ensure_ascii=False, indent=1, default=lambda o: o.hex() if isinstance(o, (bytes, bytearray)) else str(o))
     nd, nc = len(proj["devices"]), len(proj["cables"])
     print(f"\n完成（{time.time() - t0:.1f} 秒）：{nd} 台設備、{nc} 條線 → {os.path.abspath(out)}")
+    lf, lh = proj.get("lagInfer") or (0, 0)
+    if lf or lh: print(f"聚合（LACP）：依對端補上 {lf} 個埠" + (f"；{lh} 組平行線可能是聚合（也可能是備援線），請在網頁點那條線確認" if lh else "") + "。")
     print(f"下一步：打開 {APP_URL} ，在首頁選「匯入 ▸ JSON 專案檔」，選這個檔案。")
     if failed: print(f"有 {len(failed)} 台沒讀到完整資料，可加上 -t 5 延長逾時後重試。")
     if interactive and os.name == "nt":

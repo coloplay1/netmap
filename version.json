@@ -1,8 +1,8 @@
 {
- "web": "3.1.1",
- "exe": "1.9.1",
+ "web": "3.2.0",
+ "exe": "1.10.0",
  "date": "2026-11-07",
- "title": "自動偵測 SNMP",
+ "title": "標籤機格式、聚合（LACP）自動判斷",
  "download": "https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe",
  "notes": "https://coloplay1.github.io/netmap/manual.html#changelog"
 }

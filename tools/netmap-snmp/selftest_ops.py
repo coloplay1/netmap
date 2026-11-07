@@ -33,3 +33,9 @@ sv.stop(); print("ops self-test OK")
 c = S.probe_candidates({"devices": [{"id": "a", "type": "sw", "ip": "10.0.0.2", "monitor": False}, {"id": "b", "type": "sw", "ip": "10.0.0.3"},
                                     {"id": "c", "type": "end", "kind": "NAS", "ip": "10.0.0.4"}, {"id": "d", "type": "end", "kind": "PC 桌機", "ip": "10.0.0.5"}]}, set())
 assert [d["id"] for d in c] == ["a", "c"], c; print("probe candidates OK")
+import netmap_snmp as ns
+assert ns.stack_lags({"ifs": {"1": {"name": "Gi1/0/1", "type": 6}, "2": {"name": "Gi1/0/2", "type": 6}, "60": {"name": "Port-channel1", "type": 53}}, "ifstack": ["60.1", "60.2"]}) == {"1": "Po1", "2": "Po1"}
+P = lambda i, l="": {"id": i, "label": i, "lag": l, "note": ""}
+pj = {"devices": [{"id": "A", "type": "sw", "ports": [P("a1", "Po1"), P("a2", "Po1"), P("a3"), P("a4")]}, {"id": "B", "type": "sw", "ports": [P("b1"), P("b2")]}, {"id": "C", "type": "sw", "ports": [P("c1"), P("c2")]}],
+      "cables": [{"a": "a1", "b": "b1"}, {"a": "b2", "b": "a2"}, {"a": "a3", "b": "c1"}, {"a": "a4", "b": "c2"}]}
+assert ns.infer_lags(pj) == (2, 1); print("lag inference OK")

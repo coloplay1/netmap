@@ -30,7 +30,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.9.1"
+VERSION = "1.10.0"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
