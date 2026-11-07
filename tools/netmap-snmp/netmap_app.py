@@ -70,6 +70,28 @@ def ascii_field(widget, var=None):
         var.trace_add("write", fix)
     return widget
 
+KP_CHARS = {"KP_Decimal": ".", "KP_Separator": ".", "KP_Delete": ".", "KP_Divide": "/", "KP_Multiply": "*", "KP_Subtract": "-", "KP_Add": "+",
+            **{f"KP_{i}": str(i) for i in range(10)}}
+
+
+def keypad_fix(root):
+    """Windows 上部分鍵盤配置或關掉輸入法後，數字鍵盤的「.」打不出來：所有輸入框直接插入對應字元。"""
+    def ins(e):
+        ch = KP_CHARS.get(e.keysym)
+        if e.keysym == "KP_Delete" and e.char != ".": return None    # NumLock 關閉時保留刪除功能
+        if not ch: return None
+        w = e.widget
+        try:
+            if str(w.cget("state")) in ("disabled", "readonly"): return "break"
+            if w.selection_present(): w.delete("sel.first", "sel.last")
+        except Exception: pass
+        w.insert("insert", ch)
+        return "break"
+    for cls in ("TEntry", "Entry", "TSpinbox", "TCombobox"):
+        for k in KP_CHARS:
+            root.bind_class(cls, f"<KeyPress-{k}>", ins, add="+")
+
+
 def resource(name):
     for d in ([sys._MEIPASS] if getattr(sys, "_MEIPASS", None) else []) + [os.path.dirname(os.path.abspath(__file__))]:
         p = os.path.join(d, name)
@@ -82,6 +104,7 @@ def ui_font():
 class App:
     def __init__(s, root, autostart=False):
         s.root = root; s.q = queue.Queue()
+        keypad_fix(root)
         s.store = srv.Store(); s.service = srv.Service(s.store, log=lambda m: s.q.put(("svclog", m)))
         s.scan_thread = None; s.stop_scan = False; s.last_project = None
         root.title(TITLE); root.geometry("920x700"); root.minsize(800, 600)
