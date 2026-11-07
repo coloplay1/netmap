@@ -221,9 +221,9 @@ class Pinger:
 # ───────────────────────── 告警訊息 ─────────────────────────
 KIND_TEXT = {"down": ("🔴", "斷線"), "up": ("🟢", "恢復連線"), "slow": ("🟡", "延遲變高"), "fast": ("🟢", "延遲恢復正常"),
              "port_down": ("🔴", "埠離線"), "port_up": ("🟢", "埠恢復"), "newdev": ("🆕", "新設備加入網路"), "gone": ("⚪", "很久沒出現"),
-             "ipchange": ("🔁", "IP 變更"), "test": ("✅", "測試訊息"), "snmp_down": ("🟠", "SNMP 沒有回應"), "snmp_up": ("🟢", "SNMP 恢復"), "back": ("🟢", "重新出現"), "snmp_found": ("🔎", "開始 SNMP 監控")}
+             "ipchange": ("🔁", "IP 變更"), "test": ("✅", "測試訊息"), "snmp_down": ("🟠", "SNMP 沒有回應"), "snmp_up": ("🟢", "SNMP 恢復"), "back": ("🟢", "重新出現"), "snmp_found": ("🔎", "開始 SNMP 監控"), "drift": ("📐", "圖面和實際不符"), "ipconflict": ("⚠️", "IP 衝突")}
 LEVEL = {"down": "bad", "port_down": "bad", "snmp_down": "warn", "slow": "warn", "newdev": "info", "gone": "warn", "ipchange": "info",
-         "up": "ok", "port_up": "ok", "fast": "ok", "snmp_up": "ok", "test": "info", "back": "ok", "snmp_found": "ok"}
+         "up": "ok", "port_up": "ok", "fast": "ok", "snmp_up": "ok", "test": "info", "back": "ok", "snmp_found": "ok", "drift": "warn", "ipconflict": "bad"}
 
 def dur(sec):
     sec = int(sec or 0)
@@ -338,9 +338,9 @@ class Notifier:
         a = s.get_cfg() or {}
         if not a.get("enabled"): return False
         on = a.get("on") or {}
-        key = {"up": "down", "fast": "slow", "port_up": "port", "port_down": "port", "snmp_up": "snmp", "snmp_down": "snmp", "ipchange": "newdev", "back": "gone", "snmp_found": "snmp"}.get(kind, kind)
+        key = {"up": "down", "fast": "slow", "port_up": "port", "port_down": "port", "snmp_up": "snmp", "snmp_down": "snmp", "ipchange": "newdev", "back": "gone", "snmp_found": "snmp", "drift": "drift", "ipconflict": "ipconflict"}.get(kind, kind)
         if kind in ("up", "fast", "port_up", "snmp_up", "back") and not on.get("recover", True): return False
-        return bool(on.get(key, key in ("down", "port")))
+        return bool(on.get(key, key in ("down", "port", "ipconflict")))
 
     def push(s, ev):
         if not s.wants(ev["kind"]): return

@@ -39,3 +39,13 @@ P = lambda i, l="": {"id": i, "label": i, "lag": l, "note": ""}
 pj = {"devices": [{"id": "A", "type": "sw", "ports": [P("a1", "Po1"), P("a2", "Po1"), P("a3"), P("a4")]}, {"id": "B", "type": "sw", "ports": [P("b1"), P("b2")]}, {"id": "C", "type": "sw", "ports": [P("c1"), P("c2")]}],
       "cables": [{"a": "a1", "b": "b1"}, {"a": "b2", "b": "a2"}, {"a": "a3", "b": "c1"}, {"a": "a4", "b": "c2"}]}
 assert ns.infer_lags(pj) == (2, 1); print("lag inference OK")
+import netmap_audit as nau
+IF = lambda n, up=True: {"name": n, "descr": n, "alias": "", "type": 6, "speed": 0, "up": up, "mac": ""}
+pj = {"devices": [{"id": "A", "type": "sw", "name": "CORE", "ports": [{"id": "a1", "label": "1", "ifIndex": 1}, {"id": "a2", "label": "2", "ifIndex": 2}, {"id": "a3", "label": "3", "ifIndex": 3}]},
+                  {"id": "B", "type": "sw", "name": "ACC", "ports": [{"id": "b1", "label": "1"}, {"id": "b9", "label": "9"}]},
+                  {"id": "E", "type": "end", "name": "PC", "mac": "aa:bb:cc:00:00:01", "ports": [{"id": "e1", "label": "LAN"}]}],
+      "cables": [{"id": "c1", "a": "a1", "b": "b1"}, {"id": "c2", "a": "a2", "b": "e1"}]}
+col = {"A": {"sysName": "CORE", "ifs": {"1": IF("Gi1"), "2": IF("Gi2"), "3": IF("Gi3")}, "ips": {}, "bridge_if": {"1": "1", "2": "2", "3": "3"},
+             "lldp": [{"lport": "1", "lportId": "Gi1", "sysName": "ACC", "mgmt": "", "chId": "", "pId": "9", "pDesc": ""}], "cdp": [], "fdb": {"AA:BB:CC:00:00:01": "3"}}}
+f, v = nau.audit(pj, col); kinds = sorted(x["kind"] for x in f); print(kinds, v); assert kinds == ["moved", "port"], kinds
+print("audit OK")

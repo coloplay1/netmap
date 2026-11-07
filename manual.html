@@ -100,7 +100,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="8 8 240 240" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22C3EE"/><stop offset="1" stop-color="#2563EB"/></linearGradient></defs><rect x="8" y="8" width="240" height="240" rx="58" fill="url(#g)"/><rect x="52" y="52" width="152" height="50" rx="14" fill="#fff"/><rect x="74" y="68" width="22" height="18" rx="4" fill="#2563EB"/><rect x="117" y="68" width="22" height="18" rx="4" fill="#F59E0B"/><rect x="160" y="68" width="22" height="18" rx="4" fill="#2563EB"/><path d="M128 102v34M80 170v-20a14 14 0 0 1 14-14h68a14 14 0 0 1 14 14v20" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/><rect x="56" y="170" width="48" height="36" rx="10" fill="#fff"/><rect x="152" y="170" width="48" height="36" rx="10" fill="#F59E0B"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v3.2.0 · netmap.exe v1.10.0</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v3.3.0 · netmap.exe v1.11.0</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -120,9 +120,9 @@ code,td,li,p{overflow-wrap:anywhere}
   <ol><li><a href="#v-rack">機櫃視圖</a></li><li><a href="#v-table">線路表</a></li><li><a href="#v-layer">圖層與線色</a></li><li><a href="#v-panel">面板與主題</a></li></ol></li>
 <li><a href="#fault">8. 故障查線</a></li>
 <li><a href="#save">9. 儲存、匯出與分享</a>
-  <ol><li><a href="#s-history">歷史版本與還原</a></li><li><a href="#s-labels">線標列印</a></li></ol></li>
+  <ol><li><a href="#s-history">歷史版本與還原</a></li><li><a href="#s-check">資料檢查與單一設備的變更紀錄</a></li><li><a href="#s-labels">線標列印</a></li></ol></li>
 <li><a href="#exe">10. netmap.exe（Windows 程式）</a>
-  <ol><li><a href="#e-install">下載與第一次開啟</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-autosnmp">自動偵測 SNMP</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-detect">從線上版切換</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-ssh">SSH 流量監控</a></li><li><a href="#e-flow">誰在用流量</a></li><li><a href="#e-vendor">各廠牌設定教學</a></li><li><a href="#e-ping">心跳與事件</a></li><li><a href="#e-alert">告警通知</a></li><li><a href="#e-auth">管理密碼與檢視連結</a></li><li><a href="#e-seen">網路上的設備</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
+  <ol><li><a href="#e-install">下載與第一次開啟</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-autosnmp">自動偵測 SNMP</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-detect">從線上版切換</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-ssh">SSH 流量監控</a></li><li><a href="#e-flow">誰在用流量</a></li><li><a href="#e-vendor">各廠牌設定教學</a></li><li><a href="#e-ping">心跳與事件</a></li><li><a href="#e-alert">告警通知</a></li><li><a href="#e-auth">管理密碼與檢視連結</a></li><li><a href="#e-seen">網路上的設備</a></li><li><a href="#e-audit">圖面比對（和實際網路對帳）</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
 <li><a href="#mobile">11. 手機操作</a></li>
 <li><a href="#keys">12. 快捷鍵</a></li>
 <li><a href="#faq">13. 常見問題</a></li>
@@ -137,7 +137,7 @@ code,td,li,p{overflow-wrap:anywhere}
   <div class="row">
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
-    <a class="btn ghost" href="#changelog">最新更新：v3.2.0</a>
+    <a class="btn ghost" href="#changelog">最新更新：v3.3.0</a>
   </div>
 </div>
 
@@ -354,6 +354,12 @@ code,td,li,p{overflow-wrap:anywhere}
 <li><b>用監控服務網址開啟時</b>：每次修改都記錄在 netmap.exe 那台電腦，大家看到的是同一份紀錄。同一個人 2 分鐘內的連續修改（例如拖曳排版）合併成一筆，最多保留 500 筆。在視窗上填 <b>你的名字</b>，紀錄就會寫名字而不是電腦 IP。</li>
 <li><b>線上版</b>：存在這台電腦的瀏覽器，有修改時每 5 分鐘自動留一份，匯入專案檔或套用範本前也會先存一份，最多 40 份。換電腦或清除瀏覽器資料就不見了，重要的圖請另外下載專案檔備份。</li>
 </ul>
+
+<h3 id="s-check">資料檢查與單一設備的變更紀錄</h3>
+<p><b>檔案 ▸ 資料檢查</b> 會掃整份圖，列出：重複的 IP、MAC、線號、設備名稱；線兩端 VLAN 不一致（access／trunk、VLAN 編號）；光纖接到網路線埠、網路線接到 SFP 埠；網路線超過 100 m；聚合只設一端；IP 格式錯誤、IP 和 Gateway 不在同一網段。點任一項就跳到那台設備或那條線。在設備屬性填 IP、MAC 時，和別台重複也會馬上提醒。</p>
+<figure><img src="manual/datacheck.jpg" alt="資料檢查" loading="lazy"></figure>
+<p>點任一台設備或一條線，在屬性面板按 <b>這台的變更紀錄</b>／<b>這條線的變更紀錄</b>，會列出它自己的修改：誰、什麼時候、哪個欄位從什麼改成什麼、哪條線從哪個埠改接到哪個埠。用監控服務網址時從伺服器的歷史版本整理（最近 500 個版本），線上版從瀏覽器自動保存的版本整理。</p>
+<figure><img src="manual/objhist.jpg" alt="單一設備的變更紀錄" loading="lazy"></figure>
 
 <h3 id="s-labels">線標列印</h3>
 <p><b>檔案 ▸ 線標列印</b>。每條線兩端各貼一張，寫線號、這一端與另一端的設備與埠。</p>
@@ -704,6 +710,28 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 </ul>
 <figure><img src="manual/app-svc.jpg" alt="netmap.exe 監控服務分頁" loading="lazy"><figcaption>netmap.exe 監控服務分頁：網址旁的按鈕打開告警設定與事件紀錄；設備清單的狀態欄會顯示 Ping 延遲。</figcaption></figure>
 
+<h3 id="e-audit">圖面比對（和實際網路對帳）</h3>
+<p>圖是人畫的，機房改了線卻沒更新圖，之後大家照著錯的圖查線，比沒有圖還糟。所以監控服務會定期（預設每 6 小時）讀每台有 SNMP 的網路設備的 <b>LLDP／CDP 鄰居</b>與 <b>MAC 表</b>，和圖上的線比對。右上角的 <b>✓ 按鈕</b>（或 <b>檔案 ▸ 圖面比對</b>）可以看結果，也可以按「現在比對」。</p>
+<figure><img src="manual/audit.jpg" alt="圖面比對" loading="lazy"></figure>
+<div class="tw"><table>
+<tr><th>差異</th><th>意思</th><th>可以怎麼處理</th></tr>
+<tr><td>接錯設備</td><td>圖上這個埠接到 A，但 LLDP／CDP 看到的是 B</td><td>到現場確認後手動改圖</td></tr>
+<tr><td>埠號不同</td><td>接的設備對，但對端的埠號不一樣</td><td>「改成實際的接法」一鍵改</td></tr>
+<tr><td>圖上沒畫</td><td>實際有連線，圖上沒有這條線</td><td>「在圖上補這條線」</td></tr>
+<tr><td>改線沒更新</td><td>終端設備（圖上有填 MAC）的 MAC 出現在別的 Switch 埠</td><td>「改成實際的接法」：把 Switch 那一端移到實際的埠</td></tr>
+<tr><td>終端沒接線</td><td>圖上沒接線，但 MAC 表看得到它接在哪</td><td>「在圖上補這條線」</td></tr>
+<tr><td>有線但沒連線</td><td>圖上兩台網路設備之間有線，那個埠卻沒有連線</td><td>線拔了、對端關機，或圖面過時</td></tr>
+<tr><td>不在圖上的鄰居</td><td>埠上接著一台圖上沒有的設備</td><td>把它加到圖上</td></tr>
+</table></div>
+<ul>
+<li>確定圖是對的（例如 LLDP 資訊本身有誤），按 <b>圖是對的，略過</b>；同樣的差異以後不會再提醒。</li>
+<li>每條線會記下最後一次被實際資料確認的時間。查線時路徑上每一段線都有標記：<span class="c-ok">✓</span> 實際確認過、<span class="c-warn">✓</span> 超過 7 天沒再確認、<span class="c-bad">!</span> 和實際不符、<b>?</b> 手動資料。勾選「在圖上標出驗證狀態」後，畫布上沒確認過的線畫成虛線、不符的畫成紅色；有差異的設備標「圖面不符」。</li>
+<li>穿過配線架的線也算：只要兩端的 Switch 和終端設備對得上，沿路每一段跳線都算確認過。</li>
+<li>只有<b>開了 SNMP 的網路設備</b>才讀得到 LLDP 與 MAC 表；傻瓜 Switch、沒填 MAC 的終端設備，就只能維持手動資料（標「?」），查線時請以現場為準。</li>
+<li>新的差異可以發告警（告警設定勾「圖面比對發現新的差異」）；比對間隔在 <b>設定 ▸ 心跳與設備偵測</b> 調整，0 代表不自動比對。</li>
+<li><b>IP 衝突</b>：同一個 IP 在 30 分鐘內出現兩個不同的 MAC（例如有人手動設了重複的固定 IP），會記一筆事件並告警（預設開啟）。</li>
+</ul>
+
 <h3 id="e-col">收集樣本（給 log 分析與設定檔備份開發用）</h3>
 <figure class="mid"><img src="manual/app-col.jpg" alt="收集樣本分頁" loading="lazy"></figure>
 <p>這個分頁是為了開發「log 分析告警」與「設定檔自動備份」而收集真實資料。只接收與讀取，不會修改設備設定。</p>
@@ -787,7 +815,8 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 
 <section id="changelog">
 <h2><span class="n">14</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v3.2　標籤機格式、聚合（LACP）自動判斷</b><span class="tag new">最新 · 2026-11-07</span><span class="tag">netmap.exe 1.10.0</span></div><ul><li>線標匯出可選 Brother P-touch Editor、Epson Label Editor、DYMO Connect、Brady Workstation：自動用合適的編碼，並說明匯入步驟</li><li>標籤 CSV 可以「一張標籤一列」（每條線兩列：A 端、B 端），標籤軟體直接整批印；可預覽前幾列</li><li>精簡內容給窄標籤帶：GigabitEthernet → Gi，可限制每行字數</li><li>A4 標籤新增旗標式：對折夾在線上，兩面都看得到線號</li><li>掃描時從 IF-MIB 介面堆疊表找聚合成員：不支援 LACP MIB 的 Cisco、FortiGate、Linux bond 也能標出 Port-Channel</li><li>一端已知是聚合、另一端沒回報時，依對端自動補上同一群組</li><li>兩端都不知道的平行線標成「可能是聚合」，點那條線或埠一鍵設定或略過（也可能是 STP 備援線）</li></ul></div>
+<div class="clog"><div class="v"><b>v3.3　圖面比對、資料檢查、變更紀錄</b><span class="tag new">最新 · 2026-11-07</span><span class="tag">netmap.exe 1.11.0</span></div><ul><li>圖面比對：監控服務定期讀 LLDP／CDP 與 MAC 表，和圖上的線對帳，列出接錯設備、埠號不同、圖上沒畫、改線沒更新、有線但沒連線，可一鍵改成實際接法或略過</li><li>每條線都有驗證狀態：實際確認過、超過 7 天、不符、手動資料；查線路徑上每一段都標出來，也可以在圖上用虛線標出未驗證的線</li><li>IP 衝突偵測：同一個 IP 同時出現兩個 MAC 會記事件並告警</li><li>資料檢查：重複 IP／MAC／線號、VLAN 不一致、光纖接到網路線埠、線太長、聚合只設一端</li><li>填 IP、MAC 時就提醒重複</li><li>每台設備、每條線都可以看自己的變更紀錄：誰在什麼時候改了哪個埠、接到哪裡</li></ul></div>
+<div class="clog"><div class="v"><b>v3.2　標籤機格式、聚合（LACP）自動判斷</b><span class="tag">2026-11-07</span><span class="tag">netmap.exe 1.10.0</span></div><ul><li>線標匯出可選 Brother P-touch Editor、Epson Label Editor、DYMO Connect、Brady Workstation：自動用合適的編碼，並說明匯入步驟</li><li>標籤 CSV 可以「一張標籤一列」（每條線兩列：A 端、B 端），標籤軟體直接整批印；可預覽前幾列</li><li>精簡內容給窄標籤帶：GigabitEthernet → Gi，可限制每行字數</li><li>A4 標籤新增旗標式：對折夾在線上，兩面都看得到線號</li><li>掃描時從 IF-MIB 介面堆疊表找聚合成員：不支援 LACP MIB 的 Cisco、FortiGate、Linux bond 也能標出 Port-Channel</li><li>一端已知是聚合、另一端沒回報時，依對端自動補上同一群組</li><li>兩端都不知道的平行線標成「可能是聚合」，點那條線或埠一鍵設定或略過（也可能是 STP 備援線）</li></ul></div>
 <div class="clog"><div class="v"><b>v3.1.1　自動偵測 SNMP</b><span class="tag">2026-11-07</span><span class="tag">netmap.exe 1.9.1</span></div><ul><li>監控服務每小時用設定好的 SNMP 帳密，去試圖上還沒監控的網路設備、伺服器、NAS、NVR、印表機；有回應就自動開始監控並補上埠號，不用重新掃描</li><li>設定 ▸ 心跳與設備偵測 可以關閉，或按「現在偵測一次」</li></ul></div>
 <div class="clog"><div class="v"><b>v3.1　心跳告警、歷史版本、權限、線標、多頁面、光纖束</b><span class="tag">2026-11-07</span><span class="tag">netmap.exe 1.9.0</span></div><ul><li>Ping 心跳：圖上所有有 IP 的設備都有綠／黃／紅燈號，斷線、延遲變高一眼看到；設備屬性看延遲曲線與最近事件</li><li>告警通知：設備斷線、主幹埠離線、新設備加入時送到 Telegram、Discord、Slack、Teams、LINE（Messaging API）、Email 或自訂 Webhook，同一段時間的事件合併成一則</li><li>事件紀錄：斷線、恢復、埠離線、新設備都記下來（保留 180 天），右上角鈴鐺顯示未讀</li><li>歷史版本：每次修改記下是誰、改了什麼，可以預覽舊版本再一鍵還原；線上版也會在這台瀏覽器自動留版本</li><li>管理密碼與檢視連結：其他電腦要登入才能編輯；可以產生只能看的連結或 QR Code 給主管、同仁</li><li>線標列印：A4 標籤紙（含 QR Code，掃了打開那條線）或匯出 Brother P-touch Editor 用的 CSV</li><li>網路上的設備：從路由器、防火牆的 ARP 表整理出新加入、很久沒出現、不在圖上的設備，一鍵加到圖上</li><li>多張圖（頁面）：樓層、機房、分公司分開畫，跨頁面的線顯示連接標籤，點一下跳過去；查線照樣整條走完</li><li>光纖收容箱與光纖束：一條多芯光纜一次建立，每一芯標 TIA-598 色碼，畫成一條粗線，點開看每一芯接到哪裡</li><li>平行線收成一條：同一對設備之間的多條線（例如 LACP）可以收成一條粗線</li><li>48 埠設備在縮小畫面或平板上點埠時，會放大成一排大按鈕讓你選，不會點錯</li></ul></div>
 <div class="clog"><div class="v"><b>v3.0.1　修正：網段探索建立的本機沒有流量</b><span class="tag">2026-11-07</span><span class="tag">netmap.exe 1.8.1</span></div><ul><li>用網段探索建立的設備預設不輪詢，連帶讓跑 netmap.exe 的那台電腦也讀不到流量；現在本機一定會讀網卡流量</li></ul></div>
@@ -815,7 +844,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 <div class="clog"><div class="v"><b>v1.0　第一版</b><span class="tag">2026-11-06</span></div><ul><li>防火牆、Switch、配線架、資訊座埠對埠接線，點埠追蹤整條路徑</li><li>產業範例與自動排版</li></ul></div>
 </section>
 
-<p class="foot">機房線路對應圖 · 網頁 v3.2.0 · netmap.exe v1.10.0 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">機房線路對應圖 · 網頁 v3.3.0 · netmap.exe v1.11.0 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>

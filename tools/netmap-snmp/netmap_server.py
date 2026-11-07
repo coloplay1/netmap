@@ -23,6 +23,7 @@ import netmap_snmp as ns
 import netmap_sshmon as sm
 import netmap_flow as nf
 import netmap_alert as na
+import netmap_audit as nau
 
 APP = "netmap"
 # 主控台不是 UTF-8 時（英文版 Windows、輸出導到檔案）也不要因為中文訊息當掉
@@ -30,7 +31,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.10.0"
+VERSION = "1.11.0"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -125,7 +126,7 @@ DEFAULT_SETTINGS = {"port": 8080, "interval": 60, "retention_days": 7, "lan_edit
                     "flow_enabled": False, "flow_port": 2055, "sflow_port": 6343,
                     "ping_enabled": True, "ping_interval": 30, "ping_fails": 2, "ping_slow_ms": 200, "ping_timeout": 1.0,
                     "alerts": {"enabled": False, "site": "", "on": {"down": True, "recover": True, "port": True, "slow": False, "snmp": False, "newdev": False, "gone": False}, "channels": []},
-                    "admin_hash": "", "view_token": "", "view_required": False, "inv_enabled": True, "inv_gone_hours": 24, "snmp_autoprobe": True,
+                    "admin_hash": "", "view_token": "", "view_required": False, "inv_enabled": True, "inv_gone_hours": 24, "snmp_autoprobe": True, "audit_hours": 6,
                     "snmp": {"version": "2c", "community": "", "user": "", "auth_proto": "SHA", "auth_key": "", "priv_proto": "AES", "priv_key": "",
                              "context": "", "port": 161, "timeout": 2.0, "retries": 1}}
 
@@ -134,6 +135,25 @@ PROJECT_KEYS = ("devices", "cables", "racks", "faults", "pages", "trunks")
 def norm_mac(m):
     h = re.sub(r"[^0-9a-fA-F]", "", str(m or "")).lower()
     return ":".join(h[i:i + 2] for i in range(0, 12, 2)) if len(h) == 12 and h not in ("000000000000", "ffffffffffff") else ""
+
+def object_snapshot(pj, oid):
+    """一個版本裡某台設備（含接在它埠上的線，與線另一端的名稱）或某條線。"""
+    owner = {}
+    for d in pj.get("devices", []):
+        for p in d.get("ports", []): owner[p["id"]] = (d, p)
+    nm = lambda pid: f"{owner[pid][0].get('name', '')} 埠 {owner[pid][1].get('label', '')}" if pid in owner else "?"
+    d = next((x for x in pj.get("devices", []) if x.get("id") == oid), None)
+    if d:
+        mine = {p["id"] for p in d.get("ports", [])}
+        cabs = [{"id": c["id"], "label": c.get("label", ""), "here": nm(c["a"] if c["a"] in mine else c["b"]), "there": nm(c["b"] if c["a"] in mine else c["a"])}
+                for c in pj.get("cables", []) if c.get("a") in mine or c.get("b") in mine]
+        dd = {k: v for k, v in d.items() if k not in ("x", "y")}
+        return {"kind": "dev", "obj": dd, "cabs": sorted(cabs, key=lambda c: c["id"])}
+    c = next((x for x in pj.get("cables", []) if x.get("id") == oid), None)
+    if c:
+        cc = {k: v for k, v in c.items() if k != "wps"}; cc["aName"] = nm(c["a"]); cc["bName"] = nm(c["b"])
+        return {"kind": "cable", "obj": cc}
+    return {"kind": None, "obj": None}
 
 def diff_projects(a, b):
     """兩個版本的差異摘要：{"text": "...", "devices": {"add": [...], "del": [...], "mod": [...]}, "cables": {...}, "moved": n}"""
@@ -173,7 +193,7 @@ def diff_projects(a, b):
 
 class Store:
     def __init__(s, root=None):
-        s.dir = root or data_dir(); os.makedirs(s.dir, exist_ok=True)
+        s.dir = root or data_dir(); os.makedirs(s.dir, exist_ok=True); s.conflicts = {}
         s.lock = threading.RLock()
         s.settings = json.loads(json.dumps(DEFAULT_SETTINGS))
         p = os.path.join(s.dir, "settings.json")
@@ -200,6 +220,8 @@ class Store:
         s.db.execute("CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, kind TEXT, level TEXT, dev TEXT, port TEXT, text TEXT, data TEXT)")
         s.db.execute("CREATE INDEX IF NOT EXISTS ix_events ON events(ts)")
         s.db.execute("CREATE TABLE IF NOT EXISTS revs(rev INTEGER PRIMARY KEY, ts INTEGER, who TEXT, summary TEXT, detail TEXT, data BLOB)")
+        s.db.execute("CREATE TABLE IF NOT EXISTS audit(key TEXT PRIMARY KEY, kind TEXT, level TEXT, dev TEXT, port TEXT, cable TEXT, text TEXT, fix TEXT, first INTEGER, last INTEGER, status TEXT)")
+        s.db.execute("CREATE TABLE IF NOT EXISTS verify(cable TEXT PRIMARY KEY, ts INTEGER, how TEXT)")
         s.db.execute("CREATE TABLE IF NOT EXISTS seen(mac TEXT PRIMARY KEY, ip TEXT, name TEXT, vendor TEXT, first INTEGER, last INTEGER, src TEXT, via TEXT, wireless INTEGER, gone INTEGER DEFAULT 0, ips TEXT)")
         s.db.commit()
         if not s.db.execute("SELECT 1 FROM revs LIMIT 1").fetchone() and s.project.get("devices"):
@@ -339,6 +361,57 @@ class Store:
             rows = s.db.execute(q + " ORDER BY id DESC LIMIT ?", a + [int(limit)]).fetchall()
         return [{"id": r[0], "ts": r[1], "kind": r[2], "level": r[3], "dev": r[4], "port": r[5], "text": r[6]} for r in rows]
 
+    # ---------- 圖面比對 ----------
+    def audit_save(s, findings, verified, info):
+        """寫入這一輪比對結果；回傳新出現的問題。已略過（ignored）的維持略過，這輪沒再出現的標成已解決。"""
+        now = int(time.time()); new = []
+        with s.lock:
+            cur = {r[0]: r[1] for r in s.db.execute("SELECT key, status FROM audit")}
+            keys = set()
+            for f in findings:
+                keys.add(f["key"]); st = cur.get(f["key"])
+                if st is None or st in ("resolved", "fixed"):
+                    s.db.execute("INSERT OR REPLACE INTO audit VALUES (?,?,?,?,?,?,?,?,?,?,?)", (f["key"], f["kind"], f.get("level", "warn"), f.get("dev") or "", f.get("port") or "", f.get("cable") or "",
+                                 f["text"], json.dumps(f.get("fix"), ensure_ascii=False), now, now, "open"))
+                    new.append(f)
+                else:
+                    s.db.execute("UPDATE audit SET last=?, text=?, fix=?, cable=? WHERE key=?", (now, f["text"], json.dumps(f.get("fix"), ensure_ascii=False), f.get("cable") or "", f["key"]))
+            for k, st in cur.items():
+                if k not in keys and st in ("open", "fixed"): s.db.execute("UPDATE audit SET status='resolved', last=? WHERE key=?", (now, k))
+            s.db.execute("DELETE FROM audit WHERE status='resolved' AND last < ?", (now - 30 * 86400,))
+            s.db.executemany("INSERT OR REPLACE INTO verify VALUES (?,?,?)", [(c, now, how) for c, how in verified.items()])
+            s.db.executemany("DELETE FROM verify WHERE cable=?", [(f["cable"],) for f in findings if f.get("cable")])
+            s.settings["audit_last"] = dict(info, ts=now); s.save_settings()
+            s.db.commit()
+        return new
+
+    def audit_list(s):
+        with s.lock:
+            rows = s.db.execute("SELECT key, kind, level, dev, port, cable, text, fix, first, last, status FROM audit WHERE status IN ('open','ignored','fixed') ORDER BY status, first DESC").fetchall()
+            ver = {r[0]: [r[1], r[2]] for r in s.db.execute("SELECT cable, ts, how FROM verify")}
+        return {"findings": [{"key": r[0], "kind": r[1], "level": r[2], "dev": r[3], "port": r[4], "cable": r[5], "text": r[6], "fix": json.loads(r[7] or "null"),
+                              "first": r[8], "last": r[9], "status": r[10]} for r in rows],
+                "verify": ver, "last": s.settings.get("audit_last") or {}, "hours": s.settings.get("audit_hours", 6)}
+
+    def audit_mark(s, key, status):
+        with s.lock:
+            s.db.execute("UPDATE audit SET status=? WHERE key=?", (status, key)); s.db.commit()
+
+    def audit_open(s):
+        with s.lock: return s.db.execute("SELECT COUNT(*) FROM audit WHERE status='open'").fetchone()[0]
+
+    def object_history(s, oid, limit=500):
+        """某台設備或某條線在各版本的樣子（只回傳有變的版本），給網頁算出「改了什麼」。"""
+        with s.lock:
+            rows = s.db.execute("SELECT rev, ts, who, data FROM (SELECT rev, ts, who, data FROM revs ORDER BY rev DESC LIMIT ?) ORDER BY rev", (limit,)).fetchall()
+        out, last = [], None
+        for rev, ts, who, data in rows:
+            pj = json.loads(zlib.decompress(data))
+            snap = object_snapshot(pj, oid)
+            sig = json.dumps(snap, ensure_ascii=False, sort_keys=True)
+            if sig != last: out.append({"rev": rev, "ts": ts, "who": who, **snap}); last = sig
+        return out
+
     # ---------- 網路上看過的設備（新加入／離線） ----------
     def seen_update(s, items, src):
         """items: [{mac, ip, name, wireless, via}]。回傳事件清單（新設備、IP 變更）。第一次收到資料時當作基準，不發「新設備」。"""
@@ -353,6 +426,12 @@ class Store:
                 if not mac: continue
                 ip = it.get("ip") or ""; name = it.get("name") or ""
                 r = s.db.execute("SELECT ip, name, first, gone, ips FROM seen WHERE mac=?", (mac,)).fetchone()
+                if ip and not baseline:
+                    other = s.db.execute("SELECT mac, name FROM seen WHERE ip=? AND mac<>? AND last > ?", (ip, mac, now - 1800)).fetchone()
+                    k = (ip, *sorted([mac, other[0]])) if other else None
+                    if other and now - s.conflicts.get(k, 0) > 6 * 3600:
+                        s.conflicts[k] = now
+                        evs.append({"kind": "ipconflict", "ip": ip, "name": ip, "mac": mac, "ts": now, "detail": f"{mac.upper()}（{name or ns.oui_vendor(mac.upper()) or '?'}）和 {other[0].upper()}（{other[1] or ns.oui_vendor(other[0].upper()) or '?'}）同時使用"})
                 if not r:
                     vendor = ns.oui_vendor(mac.upper())
                     s.db.execute("INSERT INTO seen VALUES (?,?,?,?,?,?,?,?,?,0,?)", (mac, ip, name, vendor, 0 if baseline else now, now, src, it.get("via") or "", 1 if it.get("wireless") else 0, ip))
@@ -539,6 +618,8 @@ class Poller:
         s.inv_t = 0          # 上次整理「網路上的設備」的時間
         s.probe_t = time.time() - PROBE_EVERY + 90   # 啟動 1～2 分鐘後先試一次 SNMP
         s.probe_force = False; s.probe_last = {"ts": 0, "tried": 0, "found": []}
+        s.audit_t = time.time() - 3600 * 6 + 180   # 啟動 3 分鐘後先比對一次
+        s.audit_force = False; s.audit_busy = False
         s.status = {"ts": 0, "devices": {}, "ports": {}}
         s.prev = {}          # (host, ifIndex) → (t, in, out, ierr, oerr)
         s.ifmaps = {}        # host → (time, {label → ifIndex})
@@ -722,6 +803,10 @@ class Poller:
         except Exception as e: s.log(f"事件判斷錯誤：{e}")
         try: s.inventory(inv)
         except Exception as e: s.log(f"設備清單錯誤：{e}")
+        hrs = float(s.store.settings.get("audit_hours", 6) or 0)
+        if s.audit_force or (hrs > 0 and time.time() - s.audit_t > hrs * 3600):
+            s.audit_force = False; s.audit_t = time.time()
+            threading.Thread(target=s.run_audit, args=(opts,), daemon=True, name="audit").start()
         if s.store.settings.get("snmp_autoprobe", True) and (s.probe_force or time.time() - s.probe_t > PROBE_EVERY):
             s.probe_force = False; s.probe_t = time.time()
             try: s.autoprobe(opts)
@@ -764,6 +849,33 @@ class Poller:
             for ev in s.store.seen_gone(int(st.get("inv_gone_hours") or 24), known): s.emit(ev)
         for src, items in inv:
             for ev in s.store.seen_update(items, src): s.emit(ev)
+
+    def run_audit(s, opts):
+        """圖面比對：讀每台有 SNMP 的網路設備的 LLDP／CDP 與 MAC 表，和圖上的線比對。"""
+        if s.audit_busy: return
+        s.audit_busy = True
+        try:
+            proj = s.store.project
+            devs = [d for d in proj.get("devices", []) if (d.get("snmp") or {}).get("host") and d.get("type") in INFRA_TYPES and d.get("monitor") is not False]
+            coll, fails = {}, []
+            def one(d):
+                h = d["snmp"]["host"]
+                try: return d, ns.collect(ns.make_client(opts, h), h, want_fdb=True, log=lambda *a: None)
+                except Exception as e: return d, e
+            if devs:
+                with ThreadPoolExecutor(max_workers=min(8, len(devs))) as ex:
+                    for d, r in ex.map(one, devs):
+                        if isinstance(r, Exception): fails.append(d.get("name", ""))
+                        else: coll[d["id"]] = r
+            findings, verified = nau.audit(proj, coll)
+            new = s.store.audit_save(findings, verified, {"devices": len(devs), "ok": len(coll), "fail": fails, "findings": len(findings), "verified": len(verified)})
+            s.log(f"圖面比對：讀了 {len(coll)}／{len(devs)} 台，{len(findings)} 個差異（新的 {len(new)} 個），確認 {len(verified)} 條線")
+            for f in new:
+                s.emit({"kind": "drift", "dev": f.get("dev"), "port": f.get("port"), "name": "圖面比對", "detail": f["text"], "ts": int(time.time())})
+        except Exception as e:
+            s.log(f"圖面比對錯誤：{e}")
+        finally:
+            s.audit_busy = False
 
     def autoprobe(s, opts):
         """用已設定的 SNMP 帳密試圖上還沒監控的設備；有回應就開始監控，並用設備回報的介面補上埠號。"""
@@ -985,7 +1097,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             return s._send(200, {"rev": st.rev, "ts": stat.get("ts", 0), "interval": st.settings.get("interval", 60), "running": po.running,
                                  "devices": stat.get("devices", {}), "ports": stat.get("ports", {}), "edit": s.can_edit(), "admin": s.is_admin(),
                                  "ping": sv.pinger.snapshot() if sv else {}, "ping_on": bool(st.settings.get("ping_enabled", True)),
-                                 "ev": last_ev[0]["id"] if last_ev else 0})
+                                 "ev": last_ev[0]["id"] if last_ev else 0, "audit_open": st.audit_open()})
         if u.path == "/api/pinghist":
             snap = sv.pinger.snapshot(hist=True) if sv else {}
             return s._send(200, snap.get(arg("id")) or {})
@@ -996,6 +1108,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if u.path == "/api/revs/get":
             proj, ts = st.rev_project(arg("rev", "0") or 0)
             return s._send(200, {"rev": int(arg("rev", "0") or 0), "ts": ts, "project": proj}) if proj is not None else s._send(404, {"error": "找不到這個版本"})
+        if u.path == "/api/audit":
+            o = st.audit_list(); o["busy"] = po.audit_busy; o["next"] = int(po.audit_t + float(st.settings.get("audit_hours", 6) or 0) * 3600) if st.settings.get("audit_hours", 6) else 0
+            return s._send(200, o)
+        if u.path == "/api/revs/object":
+            return s._send(200, {"items": st.object_history(arg("id"))})
         if u.path == "/api/seen":
             return s._send(200, {"items": st.seen_list(), "enabled": bool(st.settings.get("inv_enabled", True)), "gone_hours": st.settings.get("inv_gone_hours", 24)})
         if u.path == "/api/settings":
@@ -1047,6 +1164,13 @@ class Handler(http.server.BaseHTTPRequestHandler):
             if not st.restore(body.get("rev"), s.who()): return s._send(404, {"error": "找不到這個版本"})
             s.server.poller.ifmaps.clear()
             with st.lock: return s._send(200, {"rev": st.rev, "project": st.project})
+        if path == "/api/audit/run":
+            if not s.can_edit(): return s._send(403, {"error": "需要編輯權限"})
+            s.server.poller.audit_force = True; s.server.poller.wake.set(); return s._send(200, {"ok": True})
+        if path == "/api/audit/mark":
+            if not s.can_edit(): return s._send(403, {"error": "需要編輯權限"})
+            if body.get("status") not in ("open", "ignored", "fixed"): return s._send(400, {"error": "bad status"})
+            st.audit_mark(str(body.get("key")), body["status"]); return s._send(200, {"ok": True})
         if path == "/api/seen/forget":
             if not s.can_edit(): return s._send(403, {"error": "需要編輯權限"})
             st.seen_forget(body.get("macs") or []); return s._send(200, {"ok": True})
@@ -1121,7 +1245,7 @@ class Service:
         return {"ping_enabled": st.get("ping_enabled", True), "ping_interval": st.get("ping_interval", 30), "ping_fails": st.get("ping_fails", 2),
                 "ping_slow_ms": st.get("ping_slow_ms", 200), "ping_method": na.ping_method(),
                 "inv_enabled": st.get("inv_enabled", True), "inv_gone_hours": st.get("inv_gone_hours", 24),
-                "snmp_autoprobe": st.get("snmp_autoprobe", True), "snmp_probe": dict(s.poller.probe_last, candidates=len(probe_candidates(s.store.project, self_ips())), next=int(s.poller.probe_t + PROBE_EVERY)),
+                "snmp_autoprobe": st.get("snmp_autoprobe", True), "audit_hours": st.get("audit_hours", 6), "snmp_probe": dict(s.poller.probe_last, candidates=len(probe_candidates(s.store.project, self_ips())), next=int(s.poller.probe_t + PROBE_EVERY)),
                 "alerts": {"enabled": bool(a.get("enabled")), "site": a.get("site", ""), "on": a.get("on") or {}, "channels": chans},
                 "channel_types": {k: {"name": v["name"], "fields": [[f, l, sec] for f, l, sec in v["fields"]]} for k, v in na.CHANNELS.items()},
                 "auth": {"has_password": bool(st.get("admin_hash")), "view_required": bool(st.get("view_required")), "lan_edit": bool(st.get("lan_edit")),
@@ -1137,6 +1261,7 @@ class Service:
             if "ping_slow_ms" in b: st["ping_slow_ms"] = num(b["ping_slow_ms"], 10, 10000, 200)
             if "inv_enabled" in b: st["inv_enabled"] = bool(b["inv_enabled"])
             if "snmp_autoprobe" in b: st["snmp_autoprobe"] = bool(b["snmp_autoprobe"])
+            if "audit_hours" in b: st["audit_hours"] = max(0, min(168, float(b["audit_hours"] or 0)))
             if "inv_gone_hours" in b: st["inv_gone_hours"] = num(b["inv_gone_hours"], 1, 24 * 90, 24)
             if "lan_edit" in b: st["lan_edit"] = bool(b["lan_edit"])
             if "view_required" in b: st["view_required"] = bool(b["view_required"])
