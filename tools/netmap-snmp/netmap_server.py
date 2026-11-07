@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-netmap 監控服務：在內網提供「機房線路對應圖」網頁，並定時用 SNMP 讀取每個埠的流量與上下線狀態。
+netmap 監控服務：在內網提供 RackTrace（機房線路對應圖）網頁，並定時用 SNMP 讀取每個埠的流量與上下線狀態。
 
   網頁        http://<這台電腦>:8080/
   API         GET  /api/project          目前的圖（含 rev）
@@ -31,7 +31,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.11.0"
+VERSION = "1.12.0"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -992,7 +992,7 @@ class Auth:
         with s.lock: s.fails.setdefault(ip, []).append(time.time())
 
 LOGIN_HTML = """<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>netmap 登入</title><style>
+<title>RackTrace 登入</title><style>
 :root{--bg:#F4F6F9;--card:#fff;--ink:#16202B;--mute:#5B6878;--line:#D9DFE7;--acc:#2563EB}
 @media (prefers-color-scheme:dark){:root{--bg:#0F141B;--card:#18202A;--ink:#E6EBF1;--mute:#9AA7B6;--line:#2A3441;--acc:#4F8BFF}}
 body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Segoe UI","Microsoft JhengHei",sans-serif}
@@ -1001,7 +1001,7 @@ h1{font-size:19px;margin:0 0 6px}p{color:var(--mute);margin:0 0 18px;font-size:1
 input{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:transparent;color:inherit;font:inherit}
 button{margin-top:12px;width:100%;padding:10px;border:0;border-radius:9px;background:var(--acc);color:#fff;font:inherit;font-weight:600;cursor:pointer}
 .err{color:#D9443A;font-size:13px;min-height:20px;margin-top:8px}</style></head><body>
-<form id="f"><h1>機房線路對應圖</h1><p>這個監控服務需要登入才能查看。沒有密碼的話，請向管理員要一個「檢視連結」。</p>
+<form id="f"><h1>RackTrace</h1><p>這個監控服務需要登入才能查看。沒有密碼的話，請向管理員要一個「檢視連結」。</p>
 <input type="password" id="pw" placeholder="管理密碼" autocomplete="current-password" autofocus aria-label="管理密碼"><button>登入</button><div class="err" id="e"></div></form>
 <script>document.getElementById('f').onsubmit=async e=>{e.preventDefault();const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json','X-Netmap':'1'},body:JSON.stringify({password:document.getElementById('pw').value})});
 if(r.ok)location.replace('/'+location.hash);else{const j=await r.json().catch(()=>({}));document.getElementById('e').textContent=j.error||'密碼不對'}}</script></body></html>"""

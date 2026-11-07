@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-netmap-snmp：用 SNMP 掃描網路設備，產生「機房線路對應圖」可匯入的 JSON。
+netmap-snmp：用 SNMP 掃描網路設備，產生 RackTrace（機房線路對應圖）可匯入的 JSON。
 https://coloplay1.github.io/netmap/
 
 讀取（唯讀，不會修改設備設定）：
@@ -953,7 +953,7 @@ def run_scan(a, targets, log=print, progress=None, stop=lambda: False, on_device
     return proj, devs, failed
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(prog="netmap-snmp", description="用 SNMP 掃描網路設備，輸出「機房線路對應圖」可匯入的 JSON。")
+    ap = argparse.ArgumentParser(prog="netmap-snmp", description="用 SNMP 掃描網路設備，輸出 RackTrace 可匯入的 JSON。")
     ap.add_argument("targets", nargs="*", help="IP、網段或範圍，例如 192.168.1.1  192.168.1.0/24  10.0.0.1-50  host:1161")
     ap.add_argument("-c", "--community", default="public", help="SNMP community（v1/v2c，預設 public）")
     ap.add_argument("-v", "--version", default="2c", choices=["1", "2c", "3"], help="SNMP 版本（預設 2c）")
@@ -979,7 +979,7 @@ def main(argv=None):
     a = ap.parse_args(argv)
     interactive = not a.targets and not a.discover
     if interactive:
-        print(f"netmap-snmp {VERSION}  —  機房線路對應圖 SNMP 掃描\n")
+        print(f"netmap-snmp {VERSION}  —  RackTrace SNMP 掃描\n")
         print("輸入要掃描的設備 IP 或網段（可多個，用空白分隔），例如：192.168.1.1 192.168.1.0/24")
         a.targets = input("掃描目標：").split()
         if not a.targets: print("沒有輸入目標。"); return 1

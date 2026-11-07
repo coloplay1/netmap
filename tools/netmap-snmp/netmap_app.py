@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-netmap：機房線路對應圖 Windows 程式
+RackTrace（機房線路對應圖）Windows 程式（netmap.exe）
   - SNMP 掃描（圖形介面）
   - 監控服務：在內網提供網頁，定時讀取每個埠的流量與上下線狀態
 
@@ -36,7 +36,7 @@ def newer(a, b):
     try: return parts(a) > parts(b)
     except Exception: return False
 
-TITLE = "機房線路對應圖 netmap"
+TITLE = "RackTrace 機房線路對應圖"
 WEB = "https://coloplay1.github.io/netmap/"
 
 FULLWIDTH = {ord("。"): ".", ord("．"): ".", ord("、"): " ", ord("，"): " ", ord("　"): " ", ord("／"): "/", ord("－"): "-", ord("："): ":", ord("～"): "~"}
@@ -132,7 +132,7 @@ class App:
 
         head = ttk.Frame(root, padding=(16, 12, 16, 4)); head.pack(fill="x")
         if s.logo: ttk.Label(head, image=s.logo_small).pack(side="left", padx=(0, 10))
-        ttk.Label(head, text="機房線路對應圖", style="Title.TLabel").pack(side="left")
+        ttk.Label(head, text="RackTrace", style="Title.TLabel").pack(side="left")
         ttk.Label(head, text=f"  SNMP 掃描與監控服務  v{srv.VERSION}", style="Muted.TLabel").pack(side="left", pady=(6, 0))
         ttk.Button(head, text="開啟網頁", command=s.open_web).pack(side="right")
         s.upd = ttk.Label(head, text="", foreground="#ffffff", background="#2563EB", cursor="hand2", padding=(8, 2))

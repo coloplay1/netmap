@@ -1,4 +1,8 @@
-# 機房線路對應圖
+# RackTrace 機房線路對應圖
+
+<img src="racktrace-mark.svg" width="96" alt="RackTrace 標誌">
+
+點埠就查到整條線的機房文件工具（原名 netmap；網址、檔名 netmap.exe 不變）。
 
 IT 用的網路線路對應工具：建立防火牆、路由器、Switch、Hub、AP、配線架、座位資訊座與終端設備，埠對埠拖曳接線，點任一網路埠即可追蹤「Switch 埠 ➔ 配線架 ➔ 座位 ➔ 電腦」整條路徑。
 

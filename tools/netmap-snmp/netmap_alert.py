@@ -247,7 +247,7 @@ def event_line(ev):
 def compose(events, site=""):
     """把一批事件組成 (標題, 內文)。"""
     bad = [e for e in events if LEVEL.get(e["kind"]) == "bad"]
-    head = f"[netmap{(' ' + site) if site else ''}] "
+    head = f"[RackTrace{(' ' + site) if site else ''}] "
     if len(events) == 1: title = head + event_line(events[0])
     else: title = head + f"{len(events)} 則事件" + (f"，{len(bad)} 項異常" if bad else "")
     t = time.strftime("%Y-%m-%d %H:%M", time.localtime(events[0].get("ts") or time.time()))

@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>機房線路對應圖 使用手冊</title>
-<meta name="description" content="機房線路對應圖（netmap）網頁版與 netmap.exe 的完整使用教學。">
+<title>RackTrace 使用手冊</title>
+<meta name="description" content="RackTrace（機房線路對應圖）網頁版與 netmap.exe 的完整使用教學。">
 <link rel="icon" href="data:image/svg+xml;base64,__FAVICON__">
 <style>
 :root{--bg:#F6F7FB;--panel:#FFFFFF;--ink:#0F172A;--ink2:#475569;--line:#E2E8F0;--acc:#2563EB;--acc2:#0EA5E9;--warn:#F59E0B;--ok:#16A34A;--bad:#DC2626;--code:#EEF2F7;--tip:#EFF6FF;--tipb:#BFDBFE;--note:#FFFBEB;--noteb:#FDE68A;--shadow:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(15,23,42,.06)}
@@ -99,7 +99,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <body>
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
-  <svg class="mark" viewBox="8 8 240 240" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22C3EE"/><stop offset="1" stop-color="#2563EB"/></linearGradient></defs><rect x="8" y="8" width="240" height="240" rx="58" fill="url(#g)"/><rect x="52" y="52" width="152" height="50" rx="14" fill="#fff"/><rect x="74" y="68" width="22" height="18" rx="4" fill="#2563EB"/><rect x="117" y="68" width="22" height="18" rx="4" fill="#F59E0B"/><rect x="160" y="68" width="22" height="18" rx="4" fill="#2563EB"/><path d="M128 102v34M80 170v-20a14 14 0 0 1 14-14h68a14 14 0 0 1 14 14v20" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/><rect x="56" y="170" width="48" height="36" rx="10" fill="#fff"/><rect x="152" y="170" width="48" height="36" rx="10" fill="#F59E0B"/></svg>
+  <svg class="mark" viewBox="0 0 256 256" aria-hidden="true"><defs><linearGradient id="rtg3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14B8A6"/><stop offset="1" stop-color="#2563EB"/></linearGradient></defs><rect width="256" height="256" rx="60" fill="url(#rtg3)"/><rect x="44" y="52" width="124" height="38" rx="10" fill="#fff"/><rect x="44" y="109" width="124" height="38" rx="10" fill="#fff" fill-opacity=".55"/><rect x="44" y="166" width="124" height="38" rx="10" fill="#fff"/><path d="M142 71H196a14 14 0 0 1 14 14v86a14 14 0 0 1-14 14H142" fill="none" stroke="#FBBF24" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/><circle cx="142" cy="71" r="13" fill="#FBBF24"/><circle cx="142" cy="185" r="13" fill="#FBBF24"/><rect x="62" y="64" width="18" height="14" rx="4" fill="#2563EB"/><rect x="62" y="178" width="18" height="14" rx="4" fill="#2563EB"/></svg>
   <b>使用手冊</b><span class="ver hide-s">網頁 v__WEBV__ · netmap.exe v__EXEV__</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
@@ -132,7 +132,7 @@ code,td,li,p{overflow-wrap:anywhere}
 
 <main>
 <div class="hero">
-  <h1>機房線路對應圖 使用手冊</h1>
+  <h1>RackTrace 使用手冊</h1>
   <p>從畫第一台設備、接線、查線，到用 netmap.exe 自動掃描與即時監控流量，一步一步說明。</p>
   <div class="row">
     <a class="btn" href="./">開啟網頁版</a>
@@ -143,7 +143,7 @@ code,td,li,p{overflow-wrap:anywhere}
 
 <section id="intro">
 <h2><span class="n">1</span>這是什麼</h2>
-<p>「機房線路對應圖」把機房裡的防火牆、Switch、配線架、牆上資訊座和電腦，畫成一張可以<b>點埠就看到整條路徑</b>的圖。它有兩個部分：</p>
+<p><b>RackTrace</b>（機房線路對應圖）把機房裡的防火牆、Switch、配線架、牆上資訊座和電腦，畫成一張可以<b>點埠就看到整條路徑</b>的圖。它有兩個部分：</p>
 <div class="grid2">
   <div class="card"><h4>🌐 網頁版</h4><p>直接在瀏覽器使用，免安裝。手動畫圖、查線、故障查線、匯出報表。資料存在你自己的瀏覽器裡，不會上傳。</p></div>
   <div class="card"><h4>🪟 netmap.exe</h4><p>Windows 程式。用 SNMP 自動掃出設備與連線，並可當「監控服務」，讓內網的人用瀏覽器看同一張圖和每個埠的即時流量。</p></div>
@@ -574,7 +574,7 @@ __VENDORS__
 </table></div>
 <ul>
 <li>20 秒內發生的事件合併成一則訊息，整台 Switch 斷線時不會連續洗版。</li>
-<li><b>地點名稱</b>會出現在訊息開頭，例如「[netmap 台北總公司] 🔴 SW-CORE 斷線」，幫好幾個地方顧網路時分得出來。</li>
+<li><b>地點名稱</b>會出現在訊息開頭，例如「[RackTrace 台北總公司] 🔴 SW-CORE 斷線」，幫好幾個地方顧網路時分得出來。</li>
 <li>Token、密碼只存在 netmap.exe 那台電腦（Windows 用 DPAPI 加密），網頁上只會顯示「已設定」。</li>
 <li>告警要靠 netmap.exe 持續執行。要 24 小時監控的話，勾「Windows 開機時自動執行」，並把電源設定成不睡眠。</li>
 </ul>
@@ -717,7 +717,7 @@ __VENDORS__
 __CHANGELOG__
 </section>
 
-<p class="foot">機房線路對應圖 · 網頁 v__WEBV__ · netmap.exe v__EXEV__ · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">RackTrace · 網頁 v__WEBV__ · netmap.exe v__EXEV__ · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>
