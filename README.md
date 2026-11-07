@@ -8,6 +8,8 @@ IT 用的網路線路對應工具：建立防火牆、路由器、Switch、Hub�
 
 🌐 **線上使用：<https://coloplay1.github.io/netmap/>**（免安裝，直接用瀏覽器開啟）
 
+📘 **使用手冊：**[網頁版](https://coloplay1.github.io/netmap/manual.html)・[PDF](https://coloplay1.github.io/netmap/RackTrace-manual.pdf)
+
 📖 **[使用手冊（圖文教學）](https://coloplay1.github.io/netmap/manual.html)** · [版本紀錄](https://coloplay1.github.io/netmap/manual.html#changelog) · [下載 netmap.exe](https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe)
 
 ## 功能
