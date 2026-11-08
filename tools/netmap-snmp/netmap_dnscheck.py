@@ -220,6 +220,7 @@ def check(ips, server, domain="", extra_names=(), workers=48, log=lambda *a: Non
             else:
                 row.update(status="ok", level="ok", text="DNS 正確")
             if others and row["status"] in ("ok", "missing"):
+                row["others"] = others
                 row.update(status="shared", level="bad", text=f"DNS 裡還有 {'、'.join(others)} 指到 {ip}（舊記錄），網芳連那些名稱會連到 {n}")
             if ptr and ptr != n and row["level"] == "ok":
                 row.update(status="ptr", level="warn", text=f"反查 {ip} 得到 {ptr}，不是 {n}（反向記錄沒更新）")
@@ -229,7 +230,7 @@ def check(ips, server, domain="", extra_names=(), workers=48, log=lambda *a: Non
         st, v = A.get(n, ("fail", []))
         for ip in v:
             if ip in at and at[ip]["name"] != n:
-                rows.append({"ip": ip, "name": n, "group": "", "mac": "", "dns": v, "ptr": P.get(ip, ("", ""))[0], "status": "ghost", "level": "bad",
+                rows.append({"ip": ip, "name": n, "group": "", "mac": "", "dns": v, "ptr": P.get(ip, ("", ""))[0], "status": "ghost", "level": "bad", "owner": at[ip]["name"],
                              "text": f"{n} 現在沒有回應，但 DNS 還把它指到 {ip}，而那個 IP 現在是 {at[ip]['name']}——網芳打 \\\\{n} 會連到 {at[ip]['name']}"})
     silent = [ip for ip in ips if ip not in at]
     for ip in silent:

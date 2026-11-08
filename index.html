@@ -1519,9 +1519,9 @@ const PUBLIC_URL='https://coloplay1.github.io/netmap/';
 /*VENDORS*/const VENDOR_GUIDE={"vendors":[{"id":"sonicwall","name":"SonicWall","kind":"防火牆（SonicOS 7）","match":["sonicwall"],"snmp":["Device ▸ Settings ▸ SNMP：勾選 Enable SNMP，在 View 設定唯讀 community「{COMM}」（或建立 SNMPv3 使用者）。","Network ▸ System ▸ Interfaces：編輯 LAN 介面（例如 X0），在 Management 勾選 SNMP，允許從內網查詢。","存取規則若有限制，允許 {IP} 連到防火牆的 UDP 161。"],"flow":"IPFIX（建議）／NetFlow v9／v5","flow_steps":["Device ▸ AppFlow ▸ Flow Reporting ▸ Settings：Report Connections 選 All（或 Interface-based 只報指定介面）。","External Collector 分頁：勾選「Send Flows and Real-Time Data To External Collector」（可能需要重新開機）。","External Flow Reporting Format 選 IPFIX，External Collector's IP 填 {IP}，Port 填 {NF}。","按 Generate ALL Templates 產生範本，再按 Accept。"],"doc":"https://www.sonicwall.com/support/technical-documentation/docs/sonicos-7-1-appflow_device/Content/appflow-d-flow-reporting-user-config-netflow-v10.htm"},{"id":"fortinet","name":"Fortinet FortiGate","kind":"防火牆（FortiOS）","match":["fortinet","fortigate","fortiswitch"],"snmp":["System ▸ SNMP：開啟 SNMP Agent，新增 SNMP v1/v2c community「{COMM}」，Hosts 加入 {IP}，只勾 Accept queries（或用 SNMPv3）。","Network ▸ Interfaces：編輯 LAN 介面，Administrative Access 勾選 SNMP。"],"snmp_cli":"config system snmp sysinfo\n    set status enable\nend\nconfig system snmp community\n    edit 1\n        set name \"{COMM}\"\n        config hosts\n            edit 1\n                set ip {IP} 255.255.255.255\n            next\n        end\n        set trap-v1-status disable\n        set trap-v2c-status disable\n    next\nend","flow":"NetFlow v9（一筆含雙向流量）","flow_steps":["只能用 CLI 設定（FortiOS 7.4.2 以後可設多個收集器）。","在 LAN 介面開啟取樣（netflow-sampler）。舊版 FortiOS 是 config system netflow 底下直接 set collector-ip。"],"flow_cli":"config system netflow\n    config collectors\n        edit 1\n            set collector-ip {IP}\n            set collector-port {NF}\n        next\n    end\nend\nconfig system interface\n    edit \"internal\"\n        set netflow-sampler both\n    next\nend","doc":"https://docs.fortinet.com/document/fortigate/7.4.0/new-features/840728"},{"id":"cisco","name":"Cisco Catalyst／IOS","kind":"交換器、路由器（IOS／IOS-XE）","match":["cisco","catalyst"],"snmp":["用 ACL 限定只有 {IP} 能查詢，並開啟 LLDP（CDP 預設已開）。"],"snmp_cli":"ip access-list standard NETMAP\n permit host {IP}\nsnmp-server community {COMM} RO NETMAP\nlldp run","flow":"Flexible NetFlow v9（路由器、Catalyst 9300／9400 等；部分入門款交換器不支援）","flow_steps":["在連接內網的介面套用 flow monitor（ingress）。"],"flow_cli":"flow exporter NETMAP\n destination {IP}\n transport udp {NF}\n export-protocol netflow-v9\nflow monitor NETMAP-MON\n exporter NETMAP\n record netflow ipv4 original-input\ninterface GigabitEthernet0/1\n ip flow monitor NETMAP-MON input"},{"id":"meraki","name":"Cisco Meraki","kind":"MX 防火牆、MS 交換器","match":["meraki"],"snmp":["Organization ▸ Settings：開啟 SNMP（這是雲端的 SNMP，netmap 讀不到埠流量）。","要讓 netmap 直接讀設備：Network-wide ▸ General ▸ Reporting 開啟 SNMP，設定 community「{COMM}」，並允許 {IP}。"],"flow":"NetFlow v9（MX）","flow_steps":["Network-wide ▸ Configure ▸ General ▸ Reporting：NetFlow traffic reporting 選 Enabled。","NetFlow collector IP 填 {IP}，port 填 {NF}，儲存。","MX 只匯出經過路由或 NAT 的流量，同一個 VLAN 裡互傳的流量不會出現。"],"doc":"https://documentation.meraki.com/MX/Monitoring_and_Reporting/NetFlow_Overview"},{"id":"mikrotik","name":"MikroTik RouterOS","kind":"路由器、交換器","match":["mikrotik","routerboard"],"snmp":["IP ▸ SNMP：Enabled 打勾；Communities 改成「{COMM}」，Addresses 填 {IP}/32，只開 Read Access。"],"snmp_cli":"/snmp set enabled=yes\n/snmp community set [find default=yes] name={COMM} addresses={IP}/32 read-access=yes write-access=no","flow":"NetFlow v9／IPFIX（Traffic Flow）","flow_steps":["IP ▸ Traffic Flow：Enabled 打勾，Interfaces 選 all。","Targets 新增：Dst. Address {IP}、Port {NF}、Version 9（或 IPFIX）。"],"flow_cli":"/ip traffic-flow set enabled=yes interfaces=all\n/ip traffic-flow target add dst-address={IP} port={NF} version=9","doc":"https://manual.mikrotik.com/docs/diagnostics-monitoring-and-troubleshooting/traffic-flow/"},{"id":"ubiquiti","name":"Ubiquiti UniFi","kind":"閘道器、交換器、AP","match":["ubiquiti","unifi","ubnt"],"snmp":["UniFi Network：Settings ▸ System（或 Settings ▸ Network 依版本）找到 SNMP，開啟 SNMPv1/v2c 並設定 community「{COMM}」。","UniFi 交換器與 AP 也會套用同一組設定。"],"flow":"IPFIX（UniFi Network 9.1 以後的閘道器）","flow_steps":["Settings ▸ CyberSecure ▸ Traffic Logging：開啟 NetFlow（IPFIX）。","收集器填 {IP}，埠 {NF}。"],"doc":"https://help.ui.com/hc/en-us/articles/32201256219799"},{"id":"edgerouter","name":"Ubiquiti EdgeRouter","kind":"路由器（EdgeOS）","match":["edgerouter","edgeos"],"snmp":["System ▸ SNMP 開啟並設定 community，或用 CLI。"],"snmp_cli":"configure\nset service snmp community {COMM} authorization ro\nset service snmp community {COMM} client {IP}\ncommit ; save","flow":"NetFlow v9","flow_cli":"configure\nset system flow-accounting interface eth1\nset system flow-accounting netflow version 9\nset system flow-accounting netflow server {IP} port {NF}\ncommit ; save","flow_steps":["把 eth1 換成連接內網的介面。"]},{"id":"pfsense","name":"pfSense","kind":"防火牆","match":["pfsense","netgate"],"snmp":["Services ▸ SNMP：Enable，Read Community String 填「{COMM}」，Bind Interfaces 選 LAN。"],"flow":"NetFlow v9／IPFIX（softflowd 套件）","flow_steps":["System ▸ Package Manager 安裝 softflowd。","Services ▸ softflowd：Interface 選 LAN，Destination Host 填 {IP}，Port {NF}，NetFlow version 選 9 或 IPFIX，儲存。"]},{"id":"opnsense","name":"OPNsense","kind":"防火牆","match":["opnsense","deciso"],"snmp":["System ▸ Firmware ▸ Plugins 安裝 os-net-snmp。","Services ▸ Net-SNMP：Enable，community 填「{COMM}」。"],"flow":"NetFlow v5／v9（內建）","flow_steps":["Reporting ▸ NetFlow：Interfaces 選 LAN（可多選）。","WAN 介面若也選了，放進 Egress only 避免重複計算。","Version 選 v9，Destinations 輸入 {IP}:{NF} 後按 Enter，套用。"],"doc":"https://docs.opnsense.org/manual/how-tos/netflow_exporter.html"},{"id":"sophos","name":"Sophos Firewall","kind":"防火牆（SFOS／XGS）","match":["sophos"],"snmp":["System services ▸ SNMP（或 Administration ▸ SNMP）：開啟 Agent，新增 community「{COMM}」，Manager IP 填 {IP}，只給查詢權限。","Administration ▸ Device access：LAN zone 勾選 SNMP。"],"flow":"NetFlow v5","flow_steps":["System ▸ Administration ▸ Netflow：Add，Netflow server IP 填 {IP}，port {NF}，儲存。","只會匯出有開記錄的規則：Rules and policies ▸ Firewall rules，要統計的規則開啟 Log firewall traffic。","NetFlow v5 沒有 IPv6。"],"doc":"https://www.avanet.com/en/kb/sophos-firewall-netflow-monitoring/"},{"id":"paloalto","name":"Palo Alto Networks","kind":"防火牆（PAN-OS）","match":["palo alto","paloalto"],"snmp":["Device ▸ Setup ▸ Operations ▸ SNMP Setup：選 V2c 填 community「{COMM}」（或 V3）。","Network ▸ Network Profiles ▸ Interface Mgmt：建立允許 SNMP 的設定檔並套到 LAN 介面，Permitted IP 加 {IP}。"],"flow":"NetFlow v9","flow_steps":["Device ▸ Server Profiles ▸ NetFlow：新增，Server 填 {IP}、Port {NF}。","Network ▸ Interfaces：編輯 LAN 介面 ▸ Advanced ▸ NetFlow Profile 選剛才的設定，Commit。"]},{"id":"checkpoint","name":"Check Point","kind":"防火牆（Gaia）","match":["check point","checkpoint"],"snmp":["Gaia Portal ▸ System Management ▸ SNMP：開啟 SNMP Agent，Version 選 v2/v3，Read Only Community 填「{COMM}」。"],"flow":"NetFlow v9／IPFIX","flow_steps":["Gaia Portal ▸ Network Management ▸ NetFlow Export：新增收集器 {IP}、Port {NF}，格式選 NetFlow V9 或 IPFIX。"]},{"id":"juniper","name":"Juniper","kind":"交換器（EX）、防火牆（SRX）","match":["juniper","junos"],"snmp":["只允許 {IP} 查詢。"],"snmp_cli":"set snmp community {COMM} authorization read-only\nset snmp community {COMM} clients {IP}/32\nset protocols lldp interface all\ncommit","flow":"sFlow（EX 交換器）；SRX 用 J-Flow v9／IPFIX","flow_steps":["EX 交換器：在上行與要觀察的介面開 sFlow。"],"flow_cli":"set protocols sflow collector {IP} udp-port {SF}\nset protocols sflow sample-rate ingress 1024\nset protocols sflow interfaces ge-0/0/0\ncommit"},{"id":"aruba","name":"HPE Aruba","kind":"交換器（AOS-S／AOS-CX）","match":["aruba","hpe","procurve"],"snmp":["AOS-S（2530／2930 等）："],"snmp_cli":"snmp-server community \"{COMM}\" operator restricted\nsnmp-server host {IP} community \"{COMM}\"\nlldp run","flow":"sFlow","flow_steps":["AOS-S：設定 sFlow 收集器並在各埠開啟取樣。AOS-CX：sflow collector {IP} 後 sflow enable。"],"flow_cli":"sflow 1 destination {IP} {SF}\ninterface 1-24 sflow 1 sampling 1024\ninterface 1-24 sflow 1 polling 30"},{"id":"h3c","name":"H3C／HPE Comware","kind":"交換器、路由器","match":["h3c","comware"],"snmp":["只允許唯讀查詢。"],"snmp_cli":"snmp-agent\nsnmp-agent sys-info version v2c\nsnmp-agent community read {COMM}\nlldp global enable","flow":"sFlow（交換器）／NetStream（路由器，相當於 NetFlow）","flow_cli":"sflow agent ip <交換器管理IP>\nsflow collector 1 ip {IP} port {SF}\ninterface GigabitEthernet1/0/1\n sflow sampling-rate 4096\n sflow flow collector 1","flow_steps":["在要觀察的埠（例如上行埠）開啟 sFlow 取樣。"]},{"id":"huawei","name":"華為 Huawei","kind":"交換器、路由器、防火牆","match":["huawei"],"snmp":["只允許唯讀查詢。"],"snmp_cli":"snmp-agent\nsnmp-agent sys-info version v2c\nsnmp-agent community read cipher {COMM}\nlldp enable","flow":"sFlow（交換器）／NetStream（路由器、防火牆）","flow_cli":"sflow agent ip <交換器管理IP>\nsflow collector 1 ip {IP} udp-port {SF}\ninterface GigabitEthernet0/0/1\n sflow sampling collector 1\n sflow sampling rate 4096","flow_steps":["在要觀察的埠開啟 sFlow 取樣。"]},{"id":"ruckus","name":"Ruckus ICX","kind":"交換器","match":["ruckus","brocade"],"snmp":["只允許唯讀查詢。"],"snmp_cli":"snmp-server community {COMM} ro\nlldp run","flow":"sFlow","flow_cli":"sflow destination {IP} {SF}\nsflow enable\ninterface ethernet 1/1/1\n sflow forwarding","flow_steps":["在要觀察的埠開啟 sflow forwarding。"]},{"id":"tplink","name":"TP-Link Omada／JetStream","kind":"交換器、閘道器","match":["tp-link","tplink","omada"],"snmp":["單機管理：Maintenance ▸ SNMP ▸ Global Config 開啟，Community 新增「{COMM}」唯讀。","Omada 控制器：Settings ▸ Services ▸ SNMP 開啟並設定 community，會套用到所有設備。"],"flow":"部分 JetStream L2+／L3 交換器支援 sFlow；Omada 閘道器目前沒有 NetFlow","flow_steps":["支援 sFlow 的機型：Maintenance ▸ sFlow，Collector 填 {IP}、Port {SF}，再到 Sampler 在上行埠開啟取樣。"]},{"id":"zyxel","name":"Zyxel","kind":"防火牆（USG FLEX／ATP）、交換器","match":["zyxel"],"snmp":["防火牆：System ▸ SNMP 開啟，設定 Get Community「{COMM}」，Service Control 只允許 LAN。","交換器：Management ▸ SNMP（或 Advanced Application ▸ SNMP）設定唯讀 community。"],"flow":"多數機型沒有 NetFlow／sFlow；可以看埠流量（SNMP）","flow_steps":["沒有流量匯出的話，「誰在用」可以改看上游防火牆或支援 sFlow 的交換器。"]},{"id":"draytek","name":"DrayTek Vigor","kind":"路由器","match":["draytek","vigor"],"snmp":["System Maintenance ▸ SNMP：Enable SNMP Agent，Get Community 填「{COMM}」，Manager Host IP 填 {IP}。"],"flow":"沒有 NetFlow／sFlow","flow_steps":["可以看 WAN／LAN 埠流量（SNMP）；要知道誰在用，請改用支援流量匯出的設備。"]},{"id":"netgear","name":"NETGEAR","kind":"網管交換器","match":["netgear"],"snmp":["System ▸ SNMP ▸ SNMP V1/V2 ▸ Community Configuration：新增唯讀 community「{COMM}」，IP 填 {IP}。"],"flow":"部分 M4300／M4350 等支援 sFlow","flow_steps":["Monitoring ▸ sFlow：Receiver 填 {IP}、Port {SF}，在上行埠設定 Sampler。"]},{"id":"dlink","name":"D-Link","kind":"網管交換器","match":["d-link","dlink"],"snmp":["Management ▸ SNMP Settings：SNMP Global State 開啟，Community 新增「{COMM}」read only。"],"flow":"DGS-3000 以上等系列支援 sFlow","flow_steps":["支援的機型：sFlow ▸ Collector 填 {IP}、Port {SF}，並在埠上開啟 Flow Sampler。"]},{"id":"synology","name":"Synology NAS","kind":"NAS","match":["synology"],"snmp":["控制台 ▸ 終端機 & SNMP ▸ SNMP：啟動 SNMP 服務，勾選 SNMPv1/v2c，community 填「{COMM}」。","也可以改用「加入 SSH 設備…」讀流量（控制台 ▸ 終端機 開啟 SSH）。"],"flow":"沒有流量匯出","flow_steps":[]},{"id":"asus","name":"ASUS 家用路由器","kind":"家用路由器","match":["asus"],"snmp":["多數機型沒有 SNMP，請改用 netmap.exe「監控服務 ▸ 加入 SSH 設備…」。","開 SSH：系統管理 ▸ 系統設定 ▸ 啟用 SSH 選「只限 LAN」。測完不用時記得關閉。"],"flow":"沒有流量匯出","flow_steps":[]},{"id":"windows","name":"Windows 電腦／伺服器","kind":"電腦","match":["microsoft","windows"],"snmp":["設定 ▸ 系統 ▸ 選用功能 ▸ 新增「簡易網路管理通訊協定（SNMP）」。","服務（services.msc）▸ SNMP Service ▸ 安全性：新增唯讀 community「{COMM}」，「接受來自這些主機」加入 {IP}。"],"flow":"沒有流量匯出","flow_steps":[]},{"id":"linux","name":"Linux 主機","kind":"伺服器","match":["linux","ubuntu","debian","red hat","centos"],"snmp":["最簡單：用 netmap.exe「加入 SSH 設備…」讀流量，不用裝東西。","或安裝 snmpd，在 /etc/snmp/snmpd.conf 加入 rocommunity {COMM} {IP}，重新啟動 snmpd。"],"flow":"可安裝 softflowd 匯出 NetFlow","flow_cli":"sudo apt install softflowd\nsudo softflowd -i eth0 -n {IP}:{NF} -v 9"}],"common":{"snmp_tip":"建議所有設備用同一組唯讀 community（例如「{COMM}」）或同一組 SNMPv3 帳密，並只允許 netmap.exe 那台電腦（{IP}）查詢。不要用 public，也不要開寫入權限。","flow_tip":"流量匯出只要開在一台設備上就夠了（通常是防火牆，在 LAN 介面開）。同一台設備的同一份流量若在多個介面都匯出，可能會重複計算。"}};/*VENDORS_END*/
 const MANUAL_URL=PUBLIC_URL+'manual.html';
 /* 版本紀錄：最新在最前面。exe = netmap.exe 的版本 */
-const APP_VERSION='3.6.0',EXE_VERSION='1.14.0';
+const APP_VERSION='3.6.1',EXE_VERSION='1.14.0';
 const CHANGELOG=[
- {v:'3.6.0',exe:'1.14.0',d:'2026-11-08',t:'DNS 對帳：找出網芳連錯台的原因',i:['新增「檔案 ▸ DNS 對帳」：用 NetBIOS 問出每個 IP 上實際是哪台電腦，和 AD 的 DNS 記錄比對','抓得出 DNS 指到舊 IP、同一個名稱有多筆記錄、IP 被舊名稱占用、沒開機的電腦還占著別人的 IP、DNS 沒有記錄、名稱重複、反查不符','監控服務每 6 小時自動對帳，發現新問題會記成事件並發告警（跟「圖面比對」同一個開關）','不需要帳密；DNS 伺服器與網域預設用這台電腦的設定，也可以自己填 AD 的 IP']},
+ {v:'3.6.1',exe:'1.14.0',d:'2026-11-08',t:'DNS 對帳：找出網芳連錯台的原因',i:['可以一鍵產生 PowerShell 修正腳本：刪除舊記錄、補上正確的正向與反查記錄；預設只預覽，加 -Apply 才修改，修改前自動備份','新增「檔案 ▸ DNS 對帳」：用 NetBIOS 問出每個 IP 上實際是哪台電腦，和 AD 的 DNS 記錄比對','抓得出 DNS 指到舊 IP、同一個名稱有多筆記錄、IP 被舊名稱占用、沒開機的電腦還占著別人的 IP、DNS 沒有記錄、名稱重複、反查不符','監控服務每 6 小時自動對帳，發現新問題會記成事件並發告警（跟「圖面比對」同一個開關）','不需要帳密；DNS 伺服器與網域預設用這台電腦的設定，也可以自己填 AD 的 IP']},
  {v:'3.5.7',exe:'1.13.3',d:'2026-11-08',t:'不回 Ping 的在線設備，心跳紀錄不再顯示 100% 遺失',i:['擋 Ping 但確認在線的時間，在心跳曲線上用綠色標出，不再算成遺失或畫成紅色','「遺失」改成只算真的離線的時間']},
  {v:'3.5.6',exe:'1.13.2',d:'2026-11-08',t:'自動修正網段探索給的暫時名稱與類型',i:['網段探索給的暫時名稱（IP 或「廠商 IP」）會自動換成路由器記錄的主機名稱；類型是「其他」的設備也會依主機名稱改成手機、筆電、平板等','用網卡廠商命名的（例如 CLOUD NETWORK 192.168.50.165）會改回只顯示 IP；你自己取的名稱不會被改']},
  {v:'3.5.5',exe:'1.13.2',d:'2026-11-08',t:'擋 Ping 的電腦也能判斷在線、網段探索不再弄亂圖',i:['Ping 不通時再用 ARP 確認（同網段的電腦就算防火牆擋了 Ping 也一定會回 ARP），筆電開機後很快就會顯示在線','路由器用戶端清單支援 ASUS 等 Broadcom 路由器的 Wi-Fi 關聯表（wl assoclist），能分出 2.4G／5G／6G','網段探索：網卡廠商（例如 Cloud Network Technology、AzureWave）不再被當成設備品牌拿來命名；隨機 MAC 或 Wi-Fi 網卡的設備先畫成無線','網段探索結果可以「保留目前的圖，加入新設備」：保留你取的名稱、位置、接線與無線設定，只加入新設備、更新改變的 IP']},
@@ -3911,6 +3911,101 @@ function markVerify(){if(!SRV||!prefs.showVf||!ui.audit)return;S.cables.forEach(
 /* ---------- DNS 對帳：NetBIOS 名稱 vs AD DNS ---------- */
 const DNS_ST={ok:'正確',stale:'DNS 指到舊 IP',multi:'DNS 有多筆',shared:'IP 被舊名稱占用',ghost:'舊記錄指到別台',missing:'DNS 沒有記錄',ptr:'反查不符',dupname:'名稱重複',dnsfail:'查詢失敗',nonb:'沒回應 NetBIOS'};
 const isPub=ip=>!!ip&&!/^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|127\.)/.test(ip);
+function dnsFixScript(J){const ok=s=>/^[A-Za-z0-9][A-Za-z0-9-]{0,62}$/.test(s||''),okip=s=>/^\d{1,3}(\.\d{1,3}){3}$/.test(s||''),zone=(J.use_domain||'').replace(/[^A-Za-z0-9.-]/g,''),srv=(J.use_server||'').replace(/[^A-Za-z0-9.-]/g,'');
+  const L=[],reg=[],seen=new Set();let n=0;const step=(title,cmds)=>{cmds=cmds.filter(c=>!seen.has(c));if(!cmds.length)return;cmds.forEach(c=>seen.add(c));n++;L.push('',`# ── ${n}. ${title}`);cmds.forEach(c=>L.push(c))};
+  (J.rows||[]).forEach(r=>{const nm=r.name,ip=r.ip;if(!okip(ip))return;const dns=(r.dns||[]).filter(okip);
+    if(r.status==='stale'&&ok(nm)){step(`${nm}：DNS 指到 ${dns.join('、')}，實際在 ${ip}`,[...dns.filter(x=>x!==ip).map(x=>`Remove-A '${nm}' '${x}'`),`Add-A '${nm}' '${ip}'`]);reg.push([nm,ip])}
+    else if(r.status==='multi'&&ok(nm)){step(`${nm}：多筆記錄，只留 ${ip}`,dns.filter(x=>x!==ip).map(x=>`Remove-A '${nm}' '${x}'`))}
+    else if(r.status==='shared'&&ok(nm)){const o=(r.others||[]).filter(ok);if(o.length)step(`${ip}（${nm}）：刪掉還指到這個 IP 的舊名稱 ${o.join('、')}`,[...o.map(x=>`Remove-A '${x}' '${ip}'`),`Set-Ptr '${ip}' '${nm}'`]);
+      if(!dns.includes(ip)){step(`${nm}：補上 ${ip}`,[`Add-A '${nm}' '${ip}'`]);reg.push([nm,ip])}}
+    else if(r.status==='ghost'&&ok(nm)){step(`${nm}（沒開機）：舊記錄指到 ${ip}，那個 IP 現在是 ${r.owner||'別台'}`,[`Remove-A '${nm}' '${ip}'`,...(ok(r.owner)?[`Set-Ptr '${ip}' '${r.owner}'`]:[])])}
+    else if(r.status==='missing'&&ok(nm)){step(`${nm}：DNS 沒有記錄，補上 ${ip}（建議也在那台電腦執行 ipconfig /registerdns）`,[`Add-A '${nm}' '${ip}'`]);reg.push([nm,ip])}
+    else if(r.status==='ptr'&&ok(nm)&&r.ptr){step(`${ip}：反查是 ${r.ptr}，改成 ${nm}`,[`Set-Ptr '${ip}' '${nm}'`])}
+    else if(r.status==='dupname'&&ok(nm)){n++;L.push('',`# ── ${n}. ${nm}：名稱重複（${ip}）——腳本不處理：請把其中一台電腦改名，或停用沒在用的網卡`)}});
+  const head=`<#
+  RackTrace DNS 修正腳本（產生時間：${new Date().toLocaleString('zh-TW',{hour12:false})}）
+  依「DNS 對帳」的結果，刪除 AD DNS 裡的舊記錄、補上正確記錄。共 ${n} 項。
+
+  在網域控制站（或裝了「RSAT：DNS 伺服器工具」的電腦）用「網域管理員」身分開 PowerShell：
+    預覽（不會改任何東西）：  .\\racktrace-dns-fix.ps1
+    確認無誤後實際修改：      .\\racktrace-dns-fix.ps1 -Apply
+  實際修改前，會先把要刪除的記錄備份成 CSV（同一個資料夾）。
+  不想處理的項目，在那幾行前面加 # 就會略過。
+
+  補上的記錄會加上時間戳記（之後可被「清除過時記錄」清掉），並允許電腦自己更新，
+  這樣電腦下次換 IP 時可以自己改，不會卡在管理員建立的記錄上。
+#>
+param([switch]$Apply, [string]$DnsServer = '${srv}', [string]$Zone = '${zone}')
+$ErrorActionPreference = 'Stop'
+Import-Module DnsServer
+$Backup = Join-Path $PSScriptRoot ("racktrace-dns-backup-" + (Get-Date -Format 'yyyyMMdd-HHmmss') + ".csv")
+$script:Done = 0
+function Say($tag, $msg, $color) { Write-Host ("  [" + $tag + "] " + $msg) -ForegroundColor $color }
+function Save-Backup($rec, $zoneName) {
+  $d = $rec.RecordData
+  $v = if ($rec.RecordType -eq 'A') { $d.IPv4Address.IPAddressToString } elseif ($rec.RecordType -eq 'PTR') { $d.PtrDomainName } else { "$d" }
+  [pscustomobject]@{ Zone = $zoneName; Name = $rec.HostName; Type = $rec.RecordType; Data = $v; Timestamp = $rec.Timestamp; TTL = $rec.TimeToLive } |
+    Export-Csv -Path $Backup -Append -NoTypeInformation -Encoding UTF8
+}
+function Get-RevZone($ip) {
+  $o = $ip.Split('.'); $best = $null
+  foreach ($z in (Get-DnsServerZone -ComputerName $DnsServer | Where-Object { $_.IsReverseLookupZone -and $_.ZoneName -like '*.in-addr.arpa' })) {
+    $p = $z.ZoneName -replace '\\.in-addr\\.arpa$', ''; $q = $p.Split('.'); [array]::Reverse($q)
+    if (($o[0..($q.Count - 1)] -join '.') -eq ($q -join '.')) { if (-not $best -or $q.Count -gt $best.N) { $best = @{ Z = $z.ZoneName; N = $q.Count } } }
+  }
+  if ($best) { $rel = $o[($best.N)..3]; [array]::Reverse($rel); return @{ Zone = $best.Z; Name = ($rel -join '.') } }
+  return $null
+}
+function Remove-Ptr($ip, $name) {
+  $r = Get-RevZone $ip; if (-not $r) { return }
+  $recs = Get-DnsServerResourceRecord -ComputerName $DnsServer -ZoneName $r.Zone -Name $r.Name -RRType Ptr -ErrorAction SilentlyContinue |
+    Where-Object { -not $name -or $_.RecordData.PtrDomainName -like ($name + '.*') -or $_.RecordData.PtrDomainName -eq $name }
+  foreach ($x in $recs) {
+    if ($Apply) { Save-Backup $x $r.Zone; Remove-DnsServerResourceRecord -ComputerName $DnsServer -ZoneName $r.Zone -InputObject $x -Force; Say '已刪除' ("反查 " + $ip + " → " + $x.RecordData.PtrDomainName) Yellow }
+    else { Say '預覽' ("會刪除反查 " + $ip + " → " + $x.RecordData.PtrDomainName) Gray }
+  }
+}
+function Remove-A($name, $ip) {
+  $recs = Get-DnsServerResourceRecord -ComputerName $DnsServer -ZoneName $Zone -Name $name -RRType A -ErrorAction SilentlyContinue |
+    Where-Object { $_.RecordData.IPv4Address.IPAddressToString -eq $ip }
+  if (-not $recs) { Say '略過' ($name + " → " + $ip + " 已經不存在") DarkGray; return }
+  foreach ($x in $recs) {
+    if ($Apply) { Save-Backup $x $Zone; Remove-DnsServerResourceRecord -ComputerName $DnsServer -ZoneName $Zone -InputObject $x -Force; $script:Done++; Say '已刪除' ($name + " → " + $ip) Yellow }
+    else { Say '預覽' ("會刪除 " + $name + " → " + $ip) Gray }
+  }
+  Remove-Ptr $ip $name
+}
+function Add-A($name, $ip) {
+  $have = Get-DnsServerResourceRecord -ComputerName $DnsServer -ZoneName $Zone -Name $name -RRType A -ErrorAction SilentlyContinue |
+    Where-Object { $_.RecordData.IPv4Address.IPAddressToString -eq $ip }
+  if ($have) { Say '略過' ($name + " → " + $ip + " 已經存在") DarkGray; return }
+  if ($Apply) {
+    Add-DnsServerResourceRecordA -ComputerName $DnsServer -ZoneName $Zone -Name $name -IPv4Address $ip -AgeRecord -AllowUpdateAny
+    $r = Get-RevZone $ip
+    if ($r) { try { Add-DnsServerResourceRecordPtr -ComputerName $DnsServer -ZoneName $r.Zone -Name $r.Name -PtrDomainName ($name + "." + $Zone) -AgeRecord -AllowUpdateAny } catch { } }
+    $script:Done++; Say '已新增' ($name + " → " + $ip) Green
+  } else { Say '預覽' ("會新增 " + $name + " → " + $ip) Gray }
+}
+function Set-Ptr($ip, $name) {
+  Remove-Ptr $ip $null
+  $r = Get-RevZone $ip; if (-not $r) { Say '略過' ("找不到 " + $ip + " 的反向區域") DarkGray; return }
+  if ($Apply) { Add-DnsServerResourceRecordPtr -ComputerName $DnsServer -ZoneName $r.Zone -Name $r.Name -PtrDomainName ($name + "." + $Zone) -AgeRecord -AllowUpdateAny; $script:Done++; Say '已新增' ("反查 " + $ip + " → " + $name) Green }
+  else { Say '預覽' ("會把反查 " + $ip + " 設成 " + $name + "." + $Zone) Gray }
+}
+if (-not $DnsServer -or -not $Zone) { Write-Host "請在檔案開頭的 param 填 DnsServer 與 Zone" -ForegroundColor Red; exit 1 }
+Write-Host ("DNS 伺服器：" + $DnsServer + "　區域：" + $Zone + "　模式：" + $(if ($Apply) { "實際修改" } else { "預覽（加 -Apply 才會修改）" })) -ForegroundColor Cyan`;
+  const tail=['','Write-Host ""',`if ($Apply) { Write-Host ("完成：修改了 " + $script:Done + " 筆。備份：" + $Backup) -ForegroundColor Cyan } else { Write-Host "以上是預覽。確認無誤後執行：.\\racktrace-dns-fix.ps1 -Apply" -ForegroundColor Cyan }`];
+  if(reg.length)tail.push('','<# 建議也在這些電腦上執行 ipconfig /registerdns，讓電腦自己登記：',...reg.map(([a,b])=>`   ${a}（${b}）`),'   遠端執行（需要 WinRM）：Invoke-Command -ComputerName <IP> -ScriptBlock { ipconfig /registerdns }','#>');
+  return{text:'﻿'+(head+'\n'+L.join('\n')+'\n'+tail.join('\n')+'\n').replace(/\r?\n/g,'\r\n'),n}}
+function openDnsFix(J){const o=dnsFixScript(J);if(!o.n){toast('目前沒有腳本能處理的項目');return}const txt=o.text.replace(/^\ufeff/,'').replace(/\r\n/g,'\n');
+  modal(`<h2>DNS 修正腳本</h2><p class="hint">依這次對帳的 ${o.n} 個項目產生的 PowerShell 腳本：刪掉 AD DNS 裡的舊記錄、補上正確的正向與反查記錄。<b>預設只預覽，不會修改</b>；確認輸出無誤後加 <code>-Apply</code> 才會真的改，改之前會把刪除的記錄備份成 CSV。</p>
+    <ol class="hint" style="margin:6px 0 10px;padding-left:20px;line-height:1.8"><li>下載後複製到網域控制站（或裝了 RSAT DNS 工具的電腦）。</li><li>用網域管理員身分開 PowerShell，執行 <code>.\\racktrace-dns-fix.ps1</code> 看預覽。</li><li>沒問題再執行 <code>.\\racktrace-dns-fix.ps1 -Apply</code>。不想處理的項目，在那幾行前面加 <code>#</code>。</li><li>如果出現「無法載入，因為這個系統上已停用指令碼執行」，先執行 <code>Set-ExecutionPolicy -Scope Process Bypass</code>。</li></ol>
+    <textarea readonly class="mono" style="width:100%;height:300px;font-size:11.5px;white-space:pre;overflow:auto" id="psTxt"></textarea>
+    <div class="actions"><button class="btn primary" id="psDl">下載 racktrace-dns-fix.ps1</button><button class="btn" id="psCp">複製</button><button class="btn" id="psBack">回到對帳結果</button></div>`,true);
+  $('psTxt').value=txt;
+  $('psDl').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([o.text],{type:'text/plain'}));a.download='racktrace-dns-fix.ps1';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);toast('已下載 racktrace-dns-fix.ps1',true)};
+  $('psCp').onclick=async()=>{try{await navigator.clipboard.writeText(txt);toast('已複製',true)}catch(e){$('psTxt').select();document.execCommand('copy');toast('已複製',true)}};
+  $('psBack').onclick=()=>openDnsCheck()}
 async function openDnsCheck(){let J;try{J=await api('/api/dnscheck')}catch(e){toast('讀不到 DNS 對帳結果');return}let f=ui.dnsf||'bad';const ed=canEdit()&&!ui.ro;
   const devOf=r=>S.devices.find(d=>(r.mac&&d.mac&&d.mac.toLowerCase().replace(/-/g,':')===r.mac)||(d.ip&&String(d.ip).split('/')[0]===r.ip));
   const draw=()=>{const R=(J.rows||[]).filter(r=>f==='all'||(f==='bad'?r.level==='bad'||r.level==='warn':r.level===f));
@@ -3935,7 +4030,8 @@ async function openDnsCheck(){let J;try{J=await api('/api/dnscheck')}catch(e){to
       <li>AD 的 DNS 開啟「清除過時記錄」（Scavenging），時間要比 DHCP 租約長，例如租約 1 天、清除 7 天。</li>
       <li>根本解法：DHCP 改由 AD 伺服器負責，它會自動幫電腦更新 DNS；防火牆只當閘道。</li>
       <li>名稱重複：兩台電腦取了一樣的名稱要改名；同一台有線、無線各一個 IP 時，網芳可能連到沒在用的那個。</li></ol></details>
-    <div class="actions">${ed?`<label class="field" style="flex:0 0 auto;flex-direction:row;align-items:center;gap:6px">每 <input id="dnsH" type="number" min="0" max="168" step="1" style="width:64px" value="${J.hours??6}"> 小時自動對帳（0＝不自動）</label><button class="btn primary" id="dnsRun"${J.busy?' disabled':''}>${J.busy?'對帳中…':'現在對帳'}</button>`:''}<button class="btn" data-close>關閉</button></div>`,{wide:true});
+    <div class="actions">${ed?`<label class="field" style="flex:0 0 auto;flex-direction:row;align-items:center;gap:6px">每 <input id="dnsH" type="number" min="0" max="168" step="1" style="width:64px" value="${J.hours??6}"> 小時自動對帳（0＝不自動）</label><button class="btn primary" id="dnsRun"${J.busy?' disabled':''}>${J.busy?'對帳中…':'現在對帳'}</button>`:''}${(S_.bad||S_.warn)&&J.use_domain?'<button class="btn" id="dnsFix">產生修正腳本（PowerShell）</button>':''}<button class="btn" data-close>關閉</button></div>`,{wide:true});
+  if($('dnsFix'))$('dnsFix').onclick=()=>openDnsFix(J);
   draw();
   $('mod').addEventListener('click',e=>{const b=e.target.closest('[data-dnsf]');if(b){f=ui.dnsf=b.dataset.dnsf;draw();return}
     const sh=e.target.closest('[data-dnsshow]');if(sh){const d=S.devices.find(x=>x.id===sh.dataset.dnsshow);if(!d)return;closeModal();if(!onPage(d))setPage(pageOf(d),{dev:d.id});else{ui.sel={dev:d.id};renderAll()}}});
