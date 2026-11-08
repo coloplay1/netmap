@@ -193,7 +193,7 @@ class Pinger:
             for did, (d, ip, rtt, how) in res.items():
                 alive.add(did)
                 st = s.state.get(did) or {"st": "wait", "rtt": None, "since": now, "fails": 0, "hist": deque(maxlen=240), "ip": ip}
-                st["ip"] = ip; st["last"] = now; st["hist"].append((now, None if rtt is None else round(rtt, 1)))
+                st["ip"] = ip; st["last"] = now; st["hist"].append((now, round(rtt, 1) if rtt is not None else (-1 if how else None)))   # -1＝不回 Ping，但有其他在線證據
                 prev = st["st"]; st["how"] = how
                 if rtt is None and st["how"]:
                     st["fails"] = 0; st["rtt"] = None
@@ -203,7 +203,7 @@ class Pinger:
                     new = "down" if st["fails"] >= fails_need else (prev if prev != "wait" else "wait")
                 else:
                     st["fails"] = 0; st["rtt"] = round(rtt, 1)
-                    recent = [r for _, r in list(st["hist"])[-3:] if r is not None]
+                    recent = [r for _, r in list(st["hist"])[-3:] if r is not None and r >= 0]
                     new = "slow" if recent and min(recent) >= slow else "up"
                 if new != prev:
                     st["since"] = now
@@ -226,9 +226,10 @@ class Pinger:
             out = {}
             for k, v in s.state.items():
                 h = list(v["hist"])
-                ok = [r for _, r in h if r is not None]
+                ok = [r for _, r in h if r is not None and r >= 0]; lost = sum(1 for _, r in h if r is None); quiet = sum(1 for _, r in h if r == -1)
                 o = {"st": v["st"], "rtt": v["rtt"], "since": v["since"], "last": v.get("last"), "ip": v.get("ip"), "how": v.get("how"),
-                     "loss": round(100 * (len(h) - len(ok)) / len(h)) if h else None, "avg": round(sum(ok) / len(ok), 1) if ok else None}
+                     "loss": round(100 * lost / len(h)) if h else None, "quiet": round(100 * quiet / len(h)) if h else None,
+                     "avg": round(sum(ok) / len(ok), 1) if ok else None}
                 if hist: o["hist"] = h[-120:]
                 out[k] = o
             return out

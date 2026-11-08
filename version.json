@@ -1,8 +1,8 @@
 {
- "web": "3.5.5",
- "exe": "1.13.2",
+ "web": "3.5.7",
+ "exe": "1.13.3",
  "date": "2026-11-08",
- "title": "擋 Ping 的電腦也能判斷在線",
+ "title": "不回 Ping 的在線設備不再顯示遺失",
  "download": "https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe",
  "notes": "https://coloplay1.github.io/netmap/manual.html#changelog"
 }
