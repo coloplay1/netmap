@@ -874,6 +874,7 @@ def discover(targets, log=print, progress=None, stop=lambda: False, link_gateway
         vendor = oui_vendor(mac); brand = brand_from_vendor(vendor) if vendor != "隨機 MAC" else ""
         wifi_guess = vendor == "隨機 MAC" or any(k in vendor.lower() for k in WIFI_MODULE_MAKERS)
         typ, kind = guess_kind(ports, brand, vendor, ip == gw, name)
+        if typ == "end" and kind == "其他" and vendor == "隨機 MAC": kind = "手機"   # 手機、平板預設用隨機 MAC 連 Wi-Fi
         svc = {80: "網頁", 443: "HTTPS", 22: "SSH", 23: "Telnet", 445: "檔案分享", 3389: "遠端桌面", 9100: "列印", 631: "列印", 554: "影像串流",
                5060: "SIP", 5000: "NAS", 5001: "NAS", 8009: "投放", 62078: "iOS", 548: "AFP", 8080: "網頁", 8443: "HTTPS"}
         label = name or ("這台電腦" if ip == me else ("路由器" if ip == gw else (f"{kind} {ip}" if kind and kind != "其他" else (f"{brand} {ip}" if brand else ip))))
