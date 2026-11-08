@@ -54,7 +54,7 @@ jobs:
         run: python selftest_ops.py
       - name: Build netmap.exe (window app)
         working-directory: tools/netmap-snmp
-        run: pyinstaller --onefile --windowed --name netmap --icon netmap.ico --collect-all pysnmp --add-data "web/index.html;web" --add-data "netmap.ico;." --add-data "netmap.png;." --add-data "oui.json.gz;." --hidden-import paramiko --hidden-import netmap_collect --hidden-import netmap_sshmon --hidden-import netmap_flow --hidden-import netmap_vendors --hidden-import netmap_alert --hidden-import netmap_audit --hidden-import psutil netmap_app.py
+        run: pyinstaller --onefile --windowed --name netmap --icon netmap.ico --collect-all pysnmp --add-data "web/index.html;web" --add-data "netmap.ico;." --add-data "netmap.png;." --add-data "oui.json.gz;." --hidden-import paramiko --hidden-import netmap_collect --hidden-import netmap_sshmon --hidden-import netmap_flow --hidden-import netmap_vendors --hidden-import netmap_alert --hidden-import netmap_audit --hidden-import netmap_dnscheck --hidden-import psutil netmap_app.py
       - name: Build netmap-snmp.exe (command line)
         working-directory: tools/netmap-snmp
         run: pyinstaller --onefile --console --name netmap-snmp --icon netmap.ico --collect-all pysnmp --add-data "oui.json.gz;." netmap_snmp.py

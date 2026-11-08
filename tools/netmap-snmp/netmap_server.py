@@ -24,6 +24,7 @@ import netmap_sshmon as sm
 import netmap_flow as nf
 import netmap_alert as na
 import netmap_audit as nau
+import netmap_dnscheck as ndc
 
 APP = "netmap"
 # 主控台不是 UTF-8 時（英文版 Windows、輸出導到檔案）也不要因為中文訊息當掉
@@ -31,7 +32,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.13.3"
+VERSION = "1.14.0"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -113,6 +114,9 @@ def self_ips():
         _self_cache[0], _self_cache[1] = time.time(), {ip for ip in ips if not ip.startswith("127.") and ip != "::1"}
     return _self_cache[1]
 
+
+def private_ip(ip):
+    return bool(re.match(r"^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)", ip or ""))
 
 _lan_cache = [0.0, []]
 def same_lan(ip):
@@ -699,6 +703,9 @@ class Poller:
         s.probe_force = False; s.probe_last = {"ts": 0, "tried": 0, "found": []}
         s.audit_t = time.time() - 3600 * 6 + 180   # 啟動 3 分鐘後先比對一次
         s.audit_force = False; s.audit_busy = False
+        s.dns_t = time.time() - 3600 * 6 + 240; s.dns_force = False; s.dns_busy = False   # 啟動 4 分鐘後先對帳一次
+        try: s.dns_last = json.load(open(os.path.join(s.store.dir, "dnscheck.json"), encoding="utf-8"))
+        except Exception: s.dns_last = {}
         s.status = {"ts": 0, "devices": {}, "ports": {}}
         s.prev = {}          # (host, ifIndex) → (t, in, out, ierr, oerr)
         s.ifmaps = {}        # host → (time, {label → ifIndex})
@@ -892,6 +899,10 @@ class Poller:
         if s.audit_force or (hrs > 0 and time.time() - s.audit_t > hrs * 3600):
             s.audit_force = False; s.audit_t = time.time()
             threading.Thread(target=s.run_audit, args=(opts,), daemon=True, name="audit").start()
+        dh = float(s.store.settings.get("dns_hours", 6) or 0)
+        if s.dns_force or (dh > 0 and time.time() - s.dns_t > dh * 3600):
+            s.dns_force = False; s.dns_t = time.time()
+            threading.Thread(target=s.run_dns, daemon=True, name="dnscheck").start()
         if s.store.settings.get("snmp_autoprobe", True) and (s.probe_force or time.time() - s.probe_t > PROBE_EVERY):
             s.probe_force = False; s.probe_t = time.time()
             try: s.autoprobe(opts)
@@ -961,6 +972,51 @@ class Poller:
             s.log(f"圖面比對錯誤：{e}")
         finally:
             s.audit_busy = False
+
+    def dns_target(s):
+        """要用哪台 DNS 伺服器、哪個網域尾碼：設定優先，沒設就用這台電腦自己的 DNS 設定。"""
+        st = s.store.settings; servers, dom = ndc.local_dns()
+        server = (st.get("dns_server") or "").strip() or (servers[0] if servers else "")
+        return server, (st.get("dns_domain") or "").strip().strip(".") or dom, servers, dom
+
+    def run_dns(s):
+        """DNS 對帳：NetBIOS 問出每個 IP 上的電腦名稱，和 AD DNS 的 A／PTR 記錄比對。"""
+        if s.dns_busy: return
+        server, domain, _a, _b = s.dns_target()
+        if not server:
+            s.dns_last = {"ts": int(time.time()), "error": "找不到 DNS 伺服器，請在設定填 AD 的 DNS 伺服器 IP", "rows": [], "summary": {}}; return
+        s.dns_busy = True
+        try:
+            proj = s.store.project; ips, names = [], []
+            priv = private_ip
+            for d in proj.get("devices", []):
+                ip = str(d.get("ip") or "").split("/")[0]
+                if priv(ip) and d.get("type") not in ("patch", "jack", "odf"): ips.append(ip)
+                if d.get("name") and ndc.HOST_RE.match(d["name"]): names.append(d["name"])
+            now = time.time()
+            for r in s.store.seen_list():
+                if not r["gone"] and now - (r["last"] or 0) < 86400 and priv(r["ip"]): ips.append(r["ip"])
+                if r.get("name") and ndc.HOST_RE.match(r["name"]): names.append(r["name"])
+            for dv in (s.status.get("devices") or {}).values():
+                for c in dv.get("clients") or []:
+                    if c.get("online") is not False and priv(c.get("ip")): ips.append(c["ip"])
+                    if c.get("name") and ndc.HOST_RE.match(c["name"]): names.append(c["name"])
+            ips = [ip for ip in dict.fromkeys(ips) if ip not in self_ips()][:1024] + [ip for ip in self_ips() if priv(ip)][:1]
+            r = ndc.check(ips, server, domain, names, log=s.log)
+            r.update(ts=int(time.time()), server=server, domain=domain, checked=len(ips))
+            old = {(x["status"], x["name"], x["ip"]) for x in (s.dns_last.get("rows") or []) if x.get("level") == "bad"}
+            s.dns_last = r
+            try: json.dump(r, open(os.path.join(s.store.dir, "dnscheck.json"), "w", encoding="utf-8"), ensure_ascii=False)
+            except OSError: pass
+            if r.get("error"): s.log("DNS 對帳：" + r["error"]); return
+            new = [x for x in r["rows"] if x["level"] == "bad" and (x["status"], x["name"], x["ip"]) not in old]
+            s.log(f"DNS 對帳：{r['summary'].get('hosts', 0)} 台電腦，{r['summary'].get('bad', 0)} 個問題（新的 {len(new)} 個）")
+            for x in new[:20]:
+                s.emit({"kind": "dns", "name": x["name"] or x["ip"], "ip": x["ip"], "detail": x["text"], "ts": int(time.time())})
+        except Exception as e:
+            s.log(f"DNS 對帳錯誤：{e}")
+        finally:
+            s.dns_busy = False
 
     def autoprobe(s, opts):
         """用已設定的 SNMP 帳密試圖上還沒監控的設備；有回應就開始監控，並用設備回報的介面補上埠號。"""
@@ -1183,6 +1239,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
                                  "devices": stat.get("devices", {}), "ports": stat.get("ports", {}), "edit": s.can_edit(), "admin": s.is_admin(),
                                  "ping": sv.pinger.snapshot() if sv else {}, "ping_on": bool(st.settings.get("ping_enabled", True)),
                                  "ev": last_ev[0]["id"] if last_ev else 0, "audit_open": st.audit_open()})
+        if u.path == "/api/dnscheck":
+            server, domain, servers, dom = po.dns_target()
+            o = dict(po.dns_last or {}); o.update(busy=po.dns_busy, hours=st.settings.get("dns_hours", 6), cfg_server=st.settings.get("dns_server", ""),
+                                                 cfg_domain=st.settings.get("dns_domain", ""), auto_servers=servers, auto_domain=dom, use_server=server, use_domain=domain)
+            return s._send(200, o)
         if u.path == "/api/pinghist":
             snap = sv.pinger.snapshot(hist=True) if sv else {}
             return s._send(200, snap.get(arg("id")) or {})
@@ -1249,6 +1310,15 @@ class Handler(http.server.BaseHTTPRequestHandler):
             if not st.restore(body.get("rev"), s.who()): return s._send(404, {"error": "找不到這個版本"})
             s.server.poller.ifmaps.clear()
             with st.lock: return s._send(200, {"rev": st.rev, "project": st.project})
+        if path == "/api/dnscheck/run":
+            if not s.can_edit(): return s._send(403, {"error": "需要編輯權限"})
+            po = s.server.poller
+            for k in ("dns_server", "dns_domain"):
+                if k in body: st.settings[k] = re.sub(r"[^\w.\-]", "", str(body[k] or ""))[:120]
+            if "dns_hours" in body:
+                try: st.settings["dns_hours"] = max(0, min(168, float(body["dns_hours"] or 0)))
+                except (TypeError, ValueError): pass
+            st.save_settings(); po.dns_force = True; po.wake.set(); return s._send(200, {"ok": True})
         if path == "/api/audit/run":
             if not s.can_edit(): return s._send(403, {"error": "需要編輯權限"})
             s.server.poller.audit_force = True; s.server.poller.wake.set(); return s._send(200, {"ok": True})

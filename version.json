@@ -1,8 +1,8 @@
 {
- "web": "3.5.7",
- "exe": "1.13.3",
+ "web": "3.6.0",
+ "exe": "1.14.0",
  "date": "2026-11-08",
- "title": "不回 Ping 的在線設備不再顯示遺失",
+ "title": "DNS 對帳",
  "download": "https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe",
  "notes": "https://coloplay1.github.io/netmap/manual.html#changelog"
 }
