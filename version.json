@@ -1,8 +1,8 @@
 {
- "web": "3.6.2",
+ "web": "3.7.0",
  "exe": "1.14.1",
  "date": "2026-11-08",
- "title": "DNS 對帳表格與即時進度",
+ "title": "工具列重新整理",
  "download": "https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe",
  "notes": "https://coloplay1.github.io/netmap/manual.html#changelog"
 }

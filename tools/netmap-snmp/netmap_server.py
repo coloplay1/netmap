@@ -1242,7 +1242,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
             return s._send(200, {"rev": st.rev, "ts": stat.get("ts", 0), "interval": st.settings.get("interval", 60), "running": po.running,
                                  "devices": stat.get("devices", {}), "ports": stat.get("ports", {}), "edit": s.can_edit(), "admin": s.is_admin(),
                                  "ping": sv.pinger.snapshot() if sv else {}, "ping_on": bool(st.settings.get("ping_enabled", True)),
-                                 "ev": last_ev[0]["id"] if last_ev else 0, "audit_open": st.audit_open()})
+                                 "ev": last_ev[0]["id"] if last_ev else 0, "audit_open": st.audit_open(),
+                                 "dns_bad": ((po.dns_last or {}).get("summary") or {}).get("bad", 0), "dns_ts": (po.dns_last or {}).get("ts", 0)})
         if u.path == "/api/dnscheck":
             server, domain, servers, dom = po.dns_target()
             o = dict(po.dns_last or {}); o.update(busy=po.dns_busy or po.dns_force, prog=po.dns_prog if (po.dns_busy or po.dns_force) else None, hours=st.settings.get("dns_hours", 6), cfg_server=st.settings.get("dns_server", ""),
