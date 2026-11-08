@@ -31,7 +31,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.13.0"
+VERSION = "1.13.1"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -858,7 +858,7 @@ class Poller:
                     if r.get("inv"): inv.append((d.get("name") or host, r["inv"]))
                     if host.startswith("ssh://") and r["dev"].get("clients") and r["dev"].get("clients_at", 0) > s.arp.get(host, 0):
                         s.arp[host] = r["dev"]["clients_at"]
-                        inv.append((d.get("name") or host, [{"mac": c["mac"], "ip": c["ip"], "name": c.get("name"), "wireless": c.get("wireless"), "via": c.get("band") or c.get("iface")} for c in r["dev"]["clients"]]))
+                        inv.append((d.get("name") or host, [{"mac": c["mac"], "ip": c["ip"], "name": c.get("name"), "wireless": bool(c.get("wireless")), "via": c.get("band") or c.get("iface")} for c in r["dev"]["clients"]]))
         s.store.add_samples(rows, {pid: p.get("speed") for pid, p in ports.items()})
         old = s.status
         s.status = {"ts": int(time.time()), "devices": devs, "ports": ports}
@@ -1294,8 +1294,8 @@ class Service:
         for dv in (st.get("devices") or {}).values():
             if not dv.get("up") or not dv.get("clients") or now - (dv.get("clients_at") or 0) > 900: continue
             for c in dv["clients"]:
-                if (mac and c.get("mac") == mac) or (c.get("ip") == ip and not mac):
-                    return "在路由器的用戶端清單上"
+                if c.get("online") and ((mac and c.get("mac") == mac) or (c.get("ip") == ip and not mac)):
+                    return "路由器回報它目前在線"
         pids = {p["id"] for p in d.get("ports", [])}
         for pid in pids:
             p = (st.get("ports") or {}).get(pid)

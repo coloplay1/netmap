@@ -249,19 +249,26 @@ def parse_clients(text, ports=None):
         if m: cur = m.group(1).lower(); iwsta[cur] = {"iface": cur_if, "rssi": None}; continue
         m = re.match(r"signal:\s*(-?\d+)", line.strip())
         if m and cur: iwsta[cur]["rssi"] = int(m.group(1))
+    # 有沒有「現在在線」的資料：Wi-Fi 關聯表、ASUS clientlist、bridge 學到的 MAC（約 5 分鐘會老化）。
+    # ARP 表會留著已經關機的設備，所以有這些資料時，只回傳真的在線的；完全沒有時才退回 ARP（online=None）。
+    presence = bool(iwsta or asus or mac_if)
+    lan_ifs = {i for i, l in label.items() if re.match(r"^(LAN|PORT|ETH|GE|P)\s*\d", str(l), re.I)}
     out = []; seen = set()
     for ip, mac, arpif in ipmac:
         if mac in seen or arpif in wan: continue
         seen.add(mac)
+        online = (mac in iwsta or mac in asus or mac in mac_if) if presence else None
+        if online is False: continue
         ifn = (iwsta.get(mac) or {}).get("iface") or mac_if.get(mac) or ""
         a = asus.get(mac) or {}
         band = a.get("band") or band_of_if.get(ifn) or (("Wi-Fi") if ifn and WIFI_IF.match(ifn) else None)
-        wireless = bool(band) or mac in iwsta
+        # 無線：有頻段或在 Wi-Fi 關聯表；有線：ASUS 列在 wired，或學到的介面是 LAN 埠；其他情況不確定（None），不要亂猜成有線
+        wireless = True if (band or mac in iwsta) else (False if (a.get("wired") or ifn in lan_ifs) else None)
         if a.get("wired"): wireless, band = False, None
         rssi = (iwsta.get(mac) or {}).get("rssi") or a.get("rssi")
         try: rssi = int(rssi) if rssi not in (None, "") else None
         except (TypeError, ValueError): rssi = None
-        out.append({"ip": ip, "mac": mac, "iface": ifn, "wireless": wireless, "band": band if wireless else None, "name": names.get(mac, ""), "rssi": rssi})
+        out.append({"ip": ip, "mac": mac, "iface": ifn, "wireless": wireless, "band": band if wireless else None, "name": names.get(mac, ""), "rssi": rssi, "online": online})
     out.sort(key=lambda c: tuple(int(x) if x.isdigit() else 0 for x in c["ip"].split(".")))
     return out
 
