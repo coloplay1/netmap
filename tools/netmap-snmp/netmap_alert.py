@@ -139,8 +139,9 @@ NO_PING_TYPES = {"patch", "seat"}
 
 class Pinger:
     """state[設備id] = {"st": up|slow|down|wait, "rtt", "since", "fails", "last", "hist": [[ts, rtt|None], ...]}"""
-    def __init__(s, get_devices, settings, on_event=None, log=print):
+    def __init__(s, get_devices, settings, on_event=None, log=print, alive=None):
         s.get_devices, s.settings, s.on_event, s.log = get_devices, settings, on_event or (lambda ev: None), log
+        s.alive = alive   # alive(d, ip) -> 說明字串或 None：Ping 不通時，用其他證據（這台電腦自己、路由器用戶端清單、埠上的流量）判斷還在線
         s.state = {}; s.lock = threading.Lock()
         s.thread = None; s.stop_ev = threading.Event(); s.wake = threading.Event(); s.last = 0
 
@@ -167,8 +168,14 @@ class Pinger:
                 alive.add(did)
                 st = s.state.get(did) or {"st": "wait", "rtt": None, "since": now, "fails": 0, "hist": deque(maxlen=240), "ip": ip}
                 st["ip"] = ip; st["last"] = now; st["hist"].append((now, None if rtt is None else round(rtt, 1)))
-                prev = st["st"]
-                if rtt is None:
+                prev = st["st"]; st["how"] = None
+                if rtt is None and s.alive:
+                    try: st["how"] = s.alive(d, ip)
+                    except Exception: st["how"] = None
+                if rtt is None and st["how"]:
+                    st["fails"] = 0; st["rtt"] = None
+                    new = prev if prev in ("up", "slow") else "up"
+                elif rtt is None:
                     st["fails"] += 1; st["rtt"] = None
                     new = "down" if st["fails"] >= fails_need else (prev if prev != "wait" else "wait")
                 else:
@@ -197,7 +204,7 @@ class Pinger:
             for k, v in s.state.items():
                 h = list(v["hist"])
                 ok = [r for _, r in h if r is not None]
-                o = {"st": v["st"], "rtt": v["rtt"], "since": v["since"], "last": v.get("last"), "ip": v.get("ip"),
+                o = {"st": v["st"], "rtt": v["rtt"], "since": v["since"], "last": v.get("last"), "ip": v.get("ip"), "how": v.get("how"),
                      "loss": round(100 * (len(h) - len(ok)) / len(h)) if h else None, "avg": round(sum(ok) / len(ok), 1) if ok else None}
                 if hist: o["hist"] = h[-120:]
                 out[k] = o

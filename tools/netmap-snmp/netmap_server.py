@@ -31,7 +31,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.12.0"
+VERSION = "1.13.0"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -112,6 +112,63 @@ def self_ips():
         ips = {ip for n in (nics or {}).values() for ip in n["ips"]} | set(local_ips())
         _self_cache[0], _self_cache[1] = time.time(), {ip for ip in ips if not ip.startswith("127.") and ip != "::1"}
     return _self_cache[1]
+
+
+_wifi_cache = [0.0, {}]
+def _band_of(ch, band_txt=""):
+    t = (band_txt or "").replace(" ", "")
+    if t.startswith("6"): return "6G"
+    if t.startswith("5"): return "5G"
+    if t.startswith("2.4"): return "2.4G"
+    try: c = int(ch)
+    except (TypeError, ValueError): return ""
+    return "2.4G" if c <= 14 else "5G" if c <= 177 else ""
+
+def wifi_nics():
+    """這台電腦的無線網卡：{網卡名稱: {"band", "ssid", "radio"}}，快取 60 秒。
+    Windows 讀 netsh wlan show interfaces（中英文欄位都認得），Linux 看 /sys/class/net/*/wireless。"""
+    if time.time() - _wifi_cache[0] < 60: return _wifi_cache[1]
+    out = {}
+    try:
+        if os.name == "nt":
+            import subprocess
+            raw = subprocess.run(["netsh", "wlan", "show", "interfaces"], capture_output=True, timeout=5,
+                                 creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0)).stdout
+            txt = None
+            for enc in ("utf-8", "cp950", "mbcs", "cp936"):
+                try: txt = raw.decode(enc); break
+                except Exception: continue
+            out = parse_netsh_wlan(txt or "")
+        else:
+            for n in os.listdir("/sys/class/net"):
+                if os.path.isdir(f"/sys/class/net/{n}/wireless"): out[n] = {"band": "", "ssid": "", "radio": ""}
+    except Exception:
+        pass
+    _wifi_cache[0], _wifi_cache[1] = time.time(), out
+    return out
+
+def parse_netsh_wlan(txt):
+    out = {}; cur = None
+    for line in txt.splitlines():
+        if ":" not in line:
+            continue
+        k, v = line.split(":", 1); k, v = k.strip(), v.strip()
+        kl = k.lower()
+        if kl in ("name", "名稱", "名称"):
+            cur = {"band": "", "ssid": "", "radio": "", "ch": "", "bandtxt": "", "state": ""}; out[v] = cur; continue
+        if cur is None: continue
+        if kl == "ssid": cur["ssid"] = v
+        elif kl in ("state", "狀態", "状态"): cur["state"] = v
+        elif "radio" in kl or "無線電" in k or "无线电" in k: cur["radio"] = v
+        elif kl in ("channel", "通道", "頻道", "频道", "信道"): cur["ch"] = v
+        elif kl in ("band", "頻帶", "频带", "頻段", "频段"): cur["bandtxt"] = v
+    res = {}
+    for n, c in out.items():
+        st = c["state"]
+        if st and (re.search(r"disconnect|中斷|中断|未連線|未连接", st, re.I) or not re.search(r"connected|已連線|已连接", st, re.I)):
+            continue
+        res[n] = {"band": _band_of(c["ch"], c["bandtxt"]), "ssid": c["ssid"], "radio": c["radio"]}
+    return res
 
 
 # ───────────────────────── store ─────────────────────────
@@ -670,6 +727,12 @@ class Poller:
         nic = next((n for n, v in nics.items() if ip in v["ips"]), None)
         if not nic: res["dev"]["err"] = f"這台電腦目前沒有 {ip} 這個 IP"; return res
         v = nics[nic]; res["dev"]["up"] = True; t = time.time()
+        wn = wifi_nics()
+        if nic in wn or re.search(r"wi-?fi|wlan|wireless|無線", nic, re.I):
+            w = wn.get(nic) or {}
+            res["dev"]["link"] = {"wireless": True, "band": w.get("band", ""), "ssid": w.get("ssid", ""), "nic": nic, "src": "self"}
+        else:
+            res["dev"]["link"] = {"wireless": False, "nic": nic, "src": "self"}
         ports = d.get("ports", []); cabled = {x for c in s.store.project.get("cables", []) for x in (c.get("a"), c.get("b"))}
         p = next((q for q in ports if q.get("ifName") == nic), None) or next((q for q in ports if q["id"] in cabled), None) or (ports[0] if ports else None)
         if not p: return res
@@ -1218,9 +1281,27 @@ class Service:
         s.poller = Poller(s.store, log, emit=s.emit); s.httpd = None; s.thread = None; s._flow = None
         s.auth = Auth()
         s.notifier = na.Notifier(lambda: s.store.settings.get("alerts"), s.resolve_channel, log)
-        s.pinger = na.Pinger(lambda: s.store.project.get("devices", []), lambda: s.store.settings, s.emit, log)
+        s.pinger = na.Pinger(lambda: s.store.project.get("devices", []), lambda: s.store.settings, s.emit, log, alive=s.alive_hint)
 
     # ---------- 事件與告警 ----------
+    def alive_hint(s, d, ip):
+        """Ping 不通時的其他在線證據；回傳說明文字，沒有證據回傳 None。"""
+        if ip in self_ips():
+            nics = local_nics() or {}
+            if any(ip in v["ips"] and v["up"] is not False for v in nics.values()): return "這台電腦自己"
+        st = s.poller.status or {}; now = time.time()
+        mac = str(d.get("mac") or "").lower().replace("-", ":")
+        for dv in (st.get("devices") or {}).values():
+            if not dv.get("up") or not dv.get("clients") or now - (dv.get("clients_at") or 0) > 900: continue
+            for c in dv["clients"]:
+                if (mac and c.get("mac") == mac) or (c.get("ip") == ip and not mac):
+                    return "在路由器的用戶端清單上"
+        pids = {p["id"] for p in d.get("ports", [])}
+        for pid in pids:
+            p = (st.get("ports") or {}).get(pid)
+            if p and p.get("up") and max(p.get("in") or 0, p.get("out") or 0) > 2000: return "埠上有流量"
+        return None
+
     def emit(s, ev):
         try: s.store.add_event(ev)
         except Exception as e: s.log(f"事件寫入失敗：{e}")
