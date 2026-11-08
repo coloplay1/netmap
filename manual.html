@@ -100,7 +100,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="0 0 256 256" aria-hidden="true"><rect width="256" height="256" rx="56" fill="#fff"/><rect x="42" y="38" width="86" height="180" rx="4" fill="none" stroke="#111" stroke-width="13"/><path d="M66 82H104M66 116H104M66 150H104M66 184H104" stroke="#111" stroke-width="11" stroke-linecap="round"/><path d="M128 96C168 96 170 70 200 70" fill="none" stroke="#F2C230" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="70" r="13" fill="#F2C230"/><path d="M128 130C168 130 170 150 200 150" fill="none" stroke="#1E9BEA" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="150" r="13" fill="#1E9BEA"/><path d="M128 178C162 178 172 206 196 206" fill="none" stroke="#5B6472" stroke-width="11" stroke-linecap="round" stroke-dasharray="1 18"/><circle cx="210" cy="206" r="11" fill="none" stroke="#5B6472" stroke-width="7"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v3.6.1 · netmap.exe v1.14.0</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v3.6.2 · netmap.exe v1.14.1</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -138,7 +138,7 @@ code,td,li,p{overflow-wrap:anywhere}
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
     <a class="btn ghost" href="RackTrace-manual.pdf" download>下載 PDF 版手冊</a>
-    <a class="btn ghost" href="#changelog">最新更新：v3.6.1</a>
+    <a class="btn ghost" href="#changelog">最新更新：v3.6.2</a>
   </div>
 </div>
 
@@ -816,7 +816,8 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 
 <section id="changelog">
 <h2><span class="n">14</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v3.6.1　DNS 對帳：找出網芳連錯台的原因</b><span class="tag new">最新 · 2026-11-08</span><span class="tag">netmap.exe 1.14.0</span></div><ul><li>可以一鍵產生 PowerShell 修正腳本：刪除舊記錄、補上正確的正向與反查記錄；預設只預覽，加 -Apply 才修改，修改前自動備份</li><li>新增「檔案 ▸ DNS 對帳」：用 NetBIOS 問出每個 IP 上實際是哪台電腦，和 AD 的 DNS 記錄比對</li><li>抓得出 DNS 指到舊 IP、同一個名稱有多筆記錄、IP 被舊名稱占用、沒開機的電腦還占著別人的 IP、DNS 沒有記錄、名稱重複、反查不符</li><li>監控服務每 6 小時自動對帳，發現新問題會記成事件並發告警（跟「圖面比對」同一個開關）</li><li>不需要帳密；DNS 伺服器與網域預設用這台電腦的設定，也可以自己填 AD 的 IP</li></ul></div>
+<div class="clog"><div class="v"><b>v3.6.2　DNS 對帳改成表格，掃描時即時顯示</b><span class="tag new">最新 · 2026-11-08</span><span class="tag">netmap.exe 1.14.1</span></div><ul><li>結果改成表格：電腦名稱、目前 IP、DNS 登記的 IP，對得上打 ✓、對不上打 ✕；DNS 裡錯的 IP 用紅色刪除線標出</li><li>按「現在對帳」後即時顯示進度和已經找到的電腦，不用等全部掃完</li></ul></div>
+<div class="clog"><div class="v"><b>v3.6.1　DNS 對帳：找出網芳連錯台的原因</b><span class="tag">2026-11-08</span><span class="tag">netmap.exe 1.14.0</span></div><ul><li>可以一鍵產生 PowerShell 修正腳本：刪除舊記錄、補上正確的正向與反查記錄；預設只預覽，加 -Apply 才修改，修改前自動備份</li><li>新增「檔案 ▸ DNS 對帳」：用 NetBIOS 問出每個 IP 上實際是哪台電腦，和 AD 的 DNS 記錄比對</li><li>抓得出 DNS 指到舊 IP、同一個名稱有多筆記錄、IP 被舊名稱占用、沒開機的電腦還占著別人的 IP、DNS 沒有記錄、名稱重複、反查不符</li><li>監控服務每 6 小時自動對帳，發現新問題會記成事件並發告警（跟「圖面比對」同一個開關）</li><li>不需要帳密；DNS 伺服器與網域預設用這台電腦的設定，也可以自己填 AD 的 IP</li></ul></div>
 <div class="clog"><div class="v"><b>v3.5.7　不回 Ping 的在線設備，心跳紀錄不再顯示 100% 遺失</b><span class="tag">2026-11-08</span><span class="tag">netmap.exe 1.13.3</span></div><ul><li>擋 Ping 但確認在線的時間，在心跳曲線上用綠色標出，不再算成遺失或畫成紅色</li><li>「遺失」改成只算真的離線的時間</li></ul></div>
 <div class="clog"><div class="v"><b>v3.5.6　自動修正網段探索給的暫時名稱與類型</b><span class="tag">2026-11-08</span><span class="tag">netmap.exe 1.13.2</span></div><ul><li>網段探索給的暫時名稱（IP 或「廠商 IP」）會自動換成路由器記錄的主機名稱；類型是「其他」的設備也會依主機名稱改成手機、筆電、平板等</li><li>用網卡廠商命名的（例如 CLOUD NETWORK 192.168.50.165）會改回只顯示 IP；你自己取的名稱不會被改</li></ul></div>
 <div class="clog"><div class="v"><b>v3.5.5　擋 Ping 的電腦也能判斷在線、網段探索不再弄亂圖</b><span class="tag">2026-11-08</span><span class="tag">netmap.exe 1.13.2</span></div><ul><li>Ping 不通時再用 ARP 確認（同網段的電腦就算防火牆擋了 Ping 也一定會回 ARP），筆電開機後很快就會顯示在線</li><li>路由器用戶端清單支援 ASUS 等 Broadcom 路由器的 Wi-Fi 關聯表（wl assoclist），能分出 2.4G／5G／6G</li><li>網段探索：網卡廠商（例如 Cloud Network Technology、AzureWave）不再被當成設備品牌拿來命名；隨機 MAC 或 Wi-Fi 網卡的設備先畫成無線</li><li>網段探索結果可以「保留目前的圖，加入新設備」：保留你取的名稱、位置、接線與無線設定，只加入新設備、更新改變的 IP</li></ul></div>
@@ -856,7 +857,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 <div class="clog"><div class="v"><b>v1.0　第一版</b><span class="tag">2026-11-06</span></div><ul><li>防火牆、Switch、配線架、資訊座埠對埠接線，點埠追蹤整條路徑</li><li>產業範例與自動排版</li></ul></div>
 </section>
 
-<p class="foot">RackTrace · 網頁 v3.6.1 · netmap.exe v1.14.0 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">RackTrace · 網頁 v3.6.2 · netmap.exe v1.14.1 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>

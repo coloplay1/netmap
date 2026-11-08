@@ -32,7 +32,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.14.0"
+VERSION = "1.14.1"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -703,7 +703,7 @@ class Poller:
         s.probe_force = False; s.probe_last = {"ts": 0, "tried": 0, "found": []}
         s.audit_t = time.time() - 3600 * 6 + 180   # 啟動 3 分鐘後先比對一次
         s.audit_force = False; s.audit_busy = False
-        s.dns_t = time.time() - 3600 * 6 + 240; s.dns_force = False; s.dns_busy = False   # 啟動 4 分鐘後先對帳一次
+        s.dns_t = time.time() - 3600 * 6 + 240; s.dns_force = False; s.dns_busy = False; s.dns_prog = {}   # 啟動 4 分鐘後先對帳一次
         try: s.dns_last = json.load(open(os.path.join(s.store.dir, "dnscheck.json"), encoding="utf-8"))
         except Exception: s.dns_last = {}
         s.status = {"ts": 0, "devices": {}, "ports": {}}
@@ -1002,7 +1002,11 @@ class Poller:
                     if c.get("online") is not False and priv(c.get("ip")): ips.append(c["ip"])
                     if c.get("name") and ndc.HOST_RE.match(c["name"]): names.append(c["name"])
             ips = [ip for ip in dict.fromkeys(ips) if ip not in self_ips()][:1024] + [ip for ip in self_ips() if priv(ip)][:1]
-            r = ndc.check(ips, server, domain, names, log=s.log)
+            s.dns_prog = {"done": 0, "total": len(ips), "rows": [], "started": int(time.time())}
+            def prog(k, n, row):
+                s.dns_prog["done"] = k
+                if row: s.dns_prog["rows"].append(row)
+            r = ndc.check(ips, server, domain, names, log=s.log, progress=prog)
             r.update(ts=int(time.time()), server=server, domain=domain, checked=len(ips))
             old = {(x["status"], x["name"], x["ip"]) for x in (s.dns_last.get("rows") or []) if x.get("level") == "bad"}
             s.dns_last = r
@@ -1241,7 +1245,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                                  "ev": last_ev[0]["id"] if last_ev else 0, "audit_open": st.audit_open()})
         if u.path == "/api/dnscheck":
             server, domain, servers, dom = po.dns_target()
-            o = dict(po.dns_last or {}); o.update(busy=po.dns_busy, hours=st.settings.get("dns_hours", 6), cfg_server=st.settings.get("dns_server", ""),
+            o = dict(po.dns_last or {}); o.update(busy=po.dns_busy or po.dns_force, prog=po.dns_prog if (po.dns_busy or po.dns_force) else None, hours=st.settings.get("dns_hours", 6), cfg_server=st.settings.get("dns_server", ""),
                                                  cfg_domain=st.settings.get("dns_domain", ""), auto_servers=servers, auto_domain=dom, use_server=server, use_domain=domain)
             return s._send(200, o)
         if u.path == "/api/pinghist":

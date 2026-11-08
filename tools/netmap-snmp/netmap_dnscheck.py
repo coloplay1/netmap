@@ -169,31 +169,44 @@ def local_dns():
 HOST_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9\-]{0,14}$")
 
 
-def check(ips, server, domain="", extra_names=(), workers=48, log=lambda *a: None, port=53):
+def check(ips, server, domain="", extra_names=(), workers=48, log=lambda *a: None, port=53, progress=None):
     """ips：要問的 IP；extra_names：圖上或路由器知道、但現在可能沒開機的電腦名稱（用來抓舊記錄）。
     回傳 {"rows": [...], "summary": {...}}。每列：{ip, name, group, mac, dns:[...], ptr, status, level, text}"""
     ips = [ip for ip in dict.fromkeys(ips) if re.match(r"^\d+\.\d+\.\d+\.\d+$", ip or "")]
-    with ThreadPoolExecutor(max_workers=max(1, min(workers, len(ips) or 1))) as ex:
-        nb = dict(zip(ips, ex.map(nbstat, ips)))
-    at = {ip: r for ip, r in nb.items() if r}                    # IP → NetBIOS 回應
-    by_name = {}
-    for ip, r in at.items(): by_name.setdefault(r["name"], []).append(ip)
-    names = set(by_name) | {n.upper() for n in extra_names if n and HOST_RE.match(n)}
-    log(f"DNS 對帳：{len(ips)} 個 IP，{len(at)} 台回應 NetBIOS，查 {len(names)} 個名稱")
+    import threading
+    lock = threading.Lock(); A, P, nb = {}, {}, {}; done = [0]
 
     def lookup(n):
+        with lock:
+            if n in A: return A[n]
         fq = f"{n}.{domain}" if domain and "." not in n else n
         st, v = dns_query(fq, server, port=port)
         if st == "nx" and fq != n:
             st2, v2 = dns_query(n, server, port=port)
             if st2 == "ok": st, v = st2, v2
-        return n, st, v
-    def rev(ip):
-        st, v = dns_query(ptr_name(ip), server, 12, port=port)
-        return ip, (v[0].split(".")[0].upper() if v else ""), st
+        with lock: A[n] = (st, v)
+        return st, v
+
+    def job(ip):
+        """一個 IP 一條龍：NetBIOS 問名稱 → 查這個名稱在 DNS 的 IP → 反查；做完馬上回報給畫面。"""
+        r = nbstat(ip)
+        st, v = lookup(r["name"]) if r else ("", [])
+        pst, pv = dns_query(ptr_name(ip), server, 12, port=port)
+        with lock:
+            nb[ip] = r; P[ip] = ((pv[0].split(".")[0].upper() if pv else ""), pst); done[0] += 1; k = done[0]
+        if progress:
+            try: progress(k, len(ips), {"ip": ip, "name": r["name"] if r else "", "dns": v, "dnsst": st,
+                                       "ok": bool(r) and st == "ok" and v == [ip]} if r else None)
+            except Exception: pass
+    with ThreadPoolExecutor(max_workers=max(1, min(workers, len(ips) or 1))) as ex:
+        list(ex.map(job, ips))
+    at = {ip: r for ip, r in nb.items() if r}                    # IP → NetBIOS 回應
+    by_name = {}
+    for ip, r in at.items(): by_name.setdefault(r["name"], []).append(ip)
+    names = set(by_name) | {n.upper() for n in extra_names if n and HOST_RE.match(n)}
     with ThreadPoolExecutor(max_workers=24) as ex:
-        A = {n: (st, v) for n, st, v in ex.map(lookup, sorted(names))}
-        P = {ip: (p, st) for ip, p, st in ex.map(rev, ips)}
+        list(ex.map(lookup, sorted(names - set(A))))
+    log(f"DNS 對帳：{len(ips)} 個 IP，{len(at)} 台回應 NetBIOS，查 {len(names)} 個名稱")
     if A and all(st == "fail" for st, _ in A.values()):
         return {"error": f"DNS 伺服器 {server} 沒有回應，請確認 IP 是 AD 的 DNS 伺服器", "rows": [], "summary": {}}
 
