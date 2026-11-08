@@ -775,7 +775,17 @@ VENDOR_BRANDS = [("asustek", "ASUS"), ("asus", "ASUS"), ("tp-link", "TP-Link"), 
                  ("fuji", "FUJIFILM"), ("hewlett packard enterprise", "HPE"), ("hp inc", "HP"), ("hewlett", "HP"), ("dell", "Dell"), ("lenovo", "Lenovo"),
                  ("intel", "Intel"), ("realtek", "Realtek"), ("microsoft", "Microsoft"), ("raspberry", "Raspberry Pi"), ("yealink", "Yealink"),
                  ("grandstream", "Grandstream"), ("aruba", "Aruba (HPE)"), ("ruckus", "Ruckus"), ("espressif", "Espressif"), ("nintendo", "Nintendo")]
+# 這些廠商做的是「網路卡／Wi-Fi 模組」，裝在別家的筆電、電腦、家電裡，不能拿來當設備品牌
+NIC_MAKERS = ("cloud network technology", "azurewave", "hon hai", "foxconn", "liteon", "lite-on", "universal global scientific", "murata",
+              "wistron neweb", "gemtek", "askey", "sercomm", "chicony", "rivet networks", "qualcomm", "atheros", "mediatek", "broadcom",
+              "intel corporate", "realtek", "ralink", "espressif", "quectel", "fn-link", "shenzhen bilian", "tenda")
+WIFI_MODULE_MAKERS = ("cloud network technology", "azurewave", "universal global scientific", "murata", "espressif", "fn-link", "shenzhen bilian", "rivet networks")
+def nic_maker(v):
+    t = (v or "").lower()
+    return any(k in t for k in NIC_MAKERS)
+
 def brand_from_vendor(v):
+    if nic_maker(v): return ""
     t = (v or "").lower()
     for k, b in VENDOR_BRANDS:
         if k in t: return b
@@ -862,6 +872,7 @@ def discover(targets, log=print, progress=None, stop=lambda: False, link_gateway
         ports, name = infos.get(ip, ([], ""))
         mac = arp.get(ip, "")
         vendor = oui_vendor(mac); brand = brand_from_vendor(vendor) if vendor != "隨機 MAC" else ""
+        wifi_guess = vendor == "隨機 MAC" or any(k in vendor.lower() for k in WIFI_MODULE_MAKERS)
         typ, kind = guess_kind(ports, brand, vendor, ip == gw, name)
         svc = {80: "網頁", 443: "HTTPS", 22: "SSH", 23: "Telnet", 445: "檔案分享", 3389: "遠端桌面", 9100: "列印", 631: "列印", 554: "影像串流",
                5060: "SIP", 5000: "NAS", 5001: "NAS", 8009: "投放", 62078: "iOS", 548: "AFP", 8080: "網頁", 8443: "HTTPS"}
@@ -870,10 +881,11 @@ def discover(targets, log=print, progress=None, stop=lambda: False, link_gateway
              "Ubiquiti", "Cisco", "Fortinet", "Zyxel", "D-Link", "Netgear", "MikroTik", "DrayTek", "Huawei", "Brother", "Epson", "Canon", "Ricoh", "Kyocera",
              "FUJIFILM", "HP", "Dell", "Lenovo", "Samsung", "Yealink", "Grandstream", "Aruba (HPE)", "Ruckus") else "", "model": "",
              "ip": ip, "mac": mac, "gw": gw if ip != gw else "", "loc": "",
-             "note": " · ".join(x for x in [("MAC 廠商：" + vendor) if vendor else "", "開放：" + "、".join(dict.fromkeys(svc[p] for p in ports if p in svc)) if ports else "",
+             "note": " · ".join(x for x in [(("網卡廠商：" + vendor + "（做網路卡的廠商，不是設備品牌）") if nic_maker(vendor) else ("MAC 廠商：" + vendor)) if vendor and vendor != "隨機 MAC" else ("隨機 MAC（手機、筆電用 Wi-Fi 時常見）" if vendor else ""), "開放：" + "、".join(dict.fromkeys(svc[p] for p in ports if p in svc)) if ports else "",
                                             "這台電腦" if ip == me and name else "", "由網段探索建立，接法請自行確認"] if x),
              "rack": "", "u": "", "uh": "", "x": 0, "y": 0, "ports": []}
         d["monitor"] = False   # 網段探索找到的設備多半沒有 SNMP，預設不讓監控服務去輪詢
+        if wifi_guess and ip != gw: d["_wifi"] = True
         if typ == "router":
             d["ports"] = [{"id": nid("p"), "label": "WAN", "kind": "rj45", "poe": False, "mode": "access", "vlan": "", "tagged": "", "lag": "", "note": ""}]
             gwdev = d
@@ -883,15 +895,21 @@ def discover(targets, log=print, progress=None, stop=lambda: False, link_gateway
             d["kind"] = kind or "其他"
             d["ports"] = [{"id": nid("p"), "label": "LAN", "kind": "rj45", "poe": False, "mode": "access", "vlan": "", "tagged": "", "lag": "", "note": ""}]
         D.append(d)
+    nwifi = 0
+    if gwdev:
+        for d in D:
+            if d.pop("_wifi", False) and d is not gwdev:
+                d["wifi"] = {"ap": gwdev["id"], "band": "", "guess": True}; nwifi += 1
     if link_gateway and gwdev:
-        others = [d for d in D if d is not gwdev]
+        others = [d for d in D if d is not gwdev and not d.get("wifi")]
         for i, d in enumerate(others):
             p = {"id": nid("p"), "label": f"LAN{i + 1}", "kind": "rj45", "poe": False, "mode": "access", "vlan": "", "tagged": "", "lag": "", "note": ""}
             gwdev["ports"].append(p)
             project["cables"].append({"id": nid("c"), "a": p["id"], "b": d["ports"][0]["id"], "label": f"N-{i + 1:03d}", "type": "Cat6", "speed": "",
                                       "color": "#7D8794", "len": "", "dir": "none", "wps": []})
     if progress: progress(1, 1, "done")
-    log(f"完成：{len(D)} 台設備" + ("，已先接到路由器（實際是有線還是 Wi‑Fi、接在哪個埠請自行調整）" if link_gateway and gwdev else ""))
+    for d in D: d.pop("_wifi", None)
+    log(f"完成：{len(D)} 台設備" + (f"，{nwifi} 台看起來是 Wi‑Fi（隨機 MAC 或 Wi‑Fi 網卡）" if nwifi else "") + ("，其他先接到路由器（實際接法請確認；有路由器 SSH 時會自動修正）" if link_gateway and gwdev else ""))
     return project
 
 DEFAULTS = dict(community="public", version="2c", user=None, auth_proto="SHA", auth_key=None, priv_proto="AES", priv_key=None, context="",

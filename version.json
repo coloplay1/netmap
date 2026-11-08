@@ -1,8 +1,8 @@
 {
- "web": "3.5.1",
- "exe": "1.13.1",
+ "web": "3.5.5",
+ "exe": "1.13.2",
  "date": "2026-11-08",
- "title": "修正關機設備顯示在線",
+ "title": "擋 Ping 的電腦也能判斷在線",
  "download": "https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe",
  "notes": "https://coloplay1.github.io/netmap/manual.html#changelog"
 }

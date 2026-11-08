@@ -174,7 +174,9 @@ CLIENTS_CMD = ("cat /proc/net/arp; echo '@@C1@@'; (bridge fdb show 2>/dev/null);
                "for b in /sys/class/net/*/brif; do [ -d \"$b\" ] || continue; br=${b%/brif}; br=${br##*/}; brctl showmacs $br 2>/dev/null | sed \"s/^/$br /\"; done; echo '@@C4@@'; "
                "cat /var/lib/misc/dnsmasq.leases /tmp/dnsmasq.leases /tmp/dhcp.leases /var/dhcp.leases 2>/dev/null; echo '@@C5@@'; "
                "(cat /tmp/clientlist.json 2>/dev/null | head -c 300000); echo; echo '@@C6@@'; "
-               "for w in $(iw dev 2>/dev/null | awk '/Interface/{print $2}'); do echo \"== $w\"; iw dev $w station dump 2>/dev/null | grep -E '^Station|signal:'; done")
+               "for w in $(iw dev 2>/dev/null | awk '/Interface/{print $2}'); do echo \"== $w\"; iw dev $w station dump 2>/dev/null | grep -E '^Station|signal:'; done; echo '@@C7@@'; "
+               "command -v wl >/dev/null 2>&1 && for x in 0 1 2 3; do i=$(nvram get wl${x}_ifname 2>/dev/null); [ -n \"$i\" ] || continue; "
+               "echo \"== $i $(nvram get wl${x}_nband 2>/dev/null)\"; wl -i $i assoclist 2>/dev/null; done")
 MAC_RE = re.compile(r"([0-9a-f]{2}(?::[0-9a-f]{2}){5})", re.I)
 WIFI_IF = re.compile(r"^(wl|ra|rai|rax|rae|ath|wlan|phy|wifi|apcli|wds)", re.I)
 
@@ -191,8 +193,8 @@ def _band_key(k):
 def parse_clients(text, ports=None):
     """路由器的用戶端：[{ip, mac, iface, wireless, band, name, rssi}]。ports：[(ifName, label)]，用來認出 WAN 與 Wi-Fi 介面。"""
     parts = re.split(r"@@C\d@@", text)
-    while len(parts) < 7: parts.append("")
-    arp, fdb, brif, showmacs, leases, clj, iw = parts[:7]
+    while len(parts) < 8: parts.append("")
+    arp, fdb, brif, showmacs, leases, clj, iw, wl = parts[:8]
     label = {i: l for i, l in (ports or [])}
     wan = {i for i, l in label.items() if str(l).upper() == "WAN"}
     band_of_if = {i: l for i, l in label.items() if l in ("2.4G", "5G", "5G-2", "6G")}
@@ -251,13 +253,25 @@ def parse_clients(text, ports=None):
         if m and cur: iwsta[cur]["rssi"] = int(m.group(1))
     # 有沒有「現在在線」的資料：Wi-Fi 關聯表、ASUS clientlist、bridge 學到的 MAC（約 5 分鐘會老化）。
     # ARP 表會留著已經關機的設備，所以有這些資料時，只回傳真的在線的；完全沒有時才退回 ARP（online=None）。
+    # Broadcom（ASUS 等）的 wl assoclist：nband 2＝2.4G、1＝5G、4＝6G
+    cur_if = None; cur_band = None
+    for line in wl.splitlines():
+        if line.startswith("== "):
+            f = line[3:].split(); cur_if = f[0] if f else None
+            cur_band = {"2": "2.4G", "1": "5G", "4": "6G"}.get(f[1] if len(f) > 1 else "", None); continue
+        m = MAC_RE.search(line)
+        if m and cur_if:
+            mac = m.group(1).lower()
+            iwsta.setdefault(mac, {"iface": cur_if, "rssi": None})
+            if cur_band: band_of_if.setdefault(cur_if, cur_band)
     presence = bool(iwsta or asus or mac_if)
     lan_ifs = {i for i, l in label.items() if re.match(r"^(LAN|PORT|ETH|GE|P)\s*\d", str(l), re.I)}
     out = []; seen = set()
     for ip, mac, arpif in ipmac:
         if mac in seen or arpif in wan: continue
         seen.add(mac)
-        online = (mac in iwsta or mac in asus or mac in mac_if) if presence else None
+        # 有線在線要靠 bridge 學到的 MAC 或 ASUS 清單判斷；只有 Wi-Fi 關聯表時，不在表上的只能算「不確定」，不能當成離線
+        online = True if (mac in iwsta or mac in asus or mac in mac_if) else (False if (mac_if or asus) else None)
         if online is False: continue
         ifn = (iwsta.get(mac) or {}).get("iface") or mac_if.get(mac) or ""
         a = asus.get(mac) or {}

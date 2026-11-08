@@ -130,6 +130,25 @@ def ping(ip, timeout=1.0):
     return None
 
 
+def _mac_of(ip):
+    """同網段：送 ARP 問這個 IP（Windows SendARP；其他系統讀 Ping 之後的 ARP 表）。有回應回傳 MAC，否則 None。
+    很多電腦用防火牆擋了 Ping，但一定會回 ARP，所以這是判斷「同網段設備在不在」最可靠的方法。"""
+    try:
+        if os.name == "nt":
+            import ctypes
+            dst = ctypes.c_ulong(struct.unpack("<L", socket.inet_aton(ip))[0])
+            buf = (ctypes.c_ubyte * 8)(); ln = ctypes.c_ulong(6)
+            if ctypes.windll.iphlpapi.SendARP(dst, 0, ctypes.byref(buf), ctypes.byref(ln)) != 0 or ln.value < 6: return None
+            mac = ":".join(f"{b:02x}" for b in list(buf)[:6])
+        else:
+            mac = None
+            for line in open("/proc/net/arp").read().splitlines()[1:]:
+                f = line.split()
+                if len(f) >= 4 and f[0] == ip and f[2] == "0x2": mac = f[3].lower(); break
+        return None if not mac or mac in ("00:00:00:00:00:00", "ff:ff:ff:ff:ff:ff") else mac
+    except Exception:
+        return None
+
 def ping_method():
     return {"win": "ICMP（Windows）", "sock": "ICMP", "cmd": "ping 指令", "tcp": "TCP 連線探測"}.get(_method[0], "尚未執行")
 
@@ -144,6 +163,13 @@ class Pinger:
         s.alive = alive   # alive(d, ip) -> 說明字串或 None：Ping 不通時，用其他證據（這台電腦自己、路由器用戶端清單、埠上的流量）判斷還在線
         s.state = {}; s.lock = threading.Lock()
         s.thread = None; s.stop_ev = threading.Event(); s.wake = threading.Event(); s.last = 0
+
+    def _probe(s, d, ip, tmo):
+        """在工作執行緒裡：先 Ping，不通再找其他在線證據（不佔用鎖）。回傳 (rtt, how)。"""
+        r = ping(ip, tmo)
+        if r is not None or not s.alive: return r, None
+        try: return None, s.alive(d, ip)
+        except Exception: return None, None
 
     def targets(s):
         out = []
@@ -160,18 +186,15 @@ class Pinger:
         res = {}
         if tg:
             with ThreadPoolExecutor(max_workers=min(48, len(tg))) as ex:
-                for (d, ip), r in zip(tg, ex.map(lambda x: ping(x[1], tmo), tg)): res[d["id"]] = (d, ip, r)
+                for (d, ip), r in zip(tg, ex.map(lambda x: s._probe(x[0], x[1], tmo), tg)): res[d["id"]] = (d, ip) + r
         now = int(time.time()); events = []
         with s.lock:
             alive = set()
-            for did, (d, ip, rtt) in res.items():
+            for did, (d, ip, rtt, how) in res.items():
                 alive.add(did)
                 st = s.state.get(did) or {"st": "wait", "rtt": None, "since": now, "fails": 0, "hist": deque(maxlen=240), "ip": ip}
                 st["ip"] = ip; st["last"] = now; st["hist"].append((now, None if rtt is None else round(rtt, 1)))
-                prev = st["st"]; st["how"] = None
-                if rtt is None and s.alive:
-                    try: st["how"] = s.alive(d, ip)
-                    except Exception: st["how"] = None
+                prev = st["st"]; st["how"] = how
                 if rtt is None and st["how"]:
                     st["fails"] = 0; st["rtt"] = None
                     new = prev if prev in ("up", "slow") else "up"

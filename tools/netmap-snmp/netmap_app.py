@@ -336,8 +336,13 @@ class App:
                 json.dump(s.store.project, open(os.path.join(bk, f"before-scan-{time.strftime('%Y%m%d-%H%M%S')}.json"), "w", encoding="utf-8"), ensure_ascii=False)
             s.store.set_project(project); msg = f"已帶入網頁：{len(project['devices'])} 台設備、{len(project['cables'])} 條線"
         else:
-            proj = json.loads(json.dumps(s.store.project)); nd, npt = srv.merge_snmp(proj, project)
-            s.store.set_project(proj); msg = f"已更新目前的圖：對到 {nd} 台設備、{npt} 個埠"
+            proj = json.loads(json.dumps(s.store.project))
+            if str(project.get("source", "")).startswith("netmap-discover"):
+                hit, new, moved = srv.merge_discover(proj, project)
+                s.store.set_project(proj); msg = f"已更新目前的圖：對到 {hit} 台、新增 {new} 台" + (f"、{len(moved)} 台 IP 改變（{'；'.join(moved[:3])}）" if moved else "")
+            else:
+                nd, npt = srv.merge_snmp(proj, project)
+                s.store.set_project(proj); msg = f"已更新目前的圖：對到 {nd} 台設備、{npt} 個埠"
         s.service.poller.poke()
         if not s.service.running: s.start_service()
         s.refresh_service()
@@ -348,8 +353,10 @@ class App:
         if not s.last_project: return
         if s.store.project.get("devices"):
             n = len(s.store.project["devices"])
-            i = s.choose("在網頁開啟結果", f"網頁上已經有一張圖（{n} 台設備）。這次的結果要怎麼處理？\n\n‧ 取代：換成這次的結果（舊的圖會自動備份）\n‧ 保留：保留你手動畫的配線架、備註，只把 SNMP 對應套上去，讓監控對到設備",
-                         ["取代成這次的結果", "保留目前的圖，只更新對應", "先不要"])
+            disc = str(s.last_project.get("source", "")).startswith("netmap-discover")
+            i = s.choose("在網頁開啟結果", f"網頁上已經有一張圖（{n} 台設備）。這次的結果要怎麼處理？\n\n‧ 取代：換成這次的結果（舊的圖會自動備份）\n‧ 保留："
+                         + ("保留你取的名稱、位置、接線與無線設定，只加入新找到的設備、更新改變的 IP" if disc else "保留你手動畫的配線架、備註，只把 SNMP 對應套上去，讓監控對到設備"),
+                         ["取代成這次的結果", "保留目前的圖，加入新設備" if disc else "保留目前的圖，只更新對應", "先不要"], default=1 if disc else 0)
             if i is None or i == 2:
                 if not auto: return
                 s.v_scanstat.set("掃描完成，按「在網頁開啟結果」可帶入網頁"); return

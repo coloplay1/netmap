@@ -31,7 +31,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.13.1"
+VERSION = "1.13.2"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -113,6 +113,28 @@ def self_ips():
         _self_cache[0], _self_cache[1] = time.time(), {ip for ip in ips if not ip.startswith("127.") and ip != "::1"}
     return _self_cache[1]
 
+
+_lan_cache = [0.0, []]
+def same_lan(ip):
+    """這個 IPv4 是否和這台電腦的某張網卡在同一個網段（才能用 ARP 確認）。"""
+    import ipaddress
+    if time.time() - _lan_cache[0] > 60:
+        nets = []
+        try:
+            import psutil
+            for n, al in psutil.net_if_addrs().items():
+                for a in al:
+                    if a.family == socket.AF_INET and a.netmask and not a.address.startswith("127."):
+                        try: nets.append(ipaddress.ip_network(f"{a.address}/{a.netmask}", strict=False))
+                        except ValueError: pass
+        except ImportError:
+            nets = [ipaddress.ip_network(f"{i}/24", strict=False) for i in self_ips() if "." in i and not i.startswith("127.")]
+        _lan_cache[0], _lan_cache[1] = time.time(), [n for n in nets if n.prefixlen >= 16]
+    try:
+        a = ipaddress.ip_address(ip)
+        return any(a in n for n in _lan_cache[1])
+    except ValueError:
+        return False
 
 _wifi_cache = [0.0, {}]
 def _band_of(ch, band_txt=""):
@@ -1296,6 +1318,9 @@ class Service:
             for c in dv["clients"]:
                 if c.get("online") and ((mac and c.get("mac") == mac) or (c.get("ip") == ip and not mac)):
                     return "路由器回報它目前在線"
+        if same_lan(ip):
+            m = na._mac_of(ip)
+            if m and (not mac or m == mac): return "ARP 有回應（它擋了 Ping）"
         pids = {p["id"] for p in d.get("ports", [])}
         for pid in pids:
             p = (st.get("ports") or {}).get(pid)
@@ -1445,6 +1470,34 @@ def merge_snmp(project, scanned):
             ix = by.get(str(p.get("label", "")).lower())
             if ix is not None and p.get("side") != 1: p["ifIndex"] = ix; npt += 1
     return nd, npt
+
+def merge_discover(project, found):
+    """網段探索結果併進目前的圖：用 MAC（沒有就用 IP）對應，保留原本的名稱、位置、接線與無線設定；
+    只更新 IP／MAC，並加入新找到的設備。回傳 (對到, 新增, 更新 IP 的設備名稱清單)。"""
+    norm = lambda m: str(m or "").lower().replace("-", ":")
+    cur = project.setdefault("devices", []); hit = new = 0; moved = []
+    bymac = {norm(d.get("mac")): d for d in cur if d.get("mac")}
+    byip = {str(d.get("ip") or "").split("/")[0]: d for d in cur if d.get("ip")}
+    idmap = {}
+    xs = [d.get("x", 0) for d in cur] or [0]; ys = [d.get("y", 0) for d in cur] or [0]
+    nx, ny = min(xs), max(ys) + 220
+    gw_new = next((d for d in found.get("devices", []) if d.get("type") == "router"), None)
+    for sd in found.get("devices", []):
+        d = bymac.get(norm(sd.get("mac"))) if sd.get("mac") else None
+        if d is None:
+            c = byip.get(sd.get("ip"))
+            if c is not None and (not c.get("mac") or not sd.get("mac") or norm(c["mac"]) == norm(sd["mac"])): d = c
+        if d is not None:
+            hit += 1; idmap[sd["id"]] = d["id"]
+            if sd.get("ip") and d.get("ip") != sd["ip"]: moved.append(f"{d.get('name')}：{d.get('ip') or '—'} → {sd['ip']}"); d["ip"] = sd["ip"]
+            if sd.get("mac") and not d.get("mac"): d["mac"] = sd["mac"]
+            continue
+        nd = {k: v for k, v in sd.items() if k not in ("wifi",)}
+        nd["x"], nd["y"] = nx, ny; nx += 180
+        if not gw_new or sd is not gw_new: nd["ports"] = sd["ports"][:1] if sd.get("type") != "router" else sd["ports"]
+        idmap[sd["id"]] = nd["id"]; cur.append(nd); new += 1
+        if sd.get("wifi") and idmap.get(sd["wifi"]["ap"]): nd["wifi"] = dict(sd["wifi"], ap=idmap[sd["wifi"]["ap"]])
+    return hit, new, moved
 
 def main():
     import argparse
