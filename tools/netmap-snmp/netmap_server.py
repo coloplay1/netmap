@@ -32,7 +32,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.14.3"
+VERSION = "1.14.4"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -599,6 +599,10 @@ class Store:
             s.db.commit()
         return evs
 
+    def seen_set_name(s, mac, name):
+        with s.lock:
+            s.db.execute("UPDATE seen SET name=? WHERE mac=? AND (name IS NULL OR name='')", (name, mac)); s.db.commit()
+
     def seen_list(s):
         with s.lock:
             rows = s.db.execute("SELECT mac, ip, name, vendor, first, last, src, via, wireless, gone, ips FROM seen ORDER BY last DESC").fetchall()
@@ -759,6 +763,8 @@ class Poller:
         s.emit = emit or (lambda ev: None)
         s.arp = {}           # host → 上次讀 ARP 表的時間
         s.inv_t = 0          # 上次整理「網路上的設備」的時間
+        s.nb_tried = {}      # IP → 上次用 NetBIOS 問名稱的時間
+        s.nb_busy = False
         s.probe_t = time.time() - PROBE_EVERY + 90   # 啟動 1～2 分鐘後先試一次 SNMP
         s.probe_force = False; s.probe_last = {"ts": 0, "tried": 0, "found": []}
         s.audit_t = time.time() - 3600 * 6 + 180   # 啟動 3 分鐘後先比對一次
@@ -1003,8 +1009,45 @@ class Poller:
             except Exception: pass
             known = {norm_mac(d.get("mac")): d.get("name", "") for d in s.store.project.get("devices", []) if norm_mac(d.get("mac"))}
             for ev in s.store.seen_gone(int(st.get("inv_gone_hours") or 24), known): s.emit(ev)
+            fill = True
+        else: fill = False
         for src, items in inv:
             for ev in s.store.seen_update(items, src): s.emit(ev)
+        if fill and not s.nb_busy:
+            s.nb_busy = True
+            threading.Thread(target=s.name_fill, daemon=True, name="nbnames").start()
+
+    def name_fill(s):
+        """「網路上的設備」裡有 IP 沒名稱的，用 NetBIOS 問電腦名稱（每個 IP 6 小時最多問一次）"""
+        try:
+            now = time.time()
+            todo = [it for it in s.store.seen_list() if it["ip"] and not it["name"] and not it["gone"] and now - (it["last"] or 0) < 3600
+                    and now - s.nb_tried.get(it["ip"], 0) > 6 * 3600][:160]
+            for it in todo: s.nb_tried[it["ip"]] = now
+            if not todo: return
+            with ThreadPoolExecutor(24) as ex:
+                res = list(ex.map(lambda it: (it, ndc.nbstat(it["ip"], timeout=1.0, tries=1)), todo))
+            for it, r in res:
+                if r and r.get("name") and (not r.get("mac") or norm_mac(r["mac"]) == it["mac"]):
+                    s.store.seen_set_name(it["mac"], r["name"])
+        except Exception as e:
+            s.log(f"NetBIOS 查名稱失敗：{e}")
+        finally:
+            s.nb_busy = False
+
+    def names_map(s):
+        """MAC → {ip, name, src}：給網頁把只有 MAC／IP 的設備自動換成電腦名稱"""
+        out = {}
+        for it in s.store.seen_list():
+            if it["gone"]: continue
+            out[it["mac"]] = {"ip": it["ip"], "name": it["name"], "src": "seen", "vendor": it["vendor"]}
+        for r in (s.dns_last or {}).get("rows") or []:
+            m = norm_mac(r.get("mac"))
+            if not m or not r.get("name") or r.get("status") in ("ghost", "nonb"): continue
+            o = out.setdefault(m, {"ip": r["ip"], "name": "", "src": "netbios", "vendor": ns.oui_vendor(m.upper())})
+            if not o["name"]: o["name"] = r["name"]; o["src"] = "netbios"
+            if not o["ip"]: o["ip"] = r["ip"]
+        return out
 
     def run_audit(s, opts):
         """圖面比對：讀每台有 SNMP 的網路設備的 LLDP／CDP 與 MAC 表，和圖上的線比對。"""
@@ -1324,6 +1367,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
             return s._send(200, o)
         if u.path == "/api/revs/object":
             return s._send(200, {"items": st.object_history(arg("id"))})
+        if u.path == "/api/names":
+            return s._send(200, {"macs": po.names_map() if po else {}})
         if u.path == "/api/seen":
             return s._send(200, {"items": st.seen_list(), "enabled": bool(st.settings.get("inv_enabled", True)), "gone_hours": st.settings.get("inv_gone_hours", 24)})
         if u.path == "/api/settings":
