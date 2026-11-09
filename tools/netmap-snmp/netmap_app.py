@@ -341,8 +341,8 @@ class App:
                 hit, new, moved = srv.merge_discover(proj, project)
                 s.store.set_project(proj); msg = f"已更新目前的圖：對到 {hit} 台、新增 {new} 台" + (f"、{len(moved)} 台 IP 改變（{'；'.join(moved[:3])}）" if moved else "")
             else:
-                nd, npt = srv.merge_snmp(proj, project)
-                s.store.set_project(proj); msg = f"已更新目前的圖：對到 {nd} 台設備、{npt} 個埠"
+                nd, npt, added = srv.merge_snmp(proj, project, add_new=True)
+                s.store.set_project(proj); msg = f"已更新目前的圖：對到 {nd - added} 台設備、{npt} 個埠" + (f"，新增 {added} 台（放在圖的最下面）" if added else "")
         s.service.poller.poke()
         if not s.service.running: s.start_service()
         s.refresh_service()
@@ -354,13 +354,20 @@ class App:
         if s.store.project.get("devices"):
             n = len(s.store.project["devices"])
             disc = str(s.last_project.get("source", "")).startswith("netmap-discover")
-            i = s.choose("在網頁開啟結果", f"網頁上已經有一張圖（{n} 台設備）。這次的結果要怎麼處理？\n\n‧ 取代：換成這次的結果（舊的圖會自動備份）\n‧ 保留："
-                         + ("保留你取的名稱、位置、接線與無線設定，只加入新找到的設備、更新改變的 IP" if disc else "保留你手動畫的配線架、備註，只把 SNMP 對應套上去，讓監控對到設備"),
-                         ["取代成這次的結果", "保留目前的圖，加入新設備" if disc else "保留目前的圖，只更新對應", "先不要"], default=1 if disc else 0)
+            m = len(s.last_project.get("devices", []))
+            i = s.choose("在網頁開啟結果", f"網頁上已經有一張圖（{n} 台設備），這次掃到 {m} 台。這次的結果要怎麼處理？\n\n‧ 保留（建議）："
+                         + ("保留你取的名稱、位置、接線與無線設定，只加入新找到的設備、更新改變的 IP" if disc else "保留目前的圖，把 SNMP 對應套到圖上已有的設備，圖上還沒有的設備加進來")
+                         + "\n‧ 取代：整張圖換成這次的結果（舊的圖會自動備份，可以從「檔案 ▸ 歷史版本」還原）",
+                         ["保留目前的圖，加入新設備", "取代成這次的結果", "先不要"], default=0)
+            if i == 1 and m < n:
+                j = s.choose("確定取代？", f"目前的圖有 {n} 台設備，取代後只剩這次掃到的 {m} 台，你取的名稱、位置、手動畫的線都會不見。\n\n確定要取代嗎？",
+                             ["不要，改成保留並加入", "確定取代", "取消"], default=0)
+                if j is None or j == 2: return
+                i = 0 if j == 0 else 1
             if i is None or i == 2:
                 if not auto: return
                 s.v_scanstat.set("掃描完成，按「在網頁開啟結果」可帶入網頁"); return
-            s.show_in_web(s.last_project, "replace" if i == 0 else "merge")
+            s.show_in_web(s.last_project, "replace" if i == 1 else "merge")
         else:
             s.show_in_web(s.last_project, "replace")
 

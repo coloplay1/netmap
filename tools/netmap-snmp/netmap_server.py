@@ -32,7 +32,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.14.4"
+VERSION = "1.14.5"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -1634,14 +1634,21 @@ class Service:
     def settings_url(s, section="settings"):
         return f"http://127.0.0.1:{int(s.store.settings.get('port', 8080))}/#{section}=1"
 
-def merge_snmp(project, scanned):
-    """把掃描結果的 SNMP 對應（host / ifIndex）套到現有的圖上，不更動版面。回傳 (對到的設備數, 對到的埠數)。"""
-    nd = npt = 0
+def merge_snmp(project, scanned, add_new=False):
+    """把掃描結果的 SNMP 對應（host / ifIndex）套到現有的圖上，不更動版面。
+    add_new：圖上還沒有的掃描設備也加進來。回傳 (對到的設備數, 對到的埠數[, 新增的設備數])。"""
+    nd = npt = added = 0
     for sd in scanned.get("devices", []):
         if not sd.get("snmp"): continue
         host = sd["snmp"]["host"]; hip = host.split(":")[0]
         cand = [d for d in project.get("devices", []) if (d.get("ip") and d["ip"] in (sd.get("ip"), hip)) or (d.get("name", "").lower() == sd.get("name", "").lower())]
-        if not cand: continue
+        if not cand:
+            if add_new:   # 圖上還沒有的網路設備：整台（含埠）加進來，放在最下面
+                cur = project.setdefault("devices", [])
+                ys = [x.get("y", 0) for x in cur] or [0]; xs = [x.get("x", 0) for x in cur] or [0]
+                n = dict(sd); n["x"] = min(xs) + 260 * added; n["y"] = max(ys) + 240
+                cur.append(n); added += 1; nd += 1
+            continue
         d = cand[0]; d["snmp"] = {"host": host}; nd += 1
         by = {}
         for p in sd["ports"]:
@@ -1649,7 +1656,7 @@ def merge_snmp(project, scanned):
         for p in d.get("ports", []):
             ix = by.get(str(p.get("label", "")).lower())
             if ix is not None and p.get("side") != 1: p["ifIndex"] = ix; npt += 1
-    return nd, npt
+    return (nd, npt, added) if add_new else (nd, npt)
 
 def merge_discover(project, found):
     """網段探索結果併進目前的圖：用 MAC（沒有就用 IP）對應，保留原本的名稱、位置、接線與無線設定；
