@@ -100,7 +100,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="0 0 256 256" aria-hidden="true"><rect width="256" height="256" rx="56" fill="#fff"/><rect x="42" y="38" width="86" height="180" rx="4" fill="none" stroke="#111" stroke-width="13"/><path d="M66 82H104M66 116H104M66 150H104M66 184H104" stroke="#111" stroke-width="11" stroke-linecap="round"/><path d="M128 96C168 96 170 70 200 70" fill="none" stroke="#F2C230" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="70" r="13" fill="#F2C230"/><path d="M128 130C168 130 170 150 200 150" fill="none" stroke="#1E9BEA" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="150" r="13" fill="#1E9BEA"/><path d="M128 178C162 178 172 206 196 206" fill="none" stroke="#5B6472" stroke-width="11" stroke-linecap="round" stroke-dasharray="1 18"/><circle cx="210" cy="206" r="11" fill="none" stroke="#5B6472" stroke-width="7"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v3.7.1 · netmap.exe v1.14.1</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v3.7.1 · netmap.exe v1.14.2</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -816,7 +816,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 
 <section id="changelog">
 <h2><span class="n">14</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v3.7.1　DNS 修正腳本加上保險機制</b><span class="tag new">最新 · 2026-11-08</span><span class="tag">netmap.exe 1.14.1</span></div><ul><li>預設只預覽，加 -Apply 才修改，修改前還要輸入 YES</li><li>執行當下用 NetBIOS 重新確認每個 IP 現在是哪台電腦，和掃描時不同就略過</li><li>不碰網域控制站、DNS 伺服器與 AD 服務記錄（@、_ 開頭），也不刪手動建立的固定記錄</li><li>一次最多改 20 筆，超過就停；可用 -Only 只做指定的步驟</li><li>修改前匯出整個區域並存 CSV，自動產生還原腳本；一筆失敗就停，最後重新查詢驗證</li></ul></div>
+<div class="clog"><div class="v"><b>v3.7.1　DNS 修正腳本加上保險機制</b><span class="tag new">最新 · 2026-11-09</span><span class="tag">netmap.exe 1.14.2</span></div><ul><li>netmap.exe：修正上一版打包錯誤造成無法開啟；網頁埠被 Windows 保留（WinError 10013）時說明原因並建議可用的埠</li><li>預設只預覽，加 -Apply 才修改，修改前還要輸入 YES</li><li>執行當下用 NetBIOS 重新確認每個 IP 現在是哪台電腦，和掃描時不同就略過</li><li>不碰網域控制站、DNS 伺服器與 AD 服務記錄（@、_ 開頭），也不刪手動建立的固定記錄</li><li>一次最多改 20 筆，超過就停；可用 -Only 只做指定的步驟</li><li>修改前匯出整個區域並存 CSV，自動產生還原腳本；一筆失敗就停，最後重新查詢驗證</li></ul></div>
 <div class="clog"><div class="v"><b>v3.7.0　工具列重新整理：檢查、通知、設定獨立出來</b><span class="tag">2026-11-08</span><span class="tag">netmap.exe 1.14.1</span></div><ul><li>新增「檢查」按鈕：資料檢查、圖面比對、DNS 對帳集中在一起，按鈕上直接顯示待處理的總數，每項也顯示自己的狀態和上次檢查時間</li><li>鈴鐺裡可以切換「事件紀錄」和「網路上的設備」</li><li>右上角齒輪＝告警、心跳與權限設定</li><li>「檔案」選單只留跟這份圖有關的操作（下載、匯出、匯入、分享、歷史版本、線標列印、新增頁面）</li></ul></div>
 <div class="clog"><div class="v"><b>v3.6.2　DNS 對帳改成表格，掃描時即時顯示</b><span class="tag">2026-11-08</span><span class="tag">netmap.exe 1.14.1</span></div><ul><li>結果改成表格：電腦名稱、目前 IP、DNS 登記的 IP，對得上打 ✓、對不上打 ✕；DNS 裡錯的 IP 用紅色刪除線標出</li><li>按「現在對帳」後即時顯示進度和已經找到的電腦，不用等全部掃完</li></ul></div>
 <div class="clog"><div class="v"><b>v3.6.1　DNS 對帳：找出網芳連錯台的原因</b><span class="tag">2026-11-08</span><span class="tag">netmap.exe 1.14.0</span></div><ul><li>可以一鍵產生 PowerShell 修正腳本：刪除舊記錄、補上正確的正向與反查記錄；預設只預覽，加 -Apply 才修改，修改前自動備份</li><li>新增「檔案 ▸ DNS 對帳」：用 NetBIOS 問出每個 IP 上實際是哪台電腦，和 AD 的 DNS 記錄比對</li><li>抓得出 DNS 指到舊 IP、同一個名稱有多筆記錄、IP 被舊名稱占用、沒開機的電腦還占著別人的 IP、DNS 沒有記錄、名稱重複、反查不符</li><li>監控服務每 6 小時自動對帳，發現新問題會記成事件並發告警（跟「圖面比對」同一個開關）</li><li>不需要帳密；DNS 伺服器與網域預設用這台電腦的設定，也可以自己填 AD 的 IP</li></ul></div>
@@ -859,7 +859,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 <div class="clog"><div class="v"><b>v1.0　第一版</b><span class="tag">2026-11-06</span></div><ul><li>防火牆、Switch、配線架、資訊座埠對埠接線，點埠追蹤整條路徑</li><li>產業範例與自動排版</li></ul></div>
 </section>
 
-<p class="foot">RackTrace · 網頁 v3.7.1 · netmap.exe v1.14.1 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">RackTrace · 網頁 v3.7.1 · netmap.exe v1.14.2 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>

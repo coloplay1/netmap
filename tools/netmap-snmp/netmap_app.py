@@ -464,7 +464,10 @@ class App:
         try:
             s.service.start()
         except OSError as e:
-            messagebox.showerror(TITLE, f"服務無法啟動：網頁埠 {s.store.settings.get('port')} 可能已被其他程式使用。\n\n請換一個埠（例如 8081）後按「套用」再啟動。\n\n（{e}）")
+            cur = s.store.settings.get('port'); alt = 18080 if str(cur) != '18080' else 18765
+            why = ("這個埠被 Windows 保留了（Hyper-V、WSL、Docker 常會保留一整段埠），或被防毒／公司政策擋住。" if getattr(e, 'winerror', None) == 10013 or '10013' in str(e)
+                   else "這個埠可能已被其他程式使用。")
+            messagebox.showerror(TITLE, f"服務無法啟動：網頁埠 {cur} 不能用。\n{why}\n\n請換一個埠（例如 {alt}）後按「套用」再啟動。\n查看被保留的範圍：netsh interface ipv4 show excludedportrange protocol=tcp\n\n（{e}）")
         s.refresh_service()
 
     # ───────────── SSH 監控設備 ─────────────
