@@ -557,20 +557,27 @@ def build(devs, extra_lldp=True, fdb=True, max_macs_per_port=4):
             if i and (not lid or lid.lower() in (i["name"].lower(), i["descr"].lower(), short_if(i["name"]).lower()) or lid.isdigit()): return portmap[(dv["host"], lport)]
         return find_port(dv["host"], lid, ldesc) or portmap.get((dv["host"], lport))
     ghosts = {}
-    def ghost(name, desc, caps, mgmt, pname):
-        key = (name or mgmt or desc).lower()
+    def ghost(name, desc, caps, mgmt, pname, chid=""):
+        # LLDP 回報的管理位址是 127.x／0.0.0.0／169.254.x 時沒有意義（多半是 Linux 主機的 lldpd），不要當成 IP
+        if mgmt and re.match(r"^(127\.|0\.0\.0\.0$|169\.254\.)", mgmt): mgmt = ""
+        chmac = chid.upper() if chid and re.fullmatch(r"[0-9A-Fa-f]{2}(:[0-9A-Fa-f]{2}){5}", chid) else ""
+        # 沒名稱、沒描述的鄰居各自獨立（用機箱 MAC 區分），不要全部併成同一台「LLDP 鄰居」
+        key = (name or mgmt or chid or desc or "?").lower()
         if key in ghosts: g = ghosts[key]
         else:
             brand = ""
             for kw, b in DESCR_BRANDS:
                 if kw in (desc or "").lower(): brand = b; break
-            typ, kind = classify(desc or "", brand, caps)
-            g = {"id": nid("d"), "type": typ, "name": (name or mgmt or "LLDP 鄰居")[:40], "brand": brand, "model": "", "ip": mgmt or "", "mac": "", "gw": "",
+            if not name and not desc and not (set(caps) & {"bridge", "router", "wlanAP"}):
+                typ, kind = "end", None      # 只送出機箱 MAC 的鄰居：多半是電腦、IP 電話、伺服器的網卡
+            else:
+                typ, kind = classify(desc or "", brand, caps)
+            g = {"id": nid("d"), "type": typ, "name": (name or mgmt or chmac or "LLDP 鄰居")[:40], "brand": brand, "model": "", "ip": mgmt or "", "mac": chmac, "gw": "",
                  "loc": "", "note": "由 LLDP / CDP 鄰居資訊建立（未直接掃描）", "rack": "", "u": "", "uh": "", "x": 0, "y": 0, "ports": []}
             if typ == "sw": g["variant"] = "l2m"
             if typ == "end": g["kind"] = kind or "其他"
             ghosts[key] = g; D.append(g)
-        lab = short_if(pname or "")[:12] or f"P{len(g['ports']) + 1}"
+        lab = "LAN" if g["type"] == "end" else (short_if(pname or "")[:12] or f"P{len(g['ports']) + 1}")
         p = next((x for x in g["ports"] if x["label"] == lab), None)
         if not p:
             p = {"id": nid("p"), "label": lab, "kind": "rj45", "poe": False, "mode": "access", "vlan": "", "tagged": "", "lag": "", "note": ""}
@@ -587,7 +594,7 @@ def build(devs, extra_lldp=True, fdb=True, max_macs_per_port=4):
             rp = find_port(rh, n["pId"], n["pDesc"]) if rh else None
             if not rp:
                 if not extra_lldp or rh: continue
-                rp = ghost(n["sysName"], n["sysDesc"], caps_set(n["caps"]), n["mgmt"], n["pDesc"] or n["pId"])
+                rp = ghost(n["sysName"], n["sysDesc"], caps_set(n["caps"]), n["mgmt"], n["pDesc"] or n["pId"], n.get("chId") or "")
             ok = add_cable(lp, rp, speed=speed_txt(dv["ifs"].get(n["lport"], {}).get("speed", 0)))
             linked_if.add(lp)
             if not ok: linked_if.add(rp)
