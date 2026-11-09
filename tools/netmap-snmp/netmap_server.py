@@ -32,7 +32,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.14.2"
+VERSION = "1.14.3"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -149,6 +149,66 @@ def _band_of(ch, band_txt=""):
     try: c = int(ch)
     except (TypeError, ValueError): return ""
     return "2.4G" if c <= 14 else "5G" if c <= 177 else ""
+
+def _run_text(cmd, timeout=6):
+    import subprocess
+    raw = subprocess.run(cmd, capture_output=True, timeout=timeout,
+                         creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0)).stdout
+    for enc in ("utf-8", "cp950", "mbcs", "cp936"):
+        try: return raw.decode(enc)
+        except Exception: continue
+    return raw.decode("latin-1")
+
+def parse_excluded(txt):
+    """netsh interface ipv4 show excludedportrange 的輸出 → [(開始, 結束)]"""
+    return [(int(a), int(b)) for a, b in re.findall(r"(?m)^\s*(\d+)\s+(\d+)\b", txt or "")]
+
+def parse_netstat_owner(txt, port):
+    """netstat -ano 的輸出 → 正在聽這個埠的 PID（找不到回 None）"""
+    for ln in (txt or "").splitlines():
+        f = ln.split()
+        if len(f) >= 5 and f[0].upper() == "TCP" and re.search(r"[:\]]" + str(port) + r"$", f[1]) and f[2].endswith(":0") and f[-1].isdigit():
+            return int(f[-1])
+    return None
+
+def port_diag(port):
+    """網頁埠開不起來時找原因：{"excluded": (開始, 結束) 或 None, "pid": PID, "proc": 程式名稱}"""
+    r = {"excluded": None, "pid": None, "proc": ""}
+    if os.name != "nt": return r
+    try:
+        for a, b in parse_excluded(_run_text(["netsh", "interface", "ipv4", "show", "excludedportrange", "protocol=tcp"])):
+            if a <= port <= b: r["excluded"] = (a, b); break
+    except Exception: pass
+    try:
+        pid = parse_netstat_owner(_run_text(["netstat", "-ano", "-p", "tcp"]), port) or parse_netstat_owner(_run_text(["netstat", "-ano", "-p", "tcpv6"]), port)
+        if pid:
+            r["pid"] = pid
+            m = re.match(r'\s*"([^"]+)"', _run_text(["tasklist", "/FI", f"PID eq {pid}", "/FO", "CSV", "/NH"]))
+            if m: r["proc"] = m.group(1)
+    except Exception: pass
+    return r
+
+def port_free(port):
+    """這個埠現在能不能開（用獨佔模式試開一下就關掉）"""
+    so = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        if os.name == "nt" and hasattr(socket, "SO_EXCLUSIVEADDRUSE"): so.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        so.bind(("0.0.0.0", port)); return True
+    except OSError: return False
+    finally: so.close()
+
+def suggest_port(avoid=()):
+    for p in (18080, 18765, 28080, 38080, 48080, 18081, 18888):
+        if p not in avoid and port_free(p): return p
+    return None
+
+class WebServer(http.server.ThreadingHTTPServer):
+    # Windows 上 SO_REUSEADDR 會讓兩個程式搶同一個埠（或靜默失敗），改用獨佔模式：被佔用就明確報錯
+    allow_reuse_address = os.name != "nt"
+    def server_bind(s):
+        if os.name == "nt" and hasattr(socket, "SO_EXCLUSIVEADDRUSE"):
+            s.socket.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        super().server_bind()
 
 def wifi_nics():
     """這台電腦的無線網卡：{網卡名稱: {"band", "ssid", "radio"}}，快取 60 秒。
@@ -1508,7 +1568,7 @@ class Service:
     def start(s):
         if s.httpd: return
         port = int(s.store.settings.get("port", 8080))
-        httpd = http.server.ThreadingHTTPServer(("0.0.0.0", port), Handler)
+        httpd = WebServer(("0.0.0.0", port), Handler)
         httpd.daemon_threads = True; httpd.store = s.store; httpd.poller = s.poller; httpd.auth = s.auth
         httpd.service = s
         s.httpd = httpd; s.thread = threading.Thread(target=httpd.serve_forever, daemon=True, name="http"); s.thread.start()

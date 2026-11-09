@@ -457,18 +457,71 @@ class App:
                 except FileNotFoundError: pass
             winreg.CloseKey(k)
         except Exception as e:
-            messagebox.showwarning(TITLE, f"無法設定開機自動執行：{e}")
+            s.copyable(TITLE, f"無法設定開機自動執行：{e}")
 
     def start_service(s):
         if s.service.running: return
         try:
             s.service.start()
         except OSError as e:
-            cur = s.store.settings.get('port'); alt = 18080 if str(cur) != '18080' else 18765
-            why = ("這個埠被 Windows 保留了（Hyper-V、WSL、Docker 常會保留一整段埠），或被防毒／公司政策擋住。" if getattr(e, 'winerror', None) == 10013 or '10013' in str(e)
-                   else "這個埠可能已被其他程式使用。")
-            messagebox.showerror(TITLE, f"服務無法啟動：網頁埠 {cur} 不能用。\n{why}\n\n請換一個埠（例如 {alt}）後按「套用」再啟動。\n查看被保留的範圍：netsh interface ipv4 show excludedportrange protocol=tcp\n\n（{e}）")
+            s.port_error(e)
         s.refresh_service()
+
+    def port_error(s, e):
+        cur = int(s.store.settings.get("port") or 0)
+        d = srv.port_diag(cur); alt = srv.suggest_port(avoid=(cur,))
+        code = getattr(e, "winerror", None) or getattr(e, "errno", None)
+        if d["excluded"]:
+            why = f"這個埠在 Windows 保留的範圍 {d['excluded'][0]}～{d['excluded'][1]} 裡（Hyper-V、WSL、Docker 等會保留），程式不能使用。"
+        elif d["pid"]:
+            who = f"「{d['proc']}」（PID {d['pid']}）" if d["proc"] else f"PID {d['pid']} 的程式"
+            why = f"這個埠已經被 {who} 使用中。" + ("那是另一個 netmap，可能是舊版還在背景執行：先從右下角圖示結束它，或到工作管理員結束。" if "netmap" in d["proc"].lower() else "")
+        elif code in (10013, 13):
+            why = "Windows 拒絕使用這個埠：可能被其他以系統身分執行的程式獨佔，或被防毒／公司政策擋住。"
+        else:
+            why = "這個埠可能已被其他程式使用。"
+        lines = [f"服務無法啟動：網頁埠 {cur} 不能用。", why, ""]
+        lines.append(f"建議改用 {alt}（已確認這台電腦現在可以用），按下方按鈕直接改用並啟動。" if alt else "請換一個 1024～49151 之間的埠後按「套用」再啟動。")
+        lines += ["", "自己查看：", "  被保留的範圍：netsh interface ipv4 show excludedportrange protocol=tcp",
+                  f"  誰在用這個埠：netstat -ano | findstr :{cur}", "", f"錯誤訊息：{e}"]
+        def use_alt():
+            s.v_port.set(str(alt)); s.store.settings["port"] = alt; s.save_service_cfg()
+            dlg.destroy(); s.start_service()
+        old = getattr(s, "_port_dlg", None)
+        if old is not None and old.winfo_exists(): old.destroy()
+        dlg = s._port_dlg = s.copyable(f"{TITLE}：服務無法啟動", "\n".join(lines),
+                                       [(f"改用 {alt} 並啟動", use_alt)] if alt else [])
+
+    def copyable(s, title, text, actions=()):
+        """可以用滑鼠選取、複製的訊息視窗（一般 messagebox 選不了字）"""
+        dlg = tk.Toplevel(s.root); dlg.title(title); dlg.transient(s.root); dlg.resizable(True, True)
+        fr = ttk.Frame(dlg, padding=14); fr.pack(fill="both", expand=True)
+        rows = min(18, sum(1 + len(l) // 60 for l in text.splitlines()) + 1)
+        box = tk.Text(fr, wrap="word", width=66, height=rows, relief="flat", borderwidth=0, font=ui_font(),
+                      background=ttk.Style().lookup("TFrame", "background") or "white", cursor="xterm")
+        box.insert("1.0", text); box.pack(fill="both", expand=True)
+        box.tag_add("first", "1.0", "1.end"); box.tag_configure("first", foreground="#c0392b")
+        # 唯讀但可以選取：擋掉會修改內容的按鍵，保留選取、複製、全選
+        def ro(ev):
+            if ev.state & 0x4 and ev.keysym.lower() in ("c", "a", "insert"): return
+            if ev.keysym in ("Left", "Right", "Up", "Down", "Home", "End", "Prior", "Next", "Shift_L", "Shift_R", "Control_L", "Control_R"): return
+            return "break"
+        box.bind("<Key>", ro); box.bind("<<Paste>>", lambda e: "break"); box.bind("<<Cut>>", lambda e: "break")
+        box.bind("<Control-a>", lambda e: (box.tag_add("sel", "1.0", "end-1c"), "break")[1])
+        row = ttk.Frame(fr); row.pack(fill="x", pady=(12, 0))
+        v_tip = tk.StringVar(value="可以用滑鼠選取文字複製")
+        ttk.Label(row, textvariable=v_tip, style="Muted.TLabel").pack(side="left")
+        ttk.Button(row, text="關閉", command=dlg.destroy).pack(side="right")
+        def cp():
+            s.root.clipboard_clear(); s.root.clipboard_append(text); v_tip.set("已複製全部內容")
+        ttk.Button(row, text="複製全部", command=cp).pack(side="right", padx=(0, 8))
+        for lab, fn in actions:
+            ttk.Button(row, text=lab, style="Accent.TButton", command=fn).pack(side="right", padx=(0, 8))
+        dlg.bind("<Escape>", lambda e: dlg.destroy())
+        try: dlg.grab_set()
+        except Exception: pass
+        box.focus_set()
+        return dlg
 
     # ───────────── SSH 監控設備 ─────────────
     def add_ssh_dialog(s):
