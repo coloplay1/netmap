@@ -158,25 +158,31 @@ NO_PING_TYPES = {"patch", "seat"}
 
 class Pinger:
     """state[設備id] = {"st": up|slow|down|wait, "rtt", "since", "fails", "last", "hist": [[ts, rtt|None], ...]}"""
-    def __init__(s, get_devices, settings, on_event=None, log=print, alive=None):
+    def __init__(s, get_devices, settings, on_event=None, log=print, alive=None, resolve=None):
         s.get_devices, s.settings, s.on_event, s.log = get_devices, settings, on_event or (lambda ev: None), log
+        s.resolve = resolve   # resolve(d, ip) -> 這次要 Ping 的 IP：DHCP 換了 IP 時跟著 MAC 或電腦名稱（DNS）走
         s.alive = alive   # alive(d, ip) -> 說明字串或 None：Ping 不通時，用其他證據（這台電腦自己、路由器用戶端清單、埠上的流量）判斷還在線
         s.state = {}; s.lock = threading.Lock()
         s.thread = None; s.stop_ev = threading.Event(); s.wake = threading.Event(); s.last = 0
 
     def _probe(s, d, ip, tmo):
-        """在工作執行緒裡：先 Ping，不通再找其他在線證據（不佔用鎖）。回傳 (rtt, how)。"""
+        """在工作執行緒裡：先決定這次的 IP（跟著 MAC／DNS），Ping，不通再找其他在線證據（不佔用鎖）。回傳 (rtt, how, ip)。"""
+        if s.resolve:
+            try: ip = s.resolve(d, ip) or ip
+            except Exception: pass
+        if not ip: return None, None, ip
         r = ping(ip, tmo)
-        if r is not None or not s.alive: return r, None
-        try: return None, s.alive(d, ip)
-        except Exception: return None, None
+        if r is not None or not s.alive: return r, None, ip
+        try: return None, s.alive(d, ip), ip
+        except Exception: return None, None, ip
 
     def targets(s):
         out = []
         for d in s.get_devices():
             ip = str(d.get("ip") or "").strip().split("/")[0]
-            if not ip or d.get("ping") is False or d.get("type") in NO_PING_TYPES: continue
-            if not re.match(r"^[\w.\-]+$", ip): continue
+            if d.get("ping") is False or d.get("type") in NO_PING_TYPES: continue
+            if not ip and not (d.get("track") == "dns" and (d.get("dnsname") or d.get("name"))): continue
+            if ip and not re.match(r"^[\w.\-]+$", ip): continue
             out.append((d, ip))
         return out
 
@@ -186,7 +192,8 @@ class Pinger:
         res = {}
         if tg:
             with ThreadPoolExecutor(max_workers=min(48, len(tg))) as ex:
-                for (d, ip), r in zip(tg, ex.map(lambda x: s._probe(x[0], x[1], tmo), tg)): res[d["id"]] = (d, ip) + r
+                for (d, _ip), (rtt, how, ip) in zip(tg, ex.map(lambda x: s._probe(x[0], x[1], tmo), tg)):
+                    if ip: res[d["id"]] = (d, ip, rtt, how)
         now = int(time.time()); events = []
         with s.lock:
             alive = set()

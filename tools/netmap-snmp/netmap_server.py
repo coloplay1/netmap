@@ -32,7 +32,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.15.0"
+VERSION = "1.15.1"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -1483,9 +1483,42 @@ class Service:
         s.poller = Poller(s.store, log, emit=s.emit); s.httpd = None; s.thread = None; s._flow = None
         s.auth = Auth()
         s.notifier = na.Notifier(lambda: s.store.settings.get("alerts"), s.resolve_channel, log)
-        s.pinger = na.Pinger(lambda: s.store.project.get("devices", []), lambda: s.store.settings, s.emit, log, alive=s.alive_hint)
+        s.pinger = na.Pinger(lambda: s.store.project.get("devices", []), lambda: s.store.settings, s.emit, log, alive=s.alive_hint, resolve=s.resolve_target)
+        s._macip = (0, {}); s._dnsc = {}
 
     # ---------- 事件與告警 ----------
+    def resolve_target(s, d, ip):
+        """這次心跳要 Ping 哪個 IP。
+        track＝ip：固定用圖上的 IP；dns：每 5 分鐘用 DNS 查一次電腦名稱；auto（預設）：有 MAC 就跟著 MAC 走（DHCP 換 IP 也找得到）。"""
+        tr = d.get("track") or "auto"
+        if tr == "ip": return ip
+        now = time.time()
+        if tr == "dns":
+            name = str(d.get("dnsname") or d.get("name") or "").strip()
+            if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9.\-]{0,252}", name): return ip
+            c = s._dnsc.get(name)
+            if c and now - c[1] < 300: return c[0] or ip
+            got = ""
+            try:
+                server, dom = s.poller.dns_target()[:2]
+                fq = name if "." in name or not dom else f"{name}.{dom}"
+                if server:
+                    stt, vals = ndc.dns_query(fq, server, 1, timeout=1.5)
+                    got = vals[0] if stt == "ok" and vals else ""
+                if not got: got = socket.gethostbyname(fq)
+            except Exception: got = ""
+            s._dnsc[name] = (got, now); return got or ip
+        mac = norm_mac(d.get("mac"))
+        if not mac: return ip
+        if now - s._macip[0] > 60:   # 每分鐘從「網路上的設備」重建一次 MAC → 最新 IP
+            m = {}
+            try:
+                for it in s.store.seen_list():
+                    if it["ip"] and not it["gone"] and now - (it["last"] or 0) < 3600: m[it["mac"]] = it["ip"]
+            except Exception: pass
+            s._macip = (now, m)
+        return s._macip[1].get(mac) or ip
+
     def alive_hint(s, d, ip):
         """Ping 不通時的其他在線證據；回傳說明文字，沒有證據回傳 None。"""
         if ip in self_ips():
