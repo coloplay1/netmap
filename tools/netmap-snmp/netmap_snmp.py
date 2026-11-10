@@ -362,13 +362,13 @@ def collect(cli, host, want_fdb=True, log=print):
                 p = k.split(".")
                 if len(p) == 6: rows[":".join(f"{int(x):02X}" for x in p)] = str(v)
         d["fdb"] = rows
-    arp = {}
+    arp = {}; arp_if = {}
     for k, v in W(ARP).items():
         p = k.split(".")
         if len(p) >= 5:
             m = mac_of(v)
-            if m: arp[m] = ".".join(p[-4:])
-    d["arp"] = arp
+            if m: arp[m] = ".".join(p[-4:]); arp_if[m] = p[0]
+    d["arp"] = arp; d["arp_if"] = arp_if
     return d
 
 # ───────────────────────── build netmap project ─────────────────────────
@@ -683,6 +683,41 @@ def build(devs, extra_lldp=True, fdb=True, max_macs_per_port=4):
                     e = {"id": nid("d"), "type": "end", "kind": "其他", "name": ip or mac, "brand": "", "model": "", "ip": ip, "mac": mac, "gw": "", "loc": "",
                          "note": "由 MAC 表推斷", "rack": "", "u": "", "uh": "", "x": 0, "y": 0,
                          "ports": [{"id": nid("p"), "label": "LAN", "kind": "rj45", "poe": False, "mode": "access", "vlan": p["vlan"], "tagged": "", "lag": "", "note": ""}]}
+                    D.append(e); add_cable(hp["id"] if hp else pid, e["ports"][0]["id"])
+    # 3.5) 防火牆／路由器的空埠後面接了無網管交換器（例如 D-Link 直接接防火牆）：
+    #      看它的 ARP 表是從哪個介面學到的，交換器 MAC 表裡都沒出現過的 MAC 就掛在那個埠後面
+    if fdb:
+        seen_fdb = set(known_macs)
+        for dv in devs: seen_fdb |= set(dv.get("fdb", {}))
+        for e in D:
+            if e.get("mac"): seen_fdb.add(e["mac"].upper())
+        for rdv in devs:
+            R = node[rdv["host"]]
+            if R["type"] not in ("fw", "router") or not rdv.get("arp_if"): continue
+            groups = {}
+            for mac, ifi in rdv["arp_if"].items():
+                if mac.upper() in seen_fdb: continue
+                pid = portmap.get((rdv["host"], ifi))
+                if not pid:   # VLAN 子介面（X0:V10、eth1.20）→ 對到實體埠
+                    nm = rdv["ifs"].get(ifi, {}).get("name", "")
+                    base = re.split(r"[:.\s]", nm)[0].lower() if nm else ""
+                    pid = next((portmap[(rdv["host"], k)] for k, i in rdv["ifs"].items() if base and i["name"].lower() == base and (rdv["host"], k) in portmap), None)
+                if pid and pid not in used: groups.setdefault(pid, []).append(mac.upper())
+            for pid, ms in groups.items():
+                p = next(x for x in R["ports"] if x["id"] == pid)
+                ms = sorted(set(ms))[:48]
+                if len(ms) > 1:
+                    hub = {"id": nid("d"), "type": "hub", "name": f"未管理交換器（{R['name']} {p['label']}）", "brand": "", "model": "", "ip": "", "mac": "", "gw": "",
+                           "loc": "", "note": f"{R['name']} 的 {p['label']} 介面 ARP 表有 {len(ms)} 台設備、交換器 MAC 表都沒看到，推測接了一台無網管交換器", "rack": "", "u": "", "uh": "", "x": 0, "y": 0,
+                           "ports": [{"id": nid("p"), "label": str(i + 1), "kind": "rj45", "poe": False, "mode": "access", "vlan": "", "tagged": "", "lag": "", "note": ""} for i in range(len(ms) + 1)]}
+                    D.append(hub); add_cable(pid, hub["ports"][0]["id"]); targets = list(zip(hub["ports"][1:], ms))
+                else:
+                    targets = [(None, ms[0])]
+                for hp, mac in targets:
+                    ip = rdv["arp"].get(mac, "") or rdv["arp"].get(mac.lower(), "")
+                    e = {"id": nid("d"), "type": "end", "kind": "其他", "name": ip or mac, "brand": "", "model": "", "ip": ip, "mac": mac, "gw": "", "loc": "",
+                         "note": f"由 {R['name']} 的 ARP 表推斷", "rack": "", "u": "", "uh": "", "x": 0, "y": 0,
+                         "ports": [{"id": nid("p"), "label": "LAN", "kind": "rj45", "poe": False, "mode": "access", "vlan": "", "tagged": "", "lag": "", "note": ""}]}
                     D.append(e); add_cable(hp["id"] if hp else pid, e["ports"][0]["id"])
     return project
 

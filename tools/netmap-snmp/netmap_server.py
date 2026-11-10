@@ -32,7 +32,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.14.8"
+VERSION = "1.15.0"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -1671,6 +1671,53 @@ def merge_snmp(project, scanned, add_new=False):
             if not a or not b or a == b or a in busy or b in busy: continue
             n = dict(c); n["id"] = "c" + secrets.token_hex(5); n["a"], n["b"] = a, b; n["label"] = f"S-{len(cabs) + 1:03d}"; n["wps"] = []
             cabs.append(n); busy |= {a, b}; ncab += 1
+        # 掃描推斷出來、掛在圖上設備空埠後面的東西（無網管交換器、終端設備）：圖上還沒有的加進來並接好線
+        sdev = {d["id"]: d for d in scanned.get("devices", [])}
+        sowner = {p["id"]: d for d in scanned.get("devices", []) for p in d.get("ports", [])}
+        nm = lambda m: re.sub(r"[^0-9a-f]", "", str(m or "").lower())
+        cur = project.setdefault("devices", [])
+        onmap = {nm(d.get("mac")): d for d in cur if nm(d.get("mac"))}
+        sc = scanned.get("cables", [])
+        def link(pa, pb):
+            nonlocal ncab
+            if pa in busy or pb in busy: return
+            cabs.append({"id": "c" + secrets.token_hex(5), "a": pa, "b": pb, "label": f"S-{len(cabs) + 1:03d}", "type": "Cat6", "speed": "", "color": "#2C6FB7", "len": "", "dir": "none", "wps": []})
+            busy.update((pa, pb)); ncab += 1
+        def place(dv, near, k):
+            dv["x"] = (near.get("x", 0) if near else 0) + 200 * (k % 6); dv["y"] = (near.get("y", 0) if near else 0) + 260 + 150 * (k // 6)
+        def attach(sp_free, x, mport, near):
+            """把掃描結果的設備 x 接到圖上的 mport（x 經由 sp_free 這個埠連過來）"""
+            nonlocal added
+            if x.get("snmp"): return
+            if x["type"] == "end":
+                e = onmap.get(nm(x.get("mac")))
+                if e:   # 圖上已經有這台：有空埠就接過去，不重複新增
+                    fp = next((p for p in e.get("ports", []) if p["id"] not in busy), None)
+                    if fp: link(mport, fp["id"])
+                    return
+                n = json.loads(json.dumps(x)); place(n, near, added); cur.append(n); added += 1; onmap[nm(n.get("mac"))] = n
+                link(mport, n["ports"][0]["id"]); return
+            if x["type"] == "hub":
+                kids = []
+                for c in sc:
+                    for mine, other in ((c["a"], c["b"]), (c["b"], c["a"])):
+                        if sowner.get(mine) is x and mine != sp_free and sowner.get(other) is not None: kids.append((mine, sowner[other], other))
+                if kids and all(onmap.get(nm(k[1].get("mac"))) for k in kids if k[1]["type"] == "end") and all(k[1]["type"] == "end" for k in kids): 
+                    # 底下的設備圖上都有了：只把還沒接線的接到新的 Hub 上
+                    if all(any(p["id"] in busy for p in onmap[nm(k[1].get("mac"))].get("ports", [])) for k in kids): return
+                h = json.loads(json.dumps(x)); place(h, near, added); cur.append(h); added += 1
+                hp = {p["id"]: p["id"] for p in h["ports"]}
+                link(mport, hp[sp_free])
+                for i, (mine, kid, other) in enumerate(kids):
+                    if kid["type"] == "end": attach(other, kid, hp[mine], h)
+        for c in list(sc):
+            for s_end, x_end in ((c["a"], c["b"]), (c["b"], c["a"])):
+                mp = pmap.get(s_end)
+                if not mp or mp in busy or x_end in pmap: continue
+                x = sowner.get(x_end)
+                if x is None or x.get("snmp"): continue
+                near = next((d for d in cur if any(p["id"] == mp for p in d.get("ports", []))), None)
+                attach(x_end, x, mp, near)
     return (nd, npt, added, ncab) if add_new else (nd, npt)
 
 def merge_discover(project, found):
