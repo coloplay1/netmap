@@ -33,7 +33,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.16.0"
+VERSION = "1.16.1"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -859,6 +859,7 @@ class Poller:
         s.arp = {}           # host → 上次讀 ARP 表的時間
         s.inv_t = 0          # 上次整理「網路上的設備」的時間
         s.nb_tried = {}      # IP → 上次用 NetBIOS 問名稱的時間
+        s.ptr_tried = {}     # IP → 上次用反向 DNS（PTR）問名稱的時間
         s.nb_busy = False
         s.probe_t = time.time() - PROBE_EVERY + 90   # 啟動 1～2 分鐘後先試一次 SNMP
         s.probe_force = False; s.probe_last = {"ts": 0, "tried": 0, "found": []}
@@ -877,7 +878,7 @@ class Poller:
 
     def reset(s):
         """換專案：丟掉上一個專案的即時狀態（埠流量基準、探索進度…），重新開始。"""
-        s.arp = {}; s.inv_t = 0; s.status = {"ts": 0, "devices": {}, "ports": {}}; s.prev = {}; s.ifmaps = {}; s.clients = {}
+        s.ptr_tried = {}; s.arp = {}; s.inv_t = 0; s.status = {"ts": 0, "devices": {}, "ports": {}}; s.prev = {}; s.ifmaps = {}; s.clients = {}
         s.probe_force = False; s.probe_t = time.time() - PROBE_EVERY + 90; s.probe_last = {"ts": 0, "tried": 0, "found": []}
         s.audit_t = time.time() - 3600 * 6 + 180; s.dns_t = time.time() - 3600 * 6 + 240; s.dns_prog = {}
         try: s.dns_last = json.load(open(os.path.join(s.store.dir, "dnscheck.json"), encoding="utf-8"))
@@ -1120,21 +1121,47 @@ class Poller:
             s.nb_busy = True
             threading.Thread(target=s.name_fill, daemon=True, name="nbnames").start()
 
+    def ptr_lookup(s, ip, port=53):
+        """反向 DNS（PTR）查名稱：先問設定的／這台電腦用的 DNS 伺服器（最多 3 台）。DHCP 發的 IP 通常會被 DHCP 伺服器或電腦自己登記進 DNS，
+        手機和 IoT 不回應 NetBIOS 時，靠這個補名字。回傳主機名稱（不含網域尾碼），查不到回空字串。"""
+        server, _dom, servers, _d = s.dns_target()
+        for sv in list(dict.fromkeys(([server] if server else []) + servers))[:3]:
+            stt, vals = ndc.dns_query(ndc.ptr_name(ip), sv, 12, timeout=1.2, port=port)
+            if stt == "ok" and vals:
+                n = vals[0].rstrip(".").split(".")[0]
+                if n and not re.fullmatch(r"[\d\-]+", n) and n.lower() not in ("localhost",): return n
+            if stt == "nx": return ""
+        return ""
+
     def name_fill(s):
-        """「網路上的設備」裡有 IP 沒名稱的，用 NetBIOS 問電腦名稱（每個 IP 6 小時最多問一次）"""
+        """「網路上的設備」裡有 IP 沒名稱的：先用 NetBIOS 問電腦名稱，還是沒有的再用反向 DNS（PTR）查（每個 IP 各 6 小時最多問一次）"""
         try:
             now = time.time()
             todo = [it for it in s.store.seen_list() if it["ip"] and not it["name"] and not it["gone"] and now - (it["last"] or 0) < 3600
                     and now - s.nb_tried.get(it["ip"], 0) > 6 * 3600][:160]
             for it in todo: s.nb_tried[it["ip"]] = now
-            if not todo: return
-            with ThreadPoolExecutor(24) as ex:
-                res = list(ex.map(lambda it: (it, ndc.nbstat(it["ip"], timeout=1.0, tries=1)), todo))
-            for it, r in res:
-                if r and r.get("name") and (not r.get("mac") or norm_mac(r["mac"]) == it["mac"]):
-                    s.store.seen_set_name(it["mac"], r["name"])
+            if todo:
+                with ThreadPoolExecutor(24) as ex:
+                    res = list(ex.map(lambda it: (it, ndc.nbstat(it["ip"], timeout=1.0, tries=1)), todo))
+                for it, r in res:
+                    if r and r.get("name") and (not r.get("mac") or norm_mac(r["mac"]) == it["mac"]):
+                        s.store.seen_set_name(it["mac"], r["name"])
         except Exception as e:
             s.log(f"NetBIOS 查名稱失敗：{e}")
+        try:
+            now = time.time()
+            todo = [it for it in s.store.seen_list() if it["ip"] and not it["name"] and not it["gone"] and now - (it["last"] or 0) < 3600
+                    and now - s.ptr_tried.get(it["ip"], 0) > 6 * 3600][:200]
+            for it in todo: s.ptr_tried[it["ip"]] = now
+            if todo:
+                with ThreadPoolExecutor(16) as ex:
+                    res = list(ex.map(lambda it: (it, s.ptr_lookup(it["ip"])), todo))
+                n = 0
+                for it, name in res:
+                    if name: s.store.seen_set_name(it["mac"], name); n += 1
+                if n: s.log(f"反向 DNS 補上 {n} 台設備的名稱")
+        except Exception as e:
+            s.log(f"反向 DNS 查名稱失敗：{e}")
         finally:
             s.nb_busy = False
 

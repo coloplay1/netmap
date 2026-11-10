@@ -100,7 +100,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="0 0 256 256" aria-hidden="true"><rect width="256" height="256" rx="56" fill="#fff"/><rect x="42" y="38" width="86" height="180" rx="4" fill="none" stroke="#111" stroke-width="13"/><path d="M66 82H104M66 116H104M66 150H104M66 184H104" stroke="#111" stroke-width="11" stroke-linecap="round"/><path d="M128 96C168 96 170 70 200 70" fill="none" stroke="#F2C230" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="70" r="13" fill="#F2C230"/><path d="M128 130C168 130 170 150 200 150" fill="none" stroke="#1E9BEA" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="150" r="13" fill="#1E9BEA"/><path d="M128 178C162 178 172 206 196 206" fill="none" stroke="#5B6472" stroke-width="11" stroke-linecap="round" stroke-dasharray="1 18"/><circle cx="210" cy="206" r="11" fill="none" stroke="#5B6472" stroke-width="7"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v3.9.8 · netmap.exe v1.16.0</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v3.9.9 · netmap.exe v1.16.1</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -138,7 +138,7 @@ code,td,li,p{overflow-wrap:anywhere}
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
     <a class="btn ghost" href="RackTrace-manual.pdf" download>下載 PDF 版手冊</a>
-    <a class="btn ghost" href="#changelog">最新更新：v3.9.8</a>
+    <a class="btn ghost" href="#changelog">最新更新：v3.9.9</a>
   </div>
 </div>
 
@@ -816,7 +816,8 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 
 <section id="changelog">
 <h2><span class="n">14</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v3.9.8　展開單台設備不再把整張圖推亂</b><span class="tag new">最新 · 2026-11-10</span><span class="tag">netmap.exe 1.16.0</span></div><ul><li>雙擊把單台設備從圖示展開成埠位時，以前會自動把整排設備往右、往下推，圖就亂了。現在左上角固定、其他設備完全不動；如果展開後蓋到旁邊的設備，只會提醒，由你決定要不要拖開。（「全部展開」仍會自動整理間距。）</li></ul></div>
+<div class="clog"><div class="v"><b>v3.9.9　用反向 DNS 補上設備名稱</b><span class="tag new">最新 · 2026-11-10</span><span class="tag">netmap.exe 1.16.1</span></div><ul><li>監控服務（netmap.exe 1.16.1）：「網路上的設備」裡有 IP、沒有名稱的設備，先用 NetBIOS 問，還是沒有的再用反向 DNS（PTR）問 DNS 伺服器，每個 IP 6 小時最多問一次。DHCP 發的 IP 常會被登記進 DNS，手機和 IoT 不回應 NetBIOS 時就靠這個補名字，補到的名稱會自動套到圖上只有 MAC／IP 的設備。</li><li>用哪台 DNS：「設定」裡填的 DNS 伺服器優先，沒填就用這台電腦自己的 DNS（最多試 3 台）。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.9.8　展開單台設備不再把整張圖推亂</b><span class="tag">2026-11-10</span><span class="tag">netmap.exe 1.16.0</span></div><ul><li>雙擊把單台設備從圖示展開成埠位時，以前會自動把整排設備往右、往下推，圖就亂了。現在左上角固定、其他設備完全不動；如果展開後蓋到旁邊的設備，只會提醒，由你決定要不要拖開。（「全部展開」仍會自動整理間距。）</li></ul></div>
 <div class="clog"><div class="v"><b>v3.9.7　選取「底下的設備」可以不含別台交換器／Hub</b><span class="tag">2026-11-10</span><span class="tag">netmap.exe 1.16.0</span></div><ul><li>右鍵選單分成「選取這台和底下的終端」（預設，不含別台交換器／Hub 和它們底下的設備）與「選取這台和底下全部」；「整理這台底下的終端」只會整理這台的終端，不會把其他交換器的設備混進來。</li><li>選取後上方操作列多一個「含底下的交換器／Hub」勾選，可以隨時切換。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.9.6　設備右鍵選單、一群設備的操作列</b><span class="tag">2026-11-10</span><span class="tag">netmap.exe 1.16.0</span></div><ul><li>在設備上按右鍵：選取這台和底下的設備、選取底下並整理排列、只選取直接連到這台的設備，也可以開啟屬性、複製、刪除。（在空白處按右鍵還是加入設備。）</li><li>框選或選取一群設備後，上方出現操作列：整理排列、移到指定位置（點畫布放置）、移到其他分頁、刪除（要按兩次確認，可以復原）、取消選取。</li><li>「底下的設備」依線路階層判斷：從數據機、防火牆、路由器、L3 往下，不含同一層互連的設備。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.9.5　長埠名只顯示埠號</b><span class="tag">2026-11-10</span><span class="tag">netmap.exe 1.16.0</span></div><ul><li>埠名很長（例如 Port 12、GigabitEthernet1/0/12）時，設備上的埠位標籤以前只剩「Por…」；現在只顯示埠號，完整名稱仍在提示和側欄。</li></ul></div>
@@ -885,7 +886,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 <div class="clog"><div class="v"><b>v1.0　第一版</b><span class="tag">2026-11-06</span></div><ul><li>防火牆、Switch、配線架、資訊座埠對埠接線，點埠追蹤整條路徑</li><li>產業範例與自動排版</li></ul></div>
 </section>
 
-<p class="foot">RackTrace · 網頁 v3.9.8 · netmap.exe v1.16.0 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">RackTrace · 網頁 v3.9.9 · netmap.exe v1.16.1 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>
