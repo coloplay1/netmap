@@ -3,7 +3,8 @@
 netmap 監控服務：在內網提供 RackTrace（機房線路對應圖）網頁，並定時用 SNMP 讀取每個埠的流量與上下線狀態。
 
   網頁        http://<這台電腦>:8080/
-  API         GET  /api/project          目前的圖（含 rev）
+  API         GET  /api/project          目前的圖（含 rev、pid）
+              GET  /api/projects  POST /api/projects   專案清單／切換／新增／複製／改名／刪除
               PUT  /api/project          儲存（rev 不符回 409）
               GET  /api/status           即時狀態：設備可達、每個埠 up/down、流量、使用率、錯誤
               GET  /api/history?port=..  埠的歷史流量（預設 24 小時）
@@ -32,7 +33,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.15.2"
+VERSION = "1.16.0"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -336,10 +337,10 @@ def diff_projects(a, b):
 
 class Store:
     def __init__(s, root=None):
-        s.dir = root or data_dir(); os.makedirs(s.dir, exist_ok=True); s.conflicts = {}
+        s.root = root or data_dir(); os.makedirs(s.root, exist_ok=True); s.dir = s.root; s.conflicts = {}
         s.lock = threading.RLock()
         s.settings = json.loads(json.dumps(DEFAULT_SETTINGS))
-        p = os.path.join(s.dir, "settings.json")
+        p = os.path.join(s.root, "settings.json")
         if os.path.exists(p):
             try:
                 saved = json.load(open(p, encoding="utf-8"))
@@ -347,6 +348,36 @@ class Store:
                 s.settings.update(saved); s.settings["snmp"] = snmp
             except Exception: pass
         if not s.settings["snmp"].get("community"): s.settings["snmp"]["community"] = protect("public")
+        s.db = None
+        s.reg = s._load_reg()
+        s._open(s.reg["current"])
+
+    # ---------- 多專案：每個專案各自的圖、歷史版本、事件與流量紀錄；設定、帳密、告警是全部專案共用 ----------
+    def _load_reg(s):
+        reg = {"current": "default", "list": []}
+        try:
+            o = json.load(open(os.path.join(s.root, "projects.json"), encoding="utf-8"))
+            if isinstance(o.get("list"), list): reg = {"current": o.get("current") or "default", "list": [x for x in o["list"] if isinstance(x, dict) and x.get("id")]}
+        except Exception: pass
+        if not any(x["id"] == "default" for x in reg["list"]): reg["list"].insert(0, {"id": "default", "name": "預設專案", "created": int(time.time())})
+        if not any(x["id"] == reg["current"] for x in reg["list"]): reg["current"] = "default"
+        return reg
+
+    def _save_reg(s):
+        tmp = os.path.join(s.root, "projects.json.tmp")
+        json.dump(s.reg, open(tmp, "w", encoding="utf-8"), ensure_ascii=False, indent=1); os.replace(tmp, os.path.join(s.root, "projects.json"))
+
+    def _pdir(s, pid):
+        return s.root if pid == "default" else os.path.join(s.root, "projects", pid)
+
+    @property
+    def pid(s): return s.reg["current"]
+
+    def _open(s, pid):
+        if s.db is not None:
+            try: s.db.close()
+            except Exception: pass
+        s.dir = s._pdir(pid); os.makedirs(s.dir, exist_ok=True); s.reg["current"] = pid
         s.rev, s.project = 0, {"devices": [], "cables": [], "racks": [], "faults": []}
         pp = os.path.join(s.dir, "project.json")
         if os.path.exists(pp):
@@ -426,8 +457,72 @@ class Store:
 
     def save_settings(s):
         with s.lock:
-            tmp = os.path.join(s.dir, "settings.json.tmp")
-            json.dump(s.settings, open(tmp, "w", encoding="utf-8"), ensure_ascii=False, indent=1); os.replace(tmp, os.path.join(s.dir, "settings.json"))
+            tmp = os.path.join(s.root, "settings.json.tmp")
+            json.dump(s.settings, open(tmp, "w", encoding="utf-8"), ensure_ascii=False, indent=1); os.replace(tmp, os.path.join(s.root, "settings.json"))
+
+    # ---------- 專案清單 ----------
+    def projects(s):
+        out = []
+        with s.lock:
+            for x in s.reg["list"]:
+                cur = x["id"] == s.reg["current"]; n = None; rev = None
+                if cur: n, rev = len(s.project.get("devices", [])), s.rev
+                else:
+                    try:
+                        o = json.load(open(os.path.join(s._pdir(x["id"]), "project.json"), encoding="utf-8"))
+                        n, rev = len((o.get("project") or {}).get("devices", [])), o.get("rev")
+                    except Exception: n = 0
+                out.append({"id": x["id"], "name": x.get("name") or x["id"], "created": x.get("created", 0), "devices": n, "rev": rev, "current": cur})
+            return {"current": s.reg["current"], "list": out}
+
+    def _clean_name(s, name, exclude=None):
+        name = re.sub(r"\s+", " ", str(name or "")).strip()[:40]
+        if not name: return None, "請輸入專案名稱"
+        if any(x.get("name") == name and x["id"] != exclude for x in s.reg["list"]): return None, "已經有同名的專案"
+        return name, None
+
+    def project_new(s, name, copy_from=None):
+        """新增專案（不切換）。copy_from 給專案 id 就複製它的圖（不含監控紀錄）。回傳 (id, 錯誤)。"""
+        with s.lock:
+            name, err = s._clean_name(name)
+            if err: return None, err
+            if len(s.reg["list"]) >= 50: return None, "專案太多了（上限 50 個）"
+            src = None
+            if copy_from:
+                if not any(x["id"] == copy_from for x in s.reg["list"]): return None, "找不到要複製的專案"
+                if copy_from == s.reg["current"]: src = s.project
+                else:
+                    try: src = (json.load(open(os.path.join(s._pdir(copy_from), "project.json"), encoding="utf-8")).get("project") or None)
+                    except Exception: src = None
+            pid = "p" + secrets.token_hex(4)
+            d = s._pdir(pid); os.makedirs(d, exist_ok=True)
+            proj = {k: (src or {}).get(k, []) for k in PROJECT_KEYS}
+            json.dump({"rev": 1, "savedAt": time.strftime("%Y-%m-%dT%H:%M:%S"), "project": proj}, open(os.path.join(d, "project.json"), "w", encoding="utf-8"), ensure_ascii=False)
+            s.reg["list"].append({"id": pid, "name": name, "created": int(time.time())}); s._save_reg()
+            return pid, None
+
+    def project_switch(s, pid):
+        with s.lock:
+            if not any(x["id"] == pid for x in s.reg["list"]): return False
+            if pid == s.reg["current"]: return True
+            s._open(pid); s._save_reg(); return True
+
+    def project_rename(s, pid, name):
+        with s.lock:
+            x = next((x for x in s.reg["list"] if x["id"] == pid), None)
+            if not x: return "找不到這個專案"
+            name, err = s._clean_name(name, pid)
+            if err: return err
+            x["name"] = name; s._save_reg(); return None
+
+    def project_delete(s, pid):
+        with s.lock:
+            if pid == "default": return "預設專案不能刪除（可以改名，或把裡面的設備清掉）"
+            if pid == s.reg["current"]: return "目前開著的專案不能刪除，請先切換到別的專案"
+            if not any(x["id"] == pid for x in s.reg["list"]): return "找不到這個專案"
+            import shutil
+            shutil.rmtree(s._pdir(pid), ignore_errors=True)
+            s.reg["list"] = [x for x in s.reg["list"] if x["id"] != pid]; s._save_reg(); return None
 
     def snmp_opts(s):
         c = s.settings["snmp"]
@@ -779,6 +874,14 @@ class Poller:
         s.clients = {}       # host → (時間, [用戶端])：路由器上的有線／無線設備，每 5 分鐘更新
         s.thread = None; s.stop_ev = threading.Event(); s.wake = threading.Event()
         s.running = False; s.last_cycle = 0; s.cycle_secs = 0
+
+    def reset(s):
+        """換專案：丟掉上一個專案的即時狀態（埠流量基準、探索進度…），重新開始。"""
+        s.arp = {}; s.inv_t = 0; s.status = {"ts": 0, "devices": {}, "ports": {}}; s.prev = {}; s.ifmaps = {}; s.clients = {}
+        s.probe_force = False; s.probe_t = time.time() - PROBE_EVERY + 90; s.probe_last = {"ts": 0, "tried": 0, "found": []}
+        s.audit_t = time.time() - 3600 * 6 + 180; s.dns_t = time.time() - 3600 * 6 + 240; s.dns_prog = {}
+        try: s.dns_last = json.load(open(os.path.join(s.store.dir, "dnscheck.json"), encoding="utf-8"))
+        except Exception: s.dns_last = {}
 
     def targets(s):
         out = []
@@ -1344,7 +1447,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             p = web_index()
             if not p: return s._send(500, "找不到網頁檔（web/index.html）", "text/plain; charset=utf-8")
             html = open(p, encoding="utf-8").read()
-            with st.lock: boot = {"rev": st.rev, "project": st.project, "interval": st.settings.get("interval", 60), "edit": s.can_edit(), "version": VERSION, "host": socket.gethostname(),
+            with st.lock: boot = {"rev": st.rev, "pid": st.pid, "pname": next((x.get("name") for x in st.reg["list"] if x["id"] == st.pid), ""), "project": st.project, "interval": st.settings.get("interval", 60), "edit": s.can_edit(), "version": VERSION, "host": socket.gethostname(),
                                       "self_ips": sorted(self_ips()) if st.settings.get("monitor_self", True) else [],
                                       "admin": s.is_admin(), "local": s._local(), "auth": bool(st.settings.get("admin_hash")), "login": s.server.auth.valid(s._cookie("nm_a"))}
             inj = "<script>window.NETMAP_SERVER=" + json.dumps(boot, ensure_ascii=False).replace("</", "<\\/") + ";</script>"
@@ -1353,11 +1456,12 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if not u.path.startswith("/api/"): return s._send(404, {"error": "not found"})
         if not s.view_ok(): return s._send(401, {"error": "需要登入或檢視連結"})
         if u.path == "/api/project":
-            with st.lock: return s._send(200, {"rev": st.rev, "project": st.project})
+            with st.lock: return s._send(200, {"rev": st.rev, "pid": st.pid, "project": st.project})
+        if u.path == "/api/projects": return s._send(200, st.projects())
         if u.path == "/api/status":
             stat = po.status
             last_ev = st.events(0, 1)
-            return s._send(200, {"rev": st.rev, "ts": stat.get("ts", 0), "interval": st.settings.get("interval", 60), "running": po.running,
+            return s._send(200, {"rev": st.rev, "pid": st.pid, "ts": stat.get("ts", 0), "interval": st.settings.get("interval", 60), "running": po.running,
                                  "devices": stat.get("devices", {}), "ports": stat.get("ports", {}), "edit": s.can_edit(), "admin": s.is_admin(),
                                  "ping": sv.pinger.snapshot() if sv else {}, "ping_on": bool(st.settings.get("ping_enabled", True)),
                                  "ev": last_ev[0]["id"] if last_ev else 0, "audit_open": st.audit_open(),
@@ -1430,6 +1534,23 @@ class Handler(http.server.BaseHTTPRequestHandler):
             s.server.auth.drop(s._cookie("nm_a"))
             return s._send(200, {"ok": True}, extra={"Set-Cookie": "nm_a=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict"})
         if not s.view_ok(): return s._send(401, {"error": "需要登入"})
+        if path == "/api/projects":
+            if not s.can_edit(): return s._send(403, {"error": "需要編輯權限"})
+            act = body.get("action"); pid = str(body.get("id") or "")
+            if act == "switch":
+                if not (sv.switch_project(pid) if sv else st.project_switch(pid)): return s._send(404, {"error": "找不到這個專案"})
+            elif act in ("new", "copy"):
+                new, err = st.project_new(body.get("name"), (pid or st.pid) if act == "copy" else None)
+                if err: return s._send(400, {"error": err})
+                if body.get("switch", True): (sv.switch_project(new) if sv else st.project_switch(new))
+            elif act == "rename":
+                err = st.project_rename(pid, body.get("name"))
+                if err: return s._send(400, {"error": err})
+            elif act == "delete":
+                err = st.project_delete(pid)
+                if err: return s._send(400, {"error": err})
+            else: return s._send(400, {"error": "unknown action"})
+            return s._send(200, st.projects())
         if path == "/api/revs/restore":
             if not s.can_edit(): return s._send(403, {"error": "需要編輯權限"})
             if not st.restore(body.get("rev"), s.who()): return s._send(404, {"error": "找不到這個版本"})
@@ -1486,8 +1607,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
         except Exception: return s._send(400, {"error": "bad json"})
         proj = body.get("project")
         if not isinstance(proj, dict) or not isinstance(proj.get("devices"), list): return s._send(400, {"error": "bad project"})
+        if body.get("pid") not in (None, st.pid):   # 別人（或另一個分頁）已經切到別的專案：不能把這張圖存進去
+            with st.lock: return s._send(409, {"rev": st.rev, "pid": st.pid, "project": st.project})
         if not st.set_project(proj, body.get("rev"), s.who()):
-            with st.lock: return s._send(409, {"rev": st.rev, "project": st.project})
+            with st.lock: return s._send(409, {"rev": st.rev, "pid": st.pid, "project": st.project})
         s.server.poller.ifmaps.clear()
         s._send(200, {"rev": st.rev})
 
@@ -1502,6 +1625,14 @@ class Service:
         s._macip = (0, {}); s._dnsc = {}
 
     # ---------- 事件與告警 ----------
+    def switch_project(s, pid):
+        ok = s.store.project_switch(pid)
+        if ok:
+            s.poller.reset(); s.pinger.reset(); s._macip = (0, {}); s._dnsc = {}
+            try: s.poller.poke()
+            except Exception: pass
+        return ok
+
     def resolve_target(s, d, ip):
         """這次心跳要 Ping 哪個 IP。
         track＝ip：固定用圖上的 IP；dns：每 5 分鐘用 DNS 查一次電腦名稱；auto（預設）：有 MAC 就跟著 MAC 走（DHCP 換 IP 也找得到）。"""
@@ -1640,7 +1771,7 @@ class Service:
     def flow(s):
         if s._flow is None:
             st = s.store.settings
-            s._flow = nf.FlowCollector(s.store.dir, int(st.get("flow_port") or 2055), int(st.get("sflow_port") or 6343), known_ips=s.known_ips, log=s.log)
+            s._flow = nf.FlowCollector(s.store.root, int(st.get("flow_port") or 2055), int(st.get("sflow_port") or 6343), known_ips=s.known_ips, log=s.log)
         return s._flow
 
     def start_flow(s):

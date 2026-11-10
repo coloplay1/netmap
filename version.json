@@ -1,6 +1,6 @@
 {
- "web": "3.8.9",
- "exe": "1.15.2",
+ "web": "3.9.0",
+ "exe": "1.16.0",
  "date": "2026-11-08",
  "title": "DNS 修正腳本保險機制",
  "download": "https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe",

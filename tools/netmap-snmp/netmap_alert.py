@@ -165,6 +165,9 @@ class Pinger:
         s.state = {}; s.lock = threading.Lock()
         s.thread = None; s.stop_ev = threading.Event(); s.wake = threading.Event(); s.last = 0
 
+    def reset(s):
+        with s.lock: s.state = {}
+
     def _probe(s, d, ip, tmo):
         """在工作執行緒裡：先決定這次的 IP（跟著 MAC／DNS），Ping，不通再找其他在線證據（不佔用鎖）。回傳 (rtt, how, ip)。"""
         if s.resolve:

@@ -863,7 +863,7 @@ class App:
                "配線架、資訊座等被動元件不會回應 SNMP，請在網頁上手動補上；它們不影響流量顯示。")
         ttk.Label(fr, text=txt, wraplength=820, justify="left").pack(anchor="w")
         b = ttk.Frame(fr); b.pack(anchor="w", pady=(16, 0))
-        ttk.Button(b, text="開啟資料資料夾", command=lambda: open_path(s.store.dir)).pack(side="left")
+        ttk.Button(b, text="開啟資料資料夾", command=lambda: open_path(s.store.root)).pack(side="left")
         ttk.Button(b, text="線上版網頁", command=lambda: webbrowser.open(WEB)).pack(side="left", padx=(8, 0))
 
     # ───────────── misc ─────────────
