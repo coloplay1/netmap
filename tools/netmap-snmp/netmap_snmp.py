@@ -557,10 +557,17 @@ def build(devs, extra_lldp=True, fdb=True, max_macs_per_port=4):
             if i and (not lid or lid.lower() in (i["name"].lower(), i["descr"].lower(), short_if(i["name"]).lower()) or lid.isdigit()): return portmap[(dv["host"], lport)]
         return find_port(dv["host"], lid, ldesc) or portmap.get((dv["host"], lport))
     ghosts = {}
-    def ghost(name, desc, caps, mgmt, pname, chid=""):
+    def any_mac(x):
+        """LLDP 的機箱／埠 ID 有時是 0x88d7f653c977、88-d7-…、88d7.f653.c977 等寫法，統一成 AA:BB:…"""
+        h = re.sub(r"^0x", "", str(x or "").strip(), flags=re.I)
+        if not re.fullmatch(r"[0-9A-Fa-f]{2}([:\-\s]?[0-9A-Fa-f]{2}){5}|[0-9A-Fa-f]{4}(\.[0-9A-Fa-f]{4}){2}", h): return ""
+        h = re.sub(r"[^0-9A-Fa-f]", "", h).upper()
+        return ":".join(h[i:i + 2] for i in range(0, 12, 2)) if len(h) == 12 else ""
+
+    def ghost(name, desc, caps, mgmt, pname, chid="", pid_mac=""):
         # LLDP 回報的管理位址是 127.x／0.0.0.0／169.254.x 時沒有意義（多半是 Linux 主機的 lldpd），不要當成 IP
         if mgmt and re.match(r"^(127\.|0\.0\.0\.0$|169\.254\.)", mgmt): mgmt = ""
-        chmac = chid.upper() if chid and re.fullmatch(r"[0-9A-Fa-f]{2}(:[0-9A-Fa-f]{2}){5}", chid) else ""
+        chmac = any_mac(chid) or any_mac(pid_mac)
         # 沒名稱、沒描述的鄰居各自獨立（用機箱 MAC 區分），不要全部併成同一台「LLDP 鄰居」
         key = (name or mgmt or chid or desc or "?").lower()
         if key in ghosts: g = ghosts[key]
@@ -568,7 +575,7 @@ def build(devs, extra_lldp=True, fdb=True, max_macs_per_port=4):
             brand = ""
             for kw, b in DESCR_BRANDS:
                 if kw in (desc or "").lower(): brand = b; break
-            if not name and not desc and not (set(caps) & {"bridge", "router", "wlanAP"}):
+            if not (set(caps) & {"bridge", "router", "wlanAP"}) and (not desc or re.match(r"^(eth|ens|enp|eno|em)\d", str(pname or ""))):
                 typ, kind = "end", None      # 只送出機箱 MAC 的鄰居：多半是電腦、IP 電話、伺服器的網卡
             else:
                 typ, kind = classify(desc or "", brand, caps)
@@ -594,7 +601,7 @@ def build(devs, extra_lldp=True, fdb=True, max_macs_per_port=4):
             rp = find_port(rh, n["pId"], n["pDesc"]) if rh else None
             if not rp:
                 if not extra_lldp or rh: continue
-                rp = ghost(n["sysName"], n["sysDesc"], caps_set(n["caps"]), n["mgmt"], n["pDesc"] or n["pId"], n.get("chId") or "")
+                rp = ghost(n["sysName"], n["sysDesc"], caps_set(n["caps"]), n["mgmt"], n["pDesc"] or n["pId"], n.get("chId") or "", n.get("pId") or "")
             ok = add_cable(lp, rp, speed=speed_txt(dv["ifs"].get(n["lport"], {}).get("speed", 0)))
             linked_if.add(lp)
             if not ok: linked_if.add(rp)
