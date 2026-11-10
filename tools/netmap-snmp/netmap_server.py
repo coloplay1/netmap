@@ -32,7 +32,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.14.7"
+VERSION = "1.14.8"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -1637,7 +1637,8 @@ class Service:
 def merge_snmp(project, scanned, add_new=False):
     """把掃描結果的 SNMP 對應（host / ifIndex）套到現有的圖上，不更動版面。
     add_new：圖上還沒有的掃描設備也加進來。回傳 (對到的設備數, 對到的埠數[, 新增的設備數])。"""
-    nd = npt = added = 0
+    nd = npt = added = ncab = 0
+    pmap = {}   # 掃描結果的埠 id → 圖上的埠 id
     for sd in scanned.get("devices", []):
         if not sd.get("snmp"): continue
         host = sd["snmp"]["host"]; hip = host.split(":")[0]
@@ -1648,6 +1649,7 @@ def merge_snmp(project, scanned, add_new=False):
                 ys = [x.get("y", 0) for x in cur] or [0]; xs = [x.get("x", 0) for x in cur] or [0]
                 n = dict(sd); n["x"] = min(xs) + 260 * added; n["y"] = max(ys) + 240
                 cur.append(n); added += 1; nd += 1
+                for p in n.get("ports", []): pmap[p["id"]] = p["id"]
             continue
         d = cand[0]; d["snmp"] = {"host": host}; nd += 1
         by = {}
@@ -1656,7 +1658,20 @@ def merge_snmp(project, scanned, add_new=False):
         for p in d.get("ports", []):
             ix = by.get(str(p.get("label", "")).lower())
             if ix is not None and p.get("side") != 1: p["ifIndex"] = ix; npt += 1
-    return (nd, npt, added) if add_new else (nd, npt)
+        for sp in sd["ports"]:
+            mp = next((p for p in d.get("ports", []) if p.get("side") != 1 and sp.get("ifIndex") is not None and p.get("ifIndex") == sp.get("ifIndex")), None) \
+                 or next((p for p in d.get("ports", []) if p.get("side") != 1 and str(p.get("label", "")).lower() == str(sp.get("label", "")).lower()), None)
+            if mp: pmap[sp["id"]] = mp["id"]
+    if add_new:
+        # 掃描找到的網路設備之間的線（LLDP 或 MAC 表推斷）：兩端在圖上都對得到、而且兩個埠都還沒接線，就補上
+        cabs = project.setdefault("cables", [])
+        busy = {c.get("a") for c in cabs} | {c.get("b") for c in cabs}
+        for c in scanned.get("cables", []):
+            a, b = pmap.get(c.get("a")), pmap.get(c.get("b"))
+            if not a or not b or a == b or a in busy or b in busy: continue
+            n = dict(c); n["id"] = "c" + secrets.token_hex(5); n["a"], n["b"] = a, b; n["label"] = f"S-{len(cabs) + 1:03d}"; n["wps"] = []
+            cabs.append(n); busy |= {a, b}; ncab += 1
+    return (nd, npt, added, ncab) if add_new else (nd, npt)
 
 def merge_discover(project, found):
     """網段探索結果併進目前的圖：用 MAC（沒有就用 IP）對應，保留原本的名稱、位置、接線與無線設定；

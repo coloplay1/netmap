@@ -341,8 +341,8 @@ class App:
                 hit, new, moved = srv.merge_discover(proj, project)
                 s.store.set_project(proj); msg = f"已更新目前的圖：對到 {hit} 台、新增 {new} 台" + (f"、{len(moved)} 台 IP 改變（{'；'.join(moved[:3])}）" if moved else "")
             else:
-                nd, npt, added = srv.merge_snmp(proj, project, add_new=True)
-                s.store.set_project(proj); msg = f"已更新目前的圖：對到 {nd - added} 台設備、{npt} 個埠" + (f"，新增 {added} 台（放在圖的最下面）" if added else "")
+                nd, npt, added, ncab = srv.merge_snmp(proj, project, add_new=True)
+                s.store.set_project(proj); msg = f"已更新目前的圖：對到 {nd - added} 台設備、{npt} 個埠" + (f"，新增 {added} 台（放在圖的最下面）" if added else "") + (f"，補上 {ncab} 條設備之間的線" if ncab else "")
         s.service.poller.poke()
         if not s.service.running: s.start_service()
         s.refresh_service()

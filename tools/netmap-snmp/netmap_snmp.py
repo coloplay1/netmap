@@ -618,6 +618,32 @@ def build(devs, extra_lldp=True, fdb=True, max_macs_per_port=4):
             linked_if.add(lp)
     # 2b) 聚合（LACP）：一端已知就補另一端；兩端都不知道的平行線標成「可能是聚合」
     project["lagInfer"] = infer_lags(project)
+    # 2.5) 沒送 LLDP 的防火牆／路由器／交換器（例如 SonicWall 預設只收不送）：
+    #      看哪台交換器的哪個埠學到它網卡的 MAC，而且那個埠學到的 MAC 最少 → 就是直接接在那裡
+    if fdb:
+        perport = {}   # (host, ifIndex) → [MAC…]
+        for sdv in devs:
+            if node[sdv["host"]]["type"] not in ("sw", "hub"): continue
+            bif = sdv.get("bridge_if", {})
+            for mac, bp in sdv.get("fdb", {}).items():
+                perport.setdefault((sdv["host"], bif.get(bp, bp)), []).append(mac)
+        for rdv in devs:
+            R = node[rdv["host"]]
+            if R["type"] not in ("fw", "router", "sw"): continue
+            rmacs = {}
+            for ifi, i in rdv["ifs"].items():
+                if i["mac"] and (rdv["host"], ifi) in portmap: rmacs.setdefault(i["mac"].upper(), ifi)
+            for mac, rifi in rmacs.items():
+                rpid = portmap[(rdv["host"], rifi)]
+                if rpid in used: continue
+                best = None
+                for (h, ifi), ms in perport.items():
+                    if h == rdv["host"] or mac not in ms: continue
+                    pid = portmap.get((h, ifi))
+                    if not pid or pid in used: continue
+                    if best is None or len(ms) < best[0]: best = (len(ms), pid)
+                if best and best[0] <= 8:
+                    add_cable(best[1], rpid)
     # 3) MAC table → end devices on access ports
     if fdb:
         arp = {}
