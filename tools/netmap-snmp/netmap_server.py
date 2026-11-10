@@ -32,7 +32,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.15.1"
+VERSION = "1.15.2"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 def data_dir():
@@ -1035,13 +1035,28 @@ class Poller:
         finally:
             s.nb_busy = False
 
+    def ip_macs(s):
+        """IP → MAC（「網路上的設備」最近一小時看到的）：NetBIOS 回應裡沒有 MAC 時用來補"""
+        now = time.time(); m = {}
+        for it in sorted(s.store.seen_list(), key=lambda x: x["last"] or 0):
+            if it["ip"] and not it["gone"] and now - (it["last"] or 0) < 3600: m[it["ip"]] = it["mac"]
+        return m
+
+    def dns_rows_with_mac(s):
+        rows = [dict(r) for r in ((s.dns_last or {}).get("rows") or [])]
+        if any(not r.get("mac") for r in rows):
+            m = s.ip_macs()
+            for r in rows:
+                if not r.get("mac") and r.get("ip") in m and r.get("status") not in ("ghost",): r["mac"] = m[r["ip"]]; r["mac_src"] = "arp"
+        return rows
+
     def names_map(s):
         """MAC → {ip, name, src}：給網頁把只有 MAC／IP 的設備自動換成電腦名稱"""
         out = {}
         for it in s.store.seen_list():
             if it["gone"]: continue
             out[it["mac"]] = {"ip": it["ip"], "name": it["name"], "src": "seen", "vendor": it["vendor"]}
-        for r in (s.dns_last or {}).get("rows") or []:
+        for r in s.dns_rows_with_mac():
             m = norm_mac(r.get("mac"))
             if not m or not r.get("name") or r.get("status") in ("ghost", "nonb"): continue
             o = out.setdefault(m, {"ip": r["ip"], "name": "", "src": "netbios", "vendor": ns.oui_vendor(m.upper())})
@@ -1349,7 +1364,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                                  "dns_bad": ((po.dns_last or {}).get("summary") or {}).get("bad", 0), "dns_ts": (po.dns_last or {}).get("ts", 0)})
         if u.path == "/api/dnscheck":
             server, domain, servers, dom = po.dns_target()
-            o = dict(po.dns_last or {}); o.update(busy=po.dns_busy or po.dns_force, prog=po.dns_prog if (po.dns_busy or po.dns_force) else None, hours=st.settings.get("dns_hours", 6), cfg_server=st.settings.get("dns_server", ""),
+            o = dict(po.dns_last or {}); o["rows"] = po.dns_rows_with_mac(); o.update(busy=po.dns_busy or po.dns_force, prog=po.dns_prog if (po.dns_busy or po.dns_force) else None, hours=st.settings.get("dns_hours", 6), cfg_server=st.settings.get("dns_server", ""),
                                                  cfg_domain=st.settings.get("dns_domain", ""), auto_servers=servers, auto_domain=dom, use_server=server, use_domain=domain)
             return s._send(200, o)
         if u.path == "/api/pinghist":
