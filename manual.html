@@ -100,7 +100,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="0 0 256 256" aria-hidden="true"><rect width="256" height="256" rx="56" fill="#fff"/><rect x="42" y="38" width="86" height="180" rx="4" fill="none" stroke="#111" stroke-width="13"/><path d="M66 82H104M66 116H104M66 150H104M66 184H104" stroke="#111" stroke-width="11" stroke-linecap="round"/><path d="M128 96C168 96 170 70 200 70" fill="none" stroke="#F2C230" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="70" r="13" fill="#F2C230"/><path d="M128 130C168 130 170 150 200 150" fill="none" stroke="#1E9BEA" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="150" r="13" fill="#1E9BEA"/><path d="M128 178C162 178 172 206 196 206" fill="none" stroke="#5B6472" stroke-width="11" stroke-linecap="round" stroke-dasharray="1 18"/><circle cx="210" cy="206" r="11" fill="none" stroke="#5B6472" stroke-width="7"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v3.8.5 · netmap.exe v1.15.2</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v3.8.6 · netmap.exe v1.15.2</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -138,7 +138,7 @@ code,td,li,p{overflow-wrap:anywhere}
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
     <a class="btn ghost" href="RackTrace-manual.pdf" download>下載 PDF 版手冊</a>
-    <a class="btn ghost" href="#changelog">最新更新：v3.8.5</a>
+    <a class="btn ghost" href="#changelog">最新更新：v3.8.6</a>
   </div>
 </div>
 
@@ -816,7 +816,8 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 
 <section id="changelog">
 <h2><span class="n">14</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v3.8.5　機櫃視圖可以直接新增設備</b><span class="tag new">最新 · 2026-11-10</span><span class="tag">netmap.exe 1.15.2</span></div><ul><li>機櫃視圖右側新增「新增設備」：交換器、防火牆、路由器、配線架、伺服器、NAS，按了留在機櫃視圖，新設備出現在「未上架設備」，拖到 U 位就上架</li></ul></div>
+<div class="clog"><div class="v"><b>v3.8.6　隱藏終端只看主幹、機房／分頁隨時可切換</b><span class="tag new">最新 · 2026-11-10</span><span class="tag">netmap.exe 1.15.2</span></div><ul><li>「顯示圖層」新增「終端設備」：選「隱藏（主幹圖）」就把電腦、筆電、手機、PLC 等終端和它們的線收起來，只留交換器、路由器、防火牆、AP 等網路設備與串接線；資料不會刪，切回「顯示」即可。</li><li>只有一張圖時，畫布下方也會常駐「主圖 ＋ 新增機房／分頁」，不用再去選單找；每張圖（樓層、機房、分公司）有自己的設備與機櫃。</li><li>機櫃視圖上方也有同一排分頁，可以直接切換機房；機櫃與未上架清單只顯示該分頁的設備。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.8.5　機櫃視圖可以直接新增設備</b><span class="tag">2026-11-10</span><span class="tag">netmap.exe 1.15.2</span></div><ul><li>機櫃視圖右側新增「新增設備」：交換器、防火牆、路由器、配線架、伺服器、NAS，按了留在機櫃視圖，新設備出現在「未上架設備」，拖到 U 位就上架</li></ul></div>
 <div class="clog"><div class="v"><b>v3.8.4　NetBIOS 問到的電腦可以直接加到圖上</b><span class="tag">2026-11-10</span><span class="tag">netmap.exe 1.15.2</span></div><ul><li>DNS 對帳新增「把不在圖上的電腦加到圖上」，每一列也有「加到圖上」：用電腦名稱、IP、MAC 建立設備，排在圖的最下方並框選起來，可以整組拖到想放的位置</li><li>netmap.exe：有些電腦的 NetBIOS 回應不含 MAC（全是 0），改用防火牆／交換器 ARP 表依 IP 補上 MAC，圖上只顯示 MAC 的設備就對得到電腦名稱了</li></ul></div>
 <div class="clog"><div class="v"><b>v3.8.3　DNS 對帳結果用 MAC 對到圖上的設備</b><span class="tag">2026-11-10</span><span class="tag">netmap.exe 1.15.1</span></div><ul><li>DNS 對帳表每一列標出對到圖上的哪台設備（用 MAC，沒有 MAC 才用 IP），沒對到的標「不在圖上」</li><li>新增「把電腦名稱套到圖上」：名稱還是 MAC、IP 或「LLDP 鄰居」的設備換成 NetBIOS 問到的電腦名稱，並補上缺的 MAC／IP；你自己取的名稱不會被改，可以復原</li><li>對帳完成後，圖上的自動命名會立刻用新的結果更新，不用等 5 分鐘</li></ul></div>
 <div class="clog"><div class="v"><b>v3.8.2　DHCP 換 IP 不再誤判斷線：設備可以選連線依據</b><span class="tag">2026-11-10</span><span class="tag">netmap.exe 1.15.1</span></div><ul><li>設備新增「連線依據」：自動（預設，有 MAC 就跟著 MAC 找 IP）／固定 IP／電腦名稱（問 DNS）</li><li>自動：DHCP 換了 IP 時，心跳會從防火牆、交換器的 ARP 表用 MAC 找到新的 IP 繼續 Ping，圖上的 IP 也會自動改成新的</li><li>電腦名稱：每 5 分鐘問一次 AD DNS 這個名稱現在是哪個 IP；可另外填 DNS 名稱</li></ul></div>
@@ -872,7 +873,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 <div class="clog"><div class="v"><b>v1.0　第一版</b><span class="tag">2026-11-06</span></div><ul><li>防火牆、Switch、配線架、資訊座埠對埠接線，點埠追蹤整條路徑</li><li>產業範例與自動排版</li></ul></div>
 </section>
 
-<p class="foot">RackTrace · 網頁 v3.8.5 · netmap.exe v1.15.2 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">RackTrace · 網頁 v3.8.6 · netmap.exe v1.15.2 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>
