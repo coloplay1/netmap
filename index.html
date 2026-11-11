@@ -1577,7 +1577,7 @@ const MANUAL_URL=PUBLIC_URL+'manual.html';
 /* 版本紀錄：最新在最前面。exe = netmap.exe 的版本 */
 const APP_VERSION='3.14.1',EXE_VERSION='1.19.0',MIN_EXE='1.18.0';
 const CHANGELOG=[
- {v:'3.14.1',exe:'1.19.0',d:'2026-11-12',t:'樓層框改成分群、下方分頁加顏色、Ctrl 點選設備',i:['Ctrl（Mac 是 ⌘）＋點設備可以逐台加入或移除選取，選到兩台以上就是群組選取，可以一起拖曳、移到分頁；框選拖曳到一半或開著框選模式時，按右鍵可以取消。','總覽裡的樓層框改成「一群一個框」：同一樓層的設備如果分得很開，會各畫各的框，不會再把中間不相干的區域也圈進去。每個框都有樓層名稱標籤，點標籤選取這個框內的設備，拖曳框線或標籤就整群一起移動。','下方分頁標籤加上顏色圓點和異常數字，設備屬性的「所在頁面」新增「＋ 新增分頁並移入…」。']},
+ {v:'3.14.1',exe:'1.19.0',d:'2026-11-12',t:'樓層框改成分群、下方分頁加顏色、Ctrl 點選設備',i:['修正：在某個分頁新增設備時，會避開其他分頁的設備，不再疊在別頁設備上（疊住時在「全部總覽」看起來像設備不見了）。','Ctrl（Mac 是 ⌘）＋點設備可以逐台加入或移除選取，選到兩台以上就是群組選取，可以一起拖曳、移到分頁；框選拖曳到一半或開著框選模式時，按右鍵可以取消。','總覽裡的樓層框改成「一群一個框」：同一樓層的設備如果分得很開，會各畫各的框，不會再把中間不相干的區域也圈進去。每個框都有樓層名稱標籤，點標籤選取這個框內的設備，拖曳框線或標籤就整群一起移動。','下方分頁標籤加上顏色圓點和異常數字，設備屬性的「所在頁面」新增「＋ 新增分頁並移入…」。']},
  {v:'3.14.0',exe:'1.19.0',d:'2026-11-12',t:'全部總覽、樓層疊層切換、框選加強',i:['新增「全部總覽」：所有樓層攤開在同一張圖，每個樓層用彩色虛線框和標籤標出（點標籤可選取整層、雙擊切到那一層）。','下方的分頁標籤每個樓層多了顏色圓點（和總覽裡的虛線框同色），有設備沒回應的樓層會顯示紅色數字。設備屬性的「所在頁面」選單新增「＋ 新增分頁並移入…」。','框選加強：Shift＋拖曳可以累加到目前的選取，Shift＋點設備可以加入或移除，在空白處按右鍵取消選取；選好後用上方的「移到分頁…」直接劃進樓層。']},
  {v:'3.13.1',exe:'1.19.0',d:'2026-11-12',t:'不同分頁的設備可以直接接線',i:['按「接到…」選好起點埠後，點下面的分頁標籤切到另一頁，再點要接的埠就能接線（之前切頁會取消）。接好後兩頁都會出現「→ 對面頁面」的連接標籤，可以看到源頭是哪台設備、哪個埠。']},
  {v:'3.13.0',exe:'1.19.0',d:'2026-11-12',t:'本機服務可以自己更新網頁畫面',i:['本機服務（127.0.0.1）的網頁原本打包在程式裡，要重新安裝才會更新。現在首頁版本旁會出現橘色的「有新版網頁，按一下更新」，按下去就會下載最新網頁，不用重新安裝。','只有你按了才會更新，只能在服務主機上操作；下載的內容會檢查大小和是否為 RackTrace 網頁。程式本身（掃描、監控）有改動時仍要重新安裝。']},
@@ -2496,7 +2496,9 @@ function setCounts(d,n,sf,poe,msg){snap();const T=TYPES[d.type];let removed=[];
     d.ports=[...main,...sfp];if(poe!=null)applyPoe(d,poe)}
   const ids=new Set(removed.map(p=>p.id));const lost=S.cables.filter(c=>ids.has(c.a)||ids.has(c.b)).length;S.cables=S.cables.filter(c=>!ids.has(c.a)&&!ids.has(c.b));
   renderAll();relaxLayout();save();toast(`${msg||'埠數已更新'}${lost?`，移除 ${lost} 條線`:''}`,true)}
-function freeSpot(){const R=Object.values(devRects()),z=ui.zoom;const vx=(stage.scrollLeft-PAD)/z,vy=(stage.scrollTop-PAD)/z,vw=stage.clientWidth/z,vh=stage.clientHeight/z;const W=240,H=140,M=24;
+function freeSpot(){const RR=devRects(),R=Object.values(RR),z=ui.zoom;
+  /* 別的分頁的設備沒有畫出來，用大概的大小估算，避免新設備疊在別頁的設備上（總覽裡就會看起來像不見） */
+  S.devices.forEach(d=>{if(RR[d.id])return;const w=Math.max(130,Math.ceil((d.ports||[]).length/2)*34+90)*((+d.scale)||1),h=(TYPES[d.type]&&TYPES[d.type].pass?190:150)*((+d.scale)||1);R.push({l:d.x,t:d.y,r:d.x+w,b:d.y+h})});const vx=(stage.scrollLeft-PAD)/z,vy=(stage.scrollTop-PAD)/z,vw=stage.clientWidth/z,vh=stage.clientHeight/z;const W=240,H=140,M=24;
   const cx=vx+vw/2-W/2,cy=vy+vh/2-H/2,free=(x,y)=>!R.some(r=>x<r.r+M&&x+W>r.l-M&&y<r.b+M&&y+H>r.t-M);
   for(let ring=0;ring<30;ring++){const pts=ring?[]:[[0,0]];for(let i=-ring;i<=ring;i++)pts.push([i,-ring],[i,ring],[-ring,i],[ring,i]);
     for(const[i,j]of pts){const x=Math.round((cx+i*50)/10)*10,y=Math.round((cy+j*40)/10)*10;if(x<Math.max(10,vx+96)||y<Math.max(10,vy+72))continue;if(free(x,y))return{x,y,off:x+W>vx+vw||y+H>vy+vh}}}
