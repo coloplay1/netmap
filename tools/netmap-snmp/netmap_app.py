@@ -1003,8 +1003,20 @@ def open_installed():
         import ctypes; ctypes.windll.user32.MessageBoxW(0, msg, "RackTrace", 0x10)
     except Exception: print(msg)
 
+def installed_url():
+    """裝了「開機自動啟動」的服務、而且它正在回應時，回傳它的網址（沒有就回空字串）。"""
+    import urllib.request
+    try:
+        url = open(os.path.join(os.environ.get("ProgramData") or r"C:\ProgramData", "netmap.url"), encoding="utf-8").read().strip()
+        if url and urllib.request.urlopen(url.rstrip("/") + "/api/ping", timeout=2).status == 200: return url
+    except Exception: pass
+    return ""
+
 def main():
     if "--open" in sys.argv: return open_installed()
+    if os.name == "nt" and not any(a in sys.argv for a in ("--gui", "--start", "--service", "--migrate-user-data")):
+        u = installed_url()   # 已經有背景服務在跑：直接開它的網頁，不要再開第二個服務搶埠、也不要兩份資料
+        if u: webbrowser.open(u); return
     if "--service" in sys.argv:
         sys.argv = [a for a in sys.argv if a != "--service"]
         try: return srv.main()
