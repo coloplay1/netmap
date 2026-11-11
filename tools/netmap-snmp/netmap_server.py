@@ -33,7 +33,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.18.0"
+VERSION = "1.18.1"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 MACHINE = False   # --machine：整台電腦共用的資料夾（C:\ProgramData\netmap），給「開機自動啟動、不用登入」的服務用（用 SYSTEM 執行，沒有使用者的 APPDATA）
@@ -321,7 +321,7 @@ MRTG_VIEWS = [("day", 33 * 3600), ("week", 8 * 86400), ("month", 35 * 86400), ("
 # 線上版網頁偵測本機 netmap.exe：只有使用者勾選才開，只回答 /api/ping，只給這台電腦自己的瀏覽器
 DETECT_ORIGINS = {"https://coloplay1.github.io"}
 
-DEFAULT_SETTINGS = {"port": 8080, "interval": 60, "retention_days": 7, "lan_edit": False, "autostart": False, "autorun": True, "web_detect": True, "monitor_self": True,
+DEFAULT_SETTINGS = {"port": 8080, "interval": 60, "retention_days": 7, "lan_edit": False, "autostart": False, "autorun": True, "web_detect": True, "web_detect_ver": 2, "monitor_self": True,
                     "flow_enabled": False, "flow_port": 2055, "sflow_port": 6343,
                     "ping_enabled": True, "ping_interval": 30, "ping_fails": 2, "ping_slow_ms": 200, "ping_timeout": 1.0,
                     "alerts": {"enabled": False, "site": "", "on": {"down": True, "recover": True, "port": True, "slow": False, "snmp": False, "newdev": False, "gone": False}, "channels": []},
@@ -401,8 +401,13 @@ class Store:
                 saved = json.load(open(p, encoding="utf-8"))
                 snmp = {**s.settings["snmp"], **saved.get("snmp", {})}
                 s.settings.update(saved); s.settings["snmp"] = snmp
+                if int(saved.get("web_detect_ver", 1) or 1) < 2:   # 舊版預設是關的，從沒有人刻意選過：升級後改成預設開（只回本機、只給版本與埠號）
+                    s.settings["web_detect"] = True; s.settings["web_detect_ver"] = 2; s._migrated = True
             except Exception: pass
         if not s.settings["snmp"].get("community"): s.settings["snmp"]["community"] = protect("public")
+        if getattr(s, "_migrated", False):
+            try: s.save_settings()
+            except Exception: pass
         s.db = None
         s.reg = s._load_reg()
         s._open(s.reg["current"])
