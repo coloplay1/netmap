@@ -33,11 +33,32 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.17.3"
+VERSION = "1.17.4"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 MACHINE = False   # --machine：整台電腦共用的資料夾（C:\ProgramData\netmap），給「開機自動啟動、不用登入」的服務用（用 SYSTEM 執行，沒有使用者的 APPDATA）
 
+
+def svc_log(m):
+    """背景服務沒有視窗：把重要訊息記在 C:\\ProgramData\\netmap-service.log（不含密碼，一般使用者也能讀）；其他情況照常 print。"""
+    if MACHINE and os.name == "nt":
+        lf = os.path.join(os.environ.get("ProgramData") or r"C:\ProgramData", "netmap-service.log")
+        try:
+            if os.path.getsize(lf) > 300000: os.replace(lf, lf + ".old")
+        except Exception: pass
+        try: open(lf, "a", encoding="utf-8").write(time.strftime("%Y-%m-%d %H:%M:%S ") + m + "\n")
+        except Exception: pass
+    else: print(m)
+
+def _fix_acl(root, note=print):
+    """共用資料夾的權限只留 SYSTEM 和系統管理員，底下的檔案改成繼承（修復安裝時可能弄壞的權限）。"""
+    if os.name != "nt" or not MACHINE: return
+    import subprocess
+    try:
+        for args in (["icacls", root, "/inheritance:r", "/grant:r", "SYSTEM:(OI)(CI)F", "*S-1-5-32-544:(OI)(CI)F", "/C", "/Q"], ["icacls", os.path.join(root, "*"), "/reset", "/T", "/C", "/Q"]):
+            subprocess.run(args, capture_output=True, timeout=120, creationflags=0x08000000)
+        note("已重設共用資料夾的權限")
+    except Exception as e: note(f"重設權限失敗：{e}")
 
 def data_dir():
     if MACHINE and os.name == "nt": base = os.environ.get("ProgramData") or r"C:\ProgramData"
@@ -418,8 +439,25 @@ class Store:
             try:
                 o = json.load(open(pp, encoding="utf-8")); s.rev = int(o.get("rev", 1)); s.project = o.get("project") or s.project
             except Exception: pass
-        s.db = sqlite3.connect(os.path.join(s.dir, "metrics.db"), check_same_thread=False)
-        s.db.execute("PRAGMA journal_mode=WAL")
+        dbp = os.path.join(s.dir, "metrics.db")
+        try:
+            s.db = sqlite3.connect(dbp, check_same_thread=False); s.db.execute("PRAGMA journal_mode=WAL")
+        except sqlite3.OperationalError as e:
+            # 資料庫打不開（常見：權限被改壞）：先試著把共用資料夾的權限修好，再不行就把壞掉的資料庫改名另開新的，服務才起得來
+            try: s.db.close()
+            except Exception: pass
+            _fix_acl(s.root, svc_log)
+            try:
+                s.db = sqlite3.connect(dbp, check_same_thread=False); s.db.execute("PRAGMA journal_mode=WAL")
+            except sqlite3.OperationalError:
+                try: s.db.close()
+                except Exception: pass
+                bad = f"{dbp}.bad-{int(time.time())}"
+                for suf in ("", "-wal", "-shm"):
+                    try: os.replace(dbp + suf, bad + suf)
+                    except Exception: pass
+                svc_log(f"metrics.db 打不開（{e}），已改名為 {os.path.basename(bad)}，另開新的歷史資料庫")
+                s.db = sqlite3.connect(dbp, check_same_thread=False); s.db.execute("PRAGMA journal_mode=WAL")
         s.db.execute("CREATE TABLE IF NOT EXISTS samples(ts INTEGER, pid TEXT, inb REAL, outb REAL, up INTEGER, ierr INTEGER, oerr INTEGER)")
         s.db.execute("CREATE INDEX IF NOT EXISTS ix_samples ON samples(pid, ts)")
         # MRTG 式彙整：每個埠在 5 分鐘／30 分鐘／2 小時／1 天的平均與最大值，保存期比原始紀錄長
@@ -2072,16 +2110,8 @@ def main():
     if a.flow: st.settings["flow_enabled"] = True
     if a.port: st.settings["port"] = a.port
     if a.interval: st.settings["interval"] = a.interval
-    _slog = print
-    if MACHINE and os.name == "nt":   # 背景服務沒有視窗：把啟動過程記在 C:\ProgramData\netmap-service.log（不含密碼，一般使用者也能讀），出問題才找得到原因
-        _lf = os.path.join(os.environ.get("ProgramData") or r"C:\ProgramData", "netmap-service.log")
-        try:
-            if os.path.getsize(_lf) > 300000: os.replace(_lf, _lf + ".old")
-        except Exception: pass
-        def _slog(m):
-            try: open(_lf, "a", encoding="utf-8").write(time.strftime("%Y-%m-%d %H:%M:%S ") + m + "\n")
-            except Exception: pass
-        _slog(f"服務啟動 v{VERSION}，資料夾 {st.root}")
+    _slog = svc_log
+    if MACHINE and os.name == "nt": _slog(f"服務啟動 v{VERSION}，資料夾 {st.root}")
     sv = Service(st, log=_slog)
     try: sv.start()
     except OSError as e:   # 埠被別的程式佔用：換一個空的埠，網址檔（netmap.url）會跟著更新，捷徑照樣能開

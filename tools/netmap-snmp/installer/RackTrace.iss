@@ -67,7 +67,9 @@ Name: "{autodesktop}\RackTrace"; Filename: "{app}\netmap.exe"; Parameters: "--op
 ; 1) 把這個使用者原本的資料（%APPDATA%\netmap）複製到共用資料夾，並把密碼改成「這台電腦」加密（已經有資料就不動）
 Filename: "{app}\netmap.exe"; Parameters: "--migrate-user-data"; Flags: runhidden runasoriginaluser waituntilterminated
 ; 2) 共用資料夾只留給系統管理員和 SYSTEM（裡面有 SNMP／SSH 帳密）
-Filename: "{sys}\icacls.exe"; Parameters: """{commonappdata}\netmap"" /inheritance:r /grant:r ""SYSTEM:(OI)(CI)F"" ""*S-1-5-32-544:(OI)(CI)F"" /T /C /Q"; Flags: runhidden waituntilterminated; Check: DirExists(ExpandConstant('{commonappdata}\netmap'))
+Filename: "{sys}\icacls.exe"; Parameters: """{commonappdata}\netmap"" /inheritance:r /grant:r ""SYSTEM:(OI)(CI)F"" ""*S-1-5-32-544:(OI)(CI)F"" /C /Q"; Flags: runhidden waituntilterminated; Check: DirExists(ExpandConstant('{commonappdata}\netmap'))
+; 裡面的檔案改成「繼承」資料夾的權限（不能對檔案逐一移除繼承，否則可能變成誰都打不開）
+Filename: "{sys}\icacls.exe"; Parameters: """{commonappdata}\netmap\*"" /reset /T /C /Q"; Flags: runhidden waituntilterminated; Check: DirExists(ExpandConstant('{commonappdata}\netmap'))
 ; 3) 防火牆
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""RackTrace"""; Flags: runhidden waituntilterminated; Tasks: firewall
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""RackTrace"" dir=in action=allow program=""{app}\netmap.exe"" enable=yes profile=private,domain"; Flags: runhidden waituntilterminated; Tasks: firewall
