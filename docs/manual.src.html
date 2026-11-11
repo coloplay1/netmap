@@ -437,6 +437,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <ul><li>掃描只能在服務主機本機操作，而且需要管理權限；其他電腦的瀏覽器看不到這個功能。掃描只讀取設備資料，不會改設備設定。</li>
 <li>沒有 SNMP 的網路改用「網段探索（ping + ARP）」。</li>
 <li>掃描結果會略過 <code>127.0.1.1</code> 這類本機位址的鄰居。</li></ul>
+<div class="note"><b>💡</b>安裝版的開始功能表有兩個項目：<b>RackTrace</b> 直接開網頁；<b>RackTrace 管理視窗</b> 才會開出本節說明的 exe 視窗（掃描、監控服務、誰在用流量、收集樣本）。也可以在命令列執行 <code>netmap.exe --gui</code>。</div>
 <h3 id="e-scan">SNMP 掃描</h3>
 <figure class="mid"><img src="manual/app-g1.jpg" alt="netmap.exe 掃描分頁" loading="lazy"><figcaption>掃描分頁（畫面中的位址為測試環境）。</figcaption></figure>
 <ol class="steps">

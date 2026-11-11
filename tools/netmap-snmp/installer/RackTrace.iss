@@ -61,6 +61,7 @@ Source: "install-task.ps1"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{autoprograms}\RackTrace"; Filename: "{app}\netmap.exe"; Parameters: "--open"; IconFilename: "{app}\netmap.exe"
+Name: "{autoprograms}\RackTrace 管理視窗"; Filename: "{app}\netmap.exe"; Parameters: "--gui"; IconFilename: "{app}\netmap.exe"
 Name: "{autodesktop}\RackTrace"; Filename: "{app}\netmap.exe"; Parameters: "--open"; Tasks: desktopicon
 
 [Run]
