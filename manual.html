@@ -452,7 +452,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <div class="note"><b>⚠️</b>設備端要先開啟 SNMP（唯讀即可），並允許這台電腦的 IP 查詢。家用路由器多半沒有 SNMP，請改用下面的「網段探索」。</div>
 
 <h3 id="e-disc">網段探索（不需要 SNMP）</h3>
-<figure class="mid"><img src="manual/app-d2.jpg" alt="網段探索" loading="lazy"></figure>
+<figure class="mid"><img src="manual/app-d2.jpg" alt="網段探索" loading="lazy"><figcaption>網頁裡的「網段探索」：不需要 SNMP，列出在線的設備（畫面中的位址為示範值）。</figcaption></figure>
 <p>在掃描分頁選「<b>網段探索</b>」，輸入網段（例如 <code>192.168.1.0/24</code>），程式用 ping 與 ARP 列出在線的設備，並依 MAC 判斷廠牌、依開啟的連接埠猜種類（印表機、NAS、攝影機…）。結果一樣可以帶入網頁，但因為沒有 SNMP，<b>不會有埠對埠的連線</b>，需要自己接線。</p>
 <h3 id="e-autosnmp">自動偵測 SNMP（不用重新掃描）</h3>
 <p>監控服務啟動後，每小時會用 netmap.exe 設定好的 SNMP 帳密，去試圖上<b>還沒有監控</b>的 Switch、路由器、防火牆、AP，以及伺服器、NAS、NVR、印表機。所以流程可以是：</p>
