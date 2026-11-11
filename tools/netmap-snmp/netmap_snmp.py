@@ -994,6 +994,14 @@ DEFAULTS = dict(community="public", version="2c", user=None, auth_proto="SHA", a
 def opts(**kw):
     o = argparse.Namespace(**DEFAULTS); o.__dict__.update({k: v for k, v in kw.items() if v is not None}); return o
 
+def _scannable(ip):
+    """鄰居回報的管理位址有些是 127.0.1.1（Linux 系統的主機名稱位址）、169.254.x.x 或 0.0.0.0，那不是真的可以連的設備，不要去掃。"""
+    try:
+        x = ipaddress.ip_address(ip.partition(":")[0] if ip.count(":") == 1 else ip)
+        return not (x.is_loopback or x.is_link_local or x.is_unspecified or x.is_multicast)
+    except ValueError:
+        return True
+
 def run_scan(a, targets, log=print, progress=None, stop=lambda: False, on_device=None):
     """掃描並建立專案。log(text)、progress(done, total, phase)、stop() 回傳 True 即中止。回傳 (project, devs, failed)。"""
     targets = expand(targets)
@@ -1039,7 +1047,7 @@ def run_scan(a, targets, log=print, progress=None, stop=lambda: False, on_device
             port = t.partition(":")[2]
             for n in dv["lldp"] + dv["cdp"]:
                 m = n.get("mgmt")
-                if m and m not in seen: queue.append(m + (f":{port}" if port else ""))
+                if m and m not in seen and _scannable(m) and not any(q.partition(":")[0] == m for q in queue): queue.append(m + (f":{port}" if port else ""))
     if progress: progress(1, 1, "done")
     proj = build(devs, extra_lldp=not a.no_neighbors, fdb=not a.no_fdb) if devs else None
     if proj:
