@@ -433,6 +433,7 @@ code,td,li,p{overflow-wrap:anywhere}
 
 <h3 id="e-webscan">在網頁裡掃描（安裝版）</h3>
 <p>用安裝版時，不用另外開 netmap.exe 的視窗：在<b>服務主機那台電腦</b>用瀏覽器開 <code>http://127.0.0.1:18080/</code>，點上方的「<b>＋ 掃描設備</b>」（或開始頁的「掃描」），在網頁裡輸入核心 Switch IP 與 community，就會掃描並把結果加到目前的圖，掃描中可以看進度、隨時停止。</p>
+<figure class="mid"><img src="manual/scan-web.jpg" alt="網頁裡的掃描設備視窗" loading="lazy"><figcaption>網頁裡的「掃描設備」視窗：SNMP 掃描與網段探索，帳密加密存在這台電腦（畫面中的位址已遮蔽）。</figcaption></figure>
 <ul><li>掃描只能在服務主機本機操作，而且需要管理權限；其他電腦的瀏覽器看不到這個功能。掃描只讀取設備資料，不會改設備設定。</li>
 <li>沒有 SNMP 的網路改用「網段探索（ping + ARP）」。</li>
 <li>掃描結果會略過 <code>127.0.1.1</code> 這類本機位址的鄰居。</li></ul>
@@ -582,7 +583,7 @@ __VENDORS__
 <p>監控服務每 30 秒 Ping 一次圖上所有有 IP 的設備（電腦、印表機、攝影機也算），不需要 SNMP。</p>
 <figure><img src="manual/lamps.jpg" alt="Ping 燈號" loading="lazy"><figcaption>設備名稱前的燈號：綠＝正常、黃＝延遲偏高、紅（閃爍）＝斷線。斷線的設備外框變紅並標「斷線」；SNMP 沒回應但 Ping 得到的標「SNMP 無回應」。</figcaption></figure>
 <div class="grid2" style="align-items:start">
-<figure class="narrow" style="margin:6px 0"><img src="manual/ping.jpg" alt="設備的心跳卡片" loading="lazy"></figure>
+<figure class="narrow" style="margin:6px 0"><img src="manual/ping-panel.jpg" alt="設備的心跳卡片" loading="lazy"><figcaption>設備屬性的「網路流量」分頁：心跳狀態、延遲、平均與遺失率，以及最近一小時的延遲曲線（畫面中的位址已遮蔽）。</figcaption></figure>
 <ul>
 <li>點設備 ▸「網路流量」分頁：目前延遲、平均、最近一小時的遺失率、延遲曲線（紅色直條＝那次沒回應），以及這台的最近事件。</li>
 <li>連續失敗 2 次才算斷線，避免一次掉包就誤報。次數、間隔、延遲門檻可以在設定裡改。</li>
