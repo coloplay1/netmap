@@ -20,7 +20,7 @@ import netmap_flow as nf
 import netmap_vendors as vendors
 
 VERSION_URL = os.environ.get("NETMAP_VERSION_URL") or "https://coloplay1.github.io/netmap/version.json"
-DOWNLOAD_URL = "https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe"
+DOWNLOAD_URL = "https://github.com/coloplay1/netmap/releases/latest/download/RackTrace-Setup.exe"
 
 
 def human_bytes(n):
@@ -937,7 +937,7 @@ class App:
 
     def open_update(s):
         i = s.update_info or {}
-        msg = f"有新版本 netmap.exe v{i.get('exe')}（目前 v{srv.VERSION}）。\n\n{i.get('title', '')}\n\n下載後把新的 netmap.exe 取代舊檔即可，設定與流量紀錄會保留。\n要現在下載嗎？"
+        msg = f"有新版本 RackTrace v{i.get('exe')}（目前 v{srv.VERSION}）。\n\n{i.get('title', '')}\n\n下載後直接執行 RackTrace-Setup.exe，會自動停止舊版並覆蓋安裝，設定與流量紀錄會保留。\n要現在下載嗎？"
         if messagebox.askyesno(TITLE, msg):
             webbrowser.open(i.get("download") or DOWNLOAD_URL)
         if i.get("notes") and messagebox.askyesno(TITLE, "要順便看更新內容嗎？"):

@@ -86,6 +86,12 @@ jobs:
           1..45 | ForEach-Object { if (-not $ok) { try { $u = (Get-Content "$env:ProgramData\netmap.url" -ErrorAction Stop).Trim(); $null = Invoke-RestMethod ($u.TrimEnd('/') + '/api/ping'); $ok = $true; Write-Host "service answers at $u" } catch { Start-Sleep 2 } } }
           if (-not $ok) { throw 'service did not answer' }
           Get-ScheduledTask -TaskName RackTrace | Select-Object TaskName, State | Format-List
+          # 覆蓋安裝（升級）：服務執行中再裝一次，要能停掉舊程式、覆蓋檔案、重新啟動
+          $p2 = Start-Process tools/netmap-snmp/dist/RackTrace-Setup.exe -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-' -Wait -PassThru
+          if ($p2.ExitCode -ne 0) { throw "upgrade setup exit code $($p2.ExitCode)" }
+          $ok = $false
+          1..45 | ForEach-Object { if (-not $ok) { try { $u = (Get-Content "$env:ProgramData\netmap.url" -ErrorAction Stop).Trim(); $null = Invoke-RestMethod ($u.TrimEnd('/') + '/api/ping'); $ok = $true; Write-Host "service answers after upgrade" } catch { Start-Sleep 2 } } }
+          if (-not $ok) { throw 'service did not answer after upgrade' }
           $un = Get-ChildItem "$env:ProgramFiles\RackTrace\unins*.exe" | Select-Object -First 1
           Start-Process $un.FullName -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES' -Wait
           Start-Sleep 3

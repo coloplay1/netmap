@@ -692,7 +692,7 @@ __VENDORS__
 <h3 id="e-webupdate">更新網頁（不用重新安裝）</h3>
 <p>服務的網頁和 <a href="./">線上版</a>是同一份。線上版更新後，從服務主機打開首頁，上方會出現橘色的「<b>有新版網頁 vX.Y.Z，按一下更新</b>」，按下去就會下載並套用，約一秒後重新載入。只有網頁改版時不用重新安裝；程式本身（掃描、監控）有新版才需要重新下載安裝檔。</p>
 <h3 id="e-update">更新程式</h3>
-<p>netmap.exe 啟動時會檢查是否有新版本，有的話標題列會出現「<b>有新版本</b>」，點一下即可下載。下載新的 netmap.exe 取代舊檔即可，設定與流量紀錄都會保留（存在 <code>%APPDATA%\netmap</code>）。</p>
+<p>netmap.exe 啟動時會檢查是否有新版本，有的話標題列會出現「<b>有新版本</b>」，點一下會下載 <b>RackTrace-Setup.exe</b>。直接執行它，安裝程式會自動停止舊版、覆蓋 <code>C:\Program Files\RackTrace</code> 裡的檔案並重新啟動服務；設定與流量紀錄都會保留（存在 <code>C:\ProgramData\netmap</code>）。免安裝版（單獨的 netmap.exe）則要自己關掉程式後取代舊檔。</p>
 </section>
 
 <section id="mobile">
