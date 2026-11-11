@@ -33,7 +33,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.17.0"
+VERSION = "1.17.1"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 MACHINE = False   # --machine：整台電腦共用的資料夾（C:\ProgramData\netmap），給「開機自動啟動、不用登入」的服務用（用 SYSTEM 執行，沒有使用者的 APPDATA）
@@ -271,7 +271,7 @@ MRTG_VIEWS = [("day", 33 * 3600), ("week", 8 * 86400), ("month", 35 * 86400), ("
 # 線上版網頁偵測本機 netmap.exe：只有使用者勾選才開，只回答 /api/ping，只給這台電腦自己的瀏覽器
 DETECT_ORIGINS = {"https://coloplay1.github.io"}
 
-DEFAULT_SETTINGS = {"port": 8080, "interval": 60, "retention_days": 7, "lan_edit": False, "autostart": False, "autorun": True, "web_detect": False, "monitor_self": True,
+DEFAULT_SETTINGS = {"port": 8080, "interval": 60, "retention_days": 7, "lan_edit": False, "autostart": False, "autorun": True, "web_detect": True, "monitor_self": True,
                     "flow_enabled": False, "flow_port": 2055, "sflow_port": 6343,
                     "ping_enabled": True, "ping_interval": 30, "ping_fails": 2, "ping_slow_ms": 200, "ping_timeout": 1.0,
                     "alerts": {"enabled": False, "site": "", "on": {"down": True, "recover": True, "port": True, "slow": False, "snmp": False, "newdev": False, "gone": False}, "channels": []},
