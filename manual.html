@@ -122,7 +122,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <li><a href="#save">9. 儲存、匯出與分享</a>
   <ol><li><a href="#s-history">歷史版本與還原</a></li><li><a href="#s-check">資料檢查與單一設備的變更紀錄</a></li><li><a href="#s-labels">線標列印</a></li></ol></li>
 <li><a href="#exe">10. netmap.exe（Windows 程式）</a>
-  <ol><li><a href="#e-setup">安裝版（建議）</a></li><li><a href="#e-install">免安裝的 netmap.exe</a></li><li><a href="#e-webscan">在網頁裡掃描</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-autosnmp">自動偵測 SNMP</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-detect">從線上版切換</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-ssh">SSH 流量監控</a></li><li><a href="#e-flow">誰在用流量</a></li><li><a href="#e-vendor">各廠牌設定教學</a></li><li><a href="#e-ping">心跳與事件</a></li><li><a href="#e-alert">告警通知</a></li><li><a href="#e-auth">管理密碼與檢視連結</a></li><li><a href="#e-seen">網路上的設備</a></li><li><a href="#e-audit">圖面比對（和實際網路對帳）</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-webupdate">更新網頁</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
+  <ol><li><a href="#e-setup">安裝版（建議）</a></li><li><a href="#e-install">免安裝的 netmap.exe</a></li><li><a href="#e-webscan">在網頁裡掃描</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-autosnmp">自動偵測 SNMP</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-remote">用平板、手機查看</a></li><li><a href="#e-detect">從線上版切換</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-ssh">SSH 流量監控</a></li><li><a href="#e-flow">誰在用流量</a></li><li><a href="#e-vendor">各廠牌設定教學</a></li><li><a href="#e-ping">心跳與事件</a></li><li><a href="#e-alert">告警通知</a></li><li><a href="#e-auth">管理密碼與檢視連結</a></li><li><a href="#e-seen">網路上的設備</a></li><li><a href="#e-audit">圖面比對（和實際網路對帳）</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-webupdate">更新網頁</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
 <li><a href="#mobile">11. 手機操作</a></li>
 <li><a href="#keys">12. 快捷鍵</a></li>
 <li><a href="#faq">13. 常見問題</a></li>
@@ -488,6 +488,23 @@ code,td,li,p{overflow-wrap:anywhere}
 <tr><td><span class="dot" style="background:#DC2626"></span>紅色虛線</td><td>埠離線（線上標示「離線」）</td></tr>
 </table></div>
 
+<h3 id="e-remote">用平板、手機或其他電腦查看</h3>
+<p>其他裝置<b>不需要安裝任何東西</b>，也不會去讀 netmap.exe：exe 只在服務主機（Windows）上執行，並在背景提供一個網頁；平板、手機、Mac 只是用瀏覽器打開那個網頁。</p>
+<div class="tw"><table>
+<tr><th>平板／手機／其他電腦</th><th></th><th>服務主機（跑 netmap.exe）</th><th></th><th>網路設備</th></tr>
+<tr><td>瀏覽器（Safari、Chrome）</td><td style="white-space:nowrap;text-align:center">⟵ 網頁 ⟶</td><td>圖、燈號、流量紀錄</td><td style="white-space:nowrap;text-align:center">⟵ SNMP ⟶</td><td>Switch、防火牆、AP</td></tr>
+</table></div>
+<ol class="steps">
+<li>在一台<b>固定開機</b>的 Windows 電腦上安裝 RackTrace-Setup.exe（不要裝在會休眠或帶走的筆電），安裝時保留「開機自動啟動」與「允許公司內網的其他電腦用瀏覽器連進來」。</li>
+<li>先完成一次掃描或畫好圖，確認服務在執行（見上一節）。</li>
+<li>在平板的瀏覽器輸入服務主機的網址，例如 <code>http://192.168.1.20:18080/</code>。網址可以在服務主機的 exe 視窗按「開啟網頁」後，從網址列看到。</li>
+<li>連上後會看到和服務主機相同的圖，並有即時燈號與流量。要省去輸入網址，可以用「權限與檢視連結」產生的 <b>QR Code</b>，用平板或手機掃描即可。</li></ol>
+<ul>
+<li>平板必須和服務主機在<b>同一個內網</b>（不能接隔離的訪客 Wi-Fi）。不在公司時請先連公司的 VPN。</li>
+<li>連線進來的裝置預設<b>只能看</b>；要編輯需要管理密碼（見「管理密碼與檢視連結」）。</li>
+<li>連不上時，先檢查服務主機的服務有在執行，以及 Windows 防火牆有沒有開放這個埠。</li>
+<li>平板以查看、追路徑、現場查線為主。右鍵選單、Ctrl＋點選這類需要滑鼠或鍵盤的操作，在觸控裝置上比較不方便。</li></ul>
+<div class="note"><b>⚠️</b>網頁版（<a href="./">GitHub Pages</a>）本身沒有資料，資料存在你自己的瀏覽器裡。要在平板上看到公司的圖，請連到服務主機，不是打開網頁版首頁。</div>
 <h3 id="e-detect">從線上版切換到監控畫面</h3>
 <p>從監控服務的網址打開時，點左上角的標誌回到開始頁，「本地端」分頁會顯示這台服務的狀況：監控中的設備、正常與沒有回應的數量、最後讀取時間，以及「開啟監控中的圖」「流量圖總覽」「故障查線」和有問題的設備，點設備就會打開它的狀態與流量圖。</p>
 <figure><img src="manual/welcome-srv.jpg" alt="從監控服務開啟時的開始頁" loading="lazy"></figure>
