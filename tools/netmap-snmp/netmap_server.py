@@ -33,7 +33,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.17.4"
+VERSION = "1.18.0"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 MACHINE = False   # --machine：整台電腦共用的資料夾（C:\ProgramData\netmap），給「開機自動啟動、不用登入」的服務用（用 SYSTEM 執行，沒有使用者的 APPDATA）
@@ -1589,6 +1589,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
             return s._send(200, {"macs": po.names_map() if po else {}})
         if u.path == "/api/seen":
             return s._send(200, {"items": st.seen_list(), "enabled": bool(st.settings.get("inv_enabled", True)), "gone_hours": st.settings.get("inv_gone_hours", 24)})
+        if u.path in ("/api/scan/status", "/api/scan/defaults"):
+            if not s._local() or not s.is_admin(): return s._send(403, {"error": "掃描只能在服務主機上操作"})
+            if not sv: return s._send(500, {"error": "no service"})
+            return s._send(200, sv.scan_status(int(arg("since", "0") or 0)) if u.path.endswith("status") else sv.scan_defaults())
         if u.path == "/api/settings":
             if not s.is_admin(): return s._send(403, {"error": "需要管理員權限"})
             return s._send(200, sv.public_settings(s.headers.get("Host")) if sv else {})
@@ -1679,6 +1683,19 @@ class Handler(http.server.BaseHTTPRequestHandler):
             if not sv: return s._send(500, {"error": "no service"})
             res = sv.notifier.deliver([{"kind": "test", "name": "netmap", "ts": int(time.time()), "detail": f"來自 {socket.gethostname()}，通知設定正常"}], only=body.get("id"))
             return s._send(200, {"results": res})
+        if path.startswith("/api/scan/"):
+            if not s._local(): return s._send(403, {"error": "掃描只能在服務主機上操作"})
+            if not s.is_admin(): return s._send(403, {"error": "需要管理員權限"})
+            if not sv: return s._send(500, {"error": "no service"})
+            act = path[len("/api/scan/"):]
+            if act == "start":
+                ok, err = sv.scan_start(body)
+                return s._send(200 if ok else 400, {"ok": True} if ok else {"error": err})
+            if act == "stop": return s._send(200, {"ok": sv.scan_stop()})
+            if act == "apply":
+                msg, err = sv.scan_apply(body.get("how"))
+                return s._send(200 if msg else 400, {"ok": True, "message": msg} if msg else {"error": err})
+            return s._send(404, {"error": "not found"})
         if path == "/api/snmp/probe":
             if not s.is_admin(): return s._send(403, {"error": "需要管理員權限"})
             s.server.poller.probe_force = True; s.server.poller.wake.set()
@@ -1905,6 +1922,96 @@ class Service:
         s.poller.start(); s.pinger.start()
         s.log(f"服務已啟動：http://{local_ips()[0]}:{port}/")
         if s.store.settings.get("flow_enabled") and not (s._flow and s._flow.running): s.start_flow()
+
+    # ---------- 網頁上的「掃描設備」：在服務主機上用 SNMP 掃描／網段探索，結果再套用到目前的圖 ----------
+    def scan_defaults(s):
+        c = s.store.settings.get("snmp") or {}
+        return {"version": c.get("version", "2c"), "user": c.get("user", ""), "auth_proto": c.get("auth_proto", "SHA"), "priv_proto": c.get("priv_proto", "AES"),
+                "context": c.get("context", ""), "timeout": c.get("timeout", 2.0), "targets": s.store.settings.get("last_targets", ""), "subnet": ns.local_subnet() or "",
+                "saved": {"community": bool(unprotect(c.get("community", ""))) and unprotect(c.get("community", "")) != "public", "auth_key": bool(unprotect(c.get("auth_key", ""))),
+                          "priv_key": bool(unprotect(c.get("priv_key", "")))}, "has_map": bool(s.store.project.get("devices"))}
+
+    def scan_start(s, b):
+        import unicodedata
+        j = getattr(s, "scan", None)
+        if j and j.get("running"): return None, "已經有一個掃描在進行中"
+        targets = unicodedata.normalize("NFKC", str(b.get("targets") or "")).replace(",", " ").replace(";", " ").split()
+        disc = b.get("mode") == "disc"
+        if disc and not targets:
+            sub = ns.local_subnet()
+            if sub: targets = [sub]
+        if not targets: return None, "請先輸入要掃描的 IP 或網段"
+        if len(targets) > 64: return None, "目標太多了（最多 64 個）"
+        c = s.store.settings.setdefault("snmp", {})
+        ver = str(b.get("version") or "2c")
+        if ver not in ("1", "2c", "3"): return None, "SNMP 版本不對"
+        pick = lambda k: (b.get(k) or "").strip() if isinstance(b.get(k), str) else ""
+        comm = pick("community") or unprotect(c.get("community", "")) or "public"
+        akey = b.get("auth_key") or unprotect(c.get("auth_key", "")) or None; pkey = b.get("priv_key") or unprotect(c.get("priv_key", "")) or None
+        if ver == "3" and not pick("user"): return None, "SNMPv3 需要填使用者"
+        try: to = min(max(float(b.get("timeout") or 2.0), 0.5), 15.0)
+        except (TypeError, ValueError): to = 2.0
+        s.store.settings["last_targets"] = " ".join(targets)
+        if b.get("remember"):
+            c.update(version=ver, community=protect(comm), user=pick("user"), auth_proto=b.get("auth_proto") or "SHA", auth_key=protect(akey or ""),
+                     priv_proto=b.get("priv_proto") or "AES", priv_key=protect(pkey or ""), context=pick("context"), timeout=to)
+        s.store.save_settings()
+        a = ns.opts(version=ver, community=comm, user=pick("user") or None, auth_proto=b.get("auth_proto") or "SHA", auth_key=akey, priv_proto=b.get("priv_proto") or "AES",
+                    priv_key=pkey, context=pick("context"), timeout=to, no_follow=not b.get("follow", True), no_fdb=not b.get("fdb", True), no_neighbors=not b.get("nbr", True))
+        j = s.scan = {"running": True, "mode": "disc" if disc else "snmp", "log": [], "prog": [0, 0, ""], "t0": time.time(), "project": None, "failed": [], "error": "", "stop": False, "done": False, "pid": s.store.reg.get("current")}
+        def lg(m):
+            j["log"].append(str(m))
+            if len(j["log"]) > 2000: del j["log"][:500]
+        def work():
+            try:
+                if disc:
+                    proj = ns.discover(targets, log=lg, progress=lambda d, t, ph: j.__setitem__("prog", [d, t, ph]), stop=lambda: j["stop"], link_gateway=bool(b.get("link", True)))
+                    j["project"] = proj if proj and proj.get("devices") else None; j["failed"] = []
+                else:
+                    proj, devs, failed = ns.run_scan(a, targets, log=lg, progress=lambda d, t, ph: j.__setitem__("prog", [d, t, ph]), stop=lambda: j["stop"])
+                    j["project"] = proj; j["failed"] = [str(x) for x in (failed or [])][:50]
+            except Exception as e:
+                j["error"] = str(e) or e.__class__.__name__
+            finally:
+                j["running"] = False; j["done"] = True; j["t1"] = time.time()
+        threading.Thread(target=work, daemon=True, name="scan").start()
+        return True, ""
+
+    def scan_status(s, since=0):
+        j = getattr(s, "scan", None)
+        if not j: return {"idle": True}
+        p = j.get("project")
+        return {"idle": False, "running": j["running"], "done": j["done"], "mode": j["mode"], "log": j["log"][since:], "n": len(j["log"]), "prog": j["prog"],
+                "secs": round((j.get("t1") or time.time()) - j["t0"], 1), "error": j["error"], "failed": j["failed"],
+                "found": {"devices": len(p.get("devices", [])), "cables": len(p.get("cables", []))} if p else None, "stopping": j["stop"] and j["running"]}
+
+    def scan_stop(s):
+        j = getattr(s, "scan", None)
+        if j and j.get("running"): j["stop"] = True
+        return True
+
+    def scan_apply(s, how):
+        j = getattr(s, "scan", None); st = s.store
+        if not j or not j.get("project"): return None, "沒有可以套用的掃描結果"
+        if j.get("pid") != st.reg.get("current"): return None, "掃描之後已經切換專案，請重新掃描"
+        project = j["project"]
+        if how == "replace":
+            if st.project.get("devices"):
+                bk = os.path.join(st.dir, "backup"); os.makedirs(bk, exist_ok=True)
+                json.dump(st.project, open(os.path.join(bk, f"before-scan-{time.strftime('%Y%m%d-%H%M%S')}.json"), "w", encoding="utf-8"), ensure_ascii=False)
+            st.set_project(project); msg = f"已換成這次的結果：{len(project['devices'])} 台設備、{len(project['cables'])} 條線（舊的圖已備份）"
+        else:
+            proj = json.loads(json.dumps(st.project))
+            if str(project.get("source", "")).startswith("netmap-discover"):
+                hit, new, moved = merge_discover(proj, project)
+                st.set_project(proj); msg = f"已更新目前的圖：對到 {hit} 台、新增 {new} 台" + (f"、{len(moved)} 台 IP 改變" if moved else "")
+            else:
+                nd, npt, added, ncab = merge_snmp(proj, project, add_new=True)
+                st.set_project(proj); msg = f"已更新目前的圖：對到 {nd - added} 台設備、{npt} 個埠" + (f"，新增 {added} 台（放在圖的最下面）" if added else "") + (f"，補上 {ncab} 條設備之間的線" if ncab else "")
+        try: s.poller.poke()
+        except Exception: pass
+        j["project"] = None
+        return msg, ""
 
     def stop(s):
         s.poller.stop(); s.pinger.stop(); s.stop_flow()
