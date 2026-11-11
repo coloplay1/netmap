@@ -439,7 +439,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <li>掃描結果會略過 <code>127.0.1.1</code> 這類本機位址的鄰居。</li></ul>
 <div class="note"><b>💡</b>安裝版的開始功能表有兩個項目：<b>RackTrace</b> 直接開網頁；<b>RackTrace 管理視窗</b> 才會開出本節說明的 exe 視窗（掃描、監控服務、誰在用流量、收集樣本）。也可以在命令列執行 <code>netmap.exe --gui</code>。</div>
 <h3 id="e-scan">SNMP 掃描</h3>
-<figure class="mid"><img src="manual/app-g1.jpg" alt="netmap.exe 掃描分頁" loading="lazy"><figcaption>掃描分頁（畫面中的位址為測試環境）。</figcaption></figure>
+<figure class="mid"><img src="manual/app-g1.jpg" alt="netmap.exe 掃描分頁" loading="lazy"><figcaption>掃描分頁（網段探索模式；畫面中的位址為示範值）。</figcaption></figure>
 <ol class="steps">
 <li><b>掃描目標</b>：填核心 Switch 的 IP 就夠了，程式會沿著 LLDP／CDP 找到其他設備。也可以輸入網段或範圍，用空白分隔，例如 <code>192.168.1.0/24 10.0.0.1-50</code>。</li>
 <li><b>SNMP 帳密</b>：選版本（v1／v2c／v3）。v2c 填唯讀的 community；v3 填使用者、驗證與加密密碼。勾「記住帳密」會用 Windows 帳號加密保存。</li>
