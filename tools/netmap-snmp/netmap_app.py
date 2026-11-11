@@ -976,10 +976,28 @@ def open_path(p):
         else: webbrowser.open("file://" + p)
     except Exception: pass
 
+def open_installed():
+    """「開啟 RackTrace」捷徑：服務已經在背景跑，這裡只要開瀏覽器到它的網址（最多等 20 秒讓剛開機的服務起來）。"""
+    import urllib.request
+    hint = os.path.join(os.environ.get("ProgramData") or r"C:\ProgramData", "netmap.url")
+    t0 = time.time(); url = ""
+    while time.time() - t0 < 20:
+        try:
+            url = open(hint, encoding="utf-8").read().strip()
+            if url and urllib.request.urlopen(url.rstrip("/") + "/api/ping", timeout=2).status == 200: webbrowser.open(url); return
+        except Exception: pass
+        time.sleep(1)
+    msg = "找不到執行中的 RackTrace 服務。\n\n請稍等幾秒再試，或到「工作排程器」確認「RackTrace」工作有在執行。"
+    try:
+        import ctypes; ctypes.windll.user32.MessageBoxW(0, msg, "RackTrace", 0x10)
+    except Exception: print(msg)
+
 def main():
+    if "--open" in sys.argv: return open_installed()
     if "--service" in sys.argv:
         sys.argv = [a for a in sys.argv if a != "--service"]
         return srv.main()
+    if "--migrate-user-data" in sys.argv: return srv.main()
     try:
         if os.name == "nt":
             import ctypes; ctypes.windll.shcore.SetProcessDpiAwareness(1)

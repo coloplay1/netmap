@@ -33,11 +33,15 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.16.1"
+VERSION = "1.17.0"
 
 # ───────────────────────── paths & secrets ─────────────────────────
+MACHINE = False   # --machine：整台電腦共用的資料夾（C:\ProgramData\netmap），給「開機自動啟動、不用登入」的服務用（用 SYSTEM 執行，沒有使用者的 APPDATA）
+
+
 def data_dir():
-    base = os.environ.get("APPDATA") or os.path.join(os.path.expanduser("~"), ".config")
+    if MACHINE and os.name == "nt": base = os.environ.get("ProgramData") or r"C:\ProgramData"
+    else: base = os.environ.get("APPDATA") or os.path.join(os.path.expanduser("~"), ".config")
     d = os.path.join(base, APP)
     os.makedirs(d, exist_ok=True)
     return d
@@ -58,7 +62,8 @@ def _dpapi(data, protect):
     buf = ctypes.create_string_buffer(data, len(data))
     inp = BLOB(len(data), ctypes.cast(buf, ctypes.POINTER(ctypes.c_char))); out = BLOB()
     fn = ctypes.windll.crypt32.CryptProtectData if protect else ctypes.windll.crypt32.CryptUnprotectData
-    ok = fn(ctypes.byref(inp), None, None, None, None, 0, ctypes.byref(out)) if protect else fn(ctypes.byref(inp), None, None, None, None, 0, ctypes.byref(out))
+    # CRYPTPROTECT_LOCAL_MACHINE(4)：服務模式用「這台電腦」加密，任何帳號（包括 SYSTEM）都解得開；解密時 Windows 會自己判斷，不用旗標
+    ok = fn(ctypes.byref(inp), None, None, None, None, 4 if (protect and MACHINE) else 0, ctypes.byref(out))
     if not ok: raise OSError("DPAPI failed")
     res = ctypes.string_at(out.pbData, out.cbData); ctypes.windll.kernel32.LocalFree(out.pbData); return res
 
@@ -1954,14 +1959,68 @@ def merge_discover(project, found):
         if sd.get("wifi") and idmap.get(sd["wifi"]["ap"]): nd["wifi"] = dict(sd["wifi"], ap=idmap[sd["wifi"]["ap"]])
     return hit, new, moved
 
+def migrate_user_data():
+    """安裝程式用：把「這個使用者」平常用的資料（%APPDATA%\\netmap）複製到整台電腦共用的資料夾（C:\\ProgramData\\netmap），
+    並把裡面用「這個使用者」加密的密碼（dpapi:）改成「這台電腦」加密，這樣開機自動啟動的服務（SYSTEM）才讀得到。
+    目的地已經有資料就不動（不覆蓋）。回傳 (狀態, 說明)。"""
+    global MACHINE
+    import shutil
+    src = os.path.join(os.environ.get("APPDATA") or "", APP)
+    MACHINE = True; dst = data_dir()
+    if not os.path.isdir(src): return "none", "這個帳號沒有舊資料，不需要搬移"
+    if any(os.path.exists(os.path.join(dst, f)) for f in ("project.json", "settings.json")): return "exists", "共用資料夾已經有資料，沒有覆蓋"
+    for dp, _dn, fns in os.walk(src):   # 自己逐檔複製（不用 shutil.copytree：Python 3.12 在 Windows 會用 CopyFile2，部分環境不支援）
+        out = os.path.join(dst, os.path.relpath(dp, src)); os.makedirs(out, exist_ok=True)
+        for f in fns:
+            with open(os.path.join(dp, f), "rb") as fi, open(os.path.join(out, f), "wb") as fo: shutil.copyfileobj(fi, fo)
+    def walk(o):
+        n = 0
+        if isinstance(o, dict):
+            for k, v in list(o.items()):
+                if isinstance(v, str) and v.startswith("dpapi:"):
+                    try: o[k] = protect(_dpapi(base64.b64decode(v[6:]), False).decode("utf-8")); n += 1
+                    except Exception: pass
+                else: n += walk(v)
+        elif isinstance(o, list):
+            for i, v in enumerate(o):
+                if isinstance(v, str) and v.startswith("dpapi:"):
+                    try: o[i] = protect(_dpapi(base64.b64decode(v[6:]), False).decode("utf-8")); n += 1
+                    except Exception: pass
+                else: n += walk(v)
+        return n
+    total = 0
+    for dp, _dn, fns in os.walk(dst):
+        for f in fns:
+            if f.endswith(".json"):
+                fp = os.path.join(dp, f)
+                try:
+                    o = json.load(open(fp, encoding="utf-8")); c = walk(o)
+                    if c: json.dump(o, open(fp, "w", encoding="utf-8"), ensure_ascii=False, indent=1); total += c
+                except Exception: pass
+    return "ok", f"已把舊資料複製到 {dst}，並重新加密 {total} 筆密碼"
+
+
 def main():
     import argparse
     ap = argparse.ArgumentParser(description="netmap 監控服務（無視窗模式）")
+    ap.add_argument("--machine", action="store_true", help="用整台電腦共用的資料夾（C:\\ProgramData\\netmap），給開機自動啟動的服務用")
+    ap.add_argument("--migrate-user-data", action="store_true", help="安裝程式用：把這個使用者的舊資料搬到共用資料夾後結束")
     ap.add_argument("--port", type=int); ap.add_argument("--interval", type=int); ap.add_argument("--data")
     ap.add_argument("--flow", action="store_true", help="同時接收 NetFlow／IPFIX（UDP 2055）與 sFlow（UDP 6343）")
     ap.add_argument("--set-password", action="store_true", help="設定管理密碼（其他電腦要登入才能編輯、改設定）後結束")
     ap.add_argument("--view-link", action="store_true", help="產生（或顯示）只能檢視的連結後結束")
     a = ap.parse_args()
+    if a.migrate_user_data:
+        # 視窗版 exe 沒有主控台，結果寫進 %TEMP%\\racktrace-migrate.log 方便查
+        lp = os.path.join(os.environ.get("TEMP") or ".", "racktrace-migrate.log")
+        try: r = migrate_user_data()[1]
+        except Exception as e:
+            import traceback; r = "失敗：" + traceback.format_exc()
+        try: open(lp, "a", encoding="utf-8").write(time.strftime("%Y-%m-%d %H:%M:%S ") + r + "\n")
+        except Exception: pass
+        print(r); return
+    global MACHINE
+    if a.machine: MACHINE = True
     st = Store(a.data)
     if a.set_password:
         import getpass
@@ -1979,6 +2038,9 @@ def main():
     if a.interval: st.settings["interval"] = a.interval
     sv = Service(st); sv.start()
     print("網頁：", ", ".join(sv.urls()))
+    if MACHINE and os.name == "nt":   # 給「開啟 RackTrace」的捷徑知道網址（資料夾本身只有管理員能讀，所以另外放一個只含網址的檔案）
+        try: open(os.path.join(os.environ.get("ProgramData") or r"C:\ProgramData", "netmap.url"), "w", encoding="utf-8").write(f"http://127.0.0.1:{int(st.settings.get('port', 8080))}/")
+        except Exception: pass
     try:
         while True: time.sleep(3600)
     except KeyboardInterrupt: sv.stop()
