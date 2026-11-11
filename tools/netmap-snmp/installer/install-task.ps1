@@ -10,6 +10,8 @@ if ($Remove) {
   exit 0
 }
 
+$logf = Join-Path ($env:ProgramData) 'netmap-install.log'
+try {
 $a = New-ScheduledTaskAction -Execute $Exe -Argument '--service --machine' -WorkingDirectory (Split-Path $Exe)
 $t = New-ScheduledTaskTrigger -AtStartup
 # No execution time limit (default stops after 3 days), retry on failure, ignore battery state
@@ -19,3 +21,7 @@ $p = New-ScheduledTaskPrincipal -UserId 'SYSTEM' -LogonType ServiceAccount -RunL
 Register-ScheduledTask -TaskName $name -Action $a -Trigger $t -Settings $s -Principal $p -Description 'RackTrace monitoring service (starts at boot)' -Force | Out-Null
 Start-ScheduledTask -TaskName $name
 Write-Output "Registered and started scheduled task: $name"
+} catch {
+  try { ("{0} install-task failed: {1}" -f (Get-Date -Format s), $_) | Out-File -FilePath $logf -Append -Encoding utf8 } catch {}
+  throw
+}

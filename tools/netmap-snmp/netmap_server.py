@@ -33,7 +33,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.17.2"
+VERSION = "1.17.3"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 MACHINE = False   # --machine：整台電腦共用的資料夾（C:\ProgramData\netmap），給「開機自動啟動、不用登入」的服務用（用 SYSTEM 執行，沒有使用者的 APPDATA）
@@ -2072,7 +2072,23 @@ def main():
     if a.flow: st.settings["flow_enabled"] = True
     if a.port: st.settings["port"] = a.port
     if a.interval: st.settings["interval"] = a.interval
-    sv = Service(st); sv.start()
+    _slog = print
+    if MACHINE and os.name == "nt":   # 背景服務沒有視窗：把啟動過程記在 C:\ProgramData\netmap-service.log（不含密碼，一般使用者也能讀），出問題才找得到原因
+        _lf = os.path.join(os.environ.get("ProgramData") or r"C:\ProgramData", "netmap-service.log")
+        try:
+            if os.path.getsize(_lf) > 300000: os.replace(_lf, _lf + ".old")
+        except Exception: pass
+        def _slog(m):
+            try: open(_lf, "a", encoding="utf-8").write(time.strftime("%Y-%m-%d %H:%M:%S ") + m + "\n")
+            except Exception: pass
+        _slog(f"服務啟動 v{VERSION}，資料夾 {st.root}")
+    sv = Service(st, log=_slog)
+    try: sv.start()
+    except OSError as e:   # 埠被別的程式佔用：換一個空的埠，網址檔（netmap.url）會跟著更新，捷徑照樣能開
+        cur = int(st.settings.get("port", 8080)); alt = suggest_port(avoid=(cur,))
+        d = port_diag(cur); sv.log(f"網頁埠 {cur} 不能用（{e}）；佔用者：{d.get('proc') or d.get('pid') or '不明'}")
+        if not (MACHINE and alt): raise
+        st.settings["port"] = alt; st.save_settings(); sv.log(f"改用埠 {alt}"); sv.start()
     print("網頁：", ", ".join(sv.urls()))
     if MACHINE and os.name == "nt":   # 給「開啟 RackTrace」的捷徑知道網址（資料夾本身只有管理員能讀，所以另外放一個只含網址的檔案）
         try: open(os.path.join(os.environ.get("ProgramData") or r"C:\ProgramData", "netmap.url"), "w", encoding="utf-8").write(f"http://127.0.0.1:{int(st.settings.get('port', 8080))}/")

@@ -980,14 +980,25 @@ def open_installed():
     """「開啟 RackTrace」捷徑：服務已經在背景跑，這裡只要開瀏覽器到它的網址（最多等 20 秒讓剛開機的服務起來）。"""
     import urllib.request
     hint = os.path.join(os.environ.get("ProgramData") or r"C:\ProgramData", "netmap.url")
-    t0 = time.time(); url = ""
-    while time.time() - t0 < 20:
+    t0 = time.time(); url = ""; kicked = False
+    while time.time() - t0 < 40:
+        if not kicked and time.time() - t0 > 6:   # 6 秒還沒起來：請工作排程器再啟動一次（沒權限也沒關係）
+            kicked = True
+            try:
+                import subprocess; subprocess.run(["schtasks", "/run", "/tn", "RackTrace"], capture_output=True, timeout=15, creationflags=0x08000000)
+            except Exception: pass
         try:
             url = open(hint, encoding="utf-8").read().strip()
             if url and urllib.request.urlopen(url.rstrip("/") + "/api/ping", timeout=2).status == 200: webbrowser.open(url); return
         except Exception: pass
         time.sleep(1)
     msg = "找不到執行中的 RackTrace 服務。\n\n請稍等幾秒再試，或到「工作排程器」確認「RackTrace」工作有在執行。"
+    pd = os.environ.get("ProgramData") or r"C:\ProgramData"
+    try:   # 附上服務自己記的最後幾行，才知道為什麼沒起來
+        lines = open(os.path.join(pd, "netmap-service.log"), encoding="utf-8").read().strip().splitlines()[-6:]
+        msg += "\n\n服務紀錄（" + os.path.join(pd, "netmap-service.log") + "）：\n" + "\n".join(lines)
+    except Exception:
+        msg += "\n\n服務沒有留下任何紀錄，表示它根本沒有啟動（工作排程器裡「RackTrace」的上次執行結果可以看到原因）。"
     try:
         import ctypes; ctypes.windll.user32.MessageBoxW(0, msg, "RackTrace", 0x10)
     except Exception: print(msg)
@@ -996,7 +1007,12 @@ def main():
     if "--open" in sys.argv: return open_installed()
     if "--service" in sys.argv:
         sys.argv = [a for a in sys.argv if a != "--service"]
-        return srv.main()
+        try: return srv.main()
+        except BaseException:
+            import traceback
+            try: open(os.path.join(os.environ.get("ProgramData") or r"C:\ProgramData", "netmap-service.log"), "a", encoding="utf-8").write(time.strftime("%Y-%m-%d %H:%M:%S ") + "服務異常結束：\n" + traceback.format_exc() + "\n")
+            except Exception: pass
+            raise
     if "--migrate-user-data" in sys.argv: return srv.main()
     try:
         if os.name == "nt":
