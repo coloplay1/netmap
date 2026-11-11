@@ -100,7 +100,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="0 0 256 256" aria-hidden="true"><rect width="256" height="256" rx="56" fill="#fff"/><rect x="42" y="38" width="86" height="180" rx="4" fill="none" stroke="#111" stroke-width="13"/><path d="M66 82H104M66 116H104M66 150H104M66 184H104" stroke="#111" stroke-width="11" stroke-linecap="round"/><path d="M128 96C168 96 170 70 200 70" fill="none" stroke="#F2C230" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="70" r="13" fill="#F2C230"/><path d="M128 130C168 130 170 150 200 150" fill="none" stroke="#1E9BEA" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="150" r="13" fill="#1E9BEA"/><path d="M128 178C162 178 172 206 196 206" fill="none" stroke="#5B6472" stroke-width="11" stroke-linecap="round" stroke-dasharray="1 18"/><circle cx="210" cy="206" r="11" fill="none" stroke="#5B6472" stroke-width="7"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v3.14.6 · netmap.exe v1.19.0</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v3.14.7 · netmap.exe v1.19.0</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -138,7 +138,7 @@ code,td,li,p{overflow-wrap:anywhere}
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
     <a class="btn ghost" href="RackTrace-manual.pdf" download>下載 PDF 版手冊</a>
-    <a class="btn ghost" href="#changelog">最新更新：v3.14.6</a>
+    <a class="btn ghost" href="#changelog">最新更新：v3.14.7</a>
   </div>
 </div>
 
@@ -860,15 +860,16 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 
 <section id="changelog">
 <h2><span class="n">14</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v3.14.6　開始頁加上線上版／本機服務的說明</b><span class="tag new">最新 · 2026-11-12</span><span class="tag">netmap.exe 1.19.0</span></div><ul><li>開始頁多了一則提示：在線上版會說明資料只存在這台電腦的瀏覽器、如何安裝本機服務；在本機服務會說明圖存在這台電腦、線上版（網址）是另一份獨立資料、搬資料用匯出 JSON。按「我知道了」就不再顯示。</li></ul></div>
-<div class="clog"><div class="v"><b>v3.14.5　分頁可以右鍵刪除、改名、排序；只有一頁時也能框選後新增分頁</b><span class="tag">2026-11-12</span><span class="tag">netmap.exe 1.19.0</span></div><ul><li>下方分頁標籤按右鍵：改名稱、往前／往後移、刪除這個分頁（上面的設備會搬到你選的頁面）、新增分頁。</li><li>還沒有任何分頁的時候，框選設備後，上方操作列的「移到分頁…」也有「＋ 新增樓層並移入…」，不用先到檔案選單新增分頁。</li></ul></div>
-<div class="clog"><div class="v"><b>v3.14.4　多樓層範例、樓層框合併距離加大</b><span class="tag">2026-11-12</span><span class="tag">netmap.exe 1.19.0</span></div><ul><li>範例新增「三層樓辦公室（多樓層）」：1F 機房、2F 辦公室、3F 研發，可以直接試「全部總覽」、樓層框、跨樓層查線。</li><li>樓層框合併的距離加大，同一樓層的設備不用貼很近也會畫成同一個框。</li></ul></div>
-<div class="clog"><div class="v"><b>v3.14.3　樓層框改成分群、下方分頁加顏色、Ctrl 點選設備</b><span class="tag">2026-11-12</span><span class="tag">netmap.exe 1.19.0</span></div><ul><li>在樓層框或標籤上按右鍵：可以「取消這個框」（把框內設備移回主圖）；設備右鍵選單也有「移回主圖」。「顯示圖層」新增「樓層框線」，可以隱藏總覽裡的虛線框。同一樓層的框只要碰到或靠得很近就會合併成一個框。虛線框只在「全部總覽」出現，而且第一頁（主圖）不畫框，只標出劃進其他樓層的設備，圖面不再到處是框。</li><li>修正：在某個分頁新增設備時，會避開其他分頁的設備，不再疊在別頁設備上（疊住時在「全部總覽」看起來像設備不見了）。</li><li>Ctrl（Mac 是 ⌘）＋點設備可以逐台加入或移除選取，選到兩台以上就是群組選取，可以一起拖曳、移到分頁；框選拖曳到一半或開著框選模式時，按右鍵可以取消。</li><li>總覽裡的樓層框改成「一群一個框」：同一樓層的設備如果分得很開，會各畫各的框，不會再把中間不相干的區域也圈進去。每個框都有樓層名稱標籤，點標籤選取這個框內的設備，拖曳框線或標籤就整群一起移動。</li><li>下方分頁標籤加上顏色圓點和異常數字，設備屬性的「所在頁面」新增「＋ 新增分頁並移入…」。</li></ul></div>
-<div class="clog"><div class="v"><b>v3.14.0　全部總覽、樓層疊層切換、框選加強</b><span class="tag">2026-11-12</span><span class="tag">netmap.exe 1.19.0</span></div><ul><li>新增「全部總覽」：所有樓層攤開在同一張圖，每個樓層用彩色虛線框和標籤標出（點標籤可選取整層、雙擊切到那一層）。</li><li>下方的分頁標籤每個樓層多了顏色圓點（和總覽裡的虛線框同色），有設備沒回應的樓層會顯示紅色數字。設備屬性的「所在頁面」選單新增「＋ 新增分頁並移入…」。</li><li>框選加強：Shift＋拖曳可以累加到目前的選取，Shift＋點設備可以加入或移除，在空白處按右鍵取消選取；選好後用上方的「移到分頁…」直接劃進樓層。</li></ul></div>
-<div class="clog"><div class="v"><b>v3.13.1　不同分頁的設備可以直接接線</b><span class="tag">2026-11-12</span><span class="tag">netmap.exe 1.19.0</span></div><ul><li>按「接到…」選好起點埠後，點下面的分頁標籤切到另一頁，再點要接的埠就能接線（之前切頁會取消）。接好後兩頁都會出現「→ 對面頁面」的連接標籤，可以看到源頭是哪台設備、哪個埠。</li></ul></div>
-<div class="clog"><div class="v"><b>v3.13.0　本機服務可以自己更新網頁畫面</b><span class="tag">2026-11-12</span><span class="tag">netmap.exe 1.19.0</span></div><ul><li>本機服務（127.0.0.1）的網頁原本打包在程式裡，要重新安裝才會更新。現在首頁版本旁會出現橘色的「有新版網頁，按一下更新」，按下去就會下載最新網頁，不用重新安裝。</li><li>只有你按了才會更新，只能在服務主機上操作；下載的內容會檢查大小和是否為 RackTrace 網頁。程式本身（掃描、監控）有改動時仍要重新安裝。</li></ul></div>
-<div class="clog"><div class="v"><b>v3.12.2　首頁「一切正常」下面加「＋ 新增監控設備」</b><span class="tag">2026-11-12</span><span class="tag">netmap.exe 1.18.3</span></div><ul><li>首頁右邊的設備狀態欄最下面多了「＋ 新增監控設備」，點下去直接開掃描設備（設定 SNMP 帳號、掃描更多設備）。</li></ul></div>
-<div class="clog"><div class="v"><b>v3.12.1　設備大小調整更好用</b><span class="tag">2026-11-12</span><span class="tag">netmap.exe 1.18.3</span></div><ul><li>右鍵選單的「大小」：左邊是「還原」按鈕，右邊「－ 目前大小 ＋」直接顯示現在的百分比；按一下不會關掉選單，可以連續調整。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.14.7　修正：筆電螢幕下方工具列重疊、範例載入後沒有全覽、更新紀錄日期</b><span class="tag new">最新 · 2026-11-11</span><span class="tag">netmap.exe 1.19.0</span></div><ul><li>下方分頁標籤移到工具列上方，在 1366×768 等筆電寬度不再蓋住縮放比例和左下角的圖例。</li><li>載入範例或自動排列後，「全部總覽」會連樓層框和標籤一起納入，整張圖都看得到。</li><li>更新紀錄 3.14.0～3.14.6 的日期寫成隔天，已改回正確日期。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.14.6　開始頁加上線上版／本機服務的說明</b><span class="tag">2026-11-11</span><span class="tag">netmap.exe 1.19.0</span></div><ul><li>開始頁多了一則提示：在線上版會說明資料只存在這台電腦的瀏覽器、如何安裝本機服務；在本機服務會說明圖存在這台電腦、線上版（網址）是另一份獨立資料、搬資料用匯出 JSON。按「我知道了」就不再顯示。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.14.5　分頁可以右鍵刪除、改名、排序；只有一頁時也能框選後新增分頁</b><span class="tag">2026-11-11</span><span class="tag">netmap.exe 1.19.0</span></div><ul><li>下方分頁標籤按右鍵：改名稱、往前／往後移、刪除這個分頁（上面的設備會搬到你選的頁面）、新增分頁。</li><li>還沒有任何分頁的時候，框選設備後，上方操作列的「移到分頁…」也有「＋ 新增樓層並移入…」，不用先到檔案選單新增分頁。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.14.4　多樓層範例、樓層框合併距離加大</b><span class="tag">2026-11-11</span><span class="tag">netmap.exe 1.19.0</span></div><ul><li>範例新增「三層樓辦公室（多樓層）」：1F 機房、2F 辦公室、3F 研發，可以直接試「全部總覽」、樓層框、跨樓層查線。</li><li>樓層框合併的距離加大，同一樓層的設備不用貼很近也會畫成同一個框。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.14.3　樓層框改成分群、下方分頁加顏色、Ctrl 點選設備</b><span class="tag">2026-11-11</span><span class="tag">netmap.exe 1.19.0</span></div><ul><li>在樓層框或標籤上按右鍵：可以「取消這個框」（把框內設備移回主圖）；設備右鍵選單也有「移回主圖」。「顯示圖層」新增「樓層框線」，可以隱藏總覽裡的虛線框。同一樓層的框只要碰到或靠得很近就會合併成一個框。虛線框只在「全部總覽」出現，而且第一頁（主圖）不畫框，只標出劃進其他樓層的設備，圖面不再到處是框。</li><li>修正：在某個分頁新增設備時，會避開其他分頁的設備，不再疊在別頁設備上（疊住時在「全部總覽」看起來像設備不見了）。</li><li>Ctrl（Mac 是 ⌘）＋點設備可以逐台加入或移除選取，選到兩台以上就是群組選取，可以一起拖曳、移到分頁；框選拖曳到一半或開著框選模式時，按右鍵可以取消。</li><li>總覽裡的樓層框改成「一群一個框」：同一樓層的設備如果分得很開，會各畫各的框，不會再把中間不相干的區域也圈進去。每個框都有樓層名稱標籤，點標籤選取這個框內的設備，拖曳框線或標籤就整群一起移動。</li><li>下方分頁標籤加上顏色圓點和異常數字，設備屬性的「所在頁面」新增「＋ 新增分頁並移入…」。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.14.0　全部總覽、樓層疊層切換、框選加強</b><span class="tag">2026-11-11</span><span class="tag">netmap.exe 1.19.0</span></div><ul><li>新增「全部總覽」：所有樓層攤開在同一張圖，每個樓層用彩色虛線框和標籤標出（點標籤可選取整層、雙擊切到那一層）。</li><li>下方的分頁標籤每個樓層多了顏色圓點（和總覽裡的虛線框同色），有設備沒回應的樓層會顯示紅色數字。設備屬性的「所在頁面」選單新增「＋ 新增分頁並移入…」。</li><li>框選加強：Shift＋拖曳可以累加到目前的選取，Shift＋點設備可以加入或移除，在空白處按右鍵取消選取；選好後用上方的「移到分頁…」直接劃進樓層。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.13.1　不同分頁的設備可以直接接線</b><span class="tag">2026-11-11</span><span class="tag">netmap.exe 1.19.0</span></div><ul><li>按「接到…」選好起點埠後，點下面的分頁標籤切到另一頁，再點要接的埠就能接線（之前切頁會取消）。接好後兩頁都會出現「→ 對面頁面」的連接標籤，可以看到源頭是哪台設備、哪個埠。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.13.0　本機服務可以自己更新網頁畫面</b><span class="tag">2026-11-11</span><span class="tag">netmap.exe 1.19.0</span></div><ul><li>本機服務（127.0.0.1）的網頁原本打包在程式裡，要重新安裝才會更新。現在首頁版本旁會出現橘色的「有新版網頁，按一下更新」，按下去就會下載最新網頁，不用重新安裝。</li><li>只有你按了才會更新，只能在服務主機上操作；下載的內容會檢查大小和是否為 RackTrace 網頁。程式本身（掃描、監控）有改動時仍要重新安裝。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.12.2　首頁「一切正常」下面加「＋ 新增監控設備」</b><span class="tag">2026-11-11</span><span class="tag">netmap.exe 1.18.3</span></div><ul><li>首頁右邊的設備狀態欄最下面多了「＋ 新增監控設備」，點下去直接開掃描設備（設定 SNMP 帳號、掃描更多設備）。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.12.1　設備大小調整更好用</b><span class="tag">2026-11-11</span><span class="tag">netmap.exe 1.18.3</span></div><ul><li>右鍵選單的「大小」：左邊是「還原」按鈕，右邊「－ 目前大小 ＋」直接顯示現在的百分比；按一下不會關掉選單，可以連續調整。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.12.0　設備可以自行縮放；埠名稱不再被截斷</b><span class="tag">2026-11-11</span><span class="tag">netmap.exe 1.18.3</span></div><ul><li>在設備上按右鍵，「大小」那一列可以縮小／放大（每次 10%，50%～200%）或還原 100%；選了一群設備時會一起縮放。連線會跟著設備走。</li><li>埠名稱像 Port1～Port9 被截成「Por…」的問題：現在只顯示數字（SFP、XG 這類名稱照舊）。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.11.4　掃描不再去連 127.0.1.1 這類假的鄰居位址</b><span class="tag">2026-11-11</span><span class="tag">netmap.exe 1.18.3</span></div><ul><li>有些設備的 LLDP／CDP 會回報 127.0.1.1（Linux 系統的主機名稱位址）、169.254.x.x 之類的管理位址，掃描沿著鄰居找下一台時會去連它而出現「沒有回應」的錯誤；現在會直接略過這些位址。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.11.3　已安裝服務時，雙擊 netmap.exe 直接開網頁</b><span class="tag">2026-11-11</span><span class="tag">netmap.exe 1.18.2</span></div><ul><li>已經裝了開機自動啟動的服務時，雙擊 netmap.exe（或 Program Files 裡的執行檔）不再開出第二個視窗和第二個服務搶埠，而是直接用瀏覽器打開服務的網頁；設定、掃描都在網頁上做，資料只有一份。</li><li>要強制開舊的視窗程式，捷徑加參數 --gui。</li></ul></div>
@@ -952,7 +953,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 <div class="clog"><div class="v"><b>v1.0　第一版</b><span class="tag">2026-11-06</span></div><ul><li>防火牆、Switch、配線架、資訊座埠對埠接線，點埠追蹤整條路徑</li><li>產業範例與自動排版</li></ul></div>
 </section>
 
-<p class="foot">RackTrace · 網頁 v3.14.6 · netmap.exe v1.19.0 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">RackTrace · 網頁 v3.14.7 · netmap.exe v1.19.0 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>
