@@ -33,7 +33,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.18.3"
+VERSION = "1.19.0"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 MACHINE = False   # --machine：整台電腦共用的資料夾（C:\ProgramData\netmap），給「開機自動啟動、不用登入」的服務用（用 SYSTEM 執行，沒有使用者的 APPDATA）
@@ -66,6 +66,45 @@ def data_dir():
     d = os.path.join(base, APP)
     os.makedirs(d, exist_ok=True)
     return d
+
+WEB_UPDATE_URL = "https://coloplay1.github.io/netmap/index.html"
+
+def _page_ver(html):
+    m = re.search(r"APP_VERSION='([\d.]+)'", html or "")
+    return _vkey(m.group(1)) if m else (0,)
+
+def web_override():
+    """使用者按過「更新網頁」後存下來的新版網頁；比程式內建的新才會用（重新安裝新版程式後，內建的更新就自然換回內建）。"""
+    try:
+        p = os.path.join(data_dir(), "web", "index.html")
+        if not os.path.exists(p): return None
+        html = open(p, encoding="utf-8").read()
+        b = web_index(); bh = open(b, encoding="utf-8").read() if b else ""
+        if _page_ver(html) <= _page_ver(bh): return None
+        m = re.search(r"MIN_EXE='([\d.]+)'", html)
+        if m and _vkey(m.group(1)) > _vkey(VERSION): return None
+        return html
+    except Exception: return None
+
+def web_update(url=None):
+    """下載最新網頁。回傳 (版本字串, 錯誤)。只收 https（測試用的環境變數除外）、大小與內容都要通過檢查。"""
+    import urllib.request
+    url = url or os.environ.get("NETMAP_WEB_URL") or WEB_UPDATE_URL
+    if not url.startswith(("https://", "file://")): return None, "網址不安全"
+    try:
+        raw = urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "RackTrace/" + VERSION, "Cache-Control": "no-cache"}), timeout=25).read(8 * 1024 * 1024 + 1)
+    except Exception as e: return None, f"下載失敗：{e}"
+    if not (300000 < len(raw) < 8 * 1024 * 1024): return None, "下載到的檔案大小不對"
+    html = raw.decode("utf-8", "replace")
+    if "<title>" not in html or "APP_VERSION='" not in html or "window.NETMAP_SERVER" not in html: return None, "下載到的內容不是 RackTrace 網頁"
+    b = web_index(); cur = max(_page_ver(open(b, encoding="utf-8").read()) if b else (0,), _page_ver(web_override()))
+    if _page_ver(html) <= cur: return None, "已經是最新的網頁"
+    m = re.search(r"MIN_EXE='([\d.]+)'", html)
+    if m and _vkey(m.group(1)) > _vkey(VERSION): return None, f"新網頁需要程式 {m.group(1)} 以上（目前 {VERSION}），請先重新安裝新版 RackTrace-Setup.exe"
+    d = os.path.join(data_dir(), "web"); os.makedirs(d, exist_ok=True)
+    tmp = os.path.join(d, "index.html.new")
+    open(tmp, "wb").write(raw); os.replace(tmp, os.path.join(d, "index.html"))
+    return ".".join(map(str, _page_ver(html))), ""
 
 def web_index():
     cands = []
@@ -1548,9 +1587,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
                     return s._send(302, b"", "text/plain", {"Location": "/", "Set-Cookie": f"nm_v={urllib.parse.quote(tok)}; Path=/; Max-Age=31536000; HttpOnly; SameSite=Lax"})
                 return s._send(403, LOGIN_HTML.replace("請向管理員要一個「檢視連結」。", "這個檢視連結已經失效，請向管理員要新的連結。"), "text/html; charset=utf-8")
             if not s.view_ok(): return s._send(401, LOGIN_HTML, "text/html; charset=utf-8")
-            p = web_index()
-            if not p: return s._send(500, "找不到網頁檔（web/index.html）", "text/plain; charset=utf-8")
-            html = open(p, encoding="utf-8").read()
+            html = web_override()
+            if html is None:
+                p = web_index()
+                if not p: return s._send(500, "找不到網頁檔（web/index.html）", "text/plain; charset=utf-8")
+                html = open(p, encoding="utf-8").read()
             with st.lock: boot = {"rev": st.rev, "pid": st.pid, "pname": next((x.get("name") for x in st.reg["list"] if x["id"] == st.pid), ""), "project": st.project, "interval": st.settings.get("interval", 60), "edit": s.can_edit(), "version": VERSION, "host": socket.gethostname(),
                                       "self_ips": sorted(self_ips()) if st.settings.get("monitor_self", True) else [],
                                       "admin": s.is_admin(), "local": s._local(), "auth": bool(st.settings.get("admin_hash")), "login": s.server.auth.valid(s._cookie("nm_a"))}
@@ -1688,6 +1729,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
             if not sv: return s._send(500, {"error": "no service"})
             res = sv.notifier.deliver([{"kind": "test", "name": "netmap", "ts": int(time.time()), "detail": f"來自 {socket.gethostname()}，通知設定正常"}], only=body.get("id"))
             return s._send(200, {"results": res})
+        if path in ("/api/webupdate", "/api/webupdate/reset"):
+            if not s._local() or not s.is_admin(): return s._send(403, {"error": "只能在服務主機上更新網頁"})
+            if path.endswith("reset"):
+                try: os.remove(os.path.join(data_dir(), "web", "index.html"))
+                except FileNotFoundError: pass
+                return s._send(200, {"ok": True})
+            v, err = web_update()
+            return s._send(200 if v else 400, {"ok": True, "version": v} if v else {"error": err})
         if path.startswith("/api/scan/"):
             if not s._local(): return s._send(403, {"error": "掃描只能在服務主機上操作"})
             if not s.is_admin(): return s._send(403, {"error": "需要管理員權限"})
