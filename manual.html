@@ -100,7 +100,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="0 0 256 256" aria-hidden="true"><rect width="256" height="256" rx="56" fill="#fff"/><rect x="42" y="38" width="86" height="180" rx="4" fill="none" stroke="#111" stroke-width="13"/><path d="M66 82H104M66 116H104M66 150H104M66 184H104" stroke="#111" stroke-width="11" stroke-linecap="round"/><path d="M128 96C168 96 170 70 200 70" fill="none" stroke="#F2C230" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="70" r="13" fill="#F2C230"/><path d="M128 130C168 130 170 150 200 150" fill="none" stroke="#1E9BEA" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="150" r="13" fill="#1E9BEA"/><path d="M128 178C162 178 172 206 196 206" fill="none" stroke="#5B6472" stroke-width="11" stroke-linecap="round" stroke-dasharray="1 18"/><circle cx="210" cy="206" r="11" fill="none" stroke="#5B6472" stroke-width="7"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v3.12.1 · netmap.exe v1.18.3</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v3.12.2 · netmap.exe v1.18.3</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -138,7 +138,7 @@ code,td,li,p{overflow-wrap:anywhere}
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
     <a class="btn ghost" href="RackTrace-manual.pdf" download>下載 PDF 版手冊</a>
-    <a class="btn ghost" href="#changelog">最新更新：v3.12.1</a>
+    <a class="btn ghost" href="#changelog">最新更新：v3.12.2</a>
   </div>
 </div>
 
@@ -816,7 +816,8 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 
 <section id="changelog">
 <h2><span class="n">14</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v3.12.1　設備大小調整更好用</b><span class="tag new">最新 · 2026-11-12</span><span class="tag">netmap.exe 1.18.3</span></div><ul><li>右鍵選單的「大小」：左邊是「還原」按鈕，右邊「－ 目前大小 ＋」直接顯示現在的百分比；按一下不會關掉選單，可以連續調整。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.12.2　首頁「一切正常」下面加「＋ 新增監控設備」</b><span class="tag new">最新 · 2026-11-12</span><span class="tag">netmap.exe 1.18.3</span></div><ul><li>首頁右邊的設備狀態欄最下面多了「＋ 新增監控設備」，點下去直接開掃描設備（設定 SNMP 帳號、掃描更多設備）。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.12.1　設備大小調整更好用</b><span class="tag">2026-11-12</span><span class="tag">netmap.exe 1.18.3</span></div><ul><li>右鍵選單的「大小」：左邊是「還原」按鈕，右邊「－ 目前大小 ＋」直接顯示現在的百分比；按一下不會關掉選單，可以連續調整。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.12.0　設備可以自行縮放；埠名稱不再被截斷</b><span class="tag">2026-11-11</span><span class="tag">netmap.exe 1.18.3</span></div><ul><li>在設備上按右鍵，「大小」那一列可以縮小／放大（每次 10%，50%～200%）或還原 100%；選了一群設備時會一起縮放。連線會跟著設備走。</li><li>埠名稱像 Port1～Port9 被截成「Por…」的問題：現在只顯示數字（SFP、XG 這類名稱照舊）。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.11.4　掃描不再去連 127.0.1.1 這類假的鄰居位址</b><span class="tag">2026-11-11</span><span class="tag">netmap.exe 1.18.3</span></div><ul><li>有些設備的 LLDP／CDP 會回報 127.0.1.1（Linux 系統的主機名稱位址）、169.254.x.x 之類的管理位址，掃描沿著鄰居找下一台時會去連它而出現「沒有回應」的錯誤；現在會直接略過這些位址。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.11.3　已安裝服務時，雙擊 netmap.exe 直接開網頁</b><span class="tag">2026-11-11</span><span class="tag">netmap.exe 1.18.2</span></div><ul><li>已經裝了開機自動啟動的服務時，雙擊 netmap.exe（或 Program Files 裡的執行檔）不再開出第二個視窗和第二個服務搶埠，而是直接用瀏覽器打開服務的網頁；設定、掃描都在網頁上做，資料只有一份。</li><li>要強制開舊的視窗程式，捷徑加參數 --gui。</li></ul></div>
@@ -900,7 +901,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 <div class="clog"><div class="v"><b>v1.0　第一版</b><span class="tag">2026-11-06</span></div><ul><li>防火牆、Switch、配線架、資訊座埠對埠接線，點埠追蹤整條路徑</li><li>產業範例與自動排版</li></ul></div>
 </section>
 
-<p class="foot">RackTrace · 網頁 v3.12.1 · netmap.exe v1.18.3 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">RackTrace · 網頁 v3.12.2 · netmap.exe v1.18.3 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>
