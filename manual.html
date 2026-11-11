@@ -100,7 +100,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="0 0 256 256" aria-hidden="true"><rect width="256" height="256" rx="56" fill="#fff"/><rect x="42" y="38" width="86" height="180" rx="4" fill="none" stroke="#111" stroke-width="13"/><path d="M66 82H104M66 116H104M66 150H104M66 184H104" stroke="#111" stroke-width="11" stroke-linecap="round"/><path d="M128 96C168 96 170 70 200 70" fill="none" stroke="#F2C230" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="70" r="13" fill="#F2C230"/><path d="M128 130C168 130 170 150 200 150" fill="none" stroke="#1E9BEA" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="150" r="13" fill="#1E9BEA"/><path d="M128 178C162 178 172 206 196 206" fill="none" stroke="#5B6472" stroke-width="11" stroke-linecap="round" stroke-dasharray="1 18"/><circle cx="210" cy="206" r="11" fill="none" stroke="#5B6472" stroke-width="7"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v3.14.4 · netmap.exe v1.19.0</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v3.14.5 · netmap.exe v1.19.0</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -138,7 +138,7 @@ code,td,li,p{overflow-wrap:anywhere}
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
     <a class="btn ghost" href="RackTrace-manual.pdf" download>下載 PDF 版手冊</a>
-    <a class="btn ghost" href="#changelog">最新更新：v3.14.4</a>
+    <a class="btn ghost" href="#changelog">最新更新：v3.14.5</a>
   </div>
 </div>
 
@@ -245,9 +245,9 @@ code,td,li,p{overflow-wrap:anywhere}
 <ul>
 <li><b>全部總覽</b>：看整體的連線狀態，跨樓層的線直接連起來，不需要連接標籤。第一頁（例如「1F 機房」）不畫框，只標出劃進其他樓層的設備。</li>
 <li><b>單獨一頁</b>：只顯示那一層的設備；接到別頁的線畫一小段，接到「→ 2F 辦公室」的標籤，點標籤就跳過去並選好對面的埠。</li>
-<li><b>分頁列</b>：每個分頁前面有顏色圓點（與總覽的虛線框同色）和設備數；有設備沒回應時，會多一個紅色數字。<b>雙擊頁籤</b>改名稱，按 <b>⋯</b> 調整順序或刪除頁面（上面的設備會搬到你選的頁面，線路不會不見）。</li>
+<li><b>分頁列</b>：每個分頁前面有顏色圓點（與總覽的虛線框同色）和設備數；有設備沒回應時，會多一個紅色數字。<b>雙擊頁籤</b>改名稱；<b>在頁籤上按右鍵</b>可以改名稱、往前／往後移、<b>刪除這個分頁</b>（上面的設備會搬到你選的頁面，線路不會不見）或新增分頁；按 <b>⋯</b> 可以一次管理所有頁面。</li>
 <li><b>把設備放進樓層</b>有三種方式：
-  <ol><li>在「全部總覽」框選或 <kbd>Ctrl</kbd>＋點選設備，上方操作列選「<b>移到分頁…</b>」，或選「<b>＋ 新增樓層並移入…</b>」一次建好樓層。</li>
+  <ol><li>框選或 <kbd>Ctrl</kbd>＋點選設備，上方操作列選「<b>移到分頁…</b>」，或選「<b>＋ 新增樓層並移入…</b>」一次建好樓層（還沒有任何分頁時也可以這樣做）。</li>
   <li>點單一設備 ▸「設備資訊」▸ <b>所在頁面</b>，選頁面，或選「<b>＋ 新增分頁並移入…</b>」。</li>
   <li>在某一頁新增設備，就會放在那一頁（位置會避開其他頁的設備）。</li></ol></li>
 <li>查線、故障查線、「如果這台壞了」都會跨頁面走完整條路徑；路徑清單裡其他頁的設備會標上頁面名稱。機櫃視圖、線路表、搜尋、匯出都是整份專案一起處理。</li>
@@ -860,7 +860,8 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 
 <section id="changelog">
 <h2><span class="n">14</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v3.14.4　多樓層範例、樓層框合併距離加大</b><span class="tag new">最新 · 2026-11-12</span><span class="tag">netmap.exe 1.19.0</span></div><ul><li>範例新增「三層樓辦公室（多樓層）」：1F 機房、2F 辦公室、3F 研發，可以直接試「全部總覽」、樓層框、跨樓層查線。</li><li>樓層框合併的距離加大，同一樓層的設備不用貼很近也會畫成同一個框。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.14.5　分頁可以右鍵刪除、改名、排序；只有一頁時也能框選後新增分頁</b><span class="tag new">最新 · 2026-11-12</span><span class="tag">netmap.exe 1.19.0</span></div><ul><li>下方分頁標籤按右鍵：改名稱、往前／往後移、刪除這個分頁（上面的設備會搬到你選的頁面）、新增分頁。</li><li>還沒有任何分頁的時候，框選設備後，上方操作列的「移到分頁…」也有「＋ 新增樓層並移入…」，不用先到檔案選單新增分頁。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.14.4　多樓層範例、樓層框合併距離加大</b><span class="tag">2026-11-12</span><span class="tag">netmap.exe 1.19.0</span></div><ul><li>範例新增「三層樓辦公室（多樓層）」：1F 機房、2F 辦公室、3F 研發，可以直接試「全部總覽」、樓層框、跨樓層查線。</li><li>樓層框合併的距離加大，同一樓層的設備不用貼很近也會畫成同一個框。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.14.3　樓層框改成分群、下方分頁加顏色、Ctrl 點選設備</b><span class="tag">2026-11-12</span><span class="tag">netmap.exe 1.19.0</span></div><ul><li>在樓層框或標籤上按右鍵：可以「取消這個框」（把框內設備移回主圖）；設備右鍵選單也有「移回主圖」。「顯示圖層」新增「樓層框線」，可以隱藏總覽裡的虛線框。同一樓層的框只要碰到或靠得很近就會合併成一個框。虛線框只在「全部總覽」出現，而且第一頁（主圖）不畫框，只標出劃進其他樓層的設備，圖面不再到處是框。</li><li>修正：在某個分頁新增設備時，會避開其他分頁的設備，不再疊在別頁設備上（疊住時在「全部總覽」看起來像設備不見了）。</li><li>Ctrl（Mac 是 ⌘）＋點設備可以逐台加入或移除選取，選到兩台以上就是群組選取，可以一起拖曳、移到分頁；框選拖曳到一半或開著框選模式時，按右鍵可以取消。</li><li>總覽裡的樓層框改成「一群一個框」：同一樓層的設備如果分得很開，會各畫各的框，不會再把中間不相干的區域也圈進去。每個框都有樓層名稱標籤，點標籤選取這個框內的設備，拖曳框線或標籤就整群一起移動。</li><li>下方分頁標籤加上顏色圓點和異常數字，設備屬性的「所在頁面」新增「＋ 新增分頁並移入…」。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.14.0　全部總覽、樓層疊層切換、框選加強</b><span class="tag">2026-11-12</span><span class="tag">netmap.exe 1.19.0</span></div><ul><li>新增「全部總覽」：所有樓層攤開在同一張圖，每個樓層用彩色虛線框和標籤標出（點標籤可選取整層、雙擊切到那一層）。</li><li>下方的分頁標籤每個樓層多了顏色圓點（和總覽裡的虛線框同色），有設備沒回應的樓層會顯示紅色數字。設備屬性的「所在頁面」選單新增「＋ 新增分頁並移入…」。</li><li>框選加強：Shift＋拖曳可以累加到目前的選取，Shift＋點設備可以加入或移除，在空白處按右鍵取消選取；選好後用上方的「移到分頁…」直接劃進樓層。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.13.1　不同分頁的設備可以直接接線</b><span class="tag">2026-11-12</span><span class="tag">netmap.exe 1.19.0</span></div><ul><li>按「接到…」選好起點埠後，點下面的分頁標籤切到另一頁，再點要接的埠就能接線（之前切頁會取消）。接好後兩頁都會出現「→ 對面頁面」的連接標籤，可以看到源頭是哪台設備、哪個埠。</li></ul></div>
@@ -950,7 +951,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 <div class="clog"><div class="v"><b>v1.0　第一版</b><span class="tag">2026-11-06</span></div><ul><li>防火牆、Switch、配線架、資訊座埠對埠接線，點埠追蹤整條路徑</li><li>產業範例與自動排版</li></ul></div>
 </section>
 
-<p class="foot">RackTrace · 網頁 v3.14.4 · netmap.exe v1.19.0 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">RackTrace · 網頁 v3.14.5 · netmap.exe v1.19.0 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>
