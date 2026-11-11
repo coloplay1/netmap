@@ -113,7 +113,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <li><a href="#quick">2. 五分鐘快速開始</a></li>
 <li><a href="#ui">3. 介面導覽</a></li>
 <li><a href="#build">4. 建立網路圖</a>
-  <ol><li><a href="#b-dev">新增設備與型號</a></li><li><a href="#b-cable">接線</a></li><li><a href="#b-wifi">無線連線</a></li><li><a href="#b-patch">配線架與資訊座</a></li><li><a href="#b-layout">排列與走線</a></li><li><a href="#b-pages">多張圖（樓層、機房）</a></li><li><a href="#b-fiber">光纖收容箱與光纖束</a></li></ol></li>
+  <ol><li><a href="#b-dev">新增設備與型號</a></li><li><a href="#b-cable">接線</a></li><li><a href="#b-wifi">無線連線</a></li><li><a href="#b-patch">配線架與資訊座</a></li><li><a href="#b-layout">排列與走線</a></li><li><a href="#b-pages">多張圖與全部總覽</a></li><li><a href="#b-select">選取多台設備</a></li><li><a href="#b-fiber">光纖收容箱與光纖束</a></li></ol></li>
 <li><a href="#trace">5. 查線路</a></li>
 <li><a href="#port">6. 埠設定（VLAN／PoE／LACP）</a></li>
 <li><a href="#view">7. 檢視與顯示</a>
@@ -122,7 +122,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <li><a href="#save">9. 儲存、匯出與分享</a>
   <ol><li><a href="#s-history">歷史版本與還原</a></li><li><a href="#s-check">資料檢查與單一設備的變更紀錄</a></li><li><a href="#s-labels">線標列印</a></li></ol></li>
 <li><a href="#exe">10. netmap.exe（Windows 程式）</a>
-  <ol><li><a href="#e-install">下載與第一次開啟</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-autosnmp">自動偵測 SNMP</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-detect">從線上版切換</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-ssh">SSH 流量監控</a></li><li><a href="#e-flow">誰在用流量</a></li><li><a href="#e-vendor">各廠牌設定教學</a></li><li><a href="#e-ping">心跳與事件</a></li><li><a href="#e-alert">告警通知</a></li><li><a href="#e-auth">管理密碼與檢視連結</a></li><li><a href="#e-seen">網路上的設備</a></li><li><a href="#e-audit">圖面比對（和實際網路對帳）</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
+  <ol><li><a href="#e-setup">安裝版（建議）</a></li><li><a href="#e-install">免安裝的 netmap.exe</a></li><li><a href="#e-webscan">在網頁裡掃描</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-autosnmp">自動偵測 SNMP</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-detect">從線上版切換</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-ssh">SSH 流量監控</a></li><li><a href="#e-flow">誰在用流量</a></li><li><a href="#e-vendor">各廠牌設定教學</a></li><li><a href="#e-ping">心跳與事件</a></li><li><a href="#e-alert">告警通知</a></li><li><a href="#e-auth">管理密碼與檢視連結</a></li><li><a href="#e-seen">網路上的設備</a></li><li><a href="#e-audit">圖面比對（和實際網路對帳）</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-webupdate">更新網頁</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
 <li><a href="#mobile">11. 手機操作</a></li>
 <li><a href="#keys">12. 快捷鍵</a></li>
 <li><a href="#faq">13. 常見問題</a></li>
@@ -162,7 +162,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <figure><img src="manual/welcome.jpg" alt="開始頁：網頁版" loading="lazy"><figcaption>開始頁的「網頁版」：新增、匯入、範例。上方顯示目前版本、更新內容與使用手冊。</figcaption></figure>
 <ol class="steps">
 <li><b>開啟網頁版</b>：<a href="./">coloplay1.github.io/netmap</a>。第一次會看到開始頁，選「網頁版」。</li>
-<li><b>先看範例</b>：在「範例」選一個產業（例如「中小企業辦公室」），馬上有一張完整的圖可以玩。</li>
+<li><b>先看範例</b>：在「範例」選一個產業（例如「中小企業辦公室」；想看多樓層就選「三層樓辦公室（多樓層）」），馬上有一張完整的圖可以玩。</li>
 <li><b>點任何一個埠</b>：整條路徑會亮起來，直到網路入口（光世代／ISP）。</li>
 <li><b>自己畫</b>：回首頁（點左上角標誌）選「新增空白圖」，用左邊的「設備」工具列加設備，從一個埠拖到另一個埠就是接線。</li>
 <li><b>想自動畫</b>：在開始頁選「本地端 netmap.exe」，下載 <a href="#exe">netmap.exe</a>，輸入核心 Switch 的 IP 與 SNMP community，掃完自動在網頁打開。</li>
@@ -239,16 +239,40 @@ code,td,li,p{overflow-wrap:anywhere}
 <figure class="mid"><img src="manual/bundle.jpg" alt="平行線收成一條" loading="lazy"><figcaption>兩台 Switch 之間 3 條線（含 LACP Po1）收成一條粗線。</figcaption></figure>
 <figure><img src="manual/picker.jpg" alt="高密度設備放大選埠" loading="lazy"><figcaption>畫面縮小時點 48 埠 Switch：放大成一排大按鈕，奇數埠在上、偶數埠在下，和機身一樣。</figcaption></figure>
 
-<h3 id="b-pages">多張圖（樓層、機房、分公司）</h3>
-<p>環境大的時候，一張圖會擠不下。<b>檔案 ▸ 新增頁面</b> 可以把圖分成好幾頁，例如「B1 機房」「2F 辦公室」「台中分公司」。有兩頁以上時，畫布下方會出現頁面列。</p>
-<figure class="mid"><img src="manual/pages.jpg" alt="多張圖與跨頁面連接標籤" loading="lazy"><figcaption>1F 機房這頁：接到 2F 的線畫一小段，接到「→ 2F 辦公室」的標籤；同一台設備有很多條時合併成一個標籤。</figcaption></figure>
+<h3 id="b-pages">多張圖與「全部總覽」（樓層、機房、分公司）</h3>
+<p>環境大的時候，一張圖會擠不下。<b>檔案 ▸ 新增頁面</b>（或畫布下方分頁列的 <b>＋</b>）可以把圖分成好幾頁，例如「1F 機房」「2F 辦公室」「3F 研發」。有兩頁以上時，畫布下方會出現分頁列，<b>最左邊多一個「全部總覽」</b>。想先看一份現成的，開始頁的範例選「<b>三層樓辦公室（多樓層）</b>」。</p>
+<figure><img src="manual/floors-overview.jpg" alt="全部總覽：所有樓層攤開在同一張圖" loading="lazy"><figcaption>「全部總覽」：所有樓層的設備和線攤開在同一張圖，劃進其他樓層的設備用同色虛線框和標籤標出來；下方分頁的圓點顏色與框相同。</figcaption></figure>
 <ul>
-<li><b>把設備搬到別頁</b>：點設備 ▸「設備資訊」▸ <b>所在頁面</b>。新增的設備會放在目前這一頁。</li>
-<li><b>跨頁面的線</b>不用重畫：兩邊都會顯示連接標籤，寫著對面的頁面、設備與埠。點標籤就跳到那一頁並選好對面的埠。</li>
-<li>查線、故障查線、「如果這台壞了」都會跨頁面走完整條路徑；路徑清單裡其他頁的設備會標上頁面名稱。</li>
-<li>頁面列上<b>雙擊頁籤</b>改名稱，按 <b>⋯</b> 調整順序或刪除頁面（上面的設備會搬到你選的頁面，線路不會不見）。</li>
-<li>機櫃視圖、線路表、搜尋、匯出都是整份專案一起處理。</li>
+<li><b>全部總覽</b>：看整體的連線狀態，跨樓層的線直接連起來，不需要連接標籤。第一頁（例如「1F 機房」）不畫框，只標出劃進其他樓層的設備。</li>
+<li><b>單獨一頁</b>：只顯示那一層的設備；接到別頁的線畫一小段，接到「→ 2F 辦公室」的標籤，點標籤就跳過去並選好對面的埠。</li>
+<li><b>分頁列</b>：每個分頁前面有顏色圓點（與總覽的虛線框同色）和設備數；有設備沒回應時，會多一個紅色數字。<b>雙擊頁籤</b>改名稱，按 <b>⋯</b> 調整順序或刪除頁面（上面的設備會搬到你選的頁面，線路不會不見）。</li>
+<li><b>把設備放進樓層</b>有三種方式：
+  <ol><li>在「全部總覽」框選或 <kbd>Ctrl</kbd>＋點選設備，上方操作列選「<b>移到分頁…</b>」，或選「<b>＋ 新增樓層並移入…</b>」一次建好樓層。</li>
+  <li>點單一設備 ▸「設備資訊」▸ <b>所在頁面</b>，選頁面，或選「<b>＋ 新增分頁並移入…</b>」。</li>
+  <li>在某一頁新增設備，就會放在那一頁（位置會避開其他頁的設備）。</li></ol></li>
+<li>查線、故障查線、「如果這台壞了」都會跨頁面走完整條路徑；路徑清單裡其他頁的設備會標上頁面名稱。機櫃視圖、線路表、搜尋、匯出都是整份專案一起處理。</li>
 </ul>
+<h4>樓層框（只出現在「全部總覽」）</h4>
+<figure class="mid"><img src="manual/floors-menu.jpg" alt="在樓層框上按右鍵" loading="lazy"><figcaption>在樓層框或標籤上按右鍵。</figcaption></figure>
+<ul>
+<li>同一樓層的設備靠得近會合併成一個框；離得很遠的各畫各的，不會把中間不相干的地方也圈進去。</li>
+<li><b>點標籤</b>選取框內的設備；<b>拖曳框線或標籤</b>，框內的設備整群一起移動；<b>雙擊標籤</b>切到那一層。</li>
+<li><b>右鍵框或標籤</b>：「選取框內的設備」、「<b>取消這個框</b>（設備移回第一頁）」、「隱藏所有樓層框線」。單一設備的右鍵選單也有「移回『第一頁』」。</li>
+<li>不想看到框：右下「顯示圖層」▸ <b>樓層框線</b> ▸ 隱藏（設定會記住）。</li>
+</ul>
+
+<h3 id="b-select">選取多台設備、框選與批次操作</h3>
+<figure><img src="manual/select-group.jpg" alt="選取多台設備後的操作列" loading="lazy"><figcaption>選了 3 台設備：上方出現操作列，可整理排列、移到指定位置、移到分頁或刪除。</figcaption></figure>
+<div class="tw"><table>
+<tr><th>操作</th><th>效果</th></tr>
+<tr><td>右下「框選」按鈕，或 <kbd>Shift</kbd>＋拖曳空白處</td><td>拉出一個方框，框住的設備全部選取。</td></tr>
+<tr><td><kbd>Shift</kbd>＋拖曳空白處（已有選取時）</td><td><b>累加</b>到目前的選取，不會取代。</td></tr>
+<tr><td><kbd>Ctrl</kbd>（Mac 是 <kbd>⌘</kbd>）＋點設備，或 <kbd>Shift</kbd>＋點設備</td><td>逐台加入或取消；選到兩台以上就是群組選取。</td></tr>
+<tr><td>拖曳任一台已選的設備</td><td>整群一起移動。</td></tr>
+<tr><td>右鍵點空白處，或框選拖曳到一半按右鍵</td><td>取消選取／取消這次框選；開著框選模式時再按右鍵會關掉框選模式。</td></tr>
+<tr><td><kbd>Esc</kbd>、操作列的 ✕</td><td>取消選取。</td></tr>
+</table></div>
+<p>操作列的按鈕：<b>整理排列</b>（排成整齊的格子）、<b>移到指定位置</b>（再點畫布上要放的位置）、<b>移到分頁…</b>、<b>刪除</b>（要按兩次確認）。設備右鍵選單也有「選取這台和底下的終端」「只選取直接連到這台的設備」等快速選法。</p>
 
 <h3 id="b-fiber">光纖收容箱與光纖束</h3>
 <p>機房之間、樓層之間常用一條多芯光纜（12、24、48 芯），兩端各接一個光纖收容箱（FDP／ODF），再從收容箱用 LC 跳線接到 Switch。</p>
@@ -388,7 +412,17 @@ code,td,li,p{overflow-wrap:anywhere}
 <h2><span class="n">10</span>netmap.exe（Windows 程式）</h2>
 <p>netmap.exe 用 SNMP 讀取防火牆、網管 Switch 的資料，自動畫出設備與連線，也可以常駐成「監控服務」，顯示每個埠的即時流量。只會<b>讀取</b>，不會修改設備設定。</p>
 
-<h3 id="e-install">下載與第一次開啟</h3>
+<h3 id="e-setup">安裝版（RackTrace-Setup.exe，建議）</h3>
+<p>想讓監控一直開著、不用每次手動啟動，用安裝版：到<a href="https://github.com/coloplay1/netmap/releases/latest/download/RackTrace-Setup.exe">這裡下載 RackTrace-Setup.exe</a>，執行後按「下一步」。</p>
+<ul>
+<li>裝在 <code>Program Files\RackTrace</code>，註冊成<b>開機自動啟動、不用登入</b>的背景服務（工作排程器的「RackTrace」）。</li>
+<li>資料放在 <code>%ProgramData%\netmap</code>（所有 Windows 帳號共用）；SNMP 帳密用 Windows 加密，只有這台電腦能解開。</li>
+<li>安裝時有「<b>允許內網其他電腦連進來</b>」選項（只開放私人／網域網路，預設勾選），讓同事能開 <code>http://這台的IP:18080/</code>；取消勾選就只有這台電腦能看。</li>
+<li>桌面與開始功能表的「<b>RackTrace</b>」會用瀏覽器打開服務的網頁；直接雙擊 <code>netmap.exe</code> 也會打開同一個網頁，不會再開第二個程式。</li>
+<li>連接埠被占用時，服務會自動換一個可用的埠，並把實際的網址寫在 <code>%ProgramData%\netmap-service.log</code>；舊版 netmap 正在執行時，新版會自動把舊版關掉再接手。</li>
+<li>出現「4551」或被 Windows 阻擋，通常是「智慧型應用程式控制」(Smart App Control) 擋掉沒有簽章的程式：可在 Windows 安全性 ▸ 應用程式與瀏覽器控制中改成「評估」或「關閉」，或請 IT 放行。程式碼完全公開，沒有付費簽章。</li>
+</ul>
+<h3 id="e-install">下載與第一次開啟（免安裝的 netmap.exe）</h3>
 <figure><img src="manual/welcome-local.jpg" alt="開始頁：本地端 netmap.exe" loading="lazy"><figcaption>開始頁的「本地端 netmap.exe」：功能介紹、三步開始與下載。</figcaption></figure>
 <ol class="steps">
 <li>在<a href="./">網頁版開始頁</a>或<a href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">這裡</a>下載 <b>netmap.exe</b>，免安裝，直接執行。</li>
@@ -397,6 +431,11 @@ code,td,li,p{overflow-wrap:anywhere}
 <li>關閉視窗時會問要「結束程式」或「縮到工作列」。監控服務需要程式保持開著。</li>
 </ol>
 
+<h3 id="e-webscan">在網頁裡掃描（安裝版）</h3>
+<p>用安裝版時，不用另外開 netmap.exe 的視窗：在<b>服務主機那台電腦</b>用瀏覽器開 <code>http://127.0.0.1:18080/</code>，點上方的「<b>＋ 掃描設備</b>」（或開始頁的「掃描」），在網頁裡輸入核心 Switch IP 與 community，就會掃描並把結果加到目前的圖，掃描中可以看進度、隨時停止。</p>
+<ul><li>掃描只能在服務主機本機操作，而且需要管理權限；其他電腦的瀏覽器看不到這個功能。掃描只讀取設備資料，不會改設備設定。</li>
+<li>沒有 SNMP 的網路改用「網段探索（ping + ARP）」。</li>
+<li>掃描結果會略過 <code>127.0.1.1</code> 這類本機位址的鄰居。</li></ul>
 <h3 id="e-scan">SNMP 掃描</h3>
 <figure class="mid"><img src="manual/app-g1.jpg" alt="netmap.exe 掃描分頁" loading="lazy"><figcaption>掃描分頁（畫面中的位址為測試環境）。</figcaption></figure>
 <ol class="steps">
@@ -649,6 +688,8 @@ __VENDORS__
 <li><b>SSH</b>：在「系統管理 → 系統設定」把 SSH 設為<b>只限 LAN</b> 開啟，用路由器帳號登入並記錄。<b>測完請記得關閉 SSH</b>。</li>
 </ol>
 
+<h3 id="e-webupdate">更新網頁（不用重新安裝）</h3>
+<p>服務的網頁和 <a href="./">線上版</a>是同一份。線上版更新後，從服務主機打開首頁，上方會出現橘色的「<b>有新版網頁 vX.Y.Z，按一下更新</b>」，按下去就會下載並套用，約一秒後重新載入。只有網頁改版時不用重新安裝；程式本身（掃描、監控）有新版才需要重新下載安裝檔。</p>
 <h3 id="e-update">更新程式</h3>
 <p>netmap.exe 啟動時會檢查是否有新版本，有的話標題列會出現「<b>有新版本</b>」，點一下即可下載。下載新的 netmap.exe 取代舊檔即可，設定與流量紀錄都會保留（存在 <code>%APPDATA%\netmap</code>）。</p>
 </section>
@@ -674,7 +715,10 @@ __VENDORS__
 <tr><td>點埠</td><td>查整條路徑、開設定列</td></tr>
 <tr><td>雙擊設備</td><td>切換圖示／網路埠模式</td></tr>
 <tr><td><kbd>Shift</kbd> + 點埠</td><td>多選埠（設 LACP、PoE、VLAN）</td></tr>
-<tr><td><kbd>Shift</kbd> + 拖曳空白處</td><td>框選埠</td></tr>
+<tr><td><kbd>Shift</kbd> + 拖曳空白處</td><td>框選設備（已有選取時累加）</td></tr>
+<tr><td><kbd>Ctrl</kbd>／<kbd>⌘</kbd> + 點設備</td><td>逐台加入或取消選取，兩台以上變成群組選取</td></tr>
+<tr><td>右鍵（空白處或框選中）</td><td>取消選取／取消框選</td></tr>
+<tr><td>右鍵（樓層框）</td><td>選取框內設備、取消這個框</td></tr>
 <tr><td>拖曳空白處</td><td>平移畫布</td></tr>
 <tr><td>點線，再雙擊線</td><td>加錨點（雙擊錨點刪除）</td></tr>
 <tr><td>右鍵／<kbd>A</kbd></td><td>在游標位置加設備</td></tr>
