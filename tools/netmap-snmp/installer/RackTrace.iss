@@ -36,16 +36,19 @@ Name: "en"; MessagesFile: "compiler:Default.isl"
 #endif
 
 [CustomMessages]
+#ifexist "ChineseTraditional.isl"
 zht.TaskAuto=開機自動啟動（不用登入）
 zht.TaskFw=允許公司內網的其他電腦用瀏覽器連進來（在 Windows 防火牆開放，只限私人／網域網路）
 zht.TaskDesk=在桌面建立捷徑
 zht.OpenNow=現在開啟 RackTrace
 zht.KeepData=要連同資料（設備圖、歷史紀錄、帳密）一起刪除嗎？%n%n選「否」會保留在 C:\ProgramData\netmap，之後重新安裝就能接著用。
+#else
 en.TaskAuto=Start automatically at boot (no sign-in needed)
 en.TaskFw=Allow other computers on the internal network to connect (Windows Firewall, private/domain only)
 en.TaskDesk=Create a desktop shortcut
 en.OpenNow=Open RackTrace now
 en.KeepData=Also delete the data (maps, history, credentials)?%n%nChoose No to keep it in C:\ProgramData\netmap.
+#endif
 
 [Tasks]
 Name: "autostart"; Description: "{cm:TaskAuto}"; GroupDescription: "服務 / Service"
