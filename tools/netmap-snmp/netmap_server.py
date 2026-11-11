@@ -33,7 +33,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.17.1"
+VERSION = "1.17.2"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 MACHINE = False   # --machine：整台電腦共用的資料夾（C:\ProgramData\netmap），給「開機自動啟動、不用登入」的服務用（用 SYSTEM 執行，沒有使用者的 APPDATA）
@@ -193,6 +193,35 @@ def port_diag(port):
             if m: r["proc"] = m.group(1)
     except Exception: pass
     return r
+
+def _vkey(v):
+    return tuple(int(x) if x.isdigit() else 0 for x in re.split(r"[.\-]", str(v or "0")))
+
+def takeover_old(port, log=lambda m: None):
+    """網頁埠被「舊版的 netmap」佔著時，把舊版結束掉讓新版接手。
+    只動版本比自己舊、而且程式名稱是 netmap／RackTrace 的程式；同版或較新的不動（回傳 False，由呼叫端提示）。"""
+    try:
+        import urllib.request
+        j = json.loads(urllib.request.urlopen(f"http://127.0.0.1:{port}/api/ping", timeout=2).read().decode("utf-8", "replace"))
+        if not (isinstance(j, dict) and j.get("ok") and j.get("version")): return False
+        if _vkey(j["version"]) >= _vkey(VERSION): return False
+    except Exception: return False
+    pid = None
+    try:
+        import psutil
+        for c in psutil.net_connections(kind="tcp"):
+            if c.status == "LISTEN" and c.laddr and c.laddr.port == port and c.pid: pid = c.pid; break
+        if not pid: return False
+        if pid == os.getpid(): return False
+        pr = psutil.Process(pid)
+        if not re.match(r"(netmap|racktrace)", pr.name(), re.I): return False
+        log(f"埠 {port} 被舊版 netmap（v{j['version']}，PID {pid}）佔用，結束它讓新版 v{VERSION} 接手")
+        pr.terminate()
+        try: pr.wait(5)
+        except Exception: pr.kill(); pr.wait(5)
+    except Exception as e:
+        log(f"無法結束舊版：{e}"); return False
+    return True
 
 def port_free(port):
     """這個埠現在能不能開（用獨佔模式試開一下就關掉）"""
@@ -1824,7 +1853,14 @@ class Service:
     def start(s):
         if s.httpd: return
         port = int(s.store.settings.get("port", 8080))
-        httpd = WebServer(("0.0.0.0", port), Handler)
+        try: httpd = WebServer(("0.0.0.0", port), Handler)
+        except OSError:
+            if not takeover_old(port, s.log): raise
+            for i in range(25):   # 舊版剛結束，埠要等一下才釋放
+                try: httpd = WebServer(("0.0.0.0", port), Handler); break
+                except OSError:
+                    if i == 24: raise
+                    time.sleep(0.2)
         httpd.daemon_threads = True; httpd.store = s.store; httpd.poller = s.poller; httpd.auth = s.auth
         httpd.service = s
         s.httpd = httpd; s.thread = threading.Thread(target=httpd.serve_forever, daemon=True, name="http"); s.thread.start()

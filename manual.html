@@ -100,7 +100,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="0 0 256 256" aria-hidden="true"><rect width="256" height="256" rx="56" fill="#fff"/><rect x="42" y="38" width="86" height="180" rx="4" fill="none" stroke="#111" stroke-width="13"/><path d="M66 82H104M66 116H104M66 150H104M66 184H104" stroke="#111" stroke-width="11" stroke-linecap="round"/><path d="M128 96C168 96 170 70 200 70" fill="none" stroke="#F2C230" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="70" r="13" fill="#F2C230"/><path d="M128 130C168 130 170 150 200 150" fill="none" stroke="#1E9BEA" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="150" r="13" fill="#1E9BEA"/><path d="M128 178C162 178 172 206 196 206" fill="none" stroke="#5B6472" stroke-width="11" stroke-linecap="round" stroke-dasharray="1 18"/><circle cx="210" cy="206" r="11" fill="none" stroke="#5B6472" stroke-width="7"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v3.10.2 · netmap.exe v1.17.1</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v3.10.3 · netmap.exe v1.17.2</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -138,7 +138,7 @@ code,td,li,p{overflow-wrap:anywhere}
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
     <a class="btn ghost" href="RackTrace-manual.pdf" download>下載 PDF 版手冊</a>
-    <a class="btn ghost" href="#changelog">最新更新：v3.10.2</a>
+    <a class="btn ghost" href="#changelog">最新更新：v3.10.3</a>
   </div>
 </div>
 
@@ -816,7 +816,8 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 
 <section id="changelog">
 <h2><span class="n">14</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v3.10.2　首頁加入安裝程式下載；網頁預設就能偵測到這台電腦的 netmap.exe</b><span class="tag new">最新 · 2026-11-11</span><span class="tag">netmap.exe 1.17.1</span></div><ul><li>首頁「本地端 netmap.exe」主要按鈕改為下載 RackTrace-Setup.exe（開機自動啟動），免安裝的 netmap.exe 放在旁邊。</li><li>netmap.exe 1.17.1：「讓線上版網頁偵測到這個程式」新安裝預設開啟（只允許本機、只回傳版本與埠號），不用再手動勾選才偵測得到。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.10.3　開新版 netmap.exe 時自動關掉舊版</b><span class="tag new">最新 · 2026-11-11</span><span class="tag">netmap.exe 1.17.2</span></div><ul><li>新版啟動時如果網頁埠被舊版 netmap 佔著，會自動結束舊版再接手，不會再搶同一個埠；同版或較新的不會被關。</li><li>只會結束版本比自己舊、而且程式名稱是 netmap／RackTrace 的程式。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.10.2　首頁加入安裝程式下載；網頁預設就能偵測到這台電腦的 netmap.exe</b><span class="tag">2026-11-11</span><span class="tag">netmap.exe 1.17.1</span></div><ul><li>首頁「本地端 netmap.exe」主要按鈕改為下載 RackTrace-Setup.exe（開機自動啟動），免安裝的 netmap.exe 放在旁邊。</li><li>netmap.exe 1.17.1：「讓線上版網頁偵測到這個程式」新安裝預設開啟（只允許本機、只回傳版本與埠號），不用再手動勾選才偵測得到。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.10.1　選取一群設備時，提示不再擋住上方操作列</b><span class="tag">2026-11-11</span><span class="tag">netmap.exe 1.17.0</span></div><ul><li>選取「這台和底下設備」後的提示改顯示在畫面下方並縮短，不會蓋住上方的整理／移動／刪除按鈕。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.10.0　Windows 安裝程式（開機自動啟動）</b><span class="tag">2026-11-11</span><span class="tag">netmap.exe 1.17.0</span></div><ul><li>新增 RackTrace-Setup.exe：裝到 Program Files，註冊成開機自動啟動、不用登入的背景服務（工作排程器，以 SYSTEM 執行），可選擇在 Windows 防火牆開放內網連線，並建立「RackTrace」開始功能表／桌面捷徑（開瀏覽器連到服務）。</li><li>資料放在 C:\ProgramData\netmap（只有系統管理員能讀）；安裝時會把原本帳號的資料複製過去並重新加密密碼，不會覆蓋已有的資料；升級不動資料，解除安裝時詢問是否刪除資料。</li><li>netmap.exe 新增 --machine（用共用資料夾）、--open（開瀏覽器連到服務）、--migrate-user-data 參數。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.9.9　用反向 DNS 補上設備名稱</b><span class="tag">2026-11-10</span><span class="tag">netmap.exe 1.16.1</span></div><ul><li>監控服務（netmap.exe 1.16.1）：「網路上的設備」裡有 IP、沒有名稱的設備，先用 NetBIOS 問，還是沒有的再用反向 DNS（PTR）問 DNS 伺服器，每個 IP 6 小時最多問一次。DHCP 發的 IP 常會被登記進 DNS，手機和 IoT 不回應 NetBIOS 時就靠這個補名字，補到的名稱會自動套到圖上只有 MAC／IP 的設備。</li><li>用哪台 DNS：「設定」裡填的 DNS 伺服器優先，沒填就用這台電腦自己的 DNS（最多試 3 台）。</li></ul></div>
@@ -889,7 +890,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 <div class="clog"><div class="v"><b>v1.0　第一版</b><span class="tag">2026-11-06</span></div><ul><li>防火牆、Switch、配線架、資訊座埠對埠接線，點埠追蹤整條路徑</li><li>產業範例與自動排版</li></ul></div>
 </section>
 
-<p class="foot">RackTrace · 網頁 v3.10.2 · netmap.exe v1.17.1 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">RackTrace · 網頁 v3.10.3 · netmap.exe v1.17.2 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>
