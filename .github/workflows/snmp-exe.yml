@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  pages: write
 
 env:
   PYTHONUTF8: '1'
@@ -133,3 +134,26 @@ jobs:
             - netmap-snmp.exe：命令列版掃描程式。
             - netmap-snmp.zip：Python 版（Windows / macOS / Linux）。
             線上版：https://coloplay1.github.io/netmap/
+
+      - name: Announce the new exe version (only after the release is published)
+        shell: bash
+        run: |
+          # version.json 的 "exe" 是「已經可以下載的最新版」：發布完成後才由這裡更新，
+          # 避免網頁／exe 提示有新版本、按下去卻只能下載到舊檔。
+          V=$(python -c "import re;print(re.search(r'VERSION = \"([0-9.]+)\"',open('tools/netmap-snmp/netmap_server.py',encoding='utf-8').read()).group(1))")
+          echo "built exe version: $V"
+          git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for i in 1 2 3; do
+            git fetch -q origin main && git reset -q --hard origin/main
+            python - "$V" <<'PY'
+          import json,sys
+          v=sys.argv[1]; d=json.load(open('version.json',encoding='utf-8'))
+          if d.get('exe')==v: print('version.json already announces',v); sys.exit(0)
+          d['exe']=v; json.dump(d,open('version.json','w',encoding='utf-8'),ensure_ascii=False,indent=1); print('announce',v)
+          PY
+            if git diff --quiet version.json; then break; fi
+            git add version.json && git commit -qm "chore: announce exe $V (release published)" && git push -q origin HEAD:main && { gh api -X POST repos/${{ github.repository }}/pages/builds >/dev/null 2>&1 || true; break; }
+            sleep 5
+          done
+        env:
+          GH_TOKEN: ${{ github.token }}
