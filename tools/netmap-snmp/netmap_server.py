@@ -33,7 +33,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.20.1"
+VERSION = "1.20.2"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 MACHINE = False   # --machine：整台電腦共用的資料夾（C:\ProgramData\netmap），給「開機自動啟動、不用登入」的服務用（用 SYSTEM 執行，沒有使用者的 APPDATA）
@@ -1526,7 +1526,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         return ip.startswith("127.") or ip == "::1" or ip in local_ips()
 
     def _send(s, code, body, ctype="application/json; charset=utf-8", extra=None):
-        if isinstance(body, (dict, list)): body = json.dumps(body, ensure_ascii=False).encode("utf-8")
+        if isinstance(body, (dict, list)): body = json.dumps(body, ensure_ascii=False, default=str).encode("utf-8")
         elif isinstance(body, str): body = body.encode("utf-8")
         s.send_response(code); s.send_header("Content-Type", ctype); s.send_header("Content-Length", str(len(body)))
         for k, v in (extra or {}).items():
@@ -1783,6 +1783,20 @@ class Handler(http.server.BaseHTTPRequestHandler):
             with st.lock: return s._send(409, {"rev": st.rev, "pid": st.pid, "project": st.project})
         s.server.poller.ifmaps.clear()
         s._send(200, {"rev": st.rev})
+
+
+def _guard(fn):
+    """處理請求時發生例外：記錄到服務紀錄並回 500，而不是什麼都不回（瀏覽器會顯示 ERR_EMPTY_RESPONSE，也查不到原因）。"""
+    def w(s):
+        try: return fn(s)
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError): raise
+        except Exception:
+            import traceback
+            svc_log("處理 %s %s 時發生錯誤：\n%s" % (s.command, (s.path or "").split("?")[0], traceback.format_exc()))
+            try: s._send(500, {"error": "伺服器內部錯誤，詳細內容在 C:\\ProgramData\\netmap-service.log"})
+            except Exception: pass
+    return w
+for _m in ("do_GET", "do_POST", "do_PUT"): setattr(Handler, _m, _guard(getattr(Handler, _m)))
 
 class Service:
     """監控服務：HTTP + 輪詢 + 心跳 + 告警。GUI 與命令列共用。"""
