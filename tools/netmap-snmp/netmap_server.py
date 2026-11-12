@@ -33,7 +33,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.20.4"
+VERSION = "1.20.5"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 MACHINE = False   # --machine：整台電腦共用的資料夾（C:\ProgramData\netmap），給「開機自動啟動、不用登入」的服務用（用 SYSTEM 執行，沒有使用者的 APPDATA）
@@ -1699,6 +1699,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 err = st.project_rename(pid, body.get("name"))
                 if err: return s._send(400, {"error": err})
             elif act == "delete":
+                if pid == st.pid and pid != "default": (sv.switch_project("default") if sv else st.project_switch("default"))
                 err = st.project_delete(pid)
                 if err: return s._send(400, {"error": err})
             else: return s._send(400, {"error": "unknown action"})
