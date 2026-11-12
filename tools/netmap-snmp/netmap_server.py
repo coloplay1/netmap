@@ -33,7 +33,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.20.5"
+VERSION = "1.20.6"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 MACHINE = False   # --machine：整台電腦共用的資料夾（C:\ProgramData\netmap），給「開機自動啟動、不用登入」的服務用（用 SYSTEM 執行，沒有使用者的 APPDATA）
@@ -368,7 +368,7 @@ DEFAULT_SETTINGS = {"port": 8080, "interval": 60, "retention_days": 7, "lan_edit
                     "snmp": {"version": "2c", "community": "", "user": "", "auth_proto": "SHA", "auth_key": "", "priv_proto": "AES", "priv_key": "",
                              "context": "", "port": 161, "timeout": 2.0, "retries": 1}}
 
-PROJECT_KEYS = ("devices", "cables", "racks", "faults", "pages", "trunks")
+PROJECT_KEYS = ("devices", "cables", "racks", "faults", "repairs", "pages", "trunks")
 
 def norm_mac(m):
     h = re.sub(r"[^0-9a-fA-F]", "", str(m or "")).lower()
@@ -417,14 +417,14 @@ def diff_projects(a, b):
         if k in ca and ca[k] != cb[k]:
             if strip(ca[k], ("wps",)) == strip(cb[k], ("wps",)): cmoved += 1
             else: cmod.append(cname(cb[k]))
-    other = [k for k in ("racks", "faults", "pages", "trunks") if (a.get(k) or []) != (b.get(k) or [])]
+    other = [k for k in ("racks", "faults", "repairs", "pages", "trunks") if (a.get(k) or []) != (b.get(k) or [])]
     parts = []
     def P(n, verb, what, names):
         if n: parts.append(f"{verb}{what} {n}" + (f"（{'、'.join(x for x in names[:3] if x)}{'…' if n > 3 else ''}）" if any(names[:3]) else ""))
     P(len(add), "新增", "設備", add); P(len(rem), "刪除", "設備", rem); P(len(mod), "修改", "設備", mod)
     P(len(cadd), "接上", "線", [c.split("（")[0] or c for c in cadd]); P(len(crem), "拔掉", "線", [c.split("（")[0] or c for c in crem]); P(len(cmod), "修改", "線", [c.split("（")[0] for c in cmod])
     if moved or cmoved: parts.append("調整版面")
-    names = {"racks": "機櫃", "faults": "故障紀錄", "pages": "頁面", "trunks": "光纖束"}
+    names = {"racks": "機櫃", "faults": "故障紀錄", "repairs": "維修記錄", "pages": "頁面", "trunks": "光纖束"}
     if other: parts.append("修改" + "、".join(names[k] for k in other))
     return {"text": "、".join(parts) or "沒有變更", "devices": {"add": add, "del": rem, "mod": mod}, "cables": {"add": cadd, "del": crem, "mod": cmod}, "moved": moved + cmoved, "other": other}
 
