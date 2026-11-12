@@ -33,7 +33,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.20.3"
+VERSION = "1.20.4"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 MACHINE = False   # --machine：整台電腦共用的資料夾（C:\ProgramData\netmap），給「開機自動啟動、不用登入」的服務用（用 SYSTEM 執行，沒有使用者的 APPDATA）
@@ -947,6 +947,7 @@ def probe_candidates(project, self_set):
     """還沒有 SNMP 監控、但可能有 SNMP 的設備：網路設備，以及伺服器、NAS、NVR、印表機。"""
     out = []
     for d in project.get("devices", []):
+        if d.get("demo"): continue
         ip = str(d.get("ip") or "").strip()
         if not ip or not re.match(r"^[\w.\-]+$", ip) or ip in self_set: continue
         if (d.get("snmp") or {}).get("host") or (d.get("sshmon") or {}).get("host") or d.get("snmp_probe") is False: continue
@@ -1003,6 +1004,7 @@ class Poller:
     def targets(s):
         out = []
         for d in s.store.project.get("devices", []):
+            if d.get("demo"): continue   # 範例（示範）設備：位址是假的，不去 SNMP／SSH
             if (d.get("sshmon") or {}).get("host"):
                 out.append((d, "ssh://" + d["sshmon"]["host"])); continue
             # 跑 netmap.exe 的這台電腦：直接讀網卡，不需要 SNMP（網段探索建立的設備即使標成不監控也照樣讀）
@@ -1354,6 +1356,7 @@ class Poller:
             proj = s.store.project; ips, names = [], []
             priv = private_ip
             for d in proj.get("devices", []):
+                if d.get("demo"): continue
                 ip = str(d.get("ip") or "").split("/")[0]
                 if priv(ip) and d.get("type") not in ("patch", "jack", "odf"): ips.append(ip)
                 if d.get("name") and ndc.HOST_RE.match(d["name"]): names.append(d["name"])
@@ -1805,7 +1808,7 @@ class Service:
         s.poller = Poller(s.store, log, emit=s.emit); s.httpd = None; s.thread = None; s._flow = None
         s.auth = Auth()
         s.notifier = na.Notifier(lambda: s.store.settings.get("alerts"), s.resolve_channel, log)
-        s.pinger = na.Pinger(lambda: s.store.project.get("devices", []), lambda: s.store.settings, s.emit, log, alive=s.alive_hint, resolve=s.resolve_target)
+        s.pinger = na.Pinger(lambda: [d for d in s.store.project.get("devices", []) if not d.get("demo")], lambda: s.store.settings, s.emit, log, alive=s.alive_hint, resolve=s.resolve_target)
         s._macip = (0, {}); s._dnsc = {}
 
     # ---------- 事件與告警 ----------
