@@ -1,8 +1,8 @@
 {
  "web": "3.15.0",
  "exe": "1.20.1",
- "date": "2026-11-11",
- "title": "更新改用安裝程式，覆蓋安裝",
+ "date": "2026-11-12",
+ "title": "本機版備份提醒、開始功能表新增管理視窗",
  "download": "https://github.com/coloplay1/netmap/releases/latest/download/RackTrace-Setup.exe",
  "notes": "https://coloplay1.github.io/netmap/manual.html#changelog"
 }
