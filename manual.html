@@ -122,7 +122,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <li><a href="#save">9. 儲存、匯出與分享</a>
   <ol><li><a href="#s-history">歷史版本與還原</a></li><li><a href="#s-check">資料檢查與單一設備的變更紀錄</a></li><li><a href="#s-labels">線標列印</a></li></ol></li>
 <li><a href="#exe">10. netmap.exe（Windows 程式）</a>
-  <ol><li><a href="#e-setup">安裝版（建議）</a></li><li><a href="#e-install">免安裝的 netmap.exe</a></li><li><a href="#e-webscan">在網頁裡掃描</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-autosnmp">自動偵測 SNMP</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-remote">用平板、手機查看</a></li><li><a href="#e-detect">從線上版切換</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-ssh">SSH 流量監控</a></li><li><a href="#e-flow">誰在用流量</a></li><li><a href="#e-vendor">各廠牌設定教學</a></li><li><a href="#e-ping">心跳與事件</a></li><li><a href="#e-alert">告警通知</a></li><li><a href="#e-auth">管理密碼與檢視連結</a></li><li><a href="#e-seen">網路上的設備</a></li><li><a href="#e-audit">圖面比對（和實際網路對帳）</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-webupdate">更新網頁</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
+  <ol><li><a href="#e-setup">安裝版（建議）</a></li><li><a href="#e-install">免安裝的 netmap.exe</a></li><li><a href="#e-webscan">在網頁裡掃描</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-autosnmp">自動偵測 SNMP</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-remote">用平板、手機查看</a></li><li><a href="#e-detect">從線上版切換</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-ssh">SSH 流量監控</a></li><li><a href="#e-flow">誰在用流量</a></li><li><a href="#e-vendor">各廠牌設定教學</a></li><li><a href="#e-ping">心跳與事件</a></li><li><a href="#e-alert">告警通知</a></li><li><a href="#e-auth">管理密碼與檢視連結</a></li><li><a href="#e-seen">網路上的設備</a></li><li><a href="#e-audit">圖面比對（和實際網路對帳）</a></li><li><a href="#e-hub">沒有管理功能的設備</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-webupdate">更新網頁</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
 <li><a href="#mobile">11. 手機操作</a></li>
 <li><a href="#keys">12. 快捷鍵</a></li>
 <li><a href="#faq">13. 常見問題</a></li>
@@ -792,6 +792,19 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 <li><b>IP 衝突</b>：同一個 IP 在 30 分鐘內出現兩個不同的 MAC（例如有人手動設了重複的固定 IP），會記一筆事件並告警（預設開啟）。</li>
 </ul>
 
+<h3 id="e-hub">沒有管理功能的設備（HUB、傻瓜 Switch、數據機）</h3>
+<p>很多現場的線路亂，是因為中間有不能登入的設備。這些設備不需要 SNMP，也一樣能畫進圖裡：</p>
+<table>
+<tr><th>情況</th><th>怎麼處理</th></tr>
+<tr><td>HUB、傻瓜 Switch</td><td>手動新增為一般設備（類型選 Hub），把線連到它的埠。路徑追蹤會穿過它。上游有管理功能的 Switch 會在 MAC 表看到「這個埠後面有哪些設備」，所以能知道終端掛在哪個 HUB 之後。</td></tr>
+<tr><td>ISP 數據機（光世代）</td><td>業者管理，通常沒有 SNMP。手動新增，用 Ping 心跳看它有沒有斷線。流量看自己路由器接它的 WAN 埠。</td></tr>
+<tr><td>家用路由器</td><td>多半沒有 SNMP。有開 SSH 的可以用「SSH 監控」；其他用網段探索（ping＋ARP）找出在線設備。</td></tr>
+</table>
+<ul>
+<li><b>看不出的部分</b>：設備接在 HUB 的第幾個埠，系統無法自動判斷，需要到現場確認後手動連線。</li>
+<li><b>建議順序</b>：先掃有管理功能的核心 Switch 與防火牆，讓主幹和 MAC 表自動建立；再用網段探索補齊終端；最後一個樓層一個機櫃地手動補 HUB 與接線，不要一次整理全部。</li>
+<li><b>現場配合</b>：查出一條線就貼上編號（「線標列印」可產生 A4 或標籤機貼紙），並記在系統裡，下次不用重查。查不出來時可用查線器（音頻探測器）或看設備燈號輔助。</li>
+</ul>
 <h3 id="e-col">收集樣本（給 log 分析與設定檔備份開發用）</h3>
 <figure class="mid"><img src="manual/app-col.jpg" alt="收集樣本分頁" loading="lazy"></figure>
 <p>這個分頁是為了開發「log 分析告警」與「設定檔自動備份」而收集真實資料。只接收與讀取，不會修改設備設定。</p>
