@@ -55,6 +55,16 @@ jobs:
       - name: Build netmap.exe (window app)
         working-directory: tools/netmap-snmp
         run: pyinstaller --onefile --windowed --name netmap --icon netmap.ico --collect-all pysnmp --add-data "web/index.html;web" --add-data "netmap.ico;." --add-data "netmap.png;." --add-data "oui.json.gz;." --hidden-import paramiko --hidden-import netmap_collect --hidden-import netmap_sshmon --hidden-import netmap_flow --hidden-import netmap_vendors --hidden-import netmap_alert --hidden-import netmap_audit --hidden-import netmap_dnscheck --hidden-import psutil netmap_app.py
+      - name: Build netmap (folder version for the installer)
+        working-directory: tools/netmap-snmp
+        run: pyinstaller --onedir --noconfirm --distpath dist-dir --workpath build-dir --windowed --name netmap --icon netmap.ico --collect-all pysnmp --add-data "web/index.html;web" --add-data "netmap.ico;." --add-data "netmap.png;." --add-data "oui.json.gz;." --hidden-import paramiko --hidden-import netmap_collect --hidden-import netmap_sshmon --hidden-import netmap_flow --hidden-import netmap_vendors --hidden-import netmap_alert --hidden-import netmap_audit --hidden-import netmap_dnscheck --hidden-import psutil netmap_app.py
+      - name: Smoke test folder version
+        working-directory: tools/netmap-snmp
+        shell: pwsh
+        run: |
+          if (-not (Test-Path dist-dir\netmap\netmap.exe)) { throw 'folder build missing' }
+          if (-not (Get-ChildItem dist-dir\netmap -Recurse -Filter python3*.dll)) { throw 'python dll missing in folder build' }
+          Get-ChildItem dist-dir\netmap | Select-Object -First 5 Name
       - name: Build netmap-snmp.exe (command line)
         working-directory: tools/netmap-snmp
         run: pyinstaller --onefile --console --name netmap-snmp --icon netmap.ico --collect-all pysnmp --add-data "oui.json.gz;." netmap_snmp.py
@@ -70,7 +80,7 @@ jobs:
           choco install innosetup -y --no-progress
           try { Invoke-WebRequest https://raw.githubusercontent.com/jrsoftware/issrc/main/Files/Languages/Unofficial/ChineseTraditional.isl -OutFile ChineseTraditional.isl } catch { Write-Host "no zh-TW language file, using English wizard text" }
           $v = (Get-Content ../../../version.json -Raw | ConvertFrom-Json).exe
-          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVer=$v" "/DSrcExe=..\dist\netmap.exe" RackTrace.iss
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVer=$v" "/DSrcDir=..\dist-dir\netmap" RackTrace.iss
           if ($LASTEXITCODE -ne 0) { throw "ISCC failed" }
       - name: Test installer (silent install, service answers, uninstall)
         id: insttest

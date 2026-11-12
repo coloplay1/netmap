@@ -1,12 +1,12 @@
 ﻿; RackTrace（機房線路對應圖）安裝程式
 ; 把 netmap.exe 裝到 Program Files，註冊成「開機自動啟動、不用登入」的背景服務（工作排程器，SYSTEM 執行），
 ; 資料放在 C:\ProgramData\netmap（只有系統管理員能讀）；升級不會動資料，解除安裝時問你要不要一併刪除資料。
-; 編譯：iscc /DAppVer=1.17.0 /DSrcExe=..\dist\netmap.exe RackTrace.iss
+; 編譯：iscc /DAppVer=1.17.0 /DSrcDir=..\dist-dir\netmap RackTrace.iss
 #ifndef AppVer
   #define AppVer "0.0.0"
 #endif
-#ifndef SrcExe
-  #define SrcExe "..\dist\netmap.exe"
+#ifndef SrcDir
+  #define SrcDir "..\dist-dir\netmap"
 #endif
 
 [Setup]
@@ -56,8 +56,12 @@ Name: "firewall"; Description: "{cm:TaskFw}"; GroupDescription: "服務 / Servic
 Name: "desktopicon"; Description: "{cm:TaskDesk}"; GroupDescription: "捷徑 / Shortcuts"; Flags: unchecked
 
 [Files]
-Source: "{#SrcExe}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#SrcDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "install-task.ps1"; DestDir: "{app}"; Flags: ignoreversion
+
+[InstallDelete]
+; 升級時先清掉舊的程式資料夾，避免殘留舊版檔案
+Type: filesandordirs; Name: "{app}\_internal"
 
 [Icons]
 Name: "{autoprograms}\RackTrace"; Filename: "{app}\netmap.exe"; Parameters: "--open"; IconFilename: "{app}\netmap.exe"
