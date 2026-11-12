@@ -24,7 +24,7 @@ class SshError(Exception):
 
 
 def split_host(host):
-    """'ssh://192.168.50.1:22' / '192.168.50.1:2222' / '192.168.50.1' → ('192.168.50.1', 22)"""
+    """'ssh://192.168.1.1:22' / '192.168.1.1:2222' / '192.168.1.1' → ('192.168.1.1', 22)"""
     h = host[6:] if host.startswith("ssh://") else host
     if h.count(":") == 1:
         a, p = h.rsplit(":", 1)
