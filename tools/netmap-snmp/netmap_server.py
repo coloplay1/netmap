@@ -33,7 +33,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.20.10"
+VERSION = "1.20.11"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 MACHINE = False   # --machine：整台電腦共用的資料夾（C:\ProgramData\netmap），給「開機自動啟動、不用登入」的服務用（用 SYSTEM 執行，沒有使用者的 APPDATA）
@@ -178,7 +178,7 @@ class ConnSampler:
     def __init__(s):
         s.lock = threading.Lock(); s.th = None; s.last = 0.0; s.on = {}; s.prev = {}; s.tot = {}
         s.status = "none" if os.name != "nt" else "starting"; s.since = 0
-        s.dll = None
+        s.dll = None; s.errs = {}
     def _api(s):
         if s.dll is None:
             import ctypes
@@ -199,9 +199,9 @@ class ConnSampler:
         return s._api().SetPerTcpConnectionEStats(ctypes.byref(row), 1, ctypes.byref(rw), 0, 1, 0)
     def _read(s, row):
         import ctypes
-        buf = ctypes.create_string_buffer(256)
-        rc = s._api().GetPerTcpConnectionEStats(ctypes.byref(row), 1, None, 0, 0, None, 0, 0, buf, 0, 256)
-        if rc: return None
+        buf = ctypes.create_string_buffer(96)   # sizeof(TCP_ESTATS_DATA_ROD_v0)＝96，大小不符會回 87／122
+        rc = s._api().GetPerTcpConnectionEStats(ctypes.byref(row), 1, None, 0, 0, None, 0, 0, buf, 0, 96)
+        if rc: s.errs["read %d" % rc] = s.errs.get("read %d" % rc, 0) + 1; return None
         return int.from_bytes(buf.raw[16:24], "little"), int.from_bytes(buf.raw[0:8], "little")   # (收到, 送出)
     def touch(s):
         with s.lock:
@@ -226,10 +226,10 @@ class ConnSampler:
                     if k not in s.on:
                         rc = s._enable(row)
                         if rc == 5: denied += 1; continue
-                        if rc: continue
+                        if rc: s.errs["set %d" % rc] = s.errs.get("set %d" % rc, 0) + 1; continue
                         s.on[k] = 1
                     r = s._read(row)
-                except Exception: continue
+                except Exception as e: s.errs["例外 " + type(e).__name__ + ": " + str(e)[:80]] = 1; continue
                 if r is None: continue
                 ok += 1
                 pr = s.prev.get(k, (0, 0)); d = (max(0, r[0] - pr[0]), max(0, r[1] - pr[1])); s.prev[k] = r
@@ -244,7 +244,7 @@ class ConnSampler:
                 for ak, t in s.tot.items():
                     a = rate.get(ak, (0, 0)); t["rr"] = a[0] * 8 / dt; t["tr"] = a[1] * 8 / dt
                 for k in [k for k in s.on if k not in seen]: s.on.pop(k, None); s.prev.pop(k, None)
-                s.status = "tcp" if ok else ("noadmin" if denied else s.status if s.status != "starting" else "tcp")
+                s.status = "tcp" if ok else ("noadmin" if denied else ("error" if s.errs else "starting"))
             time.sleep(s.EVERY)
         s.status = "starting"
     def get(s, proc, peer, port):
@@ -286,7 +286,7 @@ def local_conns():
             if t: x.update(rx=t["rx"], tx=t["tx"], rr=round(t["rr"]), tr=round(t["tr"]))
         out.append(x)
     out.sort(key=lambda x: (-((x.get("rx") or 0) + (x.get("tx") or 0)), -x["n"], x["proc"]))
-    return {"ts": int(time.time()), "conns": out[:300], "stats": _conn_sampler.status, "since": _conn_sampler.since}
+    return {"ts": int(time.time()), "conns": out[:300], "stats": _conn_sampler.status, "since": _conn_sampler.since, "err": dict(_conn_sampler.errs)}
 
 
 _self_cache = [0.0, set()]

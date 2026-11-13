@@ -115,6 +115,12 @@ jobs:
           name: installer-log
           path: ${{ runner.temp }}/setup.log
           if-no-files-found: ignore
+      - name: Version-named copy of the installer
+        if: steps.insttest.outcome == 'success'
+        shell: pwsh
+        run: |
+          $v = (Get-Content version.json -Raw | ConvertFrom-Json).exe
+          Copy-Item tools/netmap-snmp/dist/RackTrace-Setup.exe "tools/netmap-snmp/dist/RackTrace-Setup-$v.exe"
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
@@ -127,9 +133,10 @@ jobs:
             tools/netmap-snmp/dist/netmap-snmp.exe
             tools/netmap-snmp.zip
             ${{ steps.insttest.outcome == 'success' && 'tools/netmap-snmp/dist/RackTrace-Setup.exe' || '' }}
+            tools/netmap-snmp/dist/RackTrace-Setup-*.exe
           body: |
             機房線路對應圖的 Windows 程式。
-            - **RackTrace-Setup.exe**（建議安裝方式）：安裝程式。裝到 Program Files、開機自動啟動（不用登入）、可選擇開放內網連線；資料放在 C:\ProgramData\netmap，升級不會動資料。（這個檔案要通過自動安裝測試才會附上。）
+            - **RackTrace-Setup.exe**（建議安裝方式；同一個檔案另有帶版本號的 RackTrace-Setup-版本.exe，方便辨認）：安裝程式。裝到 Program Files、開機自動啟動（不用登入）、可選擇開放內網連線；資料放在 C:\ProgramData\netmap，升級不會動資料。（這個檔案要通過自動安裝測試才會附上。）
             - **netmap.exe**（建議）：視窗版。SNMP 掃描 + 監控服務：在內網提供網頁版線路圖，顯示每個埠的流量、使用率、上下線與 24 小時曲線。
             - netmap-snmp.exe：命令列版掃描程式。
             - netmap-snmp.zip：Python 版（Windows / macOS / Linux）。

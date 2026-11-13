@@ -13,6 +13,8 @@
 AppId={{6F0B4E6A-2B1D-4C57-9D0E-7A3C5B9A1E42}
 AppName=RackTrace 機房線路對應圖
 AppVersion={#AppVer}
+VersionInfoVersion={#AppVer}.0
+VersionInfoProductVersion={#AppVer}.0
 AppPublisher=RackTrace
 DefaultDirName={autopf}\RackTrace
 DefaultGroupName=RackTrace
