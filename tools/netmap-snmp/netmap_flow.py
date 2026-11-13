@@ -432,21 +432,23 @@ class FlowCollector:
                 "hosts": [{"ip": ip, "rx": rx, "tx": tx, "last": last} for ip, rx, tx, last in rows],
                 "total": {"rx": sum(r[1] for r in rows), "tx": sum(r[2] for r in rows)}}
 
-    def host(s, ip, minutes=60, exp="auto"):
+    def host(s, ip, minutes=60, exp="auto", t_from=None, t_to=None):
         s.flush()
-        now = int(time.time()); since = (now - minutes * 60) // BUCKET * BUCKET
+        now = int(time.time()); since = (now - minutes * 60) // BUCKET * BUCKET; until = now + BUCKET
+        if t_from and t_to and t_to > t_from:
+            since = int(t_from) // BUCKET * BUCKET; until = int(t_to)
         e = s._pick_exp(exp, since)
         with s.lock:
             series = s.db.execute("SELECT ts, rx, tx FROM fhost WHERE exp=? AND ip=? AND ts>=? ORDER BY ts", (e, ip, now - 33 * 3600)).fetchall()
-            tot = s.db.execute("SELECT COALESCE(SUM(rx),0), COALESCE(SUM(tx),0) FROM fhost WHERE exp=? AND ip=? AND ts>=?", (e, ip, since)).fetchone()
-            peers = s.db.execute("SELECT peer, proto, port, SUM(rx), SUM(tx) FROM fconv WHERE exp=? AND ip=? AND ts>=? GROUP BY peer, proto, port ORDER BY SUM(rx+tx) DESC LIMIT 200",
-                                 (e, ip, since)).fetchall()
+            tot = s.db.execute("SELECT COALESCE(SUM(rx),0), COALESCE(SUM(tx),0) FROM fhost WHERE exp=? AND ip=? AND ts>=? AND ts<?", (e, ip, since, until)).fetchone()
+            peers = s.db.execute("SELECT peer, proto, port, SUM(rx), SUM(tx) FROM fconv WHERE exp=? AND ip=? AND ts>=? AND ts<? GROUP BY peer, proto, port ORDER BY SUM(rx+tx) DESC LIMIT 200",
+                                 (e, ip, since, until)).fetchall()
         svc = {}
         for peer, proto, port, rx, tx in peers:
             k = (proto, port) if peer else (-1, 0); v = svc.setdefault(k, [0, 0, 0]); v[0] += rx; v[1] += tx; v[2] += 1
         cur = int(time.time()) // BUCKET * BUCKET
         pts = [[ts, rx * 8 / (min(BUCKET, max(30, now - ts)) if ts == cur else BUCKET), tx * 8 / (min(BUCKET, max(30, now - ts)) if ts == cur else BUCKET), None, None] for ts, rx, tx in series]
-        return {"ip": ip, "exp": e, "since": since, "now": now, "seconds": max(60, now - since), "total": {"rx": tot[0], "tx": tot[1]}, "series": {"res": BUCKET, "span": 33 * 3600, "points": pts},
+        return {"ip": ip, "exp": e, "since": since, "now": now, "seconds": max(60, (min(now, until) if t_from and t_to else now) - since), "range": bool(t_from and t_to), "total": {"rx": tot[0], "tx": tot[1]}, "series": {"res": BUCKET, "span": 33 * 3600, "points": pts},
                 "peers": [{"peer": p, "proto": pr, "port": po, "service": service_name(pr, po) if p else "其他", "local": bool(p) and is_local(p, s.locals()), "rx": rx, "tx": tx}
                           for p, pr, po, rx, tx in peers[:40]],
                 "services": sorted([{"proto": k[0], "port": k[1], "service": service_name(*k) if k[0] >= 0 else "其他", "rx": v[0], "tx": v[1], "peers": v[2]} for k, v in svc.items()],

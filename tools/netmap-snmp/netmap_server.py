@@ -33,7 +33,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.20.7"
+VERSION = "1.20.8"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 MACHINE = False   # --machine：整台電腦共用的資料夾（C:\ProgramData\netmap），給「開機自動啟動、不用登入」的服務用（用 SYSTEM 執行，沒有使用者的 APPDATA）
@@ -1666,7 +1666,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
             mins = max(5, min(60 * 24 * 31, int(arg("min", "60") or 60))); exp = arg("exp", "auto")
             if u.path == "/api/flow/status": return s._send(200, sv.flow_status())
             if u.path == "/api/flow/top": return s._send(200, sv.flow.top(mins, exp))
-            if u.path == "/api/flow/host": return s._send(200, sv.flow.host(arg("ip"), mins, exp))
+            if u.path == "/api/flow/host":
+                tf, tt = arg("from", ""), arg("to", "")
+                return s._send(200, sv.flow.host(arg("ip"), mins, exp, int(float(tf)) if tf else None, int(float(tt)) if tt else None))
             return s._send(404, {"error": "not found"})
         if u.path == "/api/mrtg/device":
             return s._send(200, st.mrtg_device(arg("id"), arg("view", "day")))
