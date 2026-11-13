@@ -100,7 +100,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="0 0 256 256" aria-hidden="true"><rect width="256" height="256" rx="56" fill="#fff"/><rect x="42" y="38" width="86" height="180" rx="4" fill="none" stroke="#111" stroke-width="13"/><path d="M66 82H104M66 116H104M66 150H104M66 184H104" stroke="#111" stroke-width="11" stroke-linecap="round"/><path d="M128 96C168 96 170 70 200 70" fill="none" stroke="#F2C230" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="70" r="13" fill="#F2C230"/><path d="M128 130C168 130 170 150 200 150" fill="none" stroke="#1E9BEA" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="150" r="13" fill="#1E9BEA"/><path d="M128 178C162 178 172 206 196 206" fill="none" stroke="#5B6472" stroke-width="11" stroke-linecap="round" stroke-dasharray="1 18"/><circle cx="210" cy="206" r="11" fill="none" stroke="#5B6472" stroke-width="7"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v3.17.4 · netmap.exe v1.20.7</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v3.18.0 · netmap.exe v1.20.7</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -139,7 +139,7 @@ code,td,li,p{overflow-wrap:anywhere}
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
     <a class="btn ghost" href="RackTrace-manual.pdf" download>下載 PDF 版手冊</a>
-    <a class="btn ghost" href="#changelog">最新更新：v3.17.4</a>
+    <a class="btn ghost" href="#changelog">最新更新：v3.18.0</a>
   </div>
 </div>
 
@@ -345,6 +345,7 @@ code,td,li,p{overflow-wrap:anywhere}
 
 <section id="fault">
 <h2><span class="n">8</span>故障排查與維修記錄</h2>
+<p>頂列的 <b>排障</b> 視圖把流程排成三欄：①問題（斷線設備與各項檢查）→ ②查線 → ③維修單。復原／重做在頂列，框選與查線在左側元件列；縮小畫面時終端設備會自動收成「終端 ×N」。</p>
 <p>排查分兩步：先用<b>故障查線</b>找出哪一段有問題，再用<b>維修記錄</b>記下怎麼處理，並在圖上看到哪裡還沒修好。</p>
 <h3 id="f-trace">故障查線</h3>
 <p>使用者回報「不能上網」時，從他的電腦開始，<b>一段一段往網路入口檢查</b>，並記錄每一段的結果。</p>
@@ -360,7 +361,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <p>結案前後都可以按面板下方的 <b>轉成維修單</b>，把起點、故障點、各段備註帶進維修記錄（見下一節）。</p>
 
 <h3 id="f-repair">維修記錄</h3>
-<p>在 <b>線路表 ▸ 維修記錄</b> 管理所有維修單。每一張單依影響範圍分成三種：</p>
+<p>在 <b>排障</b> 視圖的第三欄管理所有維修單（頂列第 4 個分頁；有待處理問題時分頁上會出現數字徽章）。每一張單依影響範圍分成三種：</p>
 <div class="tw"><table>
 <tr><th>範圍</th><th>什麼時候用</th><th>畫布上的標示</th></tr>
 <tr><td><b>單點</b></td><td>一台設備或一條線有問題，例如一支 AP、一條跳線。</td><td>該設備或線路</td></tr>
@@ -921,7 +922,8 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 
 <section id="changelog">
 <h2><span class="n">14</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v3.17.4　DNS 對帳可以略過已知情的項目</b><span class="tag new">最新 · 2026-11-13</span><span class="tag">netmap.exe 1.20.7</span></div><ul><li>DNS 對帳每一筆問題多了「略過（已知情）」：電腦已報廢、換硬碟等情況可以標成已排除，不再列為問題、不計入徽章數字與告警；在「已略過」分頁可改回待處理。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.18.0　介面整理：新增「排障」視圖</b><span class="tag new">最新 · 2026-11-13</span><span class="tag">netmap.exe 1.20.7</span></div><ul><li>新增第 4 個視圖「排障」：問題、查線、維修單三欄並排，原本線路表裡的故障紀錄與維修記錄移到這裡；檢查與告警按鈕合併成「排障」分頁上的數字徽章。</li><li>復原／重做移到頂列；框選與查線移到左側元件列；線色、走線、顯示圖層改為純圖示。</li><li>縮小畫面時，終端設備會自動收成「終端 ×N」摘要，點一下放大並展開（顯示圖層可關閉）。</li><li>窄螢幕與伺服器模式的頂列重新壓縮，不再溢出。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.17.4　DNS 對帳可以略過已知情的項目</b><span class="tag">2026-11-13</span><span class="tag">netmap.exe 1.20.7</span></div><ul><li>DNS 對帳每一筆問題多了「略過（已知情）」：電腦已報廢、換硬碟等情況可以標成已排除，不再列為問題、不計入徽章數字與告警；在「已略過」分頁可改回待處理。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.17.3　手冊新增「故障排查與維修記錄」</b><span class="tag">2026-11-13</span><span class="tag">netmap.exe 1.20.6</span></div><ul><li>使用手冊第 8 章改為「故障排查與維修記錄」，說明單點／區域／全域、從故障通知帶入、處理紀錄與畫布標示。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.17.2　故障排查流程整理</b><span class="tag">2026-11-13</span><span class="tag">netmap.exe 1.20.6</span></div><ul><li>修正：IP 欄填「DHCP」的設備不再被當成重複 IP，開範例不會一開始就跳紅色錯誤。</li><li>查線面板新增「轉成維修單」：把起點、故障點、各段備註帶進維修記錄，結案方式會變成修復方式。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.17.1　維修單可從故障通知帶入、可自由記錄處理過程</b><span class="tag">2026-11-13</span><span class="tag">netmap.exe 1.20.6</span></div><ul><li>新增維修單時，可從「設備沒有回應」「檢查發現」「查線紀錄」的清單挑一項，自動帶入範圍、對象和症狀。</li><li>每張維修單多了「處理紀錄」：自由填寫、依時間累積，會顯示在維修記錄表和 CSV。</li></ul></div>
@@ -1033,7 +1035,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 <div class="clog"><div class="v"><b>v1.0　第一版</b><span class="tag">2026-11-06</span></div><ul><li>防火牆、Switch、配線架、資訊座埠對埠接線，點埠追蹤整條路徑</li><li>產業範例與自動排版</li></ul></div>
 </section>
 
-<p class="foot">RackTrace · 網頁 v3.17.4 · netmap.exe v1.20.7 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">RackTrace · 網頁 v3.18.0 · netmap.exe v1.20.7 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>
