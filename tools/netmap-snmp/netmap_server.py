@@ -33,7 +33,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.20.8"
+VERSION = "1.20.9"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 MACHINE = False   # --machine：整台電腦共用的資料夾（C:\ProgramData\netmap），給「開機自動啟動、不用登入」的服務用（用 SYSTEM 執行，沒有使用者的 APPDATA）
@@ -169,6 +169,35 @@ def local_nics():
         out[name] = {"ips": ips, "rx": c.bytes_recv, "tx": c.bytes_sent, "ie": c.errin, "oe": c.errout,
                      "up": bool(x.isup) if x else None, "speed": (x.speed or 0) * 1_000_000 if x else 0}
     return out
+
+
+def local_conns():
+    """這台電腦目前的對外連線，依「程式＋對方 IP＋埠」合併。需要 psutil。回傳 None＝沒有 psutil。"""
+    try:
+        import psutil
+    except ImportError:
+        return None
+    names = {}
+    def pname(pid):
+        if pid in names: return names[pid]
+        try: n = psutil.Process(pid).name()
+        except Exception: n = "（無權限讀取）" if pid else "系統"
+        names[pid] = n; return n
+    me = set(local_ips())
+    agg = {}
+    try: cs = psutil.net_connections(kind="inet")
+    except Exception as e: return {"error": str(e), "conns": []}
+    for c in cs:
+        if not c.raddr or c.status not in ("ESTABLISHED", "", "NONE"): continue
+        rip, rport = c.raddr.ip.split("%")[0], c.raddr.port
+        if rip in me or rip.startswith("127.") or rip == "::1": continue
+        proto = 6 if c.type == socket.SOCK_STREAM else 17
+        k = (pname(c.pid or 0), rip, rport, proto)
+        agg[k] = agg.get(k, 0) + 1
+    out = [{"proc": k[0], "peer": k[1], "port": k[2], "service": nf.service_name(k[3], k[2]), "n": n,
+            "local": nf.is_local(k[1])} for k, n in agg.items()]
+    out.sort(key=lambda x: (-x["n"], x["proc"]))
+    return {"ts": int(time.time()), "conns": out[:300]}
 
 
 _self_cache = [0.0, set()]
@@ -1672,6 +1701,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
             return s._send(404, {"error": "not found"})
         if u.path == "/api/mrtg/device":
             return s._send(200, st.mrtg_device(arg("id"), arg("view", "day")))
+        if u.path == "/api/localconns":
+            ip = arg("ip", "")
+            if ip not in set(local_ips()) | set(self_ips()): return s._send(200, {"conns": [], "notlocal": True})
+            r = local_conns()
+            return s._send(200, r if r is not None else {"conns": [], "nopsutil": True})
         if u.path == "/api/mrtg/summary":
             return s._send(200, {"ports": st.mrtg_summary()})
         s._send(404, {"error": "not found"})

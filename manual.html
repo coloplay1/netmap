@@ -100,7 +100,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="0 0 256 256" aria-hidden="true"><rect width="256" height="256" rx="56" fill="#fff"/><rect x="42" y="38" width="86" height="180" rx="4" fill="none" stroke="#111" stroke-width="13"/><path d="M66 82H104M66 116H104M66 150H104M66 184H104" stroke="#111" stroke-width="11" stroke-linecap="round"/><path d="M128 96C168 96 170 70 200 70" fill="none" stroke="#F2C230" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="70" r="13" fill="#F2C230"/><path d="M128 130C168 130 170 150 200 150" fill="none" stroke="#1E9BEA" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="150" r="13" fill="#1E9BEA"/><path d="M128 178C162 178 172 206 196 206" fill="none" stroke="#5B6472" stroke-width="11" stroke-linecap="round" stroke-dasharray="1 18"/><circle cx="210" cy="206" r="11" fill="none" stroke="#5B6472" stroke-width="7"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v3.19.1 · netmap.exe v1.20.7</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v3.20.0 · netmap.exe v1.20.7</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -139,7 +139,7 @@ code,td,li,p{overflow-wrap:anywhere}
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
     <a class="btn ghost" href="RackTrace-manual.pdf" download>下載 PDF 版手冊</a>
-    <a class="btn ghost" href="#changelog">最新更新：v3.19.1</a>
+    <a class="btn ghost" href="#changelog">最新更新：v3.20.0</a>
   </div>
 </div>
 
@@ -564,6 +564,8 @@ code,td,li,p{overflow-wrap:anywhere}
 <h4>拖曳選取時段</h4>
 <p>在任何一張流量圖上按住滑鼠拖曳，就會選出一段時間，圖下方顯示這段的<b>總流入／流出量</b>、平均與最高速率。兩側的圓點可左右調整範圍，在選取區中間拖動則整段平移；按「清除」取消。</p>
 <p>從設備的流量圖選好時段後，按 <b>看這段時間的對外連線（IP 與流量）</b>，可以看到這台設備那段時間連去哪些 IP、用什麼服務、各多少流量。這需要防火牆送出 NetFlow／IPFIX／sFlow，並在設定啟用「流量明細」；連線明細只保留 3 天。</p>
+<h4>這台電腦現在的連線</h4>
+<p>在跑監控服務的那台電腦的設備流量圖最下面，會列出此刻的對外連線：哪個程式、連去哪個 IP、什麼服務、幾條連線，不需要防火牆送流量明細。它只反映「現在這一刻」，沒有各連線的流量；歷史時段的連線仍要靠防火牆的流量明細。</p>
 <div class="tw"><table>
 <tr><th>圖</th><th>每一點代表</th><th>顯示範圍</th><th>資料保存</th></tr>
 <tr><td>每日圖</td><td>5 分鐘平均</td><td>最近 33 小時</td><td>3 天</td></tr>
@@ -925,7 +927,8 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 
 <section id="changelog">
 <h2><span class="n">14</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v3.19.1　電腦的流量圖改用「下載／上傳」</b><span class="tag new">最新 · 2026-11-13</span><span class="tag">netmap.exe 1.20.8</span></div><ul><li>終端設備（電腦）的流量圖與選取時段的統計，改用一般習慣的「下載／上傳」；交換器、防火牆等網路設備的埠仍用「流入／流出」。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.20.0　設備流量圖新增「這台電腦現在的連線」</b><span class="tag new">最新 · 2026-11-13</span><span class="tag">netmap.exe 1.20.9</span></div><ul><li>跑監控服務的那台電腦，在設備的流量圖最下面會列出此刻的對外連線：哪個程式、連去哪個 IP、什麼服務、幾條連線。沒有防火牆送流量明細時也能用；但只有「此刻」，沒有各連線的流量。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.19.1　電腦的流量圖改用「下載／上傳」</b><span class="tag">2026-11-13</span><span class="tag">netmap.exe 1.20.8</span></div><ul><li>終端設備（電腦）的流量圖與選取時段的統計，改用一般習慣的「下載／上傳」；交換器、防火牆等網路設備的埠仍用「流入／流出」。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.19.0　流量圖可拖曳選取時段，並查看那段的對外連線</b><span class="tag">2026-11-13</span><span class="tag">netmap.exe 1.20.8</span></div><ul><li>在流量圖上拖曳就能選取一段時間，顯示這段的總流入／流出量、平均與最高速率；兩側的圓點可以左右調整，也可以整段拖移。</li><li>選好時段後，按「看這段時間的對外連線」可查看那段時間這台設備連去哪些 IP、用什麼服務、各多少流量（需要防火牆送出 NetFlow／IPFIX／sFlow）。</li><li>需要更新監控服務（exe 1.20.8）才能查詢指定時段。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.18.4　刪除查線時可一併刪除轉出的維修單</b><span class="tag">2026-11-13</span><span class="tag">netmap.exe 1.20.7</span></div><ul><li>刪除已轉成維修單的查線紀錄時，會詢問要不要一併刪除那張維修單，不再留下孤立的維修單。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.18.3　排障視圖的查線可直接結案或刪除</b><span class="tag">2026-11-13</span><span class="tag">netmap.exe 1.20.7</span></div><ul><li>查線卡片多了「結案」（設備已恢復時顯示「已恢復，結案」）與「刪除」，不必再開啟面板。</li></ul></div>
@@ -1044,7 +1047,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 <div class="clog"><div class="v"><b>v1.0　第一版</b><span class="tag">2026-11-06</span></div><ul><li>防火牆、Switch、配線架、資訊座埠對埠接線，點埠追蹤整條路徑</li><li>產業範例與自動排版</li></ul></div>
 </section>
 
-<p class="foot">RackTrace · 網頁 v3.19.1 · netmap.exe v1.20.7 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">RackTrace · 網頁 v3.20.0 · netmap.exe v1.20.7 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>
