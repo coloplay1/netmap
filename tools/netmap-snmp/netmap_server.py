@@ -33,7 +33,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.20.6"
+VERSION = "1.20.7"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 MACHINE = False   # --machine：整台電腦共用的資料夾（C:\ProgramData\netmap），給「開機自動啟動、不用登入」的服務用（用 SYSTEM 執行，沒有使用者的 APPDATA）
@@ -367,6 +367,8 @@ DEFAULT_SETTINGS = {"port": 8080, "interval": 60, "retention_days": 7, "lan_edit
                     "admin_hash": "", "view_token": "", "view_required": False, "inv_enabled": True, "inv_gone_hours": 24, "snmp_autoprobe": True, "audit_hours": 6,
                     "snmp": {"version": "2c", "community": "", "user": "", "auth_proto": "SHA", "auth_key": "", "priv_proto": "AES", "priv_key": "",
                              "context": "", "port": 161, "timeout": 2.0, "retries": 1}}
+
+def ndc_key(x): return "%s|%s" % (x.get("status"), x.get("name") or x.get("ip"))
 
 PROJECT_KEYS = ("devices", "cables", "racks", "faults", "repairs", "pages", "trunks")
 
@@ -1345,6 +1347,12 @@ class Poller:
         server = (st.get("dns_server") or "").strip() or (servers[0] if servers else "")
         return server, (st.get("dns_domain") or "").strip().strip(".") or dom, servers, dom
 
+    def dns_bad_count(s):
+        rows = (s.dns_last or {}).get("rows")
+        if rows is None: return ((s.dns_last or {}).get("summary") or {}).get("bad", 0)
+        ig = set(s.store.settings.get("dns_ignore") or [])
+        return sum(1 for x in rows if x.get("level") == "bad" and ndc_key(x) not in ig)
+
     def run_dns(s):
         """DNS 對帳：NetBIOS 問出每個 IP 上的電腦名稱，和 AD DNS 的 A／PTR 記錄比對。"""
         if s.dns_busy: return
@@ -1380,7 +1388,8 @@ class Poller:
             try: json.dump(r, open(os.path.join(s.store.dir, "dnscheck.json"), "w", encoding="utf-8"), ensure_ascii=False)
             except OSError: pass
             if r.get("error"): s.log("DNS 對帳：" + r["error"]); return
-            new = [x for x in r["rows"] if x["level"] == "bad" and (x["status"], x["name"], x["ip"]) not in old]
+            ig = set(s.store.settings.get("dns_ignore") or [])
+            new = [x for x in r["rows"] if x["level"] == "bad" and (x["status"], x["name"], x["ip"]) not in old and ndc_key(x) not in ig]
             s.log(f"DNS 對帳：{r['summary'].get('hosts', 0)} 台電腦，{r['summary'].get('bad', 0)} 個問題（新的 {len(new)} 個）")
             for x in new[:20]:
                 s.emit({"kind": "dns", "name": x["name"] or x["ip"], "ip": x["ip"], "detail": x["text"], "ts": int(time.time())})
@@ -1613,10 +1622,12 @@ class Handler(http.server.BaseHTTPRequestHandler):
                                  "devices": stat.get("devices", {}), "ports": stat.get("ports", {}), "edit": s.can_edit(), "admin": s.is_admin(),
                                  "ping": sv.pinger.snapshot() if sv else {}, "ping_on": bool(st.settings.get("ping_enabled", True)),
                                  "ev": last_ev[0]["id"] if last_ev else 0, "audit_open": st.audit_open(),
-                                 "dns_bad": ((po.dns_last or {}).get("summary") or {}).get("bad", 0), "dns_ts": (po.dns_last or {}).get("ts", 0)})
+                                 "dns_bad": po.dns_bad_count(), "dns_ts": (po.dns_last or {}).get("ts", 0)})
         if u.path == "/api/dnscheck":
             server, domain, servers, dom = po.dns_target()
-            o = dict(po.dns_last or {}); o["rows"] = po.dns_rows_with_mac(); o.update(busy=po.dns_busy or po.dns_force, prog=po.dns_prog if (po.dns_busy or po.dns_force) else None, hours=st.settings.get("dns_hours", 6), cfg_server=st.settings.get("dns_server", ""),
+            o = dict(po.dns_last or {}); o["rows"] = po.dns_rows_with_mac(); ig = set(st.settings.get("dns_ignore") or [])
+            for x in o["rows"]: x["key"] = ndc_key(x); x["ign"] = x["key"] in ig
+            o.update(ignored=len(ig), busy=po.dns_busy or po.dns_force, prog=po.dns_prog if (po.dns_busy or po.dns_force) else None, hours=st.settings.get("dns_hours", 6), cfg_server=st.settings.get("dns_server", ""),
                                                  cfg_domain=st.settings.get("dns_domain", ""), auto_servers=servers, auto_domain=dom, use_server=server, use_domain=domain)
             return s._send(200, o)
         if u.path == "/api/pinghist":
@@ -1709,6 +1720,13 @@ class Handler(http.server.BaseHTTPRequestHandler):
             if not st.restore(body.get("rev"), s.who()): return s._send(404, {"error": "找不到這個版本"})
             s.server.poller.ifmaps.clear()
             with st.lock: return s._send(200, {"rev": st.rev, "project": st.project})
+        if path == "/api/dnscheck/ignore":
+            if not s.can_edit(): return s._send(403, {"error": "需要編輯權限"})
+            k = str(body.get("key") or "")[:200]
+            if not k: return s._send(400, {"error": "missing key"})
+            L = [x for x in (st.settings.get("dns_ignore") or []) if x != k]
+            if body.get("on", True): L.append(k)
+            st.settings["dns_ignore"] = L[-500:]; st.save_settings(); return s._send(200, {"ok": True, "ignored": len(st.settings["dns_ignore"])})
         if path == "/api/dnscheck/run":
             if not s.can_edit(): return s._send(403, {"error": "需要編輯權限"})
             po = s.server.poller
