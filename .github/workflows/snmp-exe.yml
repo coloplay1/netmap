@@ -80,7 +80,7 @@ jobs:
         run: |
           choco install innosetup -y --no-progress
           try { Invoke-WebRequest https://raw.githubusercontent.com/jrsoftware/issrc/main/Files/Languages/Unofficial/ChineseTraditional.isl -OutFile ChineseTraditional.isl } catch { Write-Host "no zh-TW language file, using English wizard text" }
-          $v = (Get-Content ../../../version.json -Raw | ConvertFrom-Json).exe
+          $v = [regex]::Match((Get-Content ../netmap_server.py -Raw -Encoding UTF8), 'VERSION = "([0-9.]+)"').Groups[1].Value
           & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVer=$v" "/DSrcDir=..\dist-dir\netmap" RackTrace.iss
           if ($LASTEXITCODE -ne 0) { throw "ISCC failed" }
       - name: Test installer (silent install, service answers, uninstall)
@@ -119,7 +119,7 @@ jobs:
         if: steps.insttest.outcome == 'success'
         shell: pwsh
         run: |
-          $v = (Get-Content version.json -Raw | ConvertFrom-Json).exe
+          $v = [regex]::Match((Get-Content tools/netmap-snmp/netmap_server.py -Raw -Encoding UTF8), 'VERSION = "([0-9.]+)"').Groups[1].Value
           Copy-Item tools/netmap-snmp/dist/RackTrace-Setup.exe "tools/netmap-snmp/dist/RackTrace-Setup-$v.exe"
       - name: Publish release
         uses: softprops/action-gh-release@v2
@@ -155,8 +155,9 @@ jobs:
             python - "$V" <<'PY'
           import json,sys
           v=sys.argv[1]; d=json.load(open('version.json',encoding='utf-8'))
-          if d.get('exe')==v: print('version.json already announces',v); sys.exit(0)
-          d['exe']=v; json.dump(d,open('version.json','w',encoding='utf-8'),ensure_ascii=False,indent=1); print('announce',v)
+          dl='https://github.com/coloplay1/netmap/releases/download/snmp-latest/RackTrace-Setup-%s.exe'%v
+          if d.get('exe')==v and d.get('download')==dl: print('version.json already announces',v); sys.exit(0)
+          d['exe']=v; d['download']='https://github.com/coloplay1/netmap/releases/download/snmp-latest/RackTrace-Setup-%s.exe'%v; json.dump(d,open('version.json','w',encoding='utf-8'),ensure_ascii=False,indent=1); print('announce',v)
           PY
             if git diff --quiet version.json; then break; fi
             git add version.json && git commit -qm "chore: announce exe $V (release published)" && git push -q origin HEAD:main && { gh api -X POST repos/${{ github.repository }}/pages/builds >/dev/null 2>&1 || true; break; }
