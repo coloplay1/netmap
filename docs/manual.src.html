@@ -118,7 +118,8 @@ code,td,li,p{overflow-wrap:anywhere}
 <li><a href="#port">6. 埠設定（VLAN／PoE／LACP）</a></li>
 <li><a href="#view">7. 檢視與顯示</a>
   <ol><li><a href="#v-rack">機櫃視圖</a></li><li><a href="#v-table">線路表</a></li><li><a href="#v-layer">圖層與線色</a></li><li><a href="#v-panel">面板與主題</a></li></ol></li>
-<li><a href="#fault">8. 故障查線</a></li>
+<li><a href="#fault">8. 故障排查與維修記錄</a>
+  <ol><li><a href="#f-trace">故障查線</a></li><li><a href="#f-repair">維修記錄</a></li></ol></li>
 <li><a href="#save">9. 儲存、匯出與分享</a>
   <ol><li><a href="#s-history">歷史版本與還原</a></li><li><a href="#s-check">資料檢查與單一設備的變更紀錄</a></li><li><a href="#s-labels">線標列印</a></li></ol></li>
 <li><a href="#exe">10. netmap.exe（Windows 程式）</a>
@@ -343,7 +344,9 @@ code,td,li,p{overflow-wrap:anywhere}
 </section>
 
 <section id="fault">
-<h2><span class="n">8</span>故障查線</h2>
+<h2><span class="n">8</span>故障排查與維修記錄</h2>
+<p>排查分兩步：先用<b>故障查線</b>找出哪一段有問題，再用<b>維修記錄</b>記下怎麼處理，並在圖上看到哪裡還沒修好。</p>
+<h3 id="f-trace">故障查線</h3>
 <p>使用者回報「不能上網」時，從他的電腦開始，<b>一段一段往網路入口檢查</b>，並記錄每一段的結果。</p>
 <figure><img src="manual/fault.jpg" alt="故障查線面板" loading="lazy"><figcaption>故障查線：左邊是路徑，右邊是逐段檢查清單、故障點與影響範圍。</figcaption></figure>
 <ol class="steps">
@@ -354,6 +357,30 @@ code,td,li,p{overflow-wrap:anywhere}
 <li>處理完在最下方填處理方式並<b>結案</b>。所有紀錄可在線路表查看並匯出 CSV。</li>
 </ol>
 <div class="tip"><b>💡</b>不確定從哪裡開始？直接按查線而不選設備，面板會列出整張圖目前的健檢問題。</div>
+<p>結案前後都可以按面板下方的 <b>轉成維修單</b>，把起點、故障點、各段備註帶進維修記錄（見下一節）。</p>
+
+<h3 id="f-repair">維修記錄</h3>
+<p>在 <b>線路表 ▸ 維修記錄</b> 管理所有維修單。每一張單依影響範圍分成三種：</p>
+<div class="tw"><table>
+<tr><th>範圍</th><th>什麼時候用</th><th>畫布上的標示</th></tr>
+<tr><td><b>單點</b></td><td>一台設備或一條線有問題，例如一支 AP、一條跳線。</td><td>該設備或線路</td></tr>
+<tr><td><b>區域</b></td><td>一群設備一起出問題，例如某台交換器底下整區沒網路。可勾選設備、加入畫布上選取的設備，或選一台設備連同它的下游一次加入。</td><td>勾選的每台設備</td></tr>
+<tr><td><b>全域</b></td><td>整個網路都受影響，例如對外斷線、停電。不用選設備。</td><td>畫面上方紅色提示列</td></tr>
+</table></div>
+<figure><img src="manual/rp-table.jpg" alt="維修記錄表" loading="lazy"><figcaption>維修記錄表：範圍、對象、狀態、症狀與原因、修復方式，最新的處理紀錄會直接顯示。可依範圍或狀態篩選，也能匯出 CSV。</figcaption></figure>
+<h4>新增一張維修單</h4>
+<ol class="steps">
+<li>按 <b>＋ 新增維修單</b>，或在設備面板按 <b>記錄維修</b>（會自動帶入該設備）。</li>
+<li>最上面的 <b>從故障通知帶入</b> 可挑：<b>設備沒有回應</b>（監控偵測到的）、<b>檢查發現</b>（資料檢查的問題）、<b>查線紀錄</b>（還沒結案的查線）。選了就會填好範圍、對象和症狀，仍可修改。</li>
+<li>填 <b>症狀</b>（怎麼發現的）、<b>原因</b>、<b>修復方式</b>。修復方式下方有常用選項（重新插拔線、更換網路線、重開機…），按一下就加進去。</li>
+<li>狀態分 <b>待處理</b>、<b>處理中</b>、<b>已修復</b>；改成已修復時會自動記下修復時間。</li>
+<li><b>處理紀錄</b>可以自由填寫，每按一次「加入紀錄」就依時間記一則，例如「到現場確認電源燈不亮」「換上備品後恢復」。</li>
+</ol>
+<figure><img src="manual/rp-form.jpg" alt="新增維修單" loading="lazy"><figcaption>新增維修單：上方可從故障通知帶入，下方是處理紀錄。</figcaption></figure>
+<h4>對應到畫布</h4>
+<p>還沒修好的維修單會直接標在拓撲圖上：對象用<b>虛線外框加 🔧</b>，紅色是待處理、黃色是處理中，線路也用虛線。全域故障在畫面上方顯示紅色提示，點一下回到維修記錄。在維修記錄表點任一列，會跳回拓撲圖並框住受影響的對象。已修復的單不再標示，但記錄會保留。</p>
+<figure><img src="manual/rp-map.jpg" alt="畫布上的維修標示" loading="lazy"><figcaption>區域維修：座位區的設備以虛線與 🔧 標出，上方是全域故障提示。</figcaption></figure>
+<div class="note"><b>ℹ️</b>維修記錄會跟著專案儲存（連到 netmap.exe 服務時存在服務裡），也包含在 JSON 備份與歷史版本中；「分享連結」不帶維修記錄。</div>
 </section>
 
 <section id="save">
