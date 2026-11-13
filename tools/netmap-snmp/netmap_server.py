@@ -171,6 +171,89 @@ def local_nics():
     return out
 
 
+class ConnSampler:
+    """Windows：用「TCP 擴充統計」量每條連線的位元組數（要管理員權限，只算開始統計之後的 TCP 流量）。
+    有人開著「現在的連線」時才在背景每 3 秒取樣，閒置 2 分鐘就停。"""
+    EVERY, IDLE = 3.0, 120.0
+    def __init__(s):
+        s.lock = threading.Lock(); s.th = None; s.last = 0.0; s.on = {}; s.prev = {}; s.tot = {}
+        s.status = "none" if os.name != "nt" else "starting"; s.since = 0
+        s.dll = None
+    def _api(s):
+        if s.dll is None:
+            import ctypes
+            s.dll = ctypes.WinDLL("iphlpapi", use_last_error=True)
+        return s.dll
+    @staticmethod
+    def _row(laddr, lport, raddr, rport):
+        import ctypes, socket as so
+        class ROW(ctypes.Structure):
+            _fields_ = [("State", ctypes.c_ulong), ("La", ctypes.c_ulong), ("Lp", ctypes.c_ulong), ("Ra", ctypes.c_ulong), ("Rp", ctypes.c_ulong)]
+        r = ROW(); r.State = 5
+        r.La = int.from_bytes(so.inet_aton(laddr), "little"); r.Lp = so.htons(lport)
+        r.Ra = int.from_bytes(so.inet_aton(raddr), "little"); r.Rp = so.htons(rport)
+        return r
+    def _enable(s, row):
+        import ctypes
+        rw = ctypes.c_ubyte(1)
+        return s._api().SetPerTcpConnectionEStats(ctypes.byref(row), 1, ctypes.byref(rw), 0, 1, 0)
+    def _read(s, row):
+        import ctypes
+        buf = ctypes.create_string_buffer(256)
+        rc = s._api().GetPerTcpConnectionEStats(ctypes.byref(row), 1, None, 0, 0, None, 0, 0, buf, 0, 256)
+        if rc: return None
+        return int.from_bytes(buf.raw[16:24], "little"), int.from_bytes(buf.raw[0:8], "little")   # (收到, 送出)
+    def touch(s):
+        with s.lock:
+            s.last = time.time()
+            if os.name != "nt" or (s.th and s.th.is_alive()): return
+            s.th = threading.Thread(target=s._loop, daemon=True); s.th.start()
+    def _loop(s):
+        try: import psutil
+        except ImportError: s.status = "none"; return
+        s.since = int(time.time()); s.tot = {}; s.prev = {}; s.on = {}
+        while time.time() - s.last < s.IDLE:
+            t0 = time.time(); me = set(local_ips()); names = {}; seen = set(); rate = {}
+            try: cs = psutil.net_connections(kind="tcp")
+            except Exception: cs = []
+            ok = denied = 0
+            for c in cs:
+                if c.status != "ESTABLISHED" or not c.raddr or ":" in c.raddr.ip or ":" in c.laddr.ip: continue
+                if c.raddr.ip in me or c.raddr.ip.startswith("127."): continue
+                k = (c.laddr.ip, c.laddr.port, c.raddr.ip, c.raddr.port); seen.add(k)
+                try:
+                    row = s._row(*k)
+                    if k not in s.on:
+                        rc = s._enable(row)
+                        if rc == 5: denied += 1; continue
+                        if rc: continue
+                        s.on[k] = 1
+                    r = s._read(row)
+                except Exception: continue
+                if r is None: continue
+                ok += 1
+                pr = s.prev.get(k, (0, 0)); d = (max(0, r[0] - pr[0]), max(0, r[1] - pr[1])); s.prev[k] = r
+                try: pn = psutil.Process(c.pid).name() if c.pid else "系統"
+                except Exception: pn = "（無權限讀取）"
+                ak = (pn, c.raddr.ip, c.raddr.port)
+                t = s.tot.setdefault(ak, {"rx": 0, "tx": 0, "rr": 0.0, "tr": 0.0})
+                t["rx"] += d[0]; t["tx"] += d[1]
+                a = rate.setdefault(ak, [0, 0]); a[0] += d[0]; a[1] += d[1]
+            dt = max(0.5, time.time() - t0 + s.EVERY)
+            with s.lock:
+                for ak, t in s.tot.items():
+                    a = rate.get(ak, (0, 0)); t["rr"] = a[0] * 8 / dt; t["tr"] = a[1] * 8 / dt
+                for k in [k for k in s.on if k not in seen]: s.on.pop(k, None); s.prev.pop(k, None)
+                s.status = "tcp" if ok else ("noadmin" if denied else s.status if s.status != "starting" else "tcp")
+            time.sleep(s.EVERY)
+        s.status = "starting"
+    def get(s, proc, peer, port):
+        with s.lock: return dict(s.tot.get((proc, peer, port)) or {})
+
+
+_conn_sampler = ConnSampler()
+
+
 def local_conns():
     """這台電腦目前的對外連線，依「程式＋對方 IP＋埠」合併。需要 psutil。回傳 None＝沒有 psutil。"""
     try:
@@ -194,10 +277,16 @@ def local_conns():
         proto = 6 if c.type == socket.SOCK_STREAM else 17
         k = (pname(c.pid or 0), rip, rport, proto)
         agg[k] = agg.get(k, 0) + 1
-    out = [{"proc": k[0], "peer": k[1], "port": k[2], "service": nf.service_name(k[3], k[2]), "n": n,
-            "local": nf.is_local(k[1])} for k, n in agg.items()]
-    out.sort(key=lambda x: (-x["n"], x["proc"]))
-    return {"ts": int(time.time()), "conns": out[:300]}
+    _conn_sampler.touch()
+    out = []
+    for k, n in agg.items():
+        x = {"proc": k[0], "peer": k[1], "port": k[2], "service": nf.service_name(k[3], k[2]), "n": n, "local": nf.is_local(k[1]), "tcp": k[3] == 6}
+        if k[3] == 6:
+            t = _conn_sampler.get(k[0], k[1], k[2])
+            if t: x.update(rx=t["rx"], tx=t["tx"], rr=round(t["rr"]), tr=round(t["tr"]))
+        out.append(x)
+    out.sort(key=lambda x: (-((x.get("rx") or 0) + (x.get("tx") or 0)), -x["n"], x["proc"]))
+    return {"ts": int(time.time()), "conns": out[:300], "stats": _conn_sampler.status, "since": _conn_sampler.since}
 
 
 _self_cache = [0.0, set()]
