@@ -33,7 +33,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.20.12"
+VERSION = "1.20.13"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 MACHINE = False   # --machine：整台電腦共用的資料夾（C:\ProgramData\netmap），給「開機自動啟動、不用登入」的服務用（用 SYSTEM 執行，沒有使用者的 APPDATA）
@@ -2205,11 +2205,36 @@ class Service:
         if j and j.get("running"): j["stop"] = True
         return True
 
+    def drop_stale(s, project):
+        """網段探索的結果裡，路由器（SSH 用戶端清單）明確說「已不在線」的設備，多半是 ARP／DHCP 留下的舊紀錄
+        （例如手機換了隨機 MAC 後的舊 IP），先拿掉、不當成新設備。回傳拿掉的 [(名稱, IP)]。"""
+        now = time.time(); on, off = set(), set()
+        for ts, lst in list((getattr(s.poller, "clients", None) or {}).values()):
+            if now - ts > 900: continue
+            for c in lst or []:
+                keys = {k for k in ((c.get("mac") or "").lower(), c.get("ip") or "") if k}
+                if c.get("online") is True: on |= keys
+                elif c.get("online") is False: off |= keys
+        if not off: return []
+        gone, ids = [], set()
+        for d in project.get("devices", []):
+            if d.get("type") != "end": continue
+            keys = {k for k in ((d.get("mac") or "").lower(), d.get("ip") or "") if k}
+            if keys & off and not keys & on: ids.add(d["id"]); gone.append((d.get("name") or "", d.get("ip") or ""))
+        if ids:
+            pids = {p["id"] for d in project["devices"] if d["id"] in ids for p in d.get("ports", [])}
+            project["devices"] = [d for d in project["devices"] if d["id"] not in ids]
+            project["cables"] = [c for c in project.get("cables", []) if c.get("a") not in pids and c.get("b") not in pids]
+        return gone
+
     def scan_apply(s, how):
         j = getattr(s, "scan", None); st = s.store
         if not j or not j.get("project"): return None, "沒有可以套用的掃描結果"
         if j.get("pid") != st.reg.get("current"): return None, "掃描之後已經切換專案，請重新掃描"
-        project = j["project"]
+        project = j["project"]; stale = []
+        if str(project.get("source", "")).startswith("netmap-discover"):
+            try: stale = s.drop_stale(project)
+            except Exception: stale = []
         if how == "replace":
             if st.project.get("devices"):
                 bk = os.path.join(st.dir, "backup"); os.makedirs(bk, exist_ok=True)
@@ -2223,6 +2248,7 @@ class Service:
             else:
                 nd, npt, added, ncab = merge_snmp(proj, project, add_new=True)
                 st.set_project(proj); msg = f"已更新目前的圖：對到 {nd - added} 台設備、{npt} 個埠" + (f"，新增 {added} 台（放在圖的最下面）" if added else "") + (f"，補上 {ncab} 條設備之間的線" if ncab else "")
+        if stale: msg += f"；略過 {len(stale)} 台可能是舊紀錄（路由器顯示已不在線）：" + "、".join(f"{n} {ip}".strip() for n, ip in stale[:6])
         try: s.poller.poke()
         except Exception: pass
         j["project"] = None

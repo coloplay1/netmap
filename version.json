@@ -1,8 +1,8 @@
 {
- "web": "3.21.2",
- "exe": "1.20.12",
- "date": "2026-11-12",
- "title": "安裝程式改用資料夾版，避免 Python DLL 載入失敗",
- "download": "https://github.com/coloplay1/netmap/releases/download/snmp-latest/RackTrace-Setup-1.20.12.exe",
- "notes": "https://coloplay1.github.io/netmap/manual.html#changelog"
+  "web": "3.21.3",
+  "exe": "1.20.12",
+  "date": "2026-11-12",
+  "title": "安裝程式改用資料夾版，避免 Python DLL 載入失敗",
+  "download": "https://github.com/coloplay1/netmap/releases/download/snmp-latest/RackTrace-Setup-1.20.12.exe",
+  "notes": "https://coloplay1.github.io/netmap/manual.html#changelog"
 }
