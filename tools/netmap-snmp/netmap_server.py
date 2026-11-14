@@ -33,7 +33,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.20.13"
+VERSION = "1.20.14"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 MACHINE = False   # --machine：整台電腦共用的資料夾（C:\ProgramData\netmap），給「開機自動啟動、不用登入」的服務用（用 SYSTEM 執行，沒有使用者的 APPDATA）
@@ -193,10 +193,22 @@ class ConnSampler:
         r.La = int.from_bytes(so.inet_aton(laddr), "little"); r.Lp = so.htons(lport)
         r.Ra = int.from_bytes(so.inet_aton(raddr), "little"); r.Rp = so.htons(rport)
         return r
-    def _enable(s, row):
+    def _enable(s, row, typ=1):
+        """typ 1＝TcpConnectionEstatsData（位元組數），3＝TcpConnectionEstatsPath（RTT 延遲）"""
         import ctypes
         rw = ctypes.c_ubyte(1)
-        return s._api().SetPerTcpConnectionEStats(ctypes.byref(row), 1, ctypes.byref(rw), 0, 1, 0)
+        return s._api().SetPerTcpConnectionEStats(ctypes.byref(row), typ, ctypes.byref(rw), 0, 1, 0)
+    def _rtt(s, row):
+        """TCP_ESTATS_PATH_ROD_v0：40 個 ULONG（160 bytes）；SmoothedRtt 是第 28 個、MinRtt 第 31 個（從 1 數），單位毫秒。
+        還沒量到時 Windows 會給 0 或 0xFFFFFFFF，一律當成沒有。"""
+        import ctypes
+        buf = ctypes.create_string_buffer(160)
+        rc = s._api().GetPerTcpConnectionEStats(ctypes.byref(row), 3, None, 0, 0, None, 0, 0, buf, 0, 160)
+        if rc: s.errs["rtt %d" % rc] = s.errs.get("rtt %d" % rc, 0) + 1; return None
+        u = lambda i: int.from_bytes(buf.raw[i * 4:i * 4 + 4], "little")
+        sm, mn = u(27), u(30)
+        ok = lambda v: v if 0 < v < 60000 else None
+        return ok(sm), ok(mn)
     def _read(s, row):
         import ctypes
         buf = ctypes.create_string_buffer(96)   # sizeof(TCP_ESTATS_DATA_ROD_v0)＝96，大小不符會回 87／122
@@ -213,7 +225,7 @@ class ConnSampler:
         except ImportError: s.status = "none"; return
         s.since = int(time.time()); s.tot = {}; s.prev = {}; s.on = {}
         while time.time() - s.last < s.IDLE:
-            t0 = time.time(); me = set(local_ips()); names = {}; seen = set(); rate = {}
+            t0 = time.time(); me = set(local_ips()); names = {}; seen = set(); rate = {}; rtts = {}; mins = {}
             try: cs = psutil.net_connections(kind="tcp")
             except Exception: cs = []
             ok = denied = 0
@@ -228,7 +240,11 @@ class ConnSampler:
                         if rc == 5: denied += 1; continue
                         if rc: s.errs["set %d" % rc] = s.errs.get("set %d" % rc, 0) + 1; continue
                         s.on[k] = 1
+                        try: s._enable(row, 3)
+                        except Exception: pass
                     r = s._read(row)
+                    try: rt = s._rtt(row)
+                    except Exception: rt = None
                 except Exception as e: s.errs["例外 " + type(e).__name__ + ": " + str(e)[:80]] = 1; continue
                 if r is None: continue
                 ok += 1
@@ -239,10 +255,14 @@ class ConnSampler:
                 t = s.tot.setdefault(ak, {"rx": 0, "tx": 0, "rr": 0.0, "tr": 0.0})
                 t["rx"] += d[0]; t["tx"] += d[1]
                 a = rate.setdefault(ak, [0, 0]); a[0] += d[0]; a[1] += d[1]
+                if rt and rt[0]: rtts.setdefault(ak, []).append(rt[0])
+                if rt and rt[1]: mins[ak] = min(mins.get(ak, rt[1]), rt[1])
             dt = max(0.5, time.time() - t0 + s.EVERY)
             with s.lock:
                 for ak, t in s.tot.items():
                     a = rate.get(ak, (0, 0)); t["rr"] = a[0] * 8 / dt; t["tr"] = a[1] * 8 / dt
+                    if ak in rtts: t["rtt"] = round(sum(rtts[ak]) / len(rtts[ak]))
+                    if ak in mins: t["minrtt"] = mins[ak]
                 for k in [k for k in s.on if k not in seen]: s.on.pop(k, None); s.prev.pop(k, None)
                 s.status = "tcp" if ok else ("noadmin" if denied else ("error" if s.errs else "starting"))
             time.sleep(s.EVERY)
@@ -283,7 +303,7 @@ def local_conns():
         x = {"proc": k[0], "peer": k[1], "port": k[2], "service": nf.service_name(k[3], k[2]), "n": n, "local": nf.is_local(k[1]), "tcp": k[3] == 6}
         if k[3] == 6:
             t = _conn_sampler.get(k[0], k[1], k[2])
-            if t: x.update(rx=t["rx"], tx=t["tx"], rr=round(t["rr"]), tr=round(t["tr"]))
+            if t: x.update(rx=t["rx"], tx=t["tx"], rr=round(t["rr"]), tr=round(t["tr"]), rtt=t.get("rtt"), minrtt=t.get("minrtt"))
         out.append(x)
     out.sort(key=lambda x: (-((x.get("rx") or 0) + (x.get("tx") or 0)), -x["n"], x["proc"]))
     return {"ts": int(time.time()), "conns": out[:300], "stats": _conn_sampler.status, "since": _conn_sampler.since, "err": dict(_conn_sampler.errs)}
