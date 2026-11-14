@@ -33,7 +33,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.20.11"
+VERSION = "1.20.12"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 MACHINE = False   # --machine：整台電腦共用的資料夾（C:\ProgramData\netmap），給「開機自動啟動、不用登入」的服務用（用 SYSTEM 執行，沒有使用者的 APPDATA）
@@ -1707,7 +1707,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         arg = lambda k, d="": (q.get(k) or [d])[0]
         if u.path == "/api/ping":
             o = s._detect_origin()
-            if o: return s._send(200, {"ok": True, "version": VERSION, "port": st.settings.get("port"), "detect": True},
+            if o: return s._send(200, {"ok": True, "version": VERSION, "port": st.settings.get("port"), "detect": True, "mode": "service" if MACHINE else "app", "devices": len(st.project.get("devices", [])), "rev": st.rev},
                                  extra={"Access-Control-Allow-Origin": o, "Vary": "Origin", "Access-Control-Allow-Private-Network": "true"})
             return s._send(200, {"ok": True, "version": VERSION})
         if u.path in ("/", "/index.html"):
