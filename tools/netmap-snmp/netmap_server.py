@@ -33,7 +33,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.20.15"
+VERSION = "1.20.16"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 MACHINE = False   # --machine：整台電腦共用的資料夾（C:\ProgramData\netmap），給「開機自動啟動、不用登入」的服務用（用 SYSTEM 執行，沒有使用者的 APPDATA）
@@ -1123,6 +1123,8 @@ class Poller:
         s.inv_t = 0          # 上次整理「網路上的設備」的時間
         s.nb_tried = {}      # IP → 上次用 NetBIOS 問名稱的時間
         s.ptr_tried = {}     # IP → 上次用反向 DNS（PTR）問名稱的時間
+        s.dev_tried = {}     # 圖上只有 IP 的設備 → 上次問名稱的時間
+        s.ip_names = {}      # IP → (名稱, 來源)：替圖上只有 IP 的設備查到的名稱
         s.nb_busy = False
         s.probe_t = time.time() - PROBE_EVERY + 90   # 啟動 1～2 分鐘後先試一次 SNMP
         s.probe_force = False; s.probe_last = {"ts": 0, "tried": 0, "found": []}
@@ -1432,6 +1434,35 @@ class Poller:
                 if n: s.log(f"反向 DNS 補上 {n} 台設備的名稱")
         except Exception as e:
             s.log(f"反向 DNS 查名稱失敗：{e}")
+        try:
+            # 圖上「只知道 IP、名稱還是 IP 或 MAC」的設備（例如固定 IP、從 ARP 表匯入的別的網段）：「網路上的設備」看不到它們，
+            # 這裡直接用 NetBIOS、再用反向 DNS 問名稱（每個 IP 各 6 小時最多問一次）
+            now = time.time(); mac_re = re.compile(r"^([0-9a-fA-F]{2}[:-]){5}[0-9a-fA-F]{2}$")
+            todo = []
+            for d in (s.store.project or {}).get("devices", []):
+                ip = str(d.get("ip") or "").split("/")[0].strip(); n = str(d.get("name") or "").strip()
+                if not re.fullmatch(r"\d+\.\d+\.\d+\.\d+", ip) or d.get("type") != "end": continue
+                if not (n == ip or mac_re.match(n) or n.endswith(" " + ip)): continue
+                if ip in s.ip_names or now - s.dev_tried.get(ip, 0) < 6 * 3600: continue
+                s.dev_tried[ip] = now; todo.append(ip)
+            todo = todo[:200]
+            if todo:
+                def ask(ip):
+                    try:
+                        r = ndc.nbstat(ip, timeout=1.0, tries=1)
+                        if r and r.get("name"): return ip, r["name"], "netbios"
+                    except Exception: pass
+                    try:
+                        n = s.ptr_lookup(ip)
+                        if n: return ip, n, "dns"
+                    except Exception: pass
+                    return ip, "", ""
+                with ThreadPoolExecutor(24) as ex: res = list(ex.map(ask, todo))
+                got = [(ip, n, src) for ip, n, src in res if n]
+                for ip, n, src in got: s.ip_names[ip] = (n, src)
+                if got: s.log(f"幫圖上 {len(got)} 台只有 IP 的設備查到名稱（NetBIOS／反向 DNS）")
+        except Exception as e:
+            s.log(f"查圖上設備名稱失敗：{e}")
         finally:
             s.nb_busy = False
 
@@ -1462,6 +1493,9 @@ class Poller:
             o = out.setdefault(m, {"ip": r["ip"], "name": "", "src": "netbios", "vendor": ns.oui_vendor(m.upper())})
             if not o["name"]: o["name"] = r["name"]; o["src"] = "netbios"
             if not o["ip"]: o["ip"] = r["ip"]
+        have = {v["ip"] for v in out.values() if v.get("name")}
+        for ip, (n, src) in list(getattr(s, "ip_names", {}).items()):
+            if ip not in have: out["ip:" + ip] = {"ip": ip, "name": n, "src": src, "vendor": ""}
         return out
 
     def run_audit(s, opts):
