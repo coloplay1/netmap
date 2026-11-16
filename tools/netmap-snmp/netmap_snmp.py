@@ -484,6 +484,32 @@ def infer_lags(project, infra=("fw", "router", "sw", "hub", "ap")):
             for x, y in un: x["lagHint"] = y["lagHint"] = f"H{n}"
     return filled, hinted
 
+def dns_confirm(ips, timeout=6.0):
+    """反向 DNS 查名稱、再正向查回來確認：IP → 名稱 → 同一個 IP 才算「DNS 與 IP 一致」。回傳 {ip: 短名稱}。"""
+    ips = [i for i in dict.fromkeys(ips) if i]
+    out = {}
+    if not ips: return out
+    def one(ip):
+        try:
+            n = socket.gethostbyaddr(ip)[0]
+        except Exception: return ip, ""
+        try:
+            back = socket.gethostbyname_ex(n)[2]
+        except Exception: back = []
+        short = n.split(".")[0]
+        if not short or re.fullmatch(r"[\d\-]+", short) or ip not in back: return ip, ""
+        return ip, short
+    ex = cf.ThreadPoolExecutor(32)
+    futs = [ex.submit(one, ip) for ip in ips]
+    done, _ = cf.wait(futs, timeout=timeout)
+    for f in done:
+        try:
+            ip, n = f.result()
+            if n: out[ip] = n
+        except Exception: pass
+    ex.shutdown(wait=False)
+    return out
+
 def build(devs, extra_lldp=True, fdb=True, max_macs_per_port=4):
     project = {"app": "netmap", "version": 3, "source": f"netmap-snmp {VERSION}", "savedAt": dt.datetime.now().isoformat(timespec="seconds"),
                "layout": "auto", "devices": [], "cables": [], "racks": [], "faults": []}
@@ -678,12 +704,24 @@ def build(devs, extra_lldp=True, fdb=True, max_macs_per_port=4):
                                "ports": [{"id": nid("p"), "label": str(i + 1), "kind": "rj45", "poe": False, "mode": "access", "vlan": "", "tagged": "", "lag": "", "note": ""} for i in range(len(ms) + 1)]}
                         D.append(hub); add_cable(pid, hub["ports"][0]["id"])
                         targets = list(zip(hub["ports"][1:], ms))
+                # 一個埠後面有好幾個 MAC＝接了未管理交換器／Hub：它不會告訴我們哪個 MAC 在哪個孔，所以不幫它們接線（以前依序排上去，
+                # 孔位全是猜的，現場確認後改名反而對不上 MAC）。只把查得到 IP 的設備放在它旁邊、標成「待接線」，讓人現場確認後自己拉線；
+                # 只有 MAC、查不到 IP 的不放進圖裡，記在 Hub 的備註。
+                hub_d = D[-1] if targets and targets[0][0] is not None else None
+                skipped = []
+                dn = dns_confirm([arp.get(m, "") for _, m in targets]) if hub_d is not None else {}
                 for hp, mac in targets:
                     ip = arp.get(mac, "")
-                    e = {"id": nid("d"), "type": "end", "kind": "其他", "name": ip or mac, "brand": "", "model": "", "ip": ip, "mac": mac, "gw": "", "loc": "",
-                         "note": "由 MAC 表推斷", "rack": "", "u": "", "uh": "", "x": 0, "y": 0,
+                    # 未管理交換器後面：要 IP 和 DNS 名稱對得起來（反查、正查都是這個 IP）才放進圖；MAC→IP 來自 ARP，三者一致
+                    if hub_d is not None and not (ip and dn.get(ip)): skipped.append(mac + (f"（{ip}）" if ip else "")); continue
+                    e = {"id": nid("d"), "type": "end", "kind": "其他", "name": dn.get(ip) or ip or mac, "brand": "", "model": "", "ip": ip, "mac": mac, "gw": "", "loc": "",
+                         "note": "由 MAC 表推斷" if hub_d is None else f"在 {hub_d['name']} 後面；DNS 名稱、IP、MAC 一致（MAC 來自 {dev['name']} {p['label']}），接在哪個孔要現場確認後自己拉線",
+                         "rack": "", "u": "", "uh": "", "x": 0, "y": 0,
                          "ports": [{"id": nid("p"), "label": "LAN", "kind": "rj45", "poe": False, "mode": "access", "vlan": p["vlan"], "tagged": "", "lag": "", "note": ""}]}
-                    D.append(e); add_cable(hp["id"] if hp else pid, e["ports"][0]["id"])
+                    if hub_d is not None: e["behind"] = hub_d["id"]; D.append(e)
+                    else: D.append(e); add_cable(hp["id"] if hp else pid, e["ports"][0]["id"])
+                if hub_d is not None and skipped:
+                    hub_d["note"] += f"；另有 {len(skipped)} 台查不到 DNS 名稱（或名稱和 IP 對不起來）的設備沒有放進圖裡，可以用「網路上的設備」或匯入 IP／MAC 對照補上：" + "、".join(skipped[:30]) + ("…" if len(skipped) > 30 else "")
     # 3.5) 防火牆／路由器的空埠後面接了無網管交換器（例如 D-Link 直接接防火牆）：
     #      看它的 ARP 表是從哪個介面學到的，交換器 MAC 表裡都沒出現過的 MAC 就掛在那個埠後面
     if fdb:
@@ -713,12 +751,21 @@ def build(devs, extra_lldp=True, fdb=True, max_macs_per_port=4):
                     D.append(hub); add_cable(pid, hub["ports"][0]["id"]); targets = list(zip(hub["ports"][1:], ms))
                 else:
                     targets = [(None, ms[0])]
+                hub_d = D[-1] if targets and targets[0][0] is not None else None
+                ipof = lambda m: rdv["arp"].get(m, "") or rdv["arp"].get(m.lower(), "")
+                dn = dns_confirm([ipof(m) for _, m in targets]) if hub_d is not None else {}
+                skipped = []
                 for hp, mac in targets:
-                    ip = rdv["arp"].get(mac, "") or rdv["arp"].get(mac.lower(), "")
-                    e = {"id": nid("d"), "type": "end", "kind": "其他", "name": ip or mac, "brand": "", "model": "", "ip": ip, "mac": mac, "gw": "", "loc": "",
-                         "note": f"由 {R['name']} 的 ARP 表推斷", "rack": "", "u": "", "uh": "", "x": 0, "y": 0,
+                    ip = ipof(mac)
+                    if hub_d is not None and not (ip and dn.get(ip)): skipped.append(mac + (f"（{ip}）" if ip else "")); continue
+                    e = {"id": nid("d"), "type": "end", "kind": "其他", "name": dn.get(ip) or ip or mac, "brand": "", "model": "", "ip": ip, "mac": mac, "gw": "", "loc": "",
+                         "note": f"由 {R['name']} 的 ARP 表推斷" + ("，接在哪個孔要現場確認後自己拉線" if hub_d is not None else ""), "rack": "", "u": "", "uh": "", "x": 0, "y": 0,
                          "ports": [{"id": nid("p"), "label": "LAN", "kind": "rj45", "poe": False, "mode": "access", "vlan": "", "tagged": "", "lag": "", "note": ""}]}
-                    D.append(e); add_cable(hp["id"] if hp else pid, e["ports"][0]["id"])
+                    D.append(e)
+                    if hub_d is not None: e["behind"] = hub_d["id"]
+                    else: add_cable(hp["id"] if hp else pid, e["ports"][0]["id"])
+                if hub_d is not None and skipped:
+                    hub_d["note"] += f"；另有 {len(skipped)} 台查不到 DNS 名稱（或名稱和 IP 對不起來）的設備沒有放進圖裡：" + "、".join(skipped[:30]) + ("…" if len(skipped) > 30 else "")
     return project
 
 # ───────────────────────── driver ─────────────────────────
