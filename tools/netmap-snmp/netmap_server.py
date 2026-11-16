@@ -33,7 +33,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.20.14"
+VERSION = "1.20.15"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 MACHINE = False   # --machine：整台電腦共用的資料夾（C:\ProgramData\netmap），給「開機自動啟動、不用登入」的服務用（用 SYSTEM 執行，沒有使用者的 APPDATA）
@@ -85,6 +85,12 @@ def web_override():
         if m and _vkey(m.group(1)) > _vkey(VERSION): return None
         return html
     except Exception: return None
+
+def served_web_ver():
+    try:
+        b = web_index(); v = max(_page_ver(open(b, encoding="utf-8").read()) if b else (0,), _page_ver(web_override()))
+        return ".".join(map(str, v)) if v != (0,) else ""
+    except Exception: return ""
 
 def web_update(url=None):
     """下載最新網頁。回傳 (版本字串, 錯誤)。只收 https（測試用的環境變數除外）、大小與內容都要通過檢查。"""
@@ -1331,6 +1337,12 @@ class Poller:
         if s.dns_force or (dh > 0 and time.time() - s.dns_t > dh * 3600):
             s.dns_force = False; s.dns_t = time.time()
             threading.Thread(target=s.run_dns, daemon=True, name="dnscheck").start()
+        if s.store.settings.get("web_auto") and time.time() - getattr(s, "web_t", 0) > 6 * 3600:
+            s.web_t = time.time()
+            def _wu():
+                v, err = web_update()
+                if v: s.log(f"已自動更新網頁到 v{v}（重新整理網頁就會看到）")
+            threading.Thread(target=_wu, daemon=True, name="webauto").start()
         if s.store.settings.get("snmp_autoprobe", True) and (s.probe_force or time.time() - s.probe_t > PROBE_EVERY):
             s.probe_force = False; s.probe_t = time.time()
             try: s.autoprobe(opts)
@@ -1727,7 +1739,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         arg = lambda k, d="": (q.get(k) or [d])[0]
         if u.path == "/api/ping":
             o = s._detect_origin()
-            if o: return s._send(200, {"ok": True, "version": VERSION, "port": st.settings.get("port"), "detect": True, "mode": "service" if MACHINE else "app", "devices": len(st.project.get("devices", [])), "rev": st.rev},
+            if o: return s._send(200, {"ok": True, "version": VERSION, "port": st.settings.get("port"), "detect": True, "web": served_web_ver(), "mode": "service" if MACHINE else "app", "devices": len(st.project.get("devices", [])), "rev": st.rev},
                                  extra={"Access-Control-Allow-Origin": o, "Vary": "Origin", "Access-Control-Allow-Private-Network": "true"})
             return s._send(200, {"ok": True, "version": VERSION})
         if u.path in ("/", "/index.html"):
@@ -2061,7 +2073,7 @@ class Service:
         return {"ping_enabled": st.get("ping_enabled", True), "ping_interval": st.get("ping_interval", 30), "ping_fails": st.get("ping_fails", 2),
                 "ping_slow_ms": st.get("ping_slow_ms", 200), "ping_method": na.ping_method(),
                 "inv_enabled": st.get("inv_enabled", True), "inv_gone_hours": st.get("inv_gone_hours", 24),
-                "snmp_autoprobe": st.get("snmp_autoprobe", True), "audit_hours": st.get("audit_hours", 6), "snmp_probe": dict(s.poller.probe_last, candidates=len(probe_candidates(s.store.project, self_ips())), next=int(s.poller.probe_t + PROBE_EVERY)),
+                "snmp_autoprobe": st.get("snmp_autoprobe", True), "web_auto": bool(st.get("web_auto")), "web_ver": served_web_ver(), "audit_hours": st.get("audit_hours", 6), "snmp_probe": dict(s.poller.probe_last, candidates=len(probe_candidates(s.store.project, self_ips())), next=int(s.poller.probe_t + PROBE_EVERY)),
                 "alerts": {"enabled": bool(a.get("enabled")), "site": a.get("site", ""), "on": a.get("on") or {}, "channels": chans},
                 "channel_types": {k: {"name": v["name"], "fields": [[f, l, sec] for f, l, sec in v["fields"]]} for k, v in na.CHANNELS.items()},
                 "auth": {"has_password": bool(st.get("admin_hash")), "view_required": bool(st.get("view_required")), "lan_edit": bool(st.get("lan_edit")),
@@ -2077,6 +2089,7 @@ class Service:
             if "ping_slow_ms" in b: st["ping_slow_ms"] = num(b["ping_slow_ms"], 10, 10000, 200)
             if "inv_enabled" in b: st["inv_enabled"] = bool(b["inv_enabled"])
             if "snmp_autoprobe" in b: st["snmp_autoprobe"] = bool(b["snmp_autoprobe"])
+            if "web_auto" in b: st["web_auto"] = bool(b["web_auto"])
             if "audit_hours" in b: st["audit_hours"] = max(0, min(168, float(b["audit_hours"] or 0)))
             if "inv_gone_hours" in b: st["inv_gone_hours"] = num(b["inv_gone_hours"], 1, 24 * 90, 24)
             if "lan_edit" in b: st["lan_edit"] = bool(b["lan_edit"])
