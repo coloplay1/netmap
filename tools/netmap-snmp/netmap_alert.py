@@ -217,7 +217,8 @@ class Pinger:
                     new = "slow" if recent and min(recent) >= slow else "up"
                 if new != prev:
                     st["since"] = now
-                    if prev != "wait" or new == "down":
+                    quiet = d.get("type") == "end" and d.get("kind") == "手機"   # 手機離開、休眠很常見，不發斷線／恢復通知
+                    if not quiet and (prev != "wait" or new == "down"):
                         events.append({"kind": {"down": "down", "up": "up", "slow": "slow"}[new] if not (new == "up" and prev == "slow") else "fast",
                                        "dev": did, "name": d.get("name") or ip, "ip": ip, "prev": prev, "rtt": st["rtt"], "ts": now,
                                        "down_secs": now - st.get("down_at", now) if new != "down" and prev == "down" else None})
