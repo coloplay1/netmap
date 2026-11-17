@@ -145,7 +145,9 @@ class App:
         root.after(120, s.pump); root.after(1500, s.refresh_service)
         s.update_info = None
         threading.Thread(target=s.check_update, daemon=True).start()
-        if autostart or s.store.settings.get("autorun"):
+        s.bg_url = installed_url() if os.name == "nt" else ""   # 這台電腦已有背景服務：視窗不再自己開服務，掃描結果直接送過去
+        if s.bg_url: root.after(400, s.bg_banner)
+        elif autostart or s.store.settings.get("autorun"):
             root.after(300, s.start_service)
         if autostart:
             root.after(800, root.iconify)
@@ -329,7 +331,12 @@ class App:
         return f"http://127.0.0.1:{int(s.store.settings.get('port', 8080))}/"
 
     def show_in_web(s, project, how="replace"):
-        """把結果放進監控服務、確定服務在跑，然後用瀏覽器打開。"""
+        """把結果放進監控服務、確定服務在跑，然後用瀏覽器打開。有背景服務時直接送到背景服務。"""
+        if s.bg_url:
+            try: msg = srv.svc_apply_scan(s.bg_url, project, how)
+            except Exception as e:
+                messagebox.showerror("RackTrace", f"送到背景服務失敗：{e}"); return
+            webbrowser.open(s.bg_url); s.v_scanstat.set(msg + "，已在瀏覽器開啟"); s.write(f"\n{msg}。網頁：{s.bg_url}"); return
         if how == "replace":
             if s.store.project.get("devices"):
                 bk = os.path.join(s.store.dir, "backup"); os.makedirs(bk, exist_ok=True)
@@ -349,10 +356,18 @@ class App:
         if s.service.running:
             webbrowser.open(s.local_url()); s.v_scanstat.set(msg + "，已在瀏覽器開啟"); s.write(f"\n{msg}。網頁：{s.local_url()}（其他電腦用 {s.service.urls()[0]}）")
 
+    def target_devices(s):
+        if s.bg_url:
+            try:
+                c, cur = srv._svc_call(s.bg_url, "/api/project")
+                return len((cur.get("project") or {}).get("devices", [])) if c == 200 else 0
+            except Exception: return 0
+        return len(s.store.project.get("devices", []))
+
     def use_scan(s, auto=False):
         if not s.last_project: return
-        if s.store.project.get("devices"):
-            n = len(s.store.project["devices"])
+        n = s.target_devices()
+        if n:
             disc = str(s.last_project.get("source", "")).startswith("netmap-discover")
             m = len(s.last_project.get("devices", []))
             i = s.choose("在網頁開啟結果", f"網頁上已經有一張圖（{n} 台設備），這次掃到 {m} 台。這次的結果要怎麼處理？\n\n‧ 保留（建議）："
@@ -373,7 +388,7 @@ class App:
 
     def merge_scan(s):
         if not s.last_project: return
-        if not s.store.project.get("devices"):
+        if not s.target_devices():
             s.show_in_web(s.last_project, "replace"); return
         s.show_in_web(s.last_project, "merge")
 
@@ -466,7 +481,34 @@ class App:
         except Exception as e:
             s.copyable(TITLE, f"無法設定開機自動執行：{e}")
 
+    def bg_banner(s):
+        """已經有背景服務：在監控服務分頁上方說明，並提供「搬資料」與「開啟網頁」。"""
+        fr = s.nb.nametowidget(s.nb.tabs()[1])
+        box = ttk.LabelFrame(fr, text="這台電腦已經有背景服務在執行", padding=10)
+        box.pack(fill="x", before=fr.winfo_children()[0], pady=(0, 10))
+        ttk.Label(box, text=f"背景服務：{s.bg_url}\n為了避免兩份資料，這個視窗不再自己啟動服務；在這裡掃描的結果會直接送到背景服務。"
+                  "手機、平板和其他電腦請一律開背景服務的網址。", wraplength=820).pack(anchor="w")
+        row = ttk.Frame(box); row.pack(fill="x", pady=(8, 0))
+        ttk.Button(row, text="開啟背景服務的網頁", style="Accent.TButton", command=lambda: webbrowser.open(s.bg_url)).pack(side="left")
+        n = sum(1 for x in s.store.projects()["list"] if x.get("devices"))
+        if n and not s.store.settings.get("pushed_to_bg"):
+            ttk.Button(row, text=f"把這個視窗的圖搬到背景服務（{n} 個專案）…", command=s.push_to_bg).pack(side="left", padx=(8, 0))
+        s.btn_svc.state(["disabled"]); s.v_state.set("● 使用背景服務"); s.lbl_state.configure(style="On.TLabel")
+
+    def push_to_bg(s):
+        if not messagebox.askyesno("搬到背景服務", "要把這個視窗（舊的 18080 等）裡的圖搬到背景服務嗎？\n\n"
+                                   "‧ 背景服務目前的專案是空的：直接放進去\n‧ 否則每個專案各建一個「（視窗版）」新專案，不會蓋掉背景服務原本的圖\n"
+                                   "‧ SNMP 帳密、告警設定不會搬（請在背景服務的網頁重新設定）\n\n這個視窗原本的資料會保留，不會刪除。"): return
+        try: res = srv.push_projects_to(s.store, s.bg_url)
+        except Exception as e:
+            messagebox.showerror("RackTrace", f"搬移失敗：{e}"); return
+        s.store.settings["pushed_to_bg"] = s.bg_url; s.store.settings["autorun"] = False; s.store.save_settings()
+        if s.service.running: s.service.stop()
+        messagebox.showinfo("搬到背景服務", "完成：\n" + "\n".join(f"‧ {a}：{b}" for a, b in res) + "\n\n之後請只用背景服務的網址。")
+        webbrowser.open(s.bg_url)
+
     def start_service(s):
+        if s.bg_url: return
         if s.service.running: return
         try:
             s.service.start()
@@ -603,6 +645,11 @@ class App:
     def refresh_service(s):
         try:
             on = s.service.running
+            if getattr(s, "bg_url", "") and not on:
+                s.v_state.set("● 使用背景服務"); s.lbl_state.configure(style="On.TLabel")
+                for w in s.url_box.winfo_children(): w.destroy()
+                l = ttk.Label(s.url_box, text=s.bg_url, foreground="#1d6fd8", cursor="hand2"); l.pack(side="left"); l.bind("<Button-1>", lambda e: webbrowser.open(s.bg_url))
+                s.v_svcfoot.set("監控、告警與流量紀錄都在背景服務裡，請到網頁查看。"); s.root.after(5000, s.refresh_service); return
             s.v_state.set("● 執行中" if on else "○ 已停止"); s.lbl_state.configure(style="On.TLabel" if on else "Off.TLabel")
             s.btn_svc.configure(text="停止服務" if on else "啟動服務")
             for w in s.url_box.winfo_children(): w.destroy()
@@ -868,7 +915,8 @@ class App:
 
     # ───────────── misc ─────────────
     def open_web(s):
-        if s.service.running: webbrowser.open(s.service.urls()[0])
+        if s.bg_url: webbrowser.open(s.bg_url)
+        elif s.service.running: webbrowser.open(s.service.urls()[0])
         else: webbrowser.open(WEB)
 
     def pump(s):

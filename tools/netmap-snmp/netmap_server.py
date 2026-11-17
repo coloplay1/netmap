@@ -33,7 +33,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.20.19"
+VERSION = "1.20.20"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 MACHINE = False   # --machine：整台電腦共用的資料夾（C:\ProgramData\netmap），給「開機自動啟動、不用登入」的服務用（用 SYSTEM 執行，沒有使用者的 APPDATA）
@@ -514,7 +514,7 @@ DEFAULT_SETTINGS = {"port": 8080, "interval": 60, "retention_days": 7, "lan_edit
 
 def ndc_key(x): return "%s|%s" % (x.get("status"), x.get("name") or x.get("ip"))
 
-PROJECT_KEYS = ("devices", "cables", "racks", "faults", "repairs", "pages", "trunks")
+PROJECT_KEYS = ("devices", "cables", "racks", "faults", "repairs", "pages", "trunks", "chkign")
 
 def norm_mac(m):
     h = re.sub(r"[^0-9a-fA-F]", "", str(m or "")).lower()
@@ -1339,7 +1339,7 @@ class Poller:
         if s.dns_force or (dh > 0 and time.time() - s.dns_t > dh * 3600):
             s.dns_force = False; s.dns_t = time.time()
             threading.Thread(target=s.run_dns, daemon=True, name="dnscheck").start()
-        if s.store.settings.get("web_auto") and time.time() - getattr(s, "web_t", 0) > 6 * 3600:
+        if s.store.settings.get("web_auto", True) and time.time() - getattr(s, "web_t", 0) > 6 * 3600:
             s.web_t = time.time()
             def _wu():
                 v, err = web_update()
@@ -2107,7 +2107,7 @@ class Service:
         return {"ping_enabled": st.get("ping_enabled", True), "ping_interval": st.get("ping_interval", 30), "ping_fails": st.get("ping_fails", 2),
                 "ping_slow_ms": st.get("ping_slow_ms", 200), "ping_method": na.ping_method(),
                 "inv_enabled": st.get("inv_enabled", True), "inv_gone_hours": st.get("inv_gone_hours", 24),
-                "snmp_autoprobe": st.get("snmp_autoprobe", True), "web_auto": bool(st.get("web_auto")), "web_ver": served_web_ver(), "audit_hours": st.get("audit_hours", 6), "snmp_probe": dict(s.poller.probe_last, candidates=len(probe_candidates(s.store.project, self_ips())), next=int(s.poller.probe_t + PROBE_EVERY)),
+                "snmp_autoprobe": st.get("snmp_autoprobe", True), "web_auto": bool(st.get("web_auto", True)), "web_ver": served_web_ver(), "audit_hours": st.get("audit_hours", 6), "snmp_probe": dict(s.poller.probe_last, candidates=len(probe_candidates(s.store.project, self_ips())), next=int(s.poller.probe_t + PROBE_EVERY)),
                 "alerts": {"enabled": bool(a.get("enabled")), "site": a.get("site", ""), "on": a.get("on") or {}, "channels": chans},
                 "channel_types": {k: {"name": v["name"], "fields": [[f, l, sec] for f, l, sec in v["fields"]]} for k, v in na.CHANNELS.items()},
                 "auth": {"has_password": bool(st.get("admin_hash")), "view_required": bool(st.get("view_required")), "lan_edit": bool(st.get("lan_edit")),
@@ -2447,6 +2447,67 @@ def merge_discover(project, found):
         idmap[sd["id"]] = nd["id"]; cur.append(nd); new += 1
         if sd.get("wifi") and idmap.get(sd["wifi"]["ap"]): nd["wifi"] = dict(sd["wifi"], ap=idmap[sd["wifi"]["ap"]])
     return hit, new, moved
+
+def _svc_call(url, path, body=None, timeout=15, method=None):
+    """呼叫另一個 RackTrace 服務（例如這台電腦的背景服務）的 API。本機連線＝管理員。"""
+    import urllib.request
+    data = None if body is None else json.dumps(body, ensure_ascii=False).encode("utf-8")
+    req = urllib.request.Request(url.rstrip("/") + path, data=data, method=method or ("POST" if data is not None else "GET"), headers={"Content-Type": "application/json", "X-Netmap": "1"})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r: return r.status, json.loads(r.read() or b"{}")
+    except urllib.error.HTTPError as e:
+        try: return e.code, json.loads(e.read() or b"{}")
+        except Exception: return e.code, {}
+
+def svc_put_project(url, proj, tries=3):
+    """把一張圖存進另一個服務的「目前專案」（衝突時重讀 rev 再試）。"""
+    for _ in range(tries):
+        c, cur = _svc_call(url, "/api/project")
+        if c != 200: raise RuntimeError(f"讀不到背景服務的圖（HTTP {c}）")
+        c, r = _svc_call(url, "/api/project", {"project": proj, "rev": cur.get("rev"), "pid": cur.get("pid")}, method="PUT")
+        if c == 200: return r.get("rev")
+        if c != 409: raise RuntimeError(r.get("error") or f"背景服務拒絕寫入（HTTP {c}）")
+    raise RuntimeError("背景服務的圖一直在變動，請稍後再試")
+
+def svc_apply_scan(url, project, how="merge"):
+    """把掃描結果套到另一個服務的目前專案：replace＝整張換掉，merge＝和 GUI 一樣保留原圖再合併。回傳說明文字。"""
+    c, cur = _svc_call(url, "/api/project")
+    if c != 200: raise RuntimeError(f"讀不到背景服務的圖（HTTP {c}）")
+    proj = cur.get("project") or {}
+    if how == "replace" or not proj.get("devices"):
+        svc_put_project(url, project); return f"已帶入背景服務：{len(project.get('devices', []))} 台設備、{len(project.get('cables', []))} 條線"
+    if str(project.get("source", "")).startswith("netmap-discover"):
+        hit, new, moved = merge_discover(proj, project); msg = f"已更新背景服務的圖：對到 {hit} 台、新增 {new} 台"
+    else:
+        nd, npt, added, ncab = merge_snmp(proj, project, add_new=True); msg = f"已更新背景服務的圖：對到 {nd - added} 台設備、{npt} 個埠" + (f"，新增 {added} 台" if added else "")
+    svc_put_project(url, proj); return msg
+
+def push_projects_to(st, url):
+    """把這個視窗版（%APPDATA%）的所有專案搬到背景服務：背景服務目前的專案是空的就直接放進去，其他的各建一個新專案。
+    背景服務原本開著的專案會切回來。回傳 [(名稱, 結果)]。"""
+    out = []
+    c, plist = _svc_call(url, "/api/projects")
+    if c != 200: raise RuntimeError(f"連不到背景服務（HTTP {c}）")
+    orig = plist.get("current"); names = {x.get("name") for x in plist.get("list", [])}
+    c, cur = _svc_call(url, "/api/project")
+    empty_cur = c == 200 and not (cur.get("project") or {}).get("devices")
+    with st.lock: items = [(x["id"], x.get("name") or x["id"]) for x in st.reg["list"]]
+    for pid, name in items:
+        with st.lock:
+            if pid == st.reg["current"]: proj = json.loads(json.dumps(st.project))
+            else:
+                try: proj = json.load(open(os.path.join(st._pdir(pid), "project.json"), encoding="utf-8")).get("project") or {}
+                except Exception: proj = {}
+        if not proj.get("devices"): out.append((name, "空的，略過")); continue
+        if empty_cur:
+            svc_put_project(url, proj); empty_cur = False; out.append((name, "放進背景服務目前的專案")); continue
+        nm = (name + "（視窗版）")[:40]; k = 2
+        while nm in names: nm = f"{name}（視窗版 {k}）"[:40]; k += 1
+        c, r = _svc_call(url, "/api/projects", {"action": "new", "name": nm, "switch": True})
+        if c != 200: out.append((name, r.get("error") or f"建立專案失敗（HTTP {c}）")); continue
+        names.add(nm); svc_put_project(url, proj); out.append((name, f"新專案「{nm}」"))
+    if orig: _svc_call(url, "/api/projects", {"action": "switch", "id": orig})
+    return out
 
 def migrate_user_data():
     """安裝程式用：把「這個使用者」平常用的資料（%APPDATA%\\netmap）複製到整台電腦共用的資料夾（C:\\ProgramData\\netmap），

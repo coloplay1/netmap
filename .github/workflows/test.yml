@@ -1,0 +1,36 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install
+        run: |
+          pip install pysnmp paramiko psutil
+          npm i --no-save playwright@1
+          npx playwright install --with-deps chromium
+          mkdir -p tools/netmap-snmp/web && cp index.html tools/netmap-snmp/web/index.html
+      - name: Service self-test
+        working-directory: tools/netmap-snmp
+        run: python selftest_ops.py
+      - name: Smoke test (desktop, phone, monitoring service)
+        run: |
+          python tests/run_server.py --serve > server.log 2>&1 &
+          for i in $(seq 1 30); do grep -q "server ready" server.log && break; sleep 1; done
+          cat server.log
+          node tests/smoke.js http://127.0.0.1:18799/
