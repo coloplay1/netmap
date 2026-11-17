@@ -100,7 +100,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="0 0 256 256" aria-hidden="true"><rect width="256" height="256" rx="56" fill="#fff"/><rect x="42" y="38" width="86" height="180" rx="4" fill="none" stroke="#111" stroke-width="13"/><path d="M66 82H104M66 116H104M66 150H104M66 184H104" stroke="#111" stroke-width="11" stroke-linecap="round"/><path d="M128 96C168 96 170 70 200 70" fill="none" stroke="#F2C230" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="70" r="13" fill="#F2C230"/><path d="M128 130C168 130 170 150 200 150" fill="none" stroke="#1E9BEA" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="150" r="13" fill="#1E9BEA"/><path d="M128 178C162 178 172 206 196 206" fill="none" stroke="#5B6472" stroke-width="11" stroke-linecap="round" stroke-dasharray="1 18"/><circle cx="210" cy="206" r="11" fill="none" stroke="#5B6472" stroke-width="7"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v3.21.30 · netmap.exe v1.20.13</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v3.21.31 · netmap.exe v1.20.13</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -139,7 +139,7 @@ code,td,li,p{overflow-wrap:anywhere}
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
     <a class="btn ghost" href="RackTrace-manual.pdf" download>下載 PDF 版手冊</a>
-    <a class="btn ghost" href="#changelog">最新更新：v3.21.30</a>
+    <a class="btn ghost" href="#changelog">最新更新：v3.21.31</a>
   </div>
 </div>
 
@@ -927,7 +927,8 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 
 <section id="changelog">
 <h2><span class="n">14</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v3.21.30　匯入 IP／MAC 時順便加入圖上沒有的設備</b><span class="tag new">最新 · 2026-11-16</span><span class="tag">netmap.exe 1.20.17</span></div><ul><li>「匯入 IP／MAC 對照」多了「圖上沒有的設備也加進來」（預設勾選，只加內網 IP）：新增的設備標成「待接線」；掃描時記在某台未管理交換器備註裡的，放在那台旁邊，其餘集中放在圖下方的待接線區，現場確認後再拉線。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.21.31　設備屬性可以直接改設備類型</b><span class="tag new">最新 · 2026-11-17</span><span class="tag">netmap.exe 1.20.17</span></div><ul><li>設備屬性多了「設備類型」：終端、Hub、Switch、AP、路由器、防火牆可以直接互換，不用刪掉重建。名稱、IP、MAC、位置和原本接好的線都保留；埠數會補到新類型的預設值，可以再自己調整。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.21.30　匯入 IP／MAC 時順便加入圖上沒有的設備</b><span class="tag">2026-11-16</span><span class="tag">netmap.exe 1.20.17</span></div><ul><li>「匯入 IP／MAC 對照」多了「圖上沒有的設備也加進來」（預設勾選，只加內網 IP）：新增的設備標成「待接線」；掃描時記在某台未管理交換器備註裡的，放在那台旁邊，其餘集中放在圖下方的待接線區，現場確認後再拉線。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.21.29　未管理交換器底下的設備改成「待接線」</b><span class="tag">2026-11-16</span><span class="tag">netmap.exe 1.20.17</span></div><ul><li>掃描時，未管理交換器／Hub 底下的設備不再依序接到它的孔上（它不會告訴我們哪台在哪個孔，以前排的孔位都是猜的）。現在只把 DNS 名稱和 IP 對得起來（反查、正查都是同一個 IP，MAC 也由 ARP 對上）的設備放在它旁邊，標成「待接線」，現場確認後再自己拉線；對不起來的不放進圖裡，列在那台交換器的備註。需要 exe 1.20.17。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.21.28　匯入 IP／MAC 不會蓋掉手動設定的 IP</b><span class="tag">2026-11-16</span><span class="tag">netmap.exe 1.20.16</span></div><ul><li>取了名字或設成固定 IP、而且已經有 IP 的設備，匯入時不再改它的 IP，預覽會列出這些設備和表裡 MAC 對應的 IP，提醒 MAC 可能是掃描時猜錯的。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.21.27　手動改 IP 不會再被改回去</b><span class="tag">2026-11-16</span><span class="tag">netmap.exe 1.20.16</span></div><ul><li>在設備資訊手動填 IP 時，「連線依據」會自動改成「固定 IP」：原本設定成「跟著 MAC 找 IP」的設備，MAC 對應到別台時，IP 會一直被改回那台的 IP。如果 MAC 在網路上對應的是另一個 IP，會提醒你 MAC 可能填錯了。</li></ul></div>
@@ -1082,7 +1083,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 <div class="clog"><div class="v"><b>v1.0　第一版</b><span class="tag">2026-11-06</span></div><ul><li>防火牆、Switch、配線架、資訊座埠對埠接線，點埠追蹤整條路徑</li><li>產業範例與自動排版</li></ul></div>
 </section>
 
-<p class="foot">RackTrace · 網頁 v3.21.30 · netmap.exe v1.20.13 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">RackTrace · 網頁 v3.21.31 · netmap.exe v1.20.13 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>
