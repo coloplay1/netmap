@@ -160,7 +160,7 @@ def audit(project, collected, mac_access_max=3):
                   text=f"{M.pname(lp)} 實際接到 {M.pname(rp) if rp else R.get('name', '') + (' ' + rport if rport else '')}（{how}），圖上沒有畫這條線", how=how)
             elif fd["id"] == R["id"]:
                 if rp and far != rp:
-                    fix = {"op": "move", "cable": last["id"], "from": far, "to": rp} if not M.cab.get(rp) else None
+                    fix = {"op": "move", "cable": last["id"], "from": far, "to": rp, **({"swap": M.cab[rp]["id"]} if M.cab.get(rp) else {})}
                     F(_key("port", lp, far, rp), kind="port", dev=d["id"], port=lp, cable=last["id"], level="warn", fix=fix,
                       text=f"{M.pname(lp)}：圖上接 {M.pname(far)}，實際是 {M.pname(rp)}（{how}）", how=how)
                 else:
@@ -201,7 +201,7 @@ def audit(project, collected, mac_access_max=3):
         fd = M.owner[far]
         if far == op: ok(cables, "MAC 表"); continue
         if fd["id"] not in collected: continue          # 圖上那一端沒有實際資料（傻瓜 Switch 等），無法判斷
-        fix = {"op": "move", "cable": last["id"], "from": far, "to": op} if not M.cab.get(op) else None
+        fix = {"op": "move", "cable": last["id"], "from": far, "to": op, **({"swap": M.cab[op]["id"]} if M.cab.get(op) else {})}
         F(_key("moved", E["id"], op), kind="moved", dev=E["id"], port=mine[0], cable=last["id"], level="warn", fix=fix,
           text=f"{E.get('name', '')}：圖上接在 {M.pname(far)}，但 MAC 表顯示它在 {M.pname(op)}（改線沒更新圖？）", how="MAC 表")
 
