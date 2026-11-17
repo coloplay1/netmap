@@ -123,7 +123,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <li><a href="#save">9. 儲存、匯出與分享</a>
   <ol><li><a href="#s-history">歷史版本與還原</a></li><li><a href="#s-check">資料檢查與單一設備的變更紀錄</a></li><li><a href="#s-labels">線標列印</a></li></ol></li>
 <li><a href="#exe">10. netmap.exe（Windows 程式）</a>
-  <ol><li><a href="#e-setup">安裝版（建議）</a></li><li><a href="#e-install">免安裝的 netmap.exe</a></li><li><a href="#e-webscan">在網頁裡掃描</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-autosnmp">自動偵測 SNMP</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-remote">用平板、手機查看</a></li><li><a href="#e-detect">從線上版切換</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-ssh">SSH 流量監控</a></li><li><a href="#e-flow">誰在用流量</a></li><li><a href="#e-vendor">各廠牌設定教學</a></li><li><a href="#e-ping">心跳與事件</a></li><li><a href="#e-alert">告警通知</a></li><li><a href="#e-auth">管理密碼與檢視連結</a></li><li><a href="#e-seen">網路上的設備</a></li><li><a href="#e-audit">圖面比對（和實際網路對帳）</a></li><li><a href="#e-hub">沒有管理功能的設備</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-webupdate">更新網頁</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
+  <ol><li><a href="#e-setup">安裝版（建議）</a></li><li><a href="#e-install">免安裝的 netmap.exe</a></li><li><a href="#e-webscan">在網頁裡掃描</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-autosnmp">自動偵測 SNMP</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-remote">用平板、手機查看</a></li><li><a href="#e-detect">從線上版切換</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-ssh">SSH 流量監控</a></li><li><a href="#e-flow">誰在用流量</a></li><li><a href="#e-vendor">各廠牌設定教學</a></li><li><a href="#e-ping">心跳與事件</a></li><li><a href="#e-alert">告警通知</a></li><li><a href="#e-auth">管理密碼與檢視連結</a></li><li><a href="#e-seen">網路上的設備</a></li><li><a href="#e-audit">圖面比對（和實際網路對帳）</a></li><li><a href="#e-ipmac">匯入 IP／MAC 對照表</a></li><li><a href="#e-hub">沒有管理功能的設備</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-webupdate">更新網頁</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
 <li><a href="#mobile">11. 手機操作</a></li>
 <li><a href="#keys">12. 快捷鍵</a></li>
 <li><a href="#faq">13. 常見問題</a></li>
@@ -200,7 +200,10 @@ code,td,li,p{overflow-wrap:anywhere}
 <li>廠牌欄可以打中文、縮寫或產品線，例如「飛塔」「ubnt」「Catalyst」都找得到。</li>
 <li>型號清單旁會標示<b>埠數</b>（例如「24 埠 + 4 SFP」），選了型號後埠的數量與名稱會自動套用。</li>
 <li><b>雙擊設備</b>切換「圖示模式」與「網路埠模式」：圖示模式較精簡，網路埠模式可看到每個埠。</li>
+<li><b>改設備類型</b>：設備屬性最上方的類型選單可以把「其他」改成 Switch、AP、印表機等。已接的線和埠都會保留，埠不夠時補到該類型的預設數量。</li>
+<li><b>埠號排列要和機身一樣</b>：「埠位配置」裡有<b>埠號排列</b>（上單下雙／上雙下單，例如 Zyxel GS1900 是 2 在上排）和<b>埠號方向</b>（由左往右／由右往左）。SonicWall NSa 2700／2800 套用型號規格後會自動變成 X0–X15 加 X16–X18（SFP+），X0 在右上、由右往左排，和實機一致。既有的設備按「套用型號規格」即可，已接的線會留在同一個孔。</li>
 </ul>
+<figure class="mid"><img src="manual/nsa-ports.jpg" alt="SonicWall NSa 埠位" loading="lazy"><figcaption>SonicWall NSa 2800：X0 在右上、由右往左排，SFP+ 在最左邊，和機身一樣。</figcaption></figure>
 <figure class="mid"><img src="manual/drawer.jpg" alt="設備屬性面板" loading="lazy"><figcaption>設備屬性：選廠牌、型號後會顯示產品說明與 OSI 層。</figcaption></figure>
 
 <h3 id="b-cable">接線</h3>
@@ -210,6 +213,11 @@ code,td,li,p{overflow-wrap:anywhere}
 <li>要改插到別的埠：直接拖曳已經接線的埠到新的埠。</li>
 <li>點線可以設定線號、線材（Cat6、單模／多模光纖、DAC、Console）、長度與顏色。</li>
 </ol>
+<ul>
+<li><b>不用拖曳也能接</b>：在設備或埠上按右鍵（手機長按）▸ <b>連線到其他設備…</b>，選對方設備與埠。從某個埠開始時會直接用那個埠；對方只有一個空埠時自動接上。</li>
+<li><b>線的右鍵選單</b>（手機長按線）：改線號、開啟線路屬性、清除錨點、拔線。</li>
+<li>點埠下方的<b>線號小標籤</b>（例如 C41），會直接選取那條線。</li>
+</ul>
 <p>埠的小燈號：<span class="dot" style="background:#94A3B8"></span>灰色＝空埠、<span class="dot" style="background:#22C55E"></span>綠色＝已接線，小閃電＝PoE 供電。</p>
 
 <h3 id="b-wifi">無線連線（Wi-Fi）</h3>
@@ -236,7 +244,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <li>點一條線，再<b>雙擊線</b>可以加錨點，拖錨點調整走向；雙擊錨點刪除。</li>
 <li>上排的埠會先往上出線、再沿機身繞出，避免線穿過設備。</li>
 <li><b>走線 ▸ 平行線收成一條</b>：同一對設備之間有 2 條以上的線（例如 LACP 聚合、備援上聯），畫成一條粗線並標出條數與群組名稱。點粗線會列出每一條，點其中一條就單獨畫出來。</li>
-<li><b>點太小的埠</b>：48 埠的 Switch、配線架在畫面縮小或用平板操作時，埠很小容易點錯。這時點一下會放大成一排大按鈕（原本點到的那一埠有框起來），再點一次選定；拖線接到小埠上也一樣。不需要的話可以在 <b>走線</b> 選單關掉。</li>
+<li><b>點太小的埠</b>：48 埠的 Switch、配線架在畫面縮小或用平板操作時，埠很小容易點錯。這時點一下會放大成一排大按鈕（原本點到的那一埠有框起來），再點一次選定；拖線接到小埠上也一樣。不需要的話按右下「畫布工具」的 <b>選埠框</b> 關掉，或在跳出的框按 <b>不再跳出</b>。</li>
 </ul>
 <figure class="mid"><img src="manual/bundle.jpg" alt="平行線收成一條" loading="lazy"><figcaption>兩台 Switch 之間 3 條線（含 LACP Po1）收成一條粗線。</figcaption></figure>
 <figure><img src="manual/picker.jpg" alt="高密度設備放大選埠" loading="lazy"><figcaption>畫面縮小時點 48 埠 Switch：放大成一排大按鈕，奇數埠在上、偶數埠在下，和機身一樣。</figcaption></figure>
@@ -274,7 +282,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <tr><td>右鍵點空白處，或框選拖曳到一半按右鍵</td><td>取消選取／取消這次框選；開著框選模式時再按右鍵會關掉框選模式。</td></tr>
 <tr><td><kbd>Esc</kbd>、操作列的 ✕</td><td>取消選取。</td></tr>
 </table></div>
-<p>操作列的按鈕：<b>整理排列</b>（排成整齊的格子）、<b>移到指定位置</b>（再點畫布上要放的位置）、<b>移到分頁…</b>、<b>刪除</b>（要按兩次確認）。設備右鍵選單也有「選取這台和底下的終端」「只選取直接連到這台的設備」等快速選法。</p>
+<p>操作列的按鈕：<b>整理排列</b>（在原地排成整齊的格子：選到的上游設備留在原位，其他設備排在它下方）、<b>移到指定位置</b>（再點畫布上要放的位置）、<b>移到分頁…</b>、<b>刪除</b>（要按兩次確認）。設備右鍵選單也有「選取這台和底下的終端」「只選取直接連到這台的設備」等快速選法。</p>
 
 <h3 id="b-fiber">光纖收容箱與光纖束</h3>
 <p>機房之間、樓層之間常用一條多芯光纜（12、24、48 芯），兩端各接一個光纖收容箱（FDP／ODF），再從收容箱用 LC 跳線接到 Switch。</p>
@@ -299,7 +307,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <figure><img src="manual/trace.jpg" alt="點設備顯示到網路入口的完整路徑" loading="lazy"><figcaption>點一台設備，整條到網路入口的線路都會亮起，並有流動箭頭標示方向。</figcaption></figure>
 <ul>
 <li><b>點埠</b>：顯示這個埠經過的整條實體路徑（Switch → 配線架 → 資訊座 → 電腦），埠的上方出現設定列。</li>
-<li><b>點設備</b>：亮出這台設備一路往上到網路入口的所有線路，線上有箭頭表示流向。</li>
+<li><b>點設備</b>：亮出這台設備一路往上到網路入口的所有線路，線上有箭頭表示流向。路徑經過的埠用顏色區分：<b style="color:#16a34a">綠色</b>是更上游的埠（往網路入口的方向），<b style="color:#d97706">橘色</b>是這台設備自己的線與往下游的埠。</li>
 <li><b>沒有選任何東西時</b>：預設只顯示設備之間的<b>主幹線路</b>；接電腦、電話、印表機等的終端線會收起，兩端用相同顏色的小標籤配對。</li>
 <li>線路顯示模式在「顯示圖層」裡切換：<b>主幹</b>／<b>全部</b>／<b>隱藏</b>。隱藏時兩端仍保留色標，方便對照。</li>
 <li>搜尋列打線號（例如 <code>H-3F-001</code>）可以直接找到那條線。</li>
@@ -314,7 +322,8 @@ code,td,li,p{overflow-wrap:anywhere}
 <li><b>PoE</b>：標記這個埠供電，埠上會出現閃電圖示。</li>
 <li><b>LACP</b>：按住 <kbd>Shift</kbd> 點多個埠（或 <kbd>Shift</kbd>+拖曳空白處框選），一次設成同一個 LACP 群組。</li>
 <li><b>拔線</b>：刪除這個埠上的線。</li>
-<li>設定列可以拖曳 <b>⋮⋮</b> 移到別處，或按 <b>–</b> 收合；右下角的屬性列按鈕可以整個開關。</li>
+<li>設定列可以拖曳 <b>⋮⋮</b> 移到別處，或按 <b>–</b> 收合；右下角的屬性列按鈕可以整個開關。關掉屬性列時，點線或埠會改成打開右側的屬性面板。</li>
+<li>手機上的設定列固定顯示在頂部工具列下方，不會跟著線跑出畫面。</li>
 </ul>
 </section>
 
@@ -333,6 +342,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <ul>
 <li><b>顯示圖層</b>：勾選要顯示在設備下方的資訊：廠牌型號、IP、MAC、Gateway、位置／機櫃、埠位 VLAN、PoE／LACP 圖示、所有線號、線路速率。</li>
 <li><b>全部收成圖示／全部展開網路埠</b>：一次切換所有設備的顯示模式。</li>
+<li><b>縮小時收合終端</b>（預設關閉）：勾選後，縮小到 50% 以下時已接線的終端會收成「終端 ×N」，大圖比較不擠。</li>
 <li><b>線色</b>：自訂、依線材（單模光纖黃、多模水藍、DAC 粗黑、Console 淺藍虛線）、依 VLAN（Trunk 為深灰虛線）。</li>
 </ul>
 
@@ -345,7 +355,8 @@ code,td,li,p{overflow-wrap:anywhere}
 
 <section id="fault">
 <h2><span class="n">8</span>故障排查與維修記錄</h2>
-<p>頂列的 <b>排障</b> 視圖把流程排成三欄：①問題（斷線設備與各項檢查）→ ②查線 → ③維修單。復原／重做在頂列，框選與查線在左側元件列；縮小畫面時終端設備會自動收成「終端 ×N」。</p>
+<p>頂列的 <b>排障</b> 視圖把流程排成三欄：①問題（斷線設備與各項檢查）→ ②查線 → ③維修單。復原／重做在頂列，框選與查線在左側元件列（右下「畫布工具」也有框選）。</p>
+<p>問題欄的「沒有回應的設備」<b>不包含手機</b>：類型是手機的設備離開、休眠很常見，只會在圖上標灰色「離線」，也不發斷線通知。某台設備被誤認成手機時，把類型改掉即可。查線卡片可以直接按「結案」或「刪除」；設備已恢復回應時會顯示「已恢復，結案」。</p>
 <p>排查分兩步：先用<b>故障查線</b>找出哪一段有問題，再用<b>維修記錄</b>記下怎麼處理，並在圖上看到哪裡還沒修好。</p>
 <h3 id="f-trace">故障查線</h3>
 <p>使用者回報「不能上網」時，從他的電腦開始，<b>一段一段往網路入口檢查</b>，並記錄每一段的結果。</p>
@@ -398,6 +409,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <tr><td>線標列印</td><td>每條線兩端的標籤，A4 標籤紙或 Brother P-touch，見下方。</td></tr>
 </table></div>
 <div class="note"><b>⚠️</b>分享連結包含圖上的 IP、MAC 等資訊，請只給需要的人。</div>
+<p><b>連監控服務時暫時斷線</b>（例如筆電切到飛航模式、Wi-Fi 斷掉）：修改會先暫存在這台裝置，每 5 秒自動重試，連回來就送出，不會遺失。如果這段時間別人也改了圖，會跳出視窗讓你選「<b>留我的</b>」或「<b>用最新的</b>」。重新打開網頁時若還有沒送出的修改，也會詢問要不要送出。</p>
 
 <h3 id="s-history">歷史版本與還原</h3>
 <p><b>檔案 ▸ 歷史版本／還原</b>。改錯、刪錯、匯入蓋掉時，可以回到之前的版本。</p>
@@ -641,7 +653,7 @@ __VENDORS__
 <li>點設備 ▸「網路流量」分頁：目前延遲、平均、最近一小時的遺失率、延遲曲線（紅色直條＝那次沒回應），以及這台的最近事件。</li>
 <li>連續失敗 2 次才算斷線，避免一次掉包就誤報。次數、間隔、延遲門檻可以在設定裡改。</li>
 <li>設備擋 ICMP 時，會改試幾個常用的 TCP 埠（對方回「拒絕連線」也代表它在線）。</li>
-<li>會休眠的筆電、手機可以勾「這台不要 Ping」，避免下班後一直顯示斷線。</li>
+<li>類型是<b>手機</b>的設備斷線只標灰色「離線」，不算故障、不發通知。會休眠的筆電可以勾「這台不要 Ping」，避免下班後一直顯示斷線。</li>
 </ul></div>
 <p>右上角的<b>鈴鐺</b>是事件紀錄：設備斷線與恢復（附斷了多久）、主幹埠離線、SNMP 沒回應、新設備加入、IP 變更都會記下來，保留 180 天，可以下載 CSV。有新事件時鈴鐺會顯示數字，發生異常時畫面上也會跳提示。</p>
 <figure><img src="manual/events.jpg" alt="事件紀錄" loading="lazy"></figure>
@@ -717,13 +729,18 @@ __VENDORS__
 <tr><td>不在圖上的鄰居</td><td>埠上接著一台圖上沒有的設備</td><td>把它加到圖上</td></tr>
 </table></div>
 <ul>
+<li><b>點設備上的「圖面不符」標籤</b>：直接打開這台的設備資訊，列出每一項差異的<b>原因</b>與<b>建議怎麼調整</b>，並可以就地按「改成實際的接法」「在圖上看」或略過。</li>
+<li>兩台設備在現場對調了接孔時（實際的埠已經接著另一條線），「改成實際的接法」會把兩條線的端點一起對調。</li>
 <li>確定圖是對的（例如 LLDP 資訊本身有誤），按 <b>圖是對的，略過</b>；同樣的差異以後不會再提醒。</li>
+<li>接在<b>不受管交換器</b>（例如 D-Link 傻瓜 Switch）後面的電腦，上層 Switch 只看得到它們都在同一個埠，「改線沒更新」可能是誤判，請先到現場確認。</li>
 <li>每條線會記下最後一次被實際資料確認的時間。查線時路徑上每一段線都有標記：<span class="c-ok">✓</span> 實際確認過、<span class="c-warn">✓</span> 超過 7 天沒再確認、<span class="c-bad">!</span> 和實際不符、<b>?</b> 手動資料。勾選「在圖上標出驗證狀態」後，畫布上沒確認過的線畫成虛線、不符的畫成紅色；有差異的設備標「圖面不符」。</li>
 <li>穿過配線架的線也算：只要兩端的 Switch 和終端設備對得上，沿路每一段跳線都算確認過。</li>
 <li>只有<b>開了 SNMP 的網路設備</b>才讀得到 LLDP 與 MAC 表；傻瓜 Switch、沒填 MAC 的終端設備，就只能維持手動資料（標「?」），查線時請以現場為準。</li>
 <li>新的差異可以發告警（告警設定勾「圖面比對發現新的差異」）；比對間隔在 <b>設定 ▸ 心跳與設備偵測</b> 調整，0 代表不自動比對。</li>
 <li><b>IP 衝突</b>：同一個 IP 在 30 分鐘內出現兩個不同的 MAC（例如有人手動設了重複的固定 IP），會記一筆事件並告警（預設開啟）。</li>
 </ul>
+
+<figure class="mid"><img src="manual/audit-why.jpg" alt="點圖面不符看原因與建議" loading="lazy"><figcaption>點「圖面不符」：每一項列出原因與建議，可就地改圖或略過。</figcaption></figure>
 
 <h3 id="e-hub">沒有管理功能的設備（HUB、傻瓜 Switch、數據機）</h3>
 <p>很多現場的線路亂，是因為中間有不能登入的設備。這些設備不需要 SNMP，也一樣能畫進圖裡：</p>
@@ -734,10 +751,21 @@ __VENDORS__
 <tr><td>家用路由器</td><td>多半沒有 SNMP。有開 SSH 的可以用「SSH 監控」；其他用網段探索（ping＋ARP）找出在線設備。</td></tr>
 </table>
 <ul>
+<li><b>掃描到不受管交換器時</b>：MAC 表只能看出「這些設備在這個埠後面」，看不出接第幾孔，所以掃描<b>不會替它們自動接線</b>。名稱（DNS）和 IP 對得上的設備會加到圖上並標橘色「<b>待接線</b>」，其他的列在交換器的備註裡。確認現場後再手動接線，標籤就會消失。</li>
 <li><b>看不出的部分</b>：設備接在 HUB 的第幾個埠，系統無法自動判斷，需要到現場確認後手動連線。</li>
 <li><b>建議順序</b>：先掃有管理功能的核心 Switch 與防火牆，讓主幹和 MAC 表自動建立；再用網段探索補齊終端；最後一個樓層一個機櫃地手動補 HUB 與接線，不要一次整理全部。</li>
 <li><b>現場配合</b>：查出一條線就貼上編號（「線標列印」可產生 A4 或標籤機貼紙），並記在系統裡，下次不用重查。查不出來時可用查線器（音頻探測器）或看設備燈號輔助。</li>
 </ul>
+<h3 id="e-ipmac">匯入 IP／MAC 對照表（防火牆 DHCP、ARP）</h3>
+<p>圖上只有 MAC、沒有 IP 的設備，可以用防火牆匯出的表格補上。<b>檔案 ▸ 匯入 IP／MAC 對照</b>，貼上內容或選檔案（CSV、TSV、文字都可以；SonicWall、Fortinet 等匯出的 DHCP 租約、ARP 表直接可用，UTF-16、Big5 編碼也會自動辨識）。</p>
+<ul>
+<li>依標題列找出 IP、MAC、名稱、廠商欄位；有廠商欄時會順便判斷設備類型。</li>
+<li>同一個 MAC 對到好幾個 IP（例如防火牆自己的介面、Proxy ARP）的列會略過，避免填錯。</li>
+<li>你<b>手動改過 IP</b> 的設備會保留你的設定，不會被表格覆蓋；手動改 IP 時如果這個 MAC 在表格裡對到別的 IP，也會提醒你。</li>
+<li>名稱還是 MAC 的終端設備，填上 IP 後會改用 IP 當名稱。</li>
+<li><b>圖上沒有的設備也加進來</b>（預設勾選，只加內網 IP）：知道在哪台不受管交換器後面的放在它旁邊，其他的放在圖下方的「待接線」區，都標橘色「待接線」。</li>
+</ul>
+
 <h3 id="e-col">收集樣本（給 log 分析與設定檔備份開發用）</h3>
 <figure class="mid"><img src="manual/app-col.jpg" alt="收集樣本分頁" loading="lazy"></figure>
 <p>這個分頁是為了開發「log 分析告警」與「設定檔自動備份」而收集真實資料。只接收與讀取，不會修改設備設定。</p>
@@ -757,17 +785,27 @@ __VENDORS__
 
 <h3 id="e-webupdate">更新網頁（不用重新安裝）</h3>
 <p>服務的網頁和 <a href="./">線上版</a>是同一份。線上版更新後，從服務主機打開首頁，上方會出現橘色的「<b>有新版網頁 vX.Y.Z，按一下更新</b>」，按下去就會下載並套用，約一秒後重新載入。只有網頁改版時不用重新安裝；程式本身（掃描、監控）有新版才需要重新下載安裝檔。</p>
+<ul>
+<li><b>自動更新網頁</b>：在設定勾選後，服務每 6 小時檢查一次，有新版網頁就自動套用，手機、平板重新整理就是新版。</li>
+<li>線上版偵測到 netmap.exe 時，有「<b>開啟並更新網頁</b>」按鈕，一鍵打開本機網頁並更新。</li>
+<li>同一台電腦同時跑著<b>背景服務</b>（安裝版，預設 8080）和 <b>netmap.exe 視窗</b>（預設 18080）時，兩邊的資料是分開的；偵測畫面會列出兩個，請固定使用同一個。</li>
+</ul>
 <h3 id="e-update">更新程式</h3>
 <p>netmap.exe 啟動時會檢查是否有新版本，有的話標題列會出現「<b>有新版本</b>」，點一下會下載 <b>RackTrace-Setup.exe</b>。直接執行它，安裝程式會自動停止舊版、覆蓋 <code>C:\Program Files\RackTrace</code> 裡的檔案並重新啟動服務；設定與流量紀錄都會保留（存在 <code>C:\ProgramData\netmap</code>）。免安裝版（單獨的 netmap.exe）則要自己關掉程式後取代舊檔。</p>
 </section>
 
 <section id="mobile">
 <h2><span class="n">11</span>手機操作</h2>
+<figure class="narrow"><img src="manual/mobile-bar.jpg" alt="收合工具列與屬性列" loading="lazy"><figcaption>收合上方工具列後點線：屬性列固定在工具列下方。</figcaption></figure>
 <div class="grid2" style="align-items:start">
 <figure class="narrow" style="margin:6px 0"><img src="manual/mobile.jpg" alt="手機畫面" loading="lazy"></figure>
 <ul>
 <li><b>單指拖曳</b>平移，<b>雙指</b>縮放。</li>
 <li>點設備時，下方出現<b>提示卡</b>顯示名稱與 IP，不會擋住畫面；<b>往上拉</b>才展開完整的設定。</li>
+<li><b>收合上方工具列</b>：第一排最右邊的「︿」按一下，只留 Logo、專案和視圖切換一排，畫面大很多；再按一次展開。</li>
+<li><b>點線</b>：屬性列固定出現在頂部工具列下方，可以改線號、線材、速率、顏色或拔線；按「詳細」開啟完整的線路屬性。手機上線的感應範圍比電腦寬，縮小畫面也點得到。</li>
+<li><b>長按</b>設備、埠或線，等同電腦上的右鍵選單（連線到其他設備、開啟線路屬性、拔線…）。</li>
+<li>埠太小時點一下會跳出放大的選埠框；不需要的話按框上的「不再跳出」，或在「畫布工具 ▸ 選埠框」關掉。</li>
 <li>適合現場查線：把分享連結或 QR Code 貼在機櫃上，手機掃了就能看（唯讀）。</li>
 </ul>
 </div>
