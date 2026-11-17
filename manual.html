@@ -100,7 +100,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="0 0 256 256" aria-hidden="true"><rect width="256" height="256" rx="56" fill="#fff"/><rect x="42" y="38" width="86" height="180" rx="4" fill="none" stroke="#111" stroke-width="13"/><path d="M66 82H104M66 116H104M66 150H104M66 184H104" stroke="#111" stroke-width="11" stroke-linecap="round"/><path d="M128 96C168 96 170 70 200 70" fill="none" stroke="#F2C230" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="70" r="13" fill="#F2C230"/><path d="M128 130C168 130 170 150 200 150" fill="none" stroke="#1E9BEA" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="150" r="13" fill="#1E9BEA"/><path d="M128 178C162 178 172 206 196 206" fill="none" stroke="#5B6472" stroke-width="11" stroke-linecap="round" stroke-dasharray="1 18"/><circle cx="210" cy="206" r="11" fill="none" stroke="#5B6472" stroke-width="7"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v3.21.45 · netmap.exe v1.20.13</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v3.21.46 · netmap.exe v1.20.13</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -109,25 +109,26 @@ code,td,li,p{overflow-wrap:anywhere}
 <div class="wrap">
 <nav class="toc" id="toc" aria-label="目錄">
 <ol>
-<li><a href="#intro">1. 這是什麼</a></li>
-<li><a href="#quick">2. 五分鐘快速開始</a></li>
-<li><a href="#ui">3. 介面導覽</a></li>
-<li><a href="#build">4. 建立網路圖</a>
-  <ol><li><a href="#b-dev">新增設備與型號</a></li><li><a href="#b-cable">接線</a></li><li><a href="#b-wifi">無線連線</a></li><li><a href="#b-patch">配線架與資訊座</a></li><li><a href="#b-layout">排列與走線</a></li><li><a href="#b-pages">多張圖與全部總覽</a></li><li><a href="#b-select">選取多台設備</a></li><li><a href="#b-fiber">光纖收容箱與光纖束</a></li></ol></li>
-<li><a href="#trace">5. 查線路</a></li>
-<li><a href="#port">6. 埠設定（VLAN／PoE／LACP）</a></li>
-<li><a href="#view">7. 檢視與顯示</a>
-  <ol><li><a href="#v-rack">機櫃視圖</a></li><li><a href="#v-table">線路表</a></li><li><a href="#v-layer">圖層與線色</a></li><li><a href="#v-panel">面板與主題</a></li></ol></li>
-<li><a href="#fault">8. 故障排查與維修記錄</a>
-  <ol><li><a href="#f-trace">故障查線</a></li><li><a href="#f-repair">維修記錄</a></li></ol></li>
-<li><a href="#save">9. 儲存、匯出與分享</a>
-  <ol><li><a href="#s-history">歷史版本與還原</a></li><li><a href="#s-check">資料檢查與單一設備的變更紀錄</a></li><li><a href="#s-labels">線標列印</a></li></ol></li>
-<li><a href="#exe">10. netmap.exe（Windows 程式）</a>
-  <ol><li><a href="#e-setup">安裝版（建議）</a></li><li><a href="#e-install">免安裝的 netmap.exe</a></li><li><a href="#e-webscan">在網頁裡掃描</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-autosnmp">自動偵測 SNMP</a></li><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-remote">用平板、手機查看</a></li><li><a href="#e-detect">從線上版切換</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-ssh">SSH 流量監控</a></li><li><a href="#e-flow">誰在用流量</a></li><li><a href="#e-vendor">各廠牌設定教學</a></li><li><a href="#e-ping">心跳與事件</a></li><li><a href="#e-alert">告警通知</a></li><li><a href="#e-auth">管理密碼與檢視連結</a></li><li><a href="#e-seen">網路上的設備</a></li><li><a href="#e-audit">圖面比對（和實際網路對帳）</a></li><li><a href="#e-ipmac">匯入 IP／MAC 對照表</a></li><li><a href="#e-hub">沒有管理功能的設備</a></li><li><a href="#e-col">收集樣本</a></li><li><a href="#e-home">在家測試</a></li><li><a href="#e-webupdate">更新網頁</a></li><li><a href="#e-update">更新程式</a></li></ol></li>
-<li><a href="#mobile">11. 手機操作</a></li>
-<li><a href="#keys">12. 快捷鍵</a></li>
-<li><a href="#faq">13. 常見問題</a></li>
-<li><a href="#changelog">14. 版本紀錄</a></li>
+<li><a href="#start">1. 開始使用</a>
+  <ol><li><a href="#intro">這是什麼</a></li><li><a href="#modes">兩種用法</a></li><li><a href="#quick">五分鐘快速開始</a></li><li><a href="#ui">介面導覽</a></li></ol></li>
+<li><a href="#build">2. 畫圖</a>
+  <ol><li><a href="#b-dev">設備與型號</a></li><li><a href="#b-cable">接線</a></li><li><a href="#b-wifi">無線連線</a></li><li><a href="#b-patch">配線架與資訊座</a></li><li><a href="#b-fiber">光纖</a></li><li><a href="#port">埠設定</a></li><li><a href="#b-layout">排列與走線</a></li><li><a href="#b-select">選取多台設備</a></li><li><a href="#b-pages">多張圖與全部總覽</a></li></ol></li>
+<li><a href="#auto">3. 自動建圖</a>
+  <ol><li><a href="#e-setup">安裝 netmap.exe</a></li><li><a href="#e-install">免安裝版</a></li><li><a href="#e-webscan">在網頁裡掃描</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-autosnmp">自動偵測 SNMP</a></li><li><a href="#e-ipmac">匯入 IP／MAC</a></li><li><a href="#a-lldp">匯入 LLDP</a></li><li><a href="#e-hub">沒有管理功能的設備</a></li><li><a href="#e-home">在家測試</a></li></ol></li>
+<li><a href="#trace">4. 查線與檢視</a>
+  <ol><li><a href="#t-trace">查線路</a></li><li><a href="#v-rack">機櫃視圖</a></li><li><a href="#v-table">線路表</a></li><li><a href="#v-layer">圖層與線色</a></li><li><a href="#v-panel">面板與主題</a></li><li><a href="#s-labels">線標列印</a></li></ol></li>
+<li><a href="#monitor">5. 監控</a>
+  <ol><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-detect">從線上版切換</a></li><li><a href="#e-ping">心跳與事件</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-ssh">SSH 流量監控</a></li><li><a href="#e-flow">誰在用流量</a></li><li><a href="#e-seen">網路上的設備</a></li><li><a href="#e-alert">告警通知</a></li></ol></li>
+<li><a href="#fault">6. 出問題時</a>
+  <ol><li><a href="#f-trace">故障查線</a></li><li><a href="#f-repair">維修記錄</a></li><li><a href="#e-audit">圖面比對</a></li><li><a href="#s-check">資料檢查</a></li></ol></li>
+<li><a href="#mobile">7. 手機與平板</a>
+  <ol><li><a href="#e-remote">連上監控服務</a></li><li><a href="#m-map">操作對照</a></li><li><a href="#m-screen">畫面導覽</a></li><li><a href="#m-cases">現場情境</a></li><li><a href="#m-set">建議設定</a></li><li><a href="#m-card">現場快速卡</a></li></ol></li>
+<li><a href="#admin">8. 管理與維護</a>
+  <ol><li><a href="#save">儲存、匯出與分享</a></li><li><a href="#s-history">歷史版本</a></li><li><a href="#e-auth">管理密碼與檢視連結</a></li><li><a href="#e-webupdate">更新網頁</a></li><li><a href="#e-update">更新程式</a></li><li><a href="#e-col">收集樣本</a></li></ol></li>
+<li><a href="#vendor">A. 各廠牌設定</a></li>
+<li><a href="#keys">B. 快捷鍵</a></li>
+<li><a href="#faq">C. 常見問題</a></li>
+<li><a href="#changelog">D. 版本紀錄</a></li>
 </ol>
 </nav>
 
@@ -139,22 +140,31 @@ code,td,li,p{overflow-wrap:anywhere}
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
     <a class="btn ghost" href="RackTrace-manual.pdf" download>下載 PDF 版手冊</a>
-    <a class="btn ghost" href="#changelog">最新更新：v3.21.45</a>
+    <a class="btn ghost" href="#changelog">最新更新：v3.21.46</a>
   </div>
 </div>
 
-<section id="intro">
-<h2><span class="n">1</span>這是什麼</h2>
+<section id="start">
+<h2><span class="n">1</span>開始使用</h2>
+<h3 id="intro">這是什麼</h3>
 <p><b>RackTrace</b>（機房線路對應圖）把機房裡的防火牆、Switch、配線架、牆上資訊座和電腦，畫成一張可以<b>點埠就看到整條路徑</b>的圖。它有兩個部分：</p>
 <div class="grid2">
   <div class="card"><h4>🌐 網頁版</h4><p>直接在瀏覽器使用，免安裝。手動畫圖、查線、故障查線、匯出報表。資料存在你自己的瀏覽器裡，不會上傳。</p></div>
   <div class="card"><h4>🪟 netmap.exe</h4><p>Windows 程式。用 SNMP 自動掃出設備與連線，並可當「監控服務」，讓內網的人用瀏覽器看同一張圖和每個埠的即時流量。</p></div>
 </div>
 <p>適合：公司 IT、機房管理員、弱電／網路工程商，需要回答「這條線接到哪」「這台電腦斷線是哪一段出問題」的時候。</p>
-</section>
 
-<section id="quick">
-<h2><span class="n">2</span>五分鐘快速開始</h2>
+<h3 id="modes">兩種用法：網頁版與監控服務</h3>
+<p>RackTrace 有兩種用法，先確定你是哪一種，再看對應的章節：</p>
+<div class="tw"><table>
+<tr><th></th><th>只用網頁版</th><th>裝 netmap.exe（監控服務）</th></tr>
+<tr><td>適合</td><td>自己畫圖、整理線路、查線、列印線標</td><td>公司內網長期使用：自動掃描、即時流量、斷線通知、大家看同一張圖</td></tr>
+<tr><td>資料存在</td><td>你自己的瀏覽器</td><td>服務主機（一台固定開機的 Windows）</td></tr>
+<tr><td>要看的章節</td><td>2 畫圖、4 查線與檢視、6 出問題時（查線、維修單）、8 管理（備份）</td><td>全部；特別是 3 自動建圖、5 監控、7 手機與平板</td></tr>
+</table></div>
+<div class="tip"><b>💡</b>不確定的話先用網頁版畫幾台設備試試；之後裝了 netmap.exe，可以把網頁版的圖匯入服務繼續用。</div>
+
+<h3 id="quick">五分鐘快速開始</h3>
 <p>開始頁最上面先選用法，下次打開會記住你上次選的：</p>
 <div class="grid2">
   <div class="card"><h4>🌐 網頁版</h4><p>在瀏覽器手動畫圖、查線、故障查線，免安裝。下面是「新增」「匯入」「範例」三欄。</p></div>
@@ -166,14 +176,12 @@ code,td,li,p{overflow-wrap:anywhere}
 <li><b>先看範例</b>：在「範例」選一個產業（例如「中小企業辦公室」；想看多樓層就選「三層樓辦公室（多樓層）」），馬上有一張完整的圖可以玩。</li>
 <li><b>點任何一個埠</b>：整條路徑會亮起來，直到網路入口（光世代／ISP）。</li>
 <li><b>自己畫</b>：回首頁（點左上角標誌）選「新增空白圖」，用左邊的「設備」工具列加設備，從一個埠拖到另一個埠就是接線。</li>
-<li><b>想自動畫</b>：在開始頁選「本地端 netmap.exe」，下載 <a href="#exe">netmap.exe</a>，輸入核心 Switch 的 IP 與 SNMP community，掃完自動在網頁打開。</li>
+<li><b>想自動畫</b>：在開始頁選「本地端 netmap.exe」，下載 <a href="#auto">netmap.exe</a>，輸入核心 Switch 的 IP 與 SNMP community，掃完自動在網頁打開。</li>
 </ol>
 <div class="note"><b>🧪</b><b>範例的燈號與流量是模擬的。</b>範例設備標記為「示範」，右上角會顯示「示範資料」：大部分線路正常、一條線偏滿、一條線壞掉（可以拿來練習故障查線）。連到本機服務時，服務不會對範例裡的假 IP 做 Ping 或 SNMP，也不會產生告警。把設備的 IP 改成真實位址，它就變成真設備、開始正常監控。</div>
 <div class="tip"><b>💡</b>所有修改都會自動存在這台電腦的瀏覽器。換電腦或要備份，請用「檔案 → 匯出 JSON」。</div>
-</section>
 
-<section id="ui">
-<h2><span class="n">3</span>介面導覽</h2>
+<h3 id="ui">介面導覽</h3>
 <figure><img src="manual/map.jpg" alt="主畫面" loading="lazy"><figcaption>主畫面（拓樸視圖）</figcaption></figure>
 <div class="tw"><table>
 <tr><th>位置</th><th>內容</th></tr>
@@ -189,10 +197,13 @@ code,td,li,p{overflow-wrap:anywhere}
 <tr><td>下方圖例</td><td>依 OSI 層標示設備顏色：L1 實體、L2 交換、L3 路由、L3–L7 防火牆、L1–L7 終端。</td></tr>
 </table></div>
 <p>每個面板左上角都有 <b>⋮⋮</b> 可以拖曳移動，按 <b>–</b> 收合。不見了可以從右上「面板」按鈕重設位置。</p>
+
 </section>
 
+<a id="view"></a><a id="exe"></a>
 <section id="build">
-<h2><span class="n">4</span>建立網路圖</h2>
+<h2><span class="n">2</span>畫圖</h2>
+<p>這一章是手動畫圖：加設備、接線、配線架與光纖、設定埠，以及排版和分頁。想讓程式自動畫，見 <a href="#auto">3. 自動建圖</a>。</p>
 <h3 id="b-dev">新增設備與選型號</h3>
 <ul>
 <li>點左側工具列的圖示，或在畫布空白處<b>按右鍵</b>／按 <kbd>A</kbd>，就會在游標位置加一台設備。</li>
@@ -237,6 +248,34 @@ code,td,li,p{overflow-wrap:anywhere}
 <li>滑鼠移到配線架的埠上，會同時標出同一號的前後兩個埠。</li>
 </ul>
 
+<h3 id="b-fiber">光纖收容箱與光纖束</h3>
+<p>機房之間、樓層之間常用一條多芯光纜（12、24、48 芯），兩端各接一個光纖收容箱（FDP／ODF），再從收容箱用 LC 跳線接到 Switch。</p>
+<ol class="steps">
+<li>在畫布按右鍵 ▸ <b>光纖收容箱</b>，或把配線架的「設備資訊 ▸ 光纖」勾選 <b>這是光纖收容箱</b>（埠會變成 LC 光纖接頭）。</li>
+<li>點其中一台收容箱 ▸「設備資訊 ▸ 光纖」▸ <b>建立光纖束</b>：選另一端、芯數、單模／多模、長度。兩邊背面的空埠會一對一接起來；埠不夠會自動加。</li>
+<li>收容箱正面用一般方式接 LC 跳線到 Switch 的 SFP 埠。查線時會穿過收容箱、走過那一芯，到另一端的設備。</li>
+</ol>
+<div class="grid2" style="align-items:start">
+<figure class="narrow" style="margin:6px 0"><img src="manual/fiber.jpg" alt="光纖束" loading="lazy"><figcaption>24 芯光纖束畫成一條粗線，標出已用芯數。</figcaption></figure>
+<ul>
+<li>每一芯依 <b>TIA-598</b> 色碼標色（藍、橘、綠、棕、灰、白、紅、黑、黃、紫、粉紅、水藍），超過 12 芯時每 12 芯一管。</li>
+<li>點粗線或標籤：列出每一芯的顏色、兩端埠號，以及跳線接到哪台設備；沒接跳線的是備用芯。點一列就單獨選取那一芯。</li>
+<li>線號自動編成「F01-1」「F01-2」…，「修改名稱／長度」會一起更新。</li>
+<li>兩台收容箱放在不同頁面時，光纖束會變成跨頁面的連接標籤。</li>
+</ul></div>
+<figure><img src="manual/fiber-cores.jpg" alt="光纖束每一芯" loading="lazy"></figure>
+
+<h3 id="port">埠設定（VLAN／PoE／LACP）</h3>
+<figure><img src="manual/ctx.jpg" alt="埠上方的設定列" loading="lazy"><figcaption>點埠後出現的設定列：Access／Trunk、VLAN、PoE、拔線、詳細。</figcaption></figure>
+<ul>
+<li><b>Access／Trunk</b>：Access 填一個 VLAN；Trunk 可填允許的 VLAN 清單。</li>
+<li><b>PoE</b>：標記這個埠供電，埠上會出現閃電圖示。</li>
+<li><b>LACP</b>：按住 <kbd>Shift</kbd> 點多個埠（或 <kbd>Shift</kbd>+拖曳空白處框選），一次設成同一個 LACP 群組。</li>
+<li><b>拔線</b>：刪除這個埠上的線。</li>
+<li>設定列可以拖曳 <b>⋮⋮</b> 移到別處，或按 <b>–</b> 收合；右下角的屬性列按鈕可以整個開關。關掉屬性列時，點線或埠會改成打開右側的屬性面板。</li>
+<li>手機上的設定列固定顯示在頂部工具列下方，不會跟著線跑出畫面。</li>
+</ul>
+
 <h3 id="b-layout">排列與走線</h3>
 <ul>
 <li><b>走線 → 依連線自動排列設備</b>：依照上下游關係自動排成由上（網路入口）到下（終端）的樹狀。</li>
@@ -248,6 +287,19 @@ code,td,li,p{overflow-wrap:anywhere}
 </ul>
 <figure class="mid"><img src="manual/bundle.jpg" alt="平行線收成一條" loading="lazy"><figcaption>兩台 Switch 之間 3 條線（含 LACP Po1）收成一條粗線。</figcaption></figure>
 <figure><img src="manual/picker.jpg" alt="高密度設備放大選埠" loading="lazy"><figcaption>畫面縮小時點 48 埠 Switch：放大成一排大按鈕，奇數埠在上、偶數埠在下，和機身一樣。</figcaption></figure>
+
+<h3 id="b-select">選取多台設備、框選與批次操作</h3>
+<figure><img src="manual/select-group.jpg" alt="選取多台設備後的操作列" loading="lazy"><figcaption>選了 3 台設備：上方出現操作列，可整理排列、移到指定位置、移到分頁或刪除。</figcaption></figure>
+<div class="tw"><table>
+<tr><th>操作</th><th>效果</th></tr>
+<tr><td>右下「框選」按鈕，或 <kbd>Shift</kbd>＋拖曳空白處</td><td>拉出一個方框，框住的設備全部選取。</td></tr>
+<tr><td><kbd>Shift</kbd>＋拖曳空白處（已有選取時）</td><td><b>累加</b>到目前的選取，不會取代。</td></tr>
+<tr><td><kbd>Ctrl</kbd>（Mac 是 <kbd>⌘</kbd>）＋點設備，或 <kbd>Shift</kbd>＋點設備</td><td>逐台加入或取消；選到兩台以上就是群組選取。</td></tr>
+<tr><td>拖曳任一台已選的設備</td><td>整群一起移動。</td></tr>
+<tr><td>右鍵點空白處，或框選拖曳到一半按右鍵</td><td>取消選取／取消這次框選；開著框選模式時再按右鍵會關掉框選模式。</td></tr>
+<tr><td><kbd>Esc</kbd>、操作列的 ✕</td><td>取消選取。</td></tr>
+</table></div>
+<p>操作列的按鈕：<b>整理排列</b>（在原地排成整齊的格子：選到的上游設備留在原位，其他設備排在它下方）、<b>移到指定位置</b>（再點畫布上要放的位置）、<b>移到分頁…</b>、<b>刪除</b>（要按兩次確認）。設備右鍵選單也有「選取這台和底下的終端」「只選取直接連到這台的設備」等快速選法。</p>
 
 <h3 id="b-pages">多張圖與「全部總覽」（樓層、機房、分公司）</h3>
 <p>環境大的時候，一張圖會擠不下。<b>檔案 ▸ 新增頁面</b>（或畫布下方分頁列的 <b>＋</b>）可以把圖分成好幾頁，例如「1F 機房」「2F 辦公室」「3F 研發」。有兩頁以上時，畫布下方會出現分頁列，<b>最左邊多一個「全部總覽」</b>。想先看一份現成的，開始頁的範例選「<b>三層樓辦公室（多樓層）</b>」。</p>
@@ -271,39 +323,114 @@ code,td,li,p{overflow-wrap:anywhere}
 <li>不想看到框：右下「顯示圖層」▸ <b>樓層框線</b> ▸ 隱藏（設定會記住）。</li>
 </ul>
 
-<h3 id="b-select">選取多台設備、框選與批次操作</h3>
-<figure><img src="manual/select-group.jpg" alt="選取多台設備後的操作列" loading="lazy"><figcaption>選了 3 台設備：上方出現操作列，可整理排列、移到指定位置、移到分頁或刪除。</figcaption></figure>
-<div class="tw"><table>
-<tr><th>操作</th><th>效果</th></tr>
-<tr><td>右下「框選」按鈕，或 <kbd>Shift</kbd>＋拖曳空白處</td><td>拉出一個方框，框住的設備全部選取。</td></tr>
-<tr><td><kbd>Shift</kbd>＋拖曳空白處（已有選取時）</td><td><b>累加</b>到目前的選取，不會取代。</td></tr>
-<tr><td><kbd>Ctrl</kbd>（Mac 是 <kbd>⌘</kbd>）＋點設備，或 <kbd>Shift</kbd>＋點設備</td><td>逐台加入或取消；選到兩台以上就是群組選取。</td></tr>
-<tr><td>拖曳任一台已選的設備</td><td>整群一起移動。</td></tr>
-<tr><td>右鍵點空白處，或框選拖曳到一半按右鍵</td><td>取消選取／取消這次框選；開著框選模式時再按右鍵會關掉框選模式。</td></tr>
-<tr><td><kbd>Esc</kbd>、操作列的 ✕</td><td>取消選取。</td></tr>
-</table></div>
-<p>操作列的按鈕：<b>整理排列</b>（在原地排成整齊的格子：選到的上游設備留在原位，其他設備排在它下方）、<b>移到指定位置</b>（再點畫布上要放的位置）、<b>移到分頁…</b>、<b>刪除</b>（要按兩次確認）。設備右鍵選單也有「選取這台和底下的終端」「只選取直接連到這台的設備」等快速選法。</p>
+</section>
 
-<h3 id="b-fiber">光纖收容箱與光纖束</h3>
-<p>機房之間、樓層之間常用一條多芯光纜（12、24、48 芯），兩端各接一個光纖收容箱（FDP／ODF），再從收容箱用 LC 跳線接到 Switch。</p>
-<ol class="steps">
-<li>在畫布按右鍵 ▸ <b>光纖收容箱</b>，或把配線架的「設備資訊 ▸ 光纖」勾選 <b>這是光纖收容箱</b>（埠會變成 LC 光纖接頭）。</li>
-<li>點其中一台收容箱 ▸「設備資訊 ▸ 光纖」▸ <b>建立光纖束</b>：選另一端、芯數、單模／多模、長度。兩邊背面的空埠會一對一接起來；埠不夠會自動加。</li>
-<li>收容箱正面用一般方式接 LC 跳線到 Switch 的 SFP 埠。查線時會穿過收容箱、走過那一芯，到另一端的設備。</li>
-</ol>
-<div class="grid2" style="align-items:start">
-<figure class="narrow" style="margin:6px 0"><img src="manual/fiber.jpg" alt="光纖束" loading="lazy"><figcaption>24 芯光纖束畫成一條粗線，標出已用芯數。</figcaption></figure>
+<section id="auto">
+<h2><span class="n">3</span>自動建圖（netmap.exe）</h2>
+<p>建議的順序：先掃有管理功能的核心 Switch 和防火牆，讓主幹和 MAC 表自動建立；再用網段探索、匯入 IP／MAC 補齊終端；最後到現場手動補傻瓜 Switch 和接線。</p>
+<p>netmap.exe 用 SNMP 讀取防火牆、網管 Switch 的資料，自動畫出設備與連線，也可以常駐成「監控服務」，顯示每個埠的即時流量。只會<b>讀取</b>，不會修改設備設定。</p>
+
+<h3 id="e-setup">安裝版（RackTrace-Setup.exe，建議）</h3>
+<p>想讓監控一直開著、不用每次手動啟動，用安裝版：到<a href="https://github.com/coloplay1/netmap/releases/latest/download/RackTrace-Setup.exe">這裡下載 RackTrace-Setup.exe</a>，執行後按「下一步」。</p>
 <ul>
-<li>每一芯依 <b>TIA-598</b> 色碼標色（藍、橘、綠、棕、灰、白、紅、黑、黃、紫、粉紅、水藍），超過 12 芯時每 12 芯一管。</li>
-<li>點粗線或標籤：列出每一芯的顏色、兩端埠號，以及跳線接到哪台設備；沒接跳線的是備用芯。點一列就單獨選取那一芯。</li>
-<li>線號自動編成「F01-1」「F01-2」…，「修改名稱／長度」會一起更新。</li>
-<li>兩台收容箱放在不同頁面時，光纖束會變成跨頁面的連接標籤。</li>
-</ul></div>
-<figure><img src="manual/fiber-cores.jpg" alt="光纖束每一芯" loading="lazy"></figure>
+<li>裝在 <code>Program Files\RackTrace</code>，註冊成<b>開機自動啟動、不用登入</b>的背景服務（工作排程器的「RackTrace」）。</li>
+<li>資料放在 <code>%ProgramData%\netmap</code>（所有 Windows 帳號共用）；SNMP 帳密用 Windows 加密，只有這台電腦能解開。</li>
+<li>安裝時有「<b>允許內網其他電腦連進來</b>」選項（只開放私人／網域網路，預設勾選），讓同事能開 <code>http://這台的IP:18080/</code>；取消勾選就只有這台電腦能看。</li>
+<li>桌面與開始功能表的「<b>RackTrace</b>」會用瀏覽器打開服務的網頁；直接雙擊 <code>netmap.exe</code> 也會打開同一個網頁，不會再開第二個程式。</li>
+<li>連接埠被占用時，服務會自動換一個可用的埠，並把實際的網址寫在 <code>%ProgramData%\netmap-service.log</code>；舊版 netmap 正在執行時，新版會自動把舊版關掉再接手。</li>
+<li>出現「4551」或被 Windows 阻擋，通常是「智慧型應用程式控制」(Smart App Control) 擋掉沒有簽章的程式：可在 Windows 安全性 ▸ 應用程式與瀏覽器控制中改成「評估」或「關閉」，或請 IT 放行。程式碼完全公開，沒有付費簽章。</li>
+</ul>
+
+<h3 id="e-install">下載與第一次開啟（免安裝的 netmap.exe）</h3>
+<figure><img src="manual/welcome-local.jpg" alt="開始頁：本地端 netmap.exe" loading="lazy"><figcaption>開始頁的「本地端 netmap.exe」：功能介紹、三步開始與下載。</figcaption></figure>
+<ol class="steps">
+<li>在<a href="./">網頁版開始頁</a>或<a href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">這裡</a>下載 <b>netmap.exe</b>，免安裝，直接執行。</li>
+<li>Windows 可能跳出「Windows 已保護您的電腦」（SmartScreen）：按「<b>其他資訊 → 仍要執行</b>」。這是因為程式沒有付費的程式碼簽章。</li>
+<li>第一次啟動監控服務時，Windows 防火牆會詢問，請按「<b>允許存取</b>」，其他電腦才能連進來看圖。</li>
+<li>關閉視窗時會問要「結束程式」或「縮到工作列」。監控服務需要程式保持開著。</li>
+</ol>
+
+<h3 id="e-webscan">在網頁裡掃描（安裝版）</h3>
+<p>用安裝版時，不用另外開 netmap.exe 的視窗：在<b>服務主機那台電腦</b>用瀏覽器開 <code>http://127.0.0.1:18080/</code>，點上方的「<b>＋ 掃描設備</b>」（或開始頁的「掃描」），在網頁裡輸入核心 Switch IP 與 community，就會掃描並把結果加到目前的圖，掃描中可以看進度、隨時停止。</p>
+<figure class="mid"><img src="manual/scan-web.jpg" alt="網頁裡的掃描設備視窗" loading="lazy"><figcaption>網頁裡的「掃描設備」視窗：SNMP 掃描與網段探索，帳密加密存在這台電腦（畫面中的位址已遮蔽）。</figcaption></figure>
+<ul><li>掃描只能在服務主機本機操作，而且需要管理權限；其他電腦的瀏覽器看不到這個功能。掃描只讀取設備資料，不會改設備設定。</li>
+<li>沒有 SNMP 的網路改用「網段探索（ping + ARP）」。</li>
+<li>掃描結果會略過 <code>127.0.1.1</code> 這類本機位址的鄰居。</li></ul>
+<div class="note"><b>💡</b>安裝版的開始功能表有兩個項目：<b>RackTrace</b> 直接開網頁；<b>RackTrace 管理視窗</b> 才會開出本節說明的 exe 視窗（掃描、監控服務、誰在用流量、收集樣本）。也可以在命令列執行 <code>netmap.exe --gui</code>。</div>
+
+<h3 id="e-scan">SNMP 掃描</h3>
+<figure class="mid"><img src="manual/app-g1.jpg" alt="netmap.exe 掃描分頁" loading="lazy"><figcaption>掃描分頁（網段探索模式；畫面中的位址為示範值）。</figcaption></figure>
+<ol class="steps">
+<li><b>掃描目標</b>：填核心 Switch 的 IP 就夠了，程式會沿著 LLDP／CDP 找到其他設備。也可以輸入網段或範圍，用空白分隔，例如 <code>192.168.1.0/24 10.0.0.1-50</code>。</li>
+<li><b>SNMP 帳密</b>：選版本（v1／v2c／v3）。v2c 填唯讀的 community；v3 填使用者、驗證與加密密碼。勾「記住帳密」會用 Windows 帳號加密保存。</li>
+<li>選項：<b>沿著 LLDP／CDP 自動找鄰居</b>、<b>從 MAC 表推斷終端設備</b>、<b>建立沒掃到的鄰居</b>（AP、電話等沒開 SNMP 的設備）。</li>
+<li><b>聚合（LACP／Port-Channel）</b>會自動標出來：先讀標準的 LACP MIB，沒有的話改讀介面堆疊表（Cisco Port-channel、FortiGate aggregate、Linux bond 多半要靠這個）。一端讀得到、另一端沒回報時，會照對端補上同一個群組名稱，埠備註寫「聚合群組依對端推測」。</li>
+<li>兩台設備之間有好幾條線、但兩端都沒回報聚合時，不會自動合併（也可能是 STP 備援線），而是標成「可能是聚合」：點那個埠或那條粗線，按 <b>設成同一個聚合群組</b> 或 <b>不是聚合</b>。</li>
+<li>按 <b>開始掃描</b>。完成後會<b>自動在瀏覽器打開結果</b>。</li>
+<li>下方按鈕：<b>在網頁開啟結果</b>、<b>只把 SNMP 對應套到目前的圖</b>（保留你手動畫的位置，只補上 SNMP 資訊）、<b>另存 JSON</b>。</li>
+</ol>
+<p>沒有回應的設備會顯示原因，例如「可能沒開 SNMP，或 community／帳密不同」或「連不到這個 IP」。</p>
+<div class="note"><b>⚠️</b>設備端要先開啟 SNMP（唯讀即可），並允許這台電腦的 IP 查詢。家用路由器多半沒有 SNMP，請改用下面的「網段探索」。</div>
+
+<h3 id="e-disc">網段探索（不需要 SNMP）</h3>
+<figure class="mid"><img src="manual/app-d2.jpg" alt="網段探索" loading="lazy"><figcaption>網頁裡的「網段探索」：不需要 SNMP，列出在線的設備（畫面中的位址為示範值）。</figcaption></figure>
+<p>在掃描分頁選「<b>網段探索</b>」，輸入網段（例如 <code>192.168.1.0/24</code>），程式用 ping 與 ARP 列出在線的設備，並依 MAC 判斷廠牌、依開啟的連接埠猜種類（印表機、NAS、攝影機…）。結果一樣可以帶入網頁，但因為沒有 SNMP，<b>不會有埠對埠的連線</b>，需要自己接線。</p>
+
+<h3 id="e-autosnmp">自動偵測 SNMP（不用重新掃描）</h3>
+<p>監控服務啟動後，每小時會用 netmap.exe 設定好的 SNMP 帳密，去試圖上<b>還沒有監控</b>的 Switch、路由器、防火牆、AP，以及伺服器、NAS、NVR、印表機。所以流程可以是：</p>
+<ol class="steps">
+<li>先用網段探索或手動把設備畫上圖，填好 IP。</li>
+<li>有空再到各台設備把 SNMP 打開（community 或 SNMPv3 帳密要和 netmap.exe 一樣）。</li>
+<li>下一次偵測時（最多一小時，或在監控網頁按 <b>檔案 ▸ 告警、心跳與權限設定 ▸ 心跳與設備偵測 ▸ 現在偵測一次</b>），有回應的設備就會自動開始監控：補上設備回報的實體埠與埠號、把 IP 名稱改成設備名稱，並記一筆「開始 SNMP 監控」事件。</li>
+</ol>
+<ul>
+<li>原本圖上已有、名稱一樣的埠會直接對應；網段探索建立的「WAN」「ETH1」這類佔位埠，沒接線的會拿掉。已接線但對不上的埠會留著，事件裡會提醒你改成設備上的埠名稱（或重新掃描一次）。</li>
+<li>LLDP／CDP 的鄰居關係（誰接誰）仍然要用 <b>SNMP 掃描</b> 才會畫出來；自動偵測只負責「開始監控」。</li>
+<li>不想要的話，在同一個設定頁取消勾選「自動偵測 SNMP」。</li>
+</ul>
+<figure class="mid"><img src="manual/lag-hint.jpg" alt="可能是聚合的提示" loading="lazy"><figcaption>點埠時看到的提示：一鍵把兩端設成同一群組，或略過。</figcaption></figure>
+
+<h3 id="e-ipmac">匯入 IP／MAC 對照表（防火牆 DHCP、ARP）</h3>
+<p>圖上只有 MAC、沒有 IP 的設備，可以用防火牆匯出的表格補上。<b>檔案 ▸ 匯入 IP／MAC 對照</b>，貼上內容或選檔案（CSV、TSV、文字都可以；SonicWall、Fortinet 等匯出的 DHCP 租約、ARP 表直接可用，UTF-16、Big5 編碼也會自動辨識）。</p>
+<ul>
+<li>依標題列找出 IP、MAC、名稱、廠商欄位；有廠商欄時會順便判斷設備類型。</li>
+<li>同一個 MAC 對到好幾個 IP（例如防火牆自己的介面、Proxy ARP）的列會略過，避免填錯。</li>
+<li>你<b>手動改過 IP</b> 的設備會保留你的設定，不會被表格覆蓋；手動改 IP 時如果這個 MAC 在表格裡對到別的 IP，也會提醒你。</li>
+<li>名稱還是 MAC 的終端設備，填上 IP 後會改用 IP 當名稱。</li>
+<li><b>圖上沒有的設備也加進來</b>（預設勾選，只加內網 IP）：知道在哪台不受管交換器後面的放在它旁邊，其他的放在圖下方的「待接線」區，都標橘色「待接線」。</li>
+</ul>
+
+<h3 id="a-lldp">匯入 LLDP 指令結果（不用裝程式）</h3>
+<p>沒有裝 netmap.exe 也可以用 Switch 的指令結果建立連線：<b>檔案 ▸ 匯入 LLDP</b>，貼上 <code>show lldp neighbors</code>（或 <code>show cdp neighbors</code>）的結果，會自動建立設備與線。</p>
+
+<h3 id="e-hub">沒有管理功能的設備（HUB、傻瓜 Switch、數據機）</h3>
+<p>很多現場的線路亂，是因為中間有不能登入的設備。這些設備不需要 SNMP，也一樣能畫進圖裡：</p>
+<table>
+<tr><th>情況</th><th>怎麼處理</th></tr>
+<tr><td>HUB、傻瓜 Switch</td><td>手動新增為一般設備（類型選 Hub），把線連到它的埠。路徑追蹤會穿過它。上游有管理功能的 Switch 會在 MAC 表看到「這個埠後面有哪些設備」，所以能知道終端掛在哪個 HUB 之後。</td></tr>
+<tr><td>ISP 數據機（光世代）</td><td>業者管理，通常沒有 SNMP。手動新增，用 Ping 心跳看它有沒有斷線。流量看自己路由器接它的 WAN 埠。</td></tr>
+<tr><td>家用路由器</td><td>多半沒有 SNMP。有開 SSH 的可以用「SSH 監控」；其他用網段探索（ping＋ARP）找出在線設備。</td></tr>
+</table>
+<ul>
+<li><b>掃描到不受管交換器時</b>：MAC 表只能看出「這些設備在這個埠後面」，看不出接第幾孔，所以掃描<b>不會替它們自動接線</b>。名稱（DNS）和 IP 對得上的設備會加到圖上並標橘色「<b>待接線</b>」，其他的列在交換器的備註裡。確認現場後再手動接線，標籤就會消失。</li>
+<li><b>看不出的部分</b>：設備接在 HUB 的第幾個埠，系統無法自動判斷，需要到現場確認後手動連線。</li>
+<li><b>建議順序</b>：先掃有管理功能的核心 Switch 與防火牆，讓主幹和 MAC 表自動建立；再用網段探索補齊終端；最後一個樓層一個機櫃地手動補 HUB 與接線，不要一次整理全部。</li>
+<li><b>現場配合</b>：查出一條線就貼上編號（「線標列印」可產生 A4 或標籤機貼紙），並記在系統裡，下次不用重查。查不出來時可用查線器（音頻探測器）或看設備燈號輔助。</li>
+</ul>
+
+<h3 id="e-home">在家測試（例如 ASUS 路由器）</h3>
+<ol class="steps">
+<li><b>網段探索</b>：輸入家裡的網段（例如 <code>192.168.1.0/24</code>），可以看到手機、電視、NAS 等。</li>
+<li><b>流量圖</b>：路由器開啟 SSH（只限 LAN）後，在「監控服務」按「加入 SSH 設備…」，就能看到 WAN、LAN、Wi-Fi 的即時流量與 MRTG 流量圖。</li>
+<li><b>Syslog</b>：在 ASUS 路由器管理頁「系統記錄 → 遠端記錄伺服器」填這台電腦的 IP，回到 netmap.exe 開始收集，重開 Wi-Fi 或拔插網路線就會有 log 進來。也可以按「傳送測試訊息」確認接收正常。</li>
+<li><b>SSH</b>：在「系統管理 → 系統設定」把 SSH 設為<b>只限 LAN</b> 開啟，用路由器帳號登入並記錄。<b>測完請記得關閉 SSH</b>。</li>
+</ol>
+
 </section>
 
 <section id="trace">
-<h2><span class="n">5</span>查線路</h2>
+<h2><span class="n">4</span>查線與檢視</h2>
+<h3 id="t-trace">查線路</h3>
 <figure><img src="manual/trace.jpg" alt="點設備顯示到網路入口的完整路徑" loading="lazy"><figcaption>點一台設備，整條到網路入口的線路都會亮起，並有流動箭頭標示方向。</figcaption></figure>
 <ul>
 <li><b>點埠</b>：顯示這個埠經過的整條實體路徑（Switch → 配線架 → 資訊座 → 電腦），埠的上方出現設定列。</li>
@@ -312,23 +439,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <li>線路顯示模式在「顯示圖層」裡切換：<b>主幹</b>／<b>全部</b>／<b>隱藏</b>。隱藏時兩端仍保留色標，方便對照。</li>
 <li>搜尋列打線號（例如 <code>H-3F-001</code>）可以直接找到那條線。</li>
 </ul>
-</section>
 
-<section id="port">
-<h2><span class="n">6</span>埠設定（VLAN／PoE／LACP）</h2>
-<figure><img src="manual/ctx.jpg" alt="埠上方的設定列" loading="lazy"><figcaption>點埠後出現的設定列：Access／Trunk、VLAN、PoE、拔線、詳細。</figcaption></figure>
-<ul>
-<li><b>Access／Trunk</b>：Access 填一個 VLAN；Trunk 可填允許的 VLAN 清單。</li>
-<li><b>PoE</b>：標記這個埠供電，埠上會出現閃電圖示。</li>
-<li><b>LACP</b>：按住 <kbd>Shift</kbd> 點多個埠（或 <kbd>Shift</kbd>+拖曳空白處框選），一次設成同一個 LACP 群組。</li>
-<li><b>拔線</b>：刪除這個埠上的線。</li>
-<li>設定列可以拖曳 <b>⋮⋮</b> 移到別處，或按 <b>–</b> 收合；右下角的屬性列按鈕可以整個開關。關掉屬性列時，點線或埠會改成打開右側的屬性面板。</li>
-<li>手機上的設定列固定顯示在頂部工具列下方，不會跟著線跑出畫面。</li>
-</ul>
-</section>
-
-<section id="view">
-<h2><span class="n">7</span>檢視與顯示</h2>
 <h3 id="v-rack">機櫃視圖</h3>
 <figure><img src="manual/rack.jpg" alt="機櫃視圖" loading="lazy"><figcaption>依設備屬性裡的「機櫃」與「U 位」排列。</figcaption></figure>
 <p>在設備屬性填好機櫃名稱與 U 位、高度，就會出現在對應的機櫃位置。適合列印貼在機櫃門上。</p>
@@ -351,82 +462,6 @@ code,td,li,p{overflow-wrap:anywhere}
 <li>拖曳空白處平移畫布；滑鼠滾輪或 <kbd>+</kbd>／<kbd>−</kbd> 縮放；<kbd>0</kbd> 或右下 <b>⌂</b> 回到預設位置。</li>
 <li>右上「深色／淺色」切換主題，設定會記住。</li>
 </ul>
-</section>
-
-<section id="fault">
-<h2><span class="n">8</span>故障排查與維修記錄</h2>
-<p>頂列的 <b>排障</b> 視圖把流程排成三欄：①問題（斷線設備與各項檢查）→ ②查線 → ③維修單。復原／重做在頂列，框選與查線在左側元件列（右下「畫布工具」也有框選）。</p>
-<p>問題欄的「沒有回應的設備」<b>不包含手機</b>：類型是手機的設備離開、休眠很常見，只會在圖上標灰色「離線」，也不發斷線通知。某台設備被誤認成手機時，把類型改掉即可。查線卡片可以直接按「結案」或「刪除」；設備已恢復回應時會顯示「已恢復，結案」。</p>
-<p>排查分兩步：先用<b>故障查線</b>找出哪一段有問題，再用<b>維修記錄</b>記下怎麼處理，並在圖上看到哪裡還沒修好。</p>
-<h3 id="f-trace">故障查線</h3>
-<p>使用者回報「不能上網」時，從他的電腦開始，<b>一段一段往網路入口檢查</b>，並記錄每一段的結果。</p>
-<figure><img src="manual/fault.jpg" alt="故障查線面板" loading="lazy"><figcaption>故障查線：左邊是路徑，右邊是逐段檢查清單、故障點與影響範圍。</figcaption></figure>
-<ol class="steps">
-<li>按右下角的 <b>查線</b>，再點有問題的設備（例如「王小明」的電腦）。</li>
-<li>右邊列出從這台電腦到網路入口的每一段：設備、埠、線。程式會先做<b>自動健檢</b>，把 VLAN 不一致、PoE、LACP、線長超過 100 m、IP 重複等可疑處排在前面。</li>
-<li>每一段按 <b>✓ 正常</b>、<b>? 不確定</b> 或 <b>✕ 有問題</b>，可以在備註寫量測結果。上方會提示<b>建議下一個要查的段</b>（用對半法，最快縮小範圍）。</li>
-<li>標記有問題後，會顯示<b>故障點</b>與<b>影響範圍</b>：從網路入口到不了的設備會用紅色斜線標示。</li>
-<li>處理完在最下方填處理方式並<b>結案</b>。所有紀錄可在線路表查看並匯出 CSV。</li>
-</ol>
-<div class="tip"><b>💡</b>不確定從哪裡開始？直接按查線而不選設備，面板會列出整張圖目前的健檢問題。</div>
-<p>結案前後都可以按面板下方的 <b>轉成維修單</b>，把起點、故障點、各段備註帶進維修記錄（見下一節）。</p>
-
-<h3 id="f-repair">維修記錄</h3>
-<p>在 <b>排障</b> 視圖的第三欄管理所有維修單（頂列第 4 個分頁；有待處理問題時分頁上會出現數字徽章）。每一張單依影響範圍分成三種：</p>
-<div class="tw"><table>
-<tr><th>範圍</th><th>什麼時候用</th><th>畫布上的標示</th></tr>
-<tr><td><b>單點</b></td><td>一台設備或一條線有問題，例如一支 AP、一條跳線。</td><td>該設備或線路</td></tr>
-<tr><td><b>區域</b></td><td>一群設備一起出問題，例如某台交換器底下整區沒網路。可勾選設備、加入畫布上選取的設備，或選一台設備連同它的下游一次加入。</td><td>勾選的每台設備</td></tr>
-<tr><td><b>全域</b></td><td>整個網路都受影響，例如對外斷線、停電。不用選設備。</td><td>畫面上方紅色提示列</td></tr>
-</table></div>
-<figure><img src="manual/rp-table.jpg" alt="維修記錄表" loading="lazy"><figcaption>維修記錄表：範圍、對象、狀態、症狀與原因、修復方式，最新的處理紀錄會直接顯示。可依範圍或狀態篩選，也能匯出 CSV。</figcaption></figure>
-<h4>新增一張維修單</h4>
-<ol class="steps">
-<li>按 <b>＋ 新增維修單</b>，或在設備面板按 <b>記錄維修</b>（會自動帶入該設備）。</li>
-<li>最上面的 <b>從故障通知帶入</b> 可挑：<b>設備沒有回應</b>（監控偵測到的）、<b>檢查發現</b>（資料檢查的問題）、<b>查線紀錄</b>（還沒結案的查線）。選了就會填好範圍、對象和症狀，仍可修改。</li>
-<li>填 <b>症狀</b>（怎麼發現的）、<b>原因</b>、<b>修復方式</b>。修復方式下方有常用選項（重新插拔線、更換網路線、重開機…），按一下就加進去。</li>
-<li>狀態分 <b>待處理</b>、<b>處理中</b>、<b>已修復</b>；改成已修復時會自動記下修復時間。</li>
-<li><b>處理紀錄</b>可以自由填寫，每按一次「加入紀錄」就依時間記一則，例如「到現場確認電源燈不亮」「換上備品後恢復」。</li>
-</ol>
-<figure><img src="manual/rp-form.jpg" alt="新增維修單" loading="lazy"><figcaption>新增維修單：上方可從故障通知帶入，下方是處理紀錄。</figcaption></figure>
-<h4>對應到畫布</h4>
-<p>還沒修好的維修單會直接標在拓撲圖上：對象用<b>虛線外框加 🔧</b>，紅色是待處理、黃色是處理中，線路也用虛線。全域故障在畫面上方顯示紅色提示，點一下回到維修記錄。在維修記錄表點任一列，會跳回拓撲圖並框住受影響的對象。已修復的單不再標示，但記錄會保留。</p>
-<figure><img src="manual/rp-map.jpg" alt="畫布上的維修標示" loading="lazy"><figcaption>區域維修：座位區的設備以虛線與 🔧 標出，上方是全域故障提示。</figcaption></figure>
-<div class="note"><b>ℹ️</b>維修記錄會跟著專案儲存（連到 netmap.exe 服務時存在服務裡），也包含在 JSON 備份與歷史版本中；「分享連結」不帶維修記錄。</div>
-</section>
-
-<section id="save">
-<h2><span class="n">9</span>儲存、匯出與分享</h2>
-<div class="tw"><table>
-<tr><th>功能</th><th>說明</th></tr>
-<tr><td>自動儲存</td><td>每次修改都存在這台電腦的瀏覽器（清除瀏覽器資料會不見）。</td></tr>
-<tr><td>匯出／匯入 JSON</td><td>完整備份，換電腦或交給同事時使用。</td></tr>
-<tr><td>匯出 CSV</td><td>線路表給 Excel。</td></tr>
-<tr><td>匯出 SVG／PNG</td><td>圖片，貼到報告或列印。</td></tr>
-<tr><td>匯入 LLDP</td><td>貼上 Switch 的 <code>show lldp neighbors</code> 結果，自動建立連線。</td></tr>
-<tr><td>分享連結、QR Code</td><td>把整張圖壓縮進網址，對方打開就是唯讀版，可貼在機櫃上用手機掃。</td></tr>
-<tr><td>歷史版本</td><td>改錯了可以回到之前的版本，見下方。</td></tr>
-<tr><td>線標列印</td><td>每條線兩端的標籤，A4 標籤紙或 Brother P-touch，見下方。</td></tr>
-</table></div>
-<div class="note"><b>⚠️</b>分享連結包含圖上的 IP、MAC 等資訊，請只給需要的人。</div>
-<p><b>連監控服務時暫時斷線</b>（例如筆電切到飛航模式、Wi-Fi 斷掉）：修改會先暫存在這台裝置，每 5 秒自動重試，連回來就送出，不會遺失。如果這段時間別人也改了圖，會跳出視窗讓你選「<b>留我的</b>」或「<b>用最新的</b>」。重新打開網頁時若還有沒送出的修改，也會詢問要不要送出。</p>
-
-<h3 id="s-history">歷史版本與還原</h3>
-<p><b>檔案 ▸ 歷史版本／還原</b>。改錯、刪錯、匯入蓋掉時，可以回到之前的版本。</p>
-<figure><img src="manual/history.jpg" alt="歷史版本" loading="lazy"><figcaption>監控服務的歷史版本：每一筆記下時間、誰改的、改了什麼。</figcaption></figure>
-<ul>
-<li><b>預覽</b>：先在畫布上看那個版本的圖（只能看），上方會顯示「預覽 #n」，確定再按 <b>還原這個版本</b>，或按 <b>回到目前版本</b>。</li>
-<li><b>還原</b>本身也會記成一筆，還原錯了可以再改回來。<b>下載</b>可以把那個版本存成專案檔。</li>
-<li><b>用監控服務網址開啟時</b>：每次修改都記錄在 netmap.exe 那台電腦，大家看到的是同一份紀錄。同一個人 2 分鐘內的連續修改（例如拖曳排版）合併成一筆，最多保留 500 筆。在視窗上填 <b>你的名字</b>，紀錄就會寫名字而不是電腦 IP。</li>
-<li><b>線上版</b>：存在這台電腦的瀏覽器，有修改時每 5 分鐘自動留一份，匯入專案檔或套用範本前也會先存一份，最多 40 份。換電腦或清除瀏覽器資料就不見了，重要的圖請另外下載專案檔備份。</li>
-</ul>
-
-<div class="note"><b>💾</b><b>沒有連服務時（線上版或單獨開網頁）</b>沒有歷史版本，資料只存在瀏覽器，清除瀏覽資料就會消失。超過 7 天沒有下載專案檔，畫面下方會出現提醒，可以一鍵「下載備份」，或選「7 天後再提醒」。平常也可以用 <b>檔案 ▸ 下載專案檔（JSON）</b> 手動備份，要還原用「開啟專案檔」。</div>
-<h3 id="s-check">資料檢查與單一設備的變更紀錄</h3>
-<p><b>檔案 ▸ 資料檢查</b> 會掃整份圖，列出：重複的 IP、MAC、線號、設備名稱；線兩端 VLAN 不一致（access／trunk、VLAN 編號）；光纖接到網路線埠、網路線接到 SFP 埠；網路線超過 100 m；聚合只設一端；IP 格式錯誤、IP 和 Gateway 不在同一網段。點任一項就跳到那台設備或那條線。在設備屬性填 IP、MAC 時，和別台重複也會馬上提醒。</p>
-<figure><img src="manual/datacheck.jpg" alt="資料檢查" loading="lazy"></figure>
-<p>點任一台設備或一條線，在屬性面板按 <b>這台的變更紀錄</b>／<b>這條線的變更紀錄</b>，會列出它自己的修改：誰、什麼時候、哪個欄位從什麼改成什麼、哪條線從哪個埠改接到哪個埠。用監控服務網址時從伺服器的歷史版本整理（最近 500 個版本），線上版從瀏覽器自動保存的版本整理。</p>
-<figure><img src="manual/objhist.jpg" alt="單一設備的變更紀錄" loading="lazy"></figure>
 
 <h3 id="s-labels">線標列印</h3>
 <p><b>檔案 ▸ 線標列印</b>。每條線兩端各貼一張，寫線號、這一端與另一端的設備與埠。</p>
@@ -450,67 +485,9 @@ code,td,li,p{overflow-wrap:anywhere}
 
 </section>
 
-<section id="exe">
-<h2><span class="n">10</span>netmap.exe（Windows 程式）</h2>
-<p>netmap.exe 用 SNMP 讀取防火牆、網管 Switch 的資料，自動畫出設備與連線，也可以常駐成「監控服務」，顯示每個埠的即時流量。只會<b>讀取</b>，不會修改設備設定。</p>
-
-<h3 id="e-setup">安裝版（RackTrace-Setup.exe，建議）</h3>
-<p>想讓監控一直開著、不用每次手動啟動，用安裝版：到<a href="https://github.com/coloplay1/netmap/releases/latest/download/RackTrace-Setup.exe">這裡下載 RackTrace-Setup.exe</a>，執行後按「下一步」。</p>
-<ul>
-<li>裝在 <code>Program Files\RackTrace</code>，註冊成<b>開機自動啟動、不用登入</b>的背景服務（工作排程器的「RackTrace」）。</li>
-<li>資料放在 <code>%ProgramData%\netmap</code>（所有 Windows 帳號共用）；SNMP 帳密用 Windows 加密，只有這台電腦能解開。</li>
-<li>安裝時有「<b>允許內網其他電腦連進來</b>」選項（只開放私人／網域網路，預設勾選），讓同事能開 <code>http://這台的IP:18080/</code>；取消勾選就只有這台電腦能看。</li>
-<li>桌面與開始功能表的「<b>RackTrace</b>」會用瀏覽器打開服務的網頁；直接雙擊 <code>netmap.exe</code> 也會打開同一個網頁，不會再開第二個程式。</li>
-<li>連接埠被占用時，服務會自動換一個可用的埠，並把實際的網址寫在 <code>%ProgramData%\netmap-service.log</code>；舊版 netmap 正在執行時，新版會自動把舊版關掉再接手。</li>
-<li>出現「4551」或被 Windows 阻擋，通常是「智慧型應用程式控制」(Smart App Control) 擋掉沒有簽章的程式：可在 Windows 安全性 ▸ 應用程式與瀏覽器控制中改成「評估」或「關閉」，或請 IT 放行。程式碼完全公開，沒有付費簽章。</li>
-</ul>
-<h3 id="e-install">下載與第一次開啟（免安裝的 netmap.exe）</h3>
-<figure><img src="manual/welcome-local.jpg" alt="開始頁：本地端 netmap.exe" loading="lazy"><figcaption>開始頁的「本地端 netmap.exe」：功能介紹、三步開始與下載。</figcaption></figure>
-<ol class="steps">
-<li>在<a href="./">網頁版開始頁</a>或<a href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">這裡</a>下載 <b>netmap.exe</b>，免安裝，直接執行。</li>
-<li>Windows 可能跳出「Windows 已保護您的電腦」（SmartScreen）：按「<b>其他資訊 → 仍要執行</b>」。這是因為程式沒有付費的程式碼簽章。</li>
-<li>第一次啟動監控服務時，Windows 防火牆會詢問，請按「<b>允許存取</b>」，其他電腦才能連進來看圖。</li>
-<li>關閉視窗時會問要「結束程式」或「縮到工作列」。監控服務需要程式保持開著。</li>
-</ol>
-
-<h3 id="e-webscan">在網頁裡掃描（安裝版）</h3>
-<p>用安裝版時，不用另外開 netmap.exe 的視窗：在<b>服務主機那台電腦</b>用瀏覽器開 <code>http://127.0.0.1:18080/</code>，點上方的「<b>＋ 掃描設備</b>」（或開始頁的「掃描」），在網頁裡輸入核心 Switch IP 與 community，就會掃描並把結果加到目前的圖，掃描中可以看進度、隨時停止。</p>
-<figure class="mid"><img src="manual/scan-web.jpg" alt="網頁裡的掃描設備視窗" loading="lazy"><figcaption>網頁裡的「掃描設備」視窗：SNMP 掃描與網段探索，帳密加密存在這台電腦（畫面中的位址已遮蔽）。</figcaption></figure>
-<ul><li>掃描只能在服務主機本機操作，而且需要管理權限；其他電腦的瀏覽器看不到這個功能。掃描只讀取設備資料，不會改設備設定。</li>
-<li>沒有 SNMP 的網路改用「網段探索（ping + ARP）」。</li>
-<li>掃描結果會略過 <code>127.0.1.1</code> 這類本機位址的鄰居。</li></ul>
-<div class="note"><b>💡</b>安裝版的開始功能表有兩個項目：<b>RackTrace</b> 直接開網頁；<b>RackTrace 管理視窗</b> 才會開出本節說明的 exe 視窗（掃描、監控服務、誰在用流量、收集樣本）。也可以在命令列執行 <code>netmap.exe --gui</code>。</div>
-<h3 id="e-scan">SNMP 掃描</h3>
-<figure class="mid"><img src="manual/app-g1.jpg" alt="netmap.exe 掃描分頁" loading="lazy"><figcaption>掃描分頁（網段探索模式；畫面中的位址為示範值）。</figcaption></figure>
-<ol class="steps">
-<li><b>掃描目標</b>：填核心 Switch 的 IP 就夠了，程式會沿著 LLDP／CDP 找到其他設備。也可以輸入網段或範圍，用空白分隔，例如 <code>192.168.1.0/24 10.0.0.1-50</code>。</li>
-<li><b>SNMP 帳密</b>：選版本（v1／v2c／v3）。v2c 填唯讀的 community；v3 填使用者、驗證與加密密碼。勾「記住帳密」會用 Windows 帳號加密保存。</li>
-<li>選項：<b>沿著 LLDP／CDP 自動找鄰居</b>、<b>從 MAC 表推斷終端設備</b>、<b>建立沒掃到的鄰居</b>（AP、電話等沒開 SNMP 的設備）。</li>
-<li><b>聚合（LACP／Port-Channel）</b>會自動標出來：先讀標準的 LACP MIB，沒有的話改讀介面堆疊表（Cisco Port-channel、FortiGate aggregate、Linux bond 多半要靠這個）。一端讀得到、另一端沒回報時，會照對端補上同一個群組名稱，埠備註寫「聚合群組依對端推測」。</li>
-<li>兩台設備之間有好幾條線、但兩端都沒回報聚合時，不會自動合併（也可能是 STP 備援線），而是標成「可能是聚合」：點那個埠或那條粗線，按 <b>設成同一個聚合群組</b> 或 <b>不是聚合</b>。</li>
-<li>按 <b>開始掃描</b>。完成後會<b>自動在瀏覽器打開結果</b>。</li>
-<li>下方按鈕：<b>在網頁開啟結果</b>、<b>只把 SNMP 對應套到目前的圖</b>（保留你手動畫的位置，只補上 SNMP 資訊）、<b>另存 JSON</b>。</li>
-</ol>
-<p>沒有回應的設備會顯示原因，例如「可能沒開 SNMP，或 community／帳密不同」或「連不到這個 IP」。</p>
-<div class="note"><b>⚠️</b>設備端要先開啟 SNMP（唯讀即可），並允許這台電腦的 IP 查詢。家用路由器多半沒有 SNMP，請改用下面的「網段探索」。</div>
-
-<h3 id="e-disc">網段探索（不需要 SNMP）</h3>
-<figure class="mid"><img src="manual/app-d2.jpg" alt="網段探索" loading="lazy"><figcaption>網頁裡的「網段探索」：不需要 SNMP，列出在線的設備（畫面中的位址為示範值）。</figcaption></figure>
-<p>在掃描分頁選「<b>網段探索</b>」，輸入網段（例如 <code>192.168.1.0/24</code>），程式用 ping 與 ARP 列出在線的設備，並依 MAC 判斷廠牌、依開啟的連接埠猜種類（印表機、NAS、攝影機…）。結果一樣可以帶入網頁，但因為沒有 SNMP，<b>不會有埠對埠的連線</b>，需要自己接線。</p>
-<h3 id="e-autosnmp">自動偵測 SNMP（不用重新掃描）</h3>
-<p>監控服務啟動後，每小時會用 netmap.exe 設定好的 SNMP 帳密，去試圖上<b>還沒有監控</b>的 Switch、路由器、防火牆、AP，以及伺服器、NAS、NVR、印表機。所以流程可以是：</p>
-<ol class="steps">
-<li>先用網段探索或手動把設備畫上圖，填好 IP。</li>
-<li>有空再到各台設備把 SNMP 打開（community 或 SNMPv3 帳密要和 netmap.exe 一樣）。</li>
-<li>下一次偵測時（最多一小時，或在監控網頁按 <b>檔案 ▸ 告警、心跳與權限設定 ▸ 心跳與設備偵測 ▸ 現在偵測一次</b>），有回應的設備就會自動開始監控：補上設備回報的實體埠與埠號、把 IP 名稱改成設備名稱，並記一筆「開始 SNMP 監控」事件。</li>
-</ol>
-<ul>
-<li>原本圖上已有、名稱一樣的埠會直接對應；網段探索建立的「WAN」「ETH1」這類佔位埠，沒接線的會拿掉。已接線但對不上的埠會留著，事件裡會提醒你改成設備上的埠名稱（或重新掃描一次）。</li>
-<li>LLDP／CDP 的鄰居關係（誰接誰）仍然要用 <b>SNMP 掃描</b> 才會畫出來；自動偵測只負責「開始監控」。</li>
-<li>不想要的話，在同一個設定頁取消勾選「自動偵測 SNMP」。</li>
-</ul>
-<figure class="mid"><img src="manual/lag-hint.jpg" alt="可能是聚合的提示" loading="lazy"><figcaption>點埠時看到的提示：一鍵把兩端設成同一群組，或略過。</figcaption></figure>
-
+<section id="monitor">
+<h2><span class="n">5</span>監控（即時流量、心跳、告警）</h2>
+<p>這一章需要先裝好 netmap.exe 並啟動監控服務（見 <a href="#e-setup">3. 安裝版</a>）。</p>
 <h3 id="e-srv">監控服務與即時流量</h3>
 <figure class="mid"><img src="manual/app-g2.jpg" alt="監控服務分頁" loading="lazy"></figure>
 <ol class="steps">
@@ -531,23 +508,6 @@ code,td,li,p{overflow-wrap:anywhere}
 <tr><td><span class="dot" style="background:#DC2626"></span>紅色虛線</td><td>埠離線（線上標示「離線」）</td></tr>
 </table></div>
 
-<h3 id="e-remote">用平板、手機或其他電腦查看</h3>
-<p>其他裝置<b>不需要安裝任何東西</b>，也不會去讀 netmap.exe：exe 只在服務主機（Windows）上執行，並在背景提供一個網頁；平板、手機、Mac 只是用瀏覽器打開那個網頁。</p>
-<div class="tw"><table>
-<tr><th>平板／手機／其他電腦</th><th></th><th>服務主機（跑 netmap.exe）</th><th></th><th>網路設備</th></tr>
-<tr><td>瀏覽器（Safari、Chrome）</td><td style="white-space:nowrap;text-align:center">⟵ 網頁 ⟶</td><td>圖、燈號、流量紀錄</td><td style="white-space:nowrap;text-align:center">⟵ SNMP ⟶</td><td>Switch、防火牆、AP</td></tr>
-</table></div>
-<ol class="steps">
-<li>在一台<b>固定開機</b>的 Windows 電腦上安裝 RackTrace-Setup.exe（不要裝在會休眠或帶走的筆電），安裝時保留「開機自動啟動」與「允許公司內網的其他電腦用瀏覽器連進來」。</li>
-<li>先完成一次掃描或畫好圖，確認服務在執行（見上一節）。</li>
-<li>在平板的瀏覽器輸入服務主機的網址，例如 <code>http://192.168.1.20:18080/</code>。網址可以在服務主機的 exe 視窗按「開啟網頁」後，從網址列看到。</li>
-<li>連上後會看到和服務主機相同的圖，並有即時燈號與流量。要省去輸入網址，可以用「權限與檢視連結」產生的 <b>QR Code</b>，用平板或手機掃描即可。</li></ol>
-<ul>
-<li>平板必須和服務主機在<b>同一個內網</b>（不能接隔離的訪客 Wi-Fi）。不在公司時請先連公司的 VPN。</li>
-<li>連線進來的裝置預設<b>只能看</b>；要編輯需要管理密碼（見「管理密碼與檢視連結」）。</li>
-<li>連不上時，先檢查服務主機的服務有在執行，以及 Windows 防火牆有沒有開放這個埠。</li>
-<li>平板以查看、追路徑、現場查線為主。右鍵選單、Ctrl＋點選這類需要滑鼠或鍵盤的操作，在觸控裝置上比較不方便。</li></ul>
-<div class="note"><b>⚠️</b>網頁版（<a href="./">GitHub Pages</a>）本身沒有資料，資料存在你自己的瀏覽器裡。要在平板上看到公司的圖，請連到服務主機，不是打開網頁版首頁。</div>
 <h3 id="e-detect">從線上版切換到監控畫面</h3>
 <p>從監控服務的網址打開時，點左上角的標誌回到開始頁，「本地端」分頁會顯示這台服務的狀況：監控中的設備、正常與沒有回應的數量、最後讀取時間，以及「開啟監控中的圖」「流量圖總覽」「故障查線」和有問題的設備，點設備就會打開它的狀態與流量圖。</p>
 <figure><img src="manual/welcome-srv.jpg" alt="從監控服務開啟時的開始頁" loading="lazy"></figure>
@@ -559,6 +519,21 @@ code,td,li,p{overflow-wrap:anywhere}
 <li>出現「偵測到 netmap.exe，監控服務執行中」後，按 <b>切換到監控畫面</b>。之後再打開線上版的本地端分頁，會自動偵測。</li>
 </ol>
 <div class="tip"><b>💡</b>偵測只限同一台電腦、只限線上版網址，而且程式只回答版本與網頁埠，不會把圖或流量資料給線上版。偵測不到時，也可以直接用 netmap.exe 顯示的網址開啟。</div>
+
+<h3 id="e-ping">心跳與事件</h3>
+<p>監控服務每 30 秒 Ping 一次圖上所有有 IP 的設備（電腦、印表機、攝影機也算），不需要 SNMP。</p>
+<figure><img src="manual/lamps.jpg" alt="Ping 燈號" loading="lazy"><figcaption>設備名稱前的燈號：綠＝正常、黃＝延遲偏高、紅（閃爍）＝斷線。斷線的設備外框變紅並標「斷線」；SNMP 沒回應但 Ping 得到的標「SNMP 無回應」。</figcaption></figure>
+<div class="grid2" style="align-items:start">
+<figure class="narrow" style="margin:6px 0"><img src="manual/ping-panel.jpg" alt="設備的心跳卡片" loading="lazy"><figcaption>設備屬性的「網路流量」分頁：心跳狀態、延遲、平均與遺失率，以及最近一小時的延遲曲線（畫面中的位址已遮蔽）。</figcaption></figure>
+<ul>
+<li>點設備 ▸「網路流量」分頁：目前延遲、平均、最近一小時的遺失率、延遲曲線（紅色直條＝那次沒回應），以及這台的最近事件。</li>
+<li>連續失敗 2 次才算斷線，避免一次掉包就誤報。次數、間隔、延遲門檻可以在設定裡改。</li>
+<li>設備擋 ICMP 時，會改試幾個常用的 TCP 埠（對方回「拒絕連線」也代表它在線）。</li>
+<li>類型是<b>手機</b>的設備斷線只標灰色「離線」，不算故障、不發通知。會休眠的筆電可以勾「這台不要 Ping」，避免下班後一直顯示斷線。</li>
+</ul></div>
+<p>右上角的<b>鈴鐺</b>是事件紀錄：設備斷線與恢復（附斷了多久）、主幹埠離線、SNMP 沒回應、新設備加入、IP 變更都會記下來，保留 180 天，可以下載 CSV。有新事件時鈴鐺會顯示數字，發生異常時畫面上也會跳提示。</p>
+<figure><img src="manual/events.jpg" alt="事件紀錄" loading="lazy"></figure>
+<p><b>主幹埠</b>是指透過 SNMP／SSH 讀得到狀態、而且線（穿過配線架）另一端是 Switch、AP、路由器、防火牆、伺服器、NAS、NVR 的埠。接電腦的埠下班關機就會離線，所以不會算進來。個別的埠可以在「埠設定 ▸ 離線告警」改成一定通知或不通知。</p>
 
 <h3 id="e-mrtg">MRTG 流量圖</h3>
 <p>監控服務每次輪詢都會把每個埠的流量存起來，整理成和 MRTG 一樣的四張圖。打開方式：</p>
@@ -622,7 +597,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <figure class="mid"><img src="manual/app-flow.jpg" alt="netmap.exe 誰在用流量分頁" loading="lazy"></figure>
 <ol class="steps">
 <li>netmap.exe「<b>誰在用流量</b>」分頁勾選 <b>接收流量紀錄</b>。預設 NetFlow／IPFIX 用 UDP 2055、sFlow 用 UDP 6343，Windows 防火牆詢問時按允許。</li>
-<li>到防火牆把收集器（Collector）設成畫面上顯示的這台電腦 IP 與埠。各廠牌怎麼設，按 <b>各廠牌設定教學</b>（見下一節）。</li>
+<li>到防火牆把收集器（Collector）設成畫面上顯示的這台電腦 IP 與埠。各廠牌怎麼設，見 <a href="#vendor">附錄 A 各廠牌設定教學</a>。</li>
 <li>幾分鐘內，下方的列表會出現防火牆的 IP，代表開始收到資料。還沒設定設備也可以先按 <b>傳送測試資料</b> 試試看。</li>
 <li>確認「監控服務」已啟動，在監控網頁按右上角 <b>流量圖</b> ▸ <b>誰在用</b>。</li>
 </ol>
@@ -638,8 +613,293 @@ code,td,li,p{overflow-wrap:anywhere}
 </ul></div>
 <div class="note"><b>⚠️</b>流量匯出只要開在<b>一台</b>設備上（通常是防火牆的 LAN 介面）。同一份流量在多台設備或多個介面都匯出時，數字會變成兩倍。有多台設備送資料時，畫面上可以選「來源」。</div>
 
-<h3 id="e-vendor">各廠牌設定教學</h3>
-<p>netmap.exe 的「掃描」分頁（各廠牌怎麼開 SNMP？）、「誰在用流量」分頁，以及網頁開始頁的本地端分頁、流量排行，都可以打開設定教學。netmap.exe 裡會自動代入這台電腦的 IP，指令可以直接複製。</p>
+<h3 id="e-seen">網路上的設備（新加入／很久沒出現）</h3>
+<p>監控網頁 <b>檔案 ▸ 網路上的設備</b>。監控服務會整理網路上出現過的每個 MAC 位址：</p>
+<figure><img src="manual/seen.jpg" alt="網路上的設備" loading="lazy"></figure>
+<ul>
+<li>資料來源：路由器、防火牆、L3 Switch 的 ARP 表（有 SNMP 的話，每 10 分鐘讀一次）、SSH 監控路由器的用戶端清單，以及 netmap.exe 那台電腦自己的 ARP 表。</li>
+<li>每個來源（每台路由器、Switch）第一次讀到的那批當作原本就在；之後出現的才算 <b>新加入</b>，同一台 IP 改變會記成 <b>IP 變更</b>。要收到通知，在告警設定勾「新設備加入網路」。</li>
+<li><b>不在圖上</b>：圖上沒有這個 MAC 或 IP 的設備，按 <b>加到圖上</b> 會建一台終端設備（名稱、廠牌、IP、MAC 自動帶入），再接線或設成無線即可。</li>
+<li><b>很久沒出現</b>：超過設定的時數（預設 24 小時）沒看到。圖上有填 MAC 的設備很久沒出現時可以發通知，適合盤點壞掉或被搬走的設備。</li>
+<li>手機常用「隨機 MAC」（廠牌顯示「隨機 MAC」），換個 Wi-Fi 或過一段時間 MAC 就會變，可能被當成新設備。</li>
+</ul>
+<figure><img src="manual/app-svc.jpg" alt="netmap.exe 監控服務分頁" loading="lazy"><figcaption>netmap.exe 監控服務分頁：網址旁的按鈕打開告警設定與事件紀錄；設備清單的狀態欄會顯示 Ping 延遲。</figcaption></figure>
+
+<h3 id="e-alert">告警通知（Telegram、Discord、Slack、Teams、LINE、Email）</h3>
+<p>netmap.exe「監控服務」分頁按 <b>告警、密碼與檢視連結</b>（或在監控網頁按 <b>檔案 ▸ 告警、心跳與權限設定</b>），切到 <b>告警通知</b>。</p>
+<figure><img src="manual/alert.jpg" alt="告警通知設定" loading="lazy"></figure>
+<ol class="steps">
+<li>勾 <b>開啟告警通知</b>，選要通知哪些事件。預設是設備斷線、主幹埠離線，以及恢復。</li>
+<li>選管道類型 ▸ <b>新增通知管道</b>，填 Token 或 Webhook 網址，按 <b>新增</b>。</li>
+<li>按 <b>測試</b>，確認手機或頻道收得到。</li>
+<li>按 <b>儲存</b>。</li>
+</ol>
+<div class="tw"><table>
+<tr><th>管道</th><th>要準備什麼</th></tr>
+<tr><td>Telegram</td><td>找 <code>@BotFather</code> 建立機器人取得 Bot Token；把機器人加進群組，用 <code>@userinfobot</code> 或 getUpdates 查 Chat ID（群組是負數）。</td></tr>
+<tr><td>Discord</td><td>頻道設定 ▸ 整合 ▸ Webhook ▸ 新增，複製 Webhook 網址。</td></tr>
+<tr><td>Slack</td><td>建立 Slack App，開啟 Incoming Webhooks，選頻道後複製網址。</td></tr>
+<tr><td>Microsoft Teams</td><td>在頻道用 Workflows 建立「收到 Webhook 要求時張貼到頻道」，複製網址（舊的 Office 365 連接器已停用）。</td></tr>
+<tr><td>LINE</td><td>LINE Notify 已在 2025 年 3 月 31 日停止服務。請在 LINE Developers 建立 <b>Messaging API</b> 頻道，發行 Channel access token；收件者是使用者 ID（U 開頭）或群組 ID（C 開頭）。免費方案每月有則數上限。</td></tr>
+<tr><td>Email</td><td>SMTP 主機、連接埠、帳號密碼、收件者。Gmail 請用「應用程式密碼」，主機 smtp.gmail.com、587、STARTTLS。</td></tr>
+<tr><td>自訂 Webhook</td><td>送出 JSON <code>{source, title, text, events:[…]}</code>，可以接自己的系統或 n8n、Make。</td></tr>
+</table></div>
+<ul>
+<li>20 秒內發生的事件合併成一則訊息，整台 Switch 斷線時不會連續洗版。</li>
+<li><b>地點名稱</b>會出現在訊息開頭，例如「[RackTrace 台北總公司] 🔴 SW-CORE 斷線」，幫好幾個地方顧網路時分得出來。</li>
+<li>Token、密碼只存在 netmap.exe 那台電腦（Windows 用 DPAPI 加密），網頁上只會顯示「已設定」。</li>
+<li>告警要靠 netmap.exe 持續執行。要 24 小時監控的話，勾「Windows 開機時自動執行」，並把電源設定成不睡眠。</li>
+</ul>
+
+</section>
+
+<section id="fault">
+<h2><span class="n">6</span>出問題時</h2>
+<p>有人說「不能上網」或收到斷線通知時，照這個順序處理：</p>
+<ol class="steps">
+<li><b>看排障視圖</b>：頂列「排障」的第一欄列出沒有回應的設備和各項檢查問題，先確認是一台還是一整區。</li>
+<li><b>故障查線</b>：從有問題的設備開始一段一段往上查，找出故障點與影響範圍。</li>
+<li><b>開維修單</b>：記下症狀、原因和怎麼修，還沒修好的會標在圖上。</li>
+<li><b>修完對一次帳</b>：用圖面比對確認圖和現場一致，改過線就順手更新。</li>
+</ol>
+<p>頂列的 <b>排障</b> 視圖把流程排成三欄：①問題（斷線設備與各項檢查）→ ②查線 → ③維修單。復原／重做在頂列，框選與查線在左側元件列（右下「畫布工具」也有框選）。</p>
+<p>問題欄的「沒有回應的設備」<b>不包含手機</b>：類型是手機的設備離開、休眠很常見，只會在圖上標灰色「離線」，也不發斷線通知。某台設備被誤認成手機時，把類型改掉即可。查線卡片可以直接按「結案」或「刪除」；設備已恢復回應時會顯示「已恢復，結案」。</p>
+<p>排查分兩步：先用<b>故障查線</b>找出哪一段有問題，再用<b>維修記錄</b>記下怎麼處理，並在圖上看到哪裡還沒修好。</p>
+<h3 id="f-trace">故障查線</h3>
+<p>使用者回報「不能上網」時，從他的電腦開始，<b>一段一段往網路入口檢查</b>，並記錄每一段的結果。</p>
+<figure><img src="manual/fault.jpg" alt="故障查線面板" loading="lazy"><figcaption>故障查線：左邊是路徑，右邊是逐段檢查清單、故障點與影響範圍。</figcaption></figure>
+<ol class="steps">
+<li>按右下角的 <b>查線</b>，再點有問題的設備（例如「王小明」的電腦）。</li>
+<li>右邊列出從這台電腦到網路入口的每一段：設備、埠、線。程式會先做<b>自動健檢</b>，把 VLAN 不一致、PoE、LACP、線長超過 100 m、IP 重複等可疑處排在前面。</li>
+<li>每一段按 <b>✓ 正常</b>、<b>? 不確定</b> 或 <b>✕ 有問題</b>，可以在備註寫量測結果。上方會提示<b>建議下一個要查的段</b>（用對半法，最快縮小範圍）。</li>
+<li>標記有問題後，會顯示<b>故障點</b>與<b>影響範圍</b>：從網路入口到不了的設備會用紅色斜線標示。</li>
+<li>處理完在最下方填處理方式並<b>結案</b>。所有紀錄可在線路表查看並匯出 CSV。</li>
+</ol>
+<div class="tip"><b>💡</b>不確定從哪裡開始？直接按查線而不選設備，面板會列出整張圖目前的健檢問題。</div>
+<p>結案前後都可以按面板下方的 <b>轉成維修單</b>，把起點、故障點、各段備註帶進維修記錄（見下一節）。</p>
+
+<h3 id="f-repair">維修記錄</h3>
+<p>在 <b>排障</b> 視圖的第三欄管理所有維修單（頂列第 4 個分頁；有待處理問題時分頁上會出現數字徽章）。每一張單依影響範圍分成三種：</p>
+<div class="tw"><table>
+<tr><th>範圍</th><th>什麼時候用</th><th>畫布上的標示</th></tr>
+<tr><td><b>單點</b></td><td>一台設備或一條線有問題，例如一支 AP、一條跳線。</td><td>該設備或線路</td></tr>
+<tr><td><b>區域</b></td><td>一群設備一起出問題，例如某台交換器底下整區沒網路。可勾選設備、加入畫布上選取的設備，或選一台設備連同它的下游一次加入。</td><td>勾選的每台設備</td></tr>
+<tr><td><b>全域</b></td><td>整個網路都受影響，例如對外斷線、停電。不用選設備。</td><td>畫面上方紅色提示列</td></tr>
+</table></div>
+<figure><img src="manual/rp-table.jpg" alt="維修記錄表" loading="lazy"><figcaption>維修記錄表：範圍、對象、狀態、症狀與原因、修復方式，最新的處理紀錄會直接顯示。可依範圍或狀態篩選，也能匯出 CSV。</figcaption></figure>
+<h4>新增一張維修單</h4>
+<ol class="steps">
+<li>按 <b>＋ 新增維修單</b>，或在設備面板按 <b>記錄維修</b>（會自動帶入該設備）。</li>
+<li>最上面的 <b>從故障通知帶入</b> 可挑：<b>設備沒有回應</b>（監控偵測到的）、<b>檢查發現</b>（資料檢查的問題）、<b>查線紀錄</b>（還沒結案的查線）。選了就會填好範圍、對象和症狀，仍可修改。</li>
+<li>填 <b>症狀</b>（怎麼發現的）、<b>原因</b>、<b>修復方式</b>。修復方式下方有常用選項（重新插拔線、更換網路線、重開機…），按一下就加進去。</li>
+<li>狀態分 <b>待處理</b>、<b>處理中</b>、<b>已修復</b>；改成已修復時會自動記下修復時間。</li>
+<li><b>處理紀錄</b>可以自由填寫，每按一次「加入紀錄」就依時間記一則，例如「到現場確認電源燈不亮」「換上備品後恢復」。</li>
+</ol>
+<figure><img src="manual/rp-form.jpg" alt="新增維修單" loading="lazy"><figcaption>新增維修單：上方可從故障通知帶入，下方是處理紀錄。</figcaption></figure>
+<h4>對應到畫布</h4>
+<p>還沒修好的維修單會直接標在拓撲圖上：對象用<b>虛線外框加 🔧</b>，紅色是待處理、黃色是處理中，線路也用虛線。全域故障在畫面上方顯示紅色提示，點一下回到維修記錄。在維修記錄表點任一列，會跳回拓撲圖並框住受影響的對象。已修復的單不再標示，但記錄會保留。</p>
+<figure><img src="manual/rp-map.jpg" alt="畫布上的維修標示" loading="lazy"><figcaption>區域維修：座位區的設備以虛線與 🔧 標出，上方是全域故障提示。</figcaption></figure>
+<div class="note"><b>ℹ️</b>維修記錄會跟著專案儲存（連到 netmap.exe 服務時存在服務裡），也包含在 JSON 備份與歷史版本中；「分享連結」不帶維修記錄。</div>
+
+<h3 id="e-audit">圖面比對（和實際網路對帳）</h3>
+<p>圖是人畫的，機房改了線卻沒更新圖，之後大家照著錯的圖查線，比沒有圖還糟。所以監控服務會定期（預設每 6 小時）讀每台有 SNMP 的網路設備的 <b>LLDP／CDP 鄰居</b>與 <b>MAC 表</b>，和圖上的線比對。右上角的 <b>✓ 按鈕</b>（或 <b>檔案 ▸ 圖面比對</b>）可以看結果，也可以按「現在比對」。</p>
+<figure><img src="manual/audit.jpg" alt="圖面比對" loading="lazy"></figure>
+<div class="tw"><table>
+<tr><th>差異</th><th>意思</th><th>可以怎麼處理</th></tr>
+<tr><td>接錯設備</td><td>圖上這個埠接到 A，但 LLDP／CDP 看到的是 B</td><td>到現場確認後手動改圖</td></tr>
+<tr><td>埠號不同</td><td>接的設備對，但對端的埠號不一樣</td><td>「改成實際的接法」一鍵改</td></tr>
+<tr><td>圖上沒畫</td><td>實際有連線，圖上沒有這條線</td><td>「在圖上補這條線」</td></tr>
+<tr><td>改線沒更新</td><td>終端設備（圖上有填 MAC）的 MAC 出現在別的 Switch 埠</td><td>「改成實際的接法」：把 Switch 那一端移到實際的埠</td></tr>
+<tr><td>終端沒接線</td><td>圖上沒接線，但 MAC 表看得到它接在哪</td><td>「在圖上補這條線」</td></tr>
+<tr><td>有線但沒連線</td><td>圖上兩台網路設備之間有線，那個埠卻沒有連線</td><td>線拔了、對端關機，或圖面過時</td></tr>
+<tr><td>不在圖上的鄰居</td><td>埠上接著一台圖上沒有的設備</td><td>把它加到圖上</td></tr>
+</table></div>
+<ul>
+<li><b>點設備上的「圖面不符」標籤</b>：直接打開這台的設備資訊，列出每一項差異的<b>原因</b>與<b>建議怎麼調整</b>，並可以就地按「改成實際的接法」「在圖上看」或略過。</li>
+<li>兩台設備在現場對調了接孔時（實際的埠已經接著另一條線），「改成實際的接法」會把兩條線的端點一起對調。</li>
+<li>確定圖是對的（例如 LLDP 資訊本身有誤），按 <b>圖是對的，略過</b>；同樣的差異以後不會再提醒。</li>
+<li>接在<b>不受管交換器</b>（例如 D-Link 傻瓜 Switch）後面的電腦，上層 Switch 只看得到它們都在同一個埠，「改線沒更新」可能是誤判，請先到現場確認。</li>
+<li>每條線會記下最後一次被實際資料確認的時間。查線時路徑上每一段線都有標記：<span class="c-ok">✓</span> 實際確認過、<span class="c-warn">✓</span> 超過 7 天沒再確認、<span class="c-bad">!</span> 和實際不符、<b>?</b> 手動資料。勾選「在圖上標出驗證狀態」後，畫布上沒確認過的線畫成虛線、不符的畫成紅色；有差異的設備標「圖面不符」。</li>
+<li>穿過配線架的線也算：只要兩端的 Switch 和終端設備對得上，沿路每一段跳線都算確認過。</li>
+<li>只有<b>開了 SNMP 的網路設備</b>才讀得到 LLDP 與 MAC 表；傻瓜 Switch、沒填 MAC 的終端設備，就只能維持手動資料（標「?」），查線時請以現場為準。</li>
+<li>新的差異可以發告警（告警設定勾「圖面比對發現新的差異」）；比對間隔在 <b>設定 ▸ 心跳與設備偵測</b> 調整，0 代表不自動比對。</li>
+<li><b>IP 衝突</b>：同一個 IP 在 30 分鐘內出現兩個不同的 MAC（例如有人手動設了重複的固定 IP），會記一筆事件並告警（預設開啟）。</li>
+</ul>
+
+<figure class="mid"><img src="manual/audit-why.jpg" alt="點圖面不符看原因與建議" loading="lazy"><figcaption>點「圖面不符」：每一項列出原因與建議，可就地改圖或略過。</figcaption></figure>
+
+<h3 id="s-check">資料檢查與單一設備的變更紀錄</h3>
+<p><b>檔案 ▸ 資料檢查</b> 會掃整份圖，列出：重複的 IP、MAC、線號、設備名稱；線兩端 VLAN 不一致（access／trunk、VLAN 編號）；光纖接到網路線埠、網路線接到 SFP 埠；網路線超過 100 m；聚合只設一端；IP 格式錯誤、IP 和 Gateway 不在同一網段。點任一項就跳到那台設備或那條線。在設備屬性填 IP、MAC 時，和別台重複也會馬上提醒。</p>
+<figure><img src="manual/datacheck.jpg" alt="資料檢查" loading="lazy"></figure>
+<p>點任一台設備或一條線，在屬性面板按 <b>這台的變更紀錄</b>／<b>這條線的變更紀錄</b>，會列出它自己的修改：誰、什麼時候、哪個欄位從什麼改成什麼、哪條線從哪個埠改接到哪個埠。用監控服務網址時從伺服器的歷史版本整理（最近 500 個版本），線上版從瀏覽器自動保存的版本整理。</p>
+<figure><img src="manual/objhist.jpg" alt="單一設備的變更紀錄" loading="lazy"></figure>
+
+</section>
+
+<section id="mobile">
+<h2><span class="n">7</span>手機與平板</h2>
+<p>手機和平板最常用在<b>機房和座位現場</b>：找一條線接到哪、確認某台電腦是哪一段斷了、改完線順手更新圖。這一章照現場的用法說明。</p>
+<div class="note"><b>ℹ️</b>手機、平板不用安裝任何東西，用瀏覽器（Safari、Chrome）打開就好。要看到公司的圖、即時燈號與流量，必須連到<b>監控服務</b>；只打開線上版首頁，看到的是那支手機自己瀏覽器裡的資料。</div>
+
+<h3 id="e-remote">連上監控服務</h3>
+<p>其他裝置<b>不需要安裝任何東西</b>，也不會去讀 netmap.exe：exe 只在服務主機（Windows）上執行，並在背景提供一個網頁；平板、手機、Mac 只是用瀏覽器打開那個網頁。</p>
+<div class="tw"><table>
+<tr><th>平板／手機／其他電腦</th><th></th><th>服務主機（跑 netmap.exe）</th><th></th><th>網路設備</th></tr>
+<tr><td>瀏覽器（Safari、Chrome）</td><td style="white-space:nowrap;text-align:center">⟵ 網頁 ⟶</td><td>圖、燈號、流量紀錄</td><td style="white-space:nowrap;text-align:center">⟵ SNMP ⟶</td><td>Switch、防火牆、AP</td></tr>
+</table></div>
+<ol class="steps">
+<li>在一台<b>固定開機</b>的 Windows 電腦上安裝 RackTrace-Setup.exe（不要裝在會休眠或帶走的筆電），安裝時保留「開機自動啟動」與「允許公司內網的其他電腦用瀏覽器連進來」。</li>
+<li>先完成一次掃描或畫好圖，確認服務在執行（見 <a href="#e-srv">監控服務與即時流量</a>）。</li>
+<li>在平板的瀏覽器輸入服務主機的網址，例如 <code>http://192.168.1.20:18080/</code>。網址可以在服務主機的 exe 視窗按「開啟網頁」後，從網址列看到。</li>
+<li>連上後會看到和服務主機相同的圖，並有即時燈號與流量。要省去輸入網址，可以用「權限與檢視連結」產生的 <b>QR Code</b>，用平板或手機掃描即可。</li></ol>
+<ul>
+<li>平板必須和服務主機在<b>同一個內網</b>（不能接隔離的訪客 Wi-Fi）。不在公司時請先連公司的 VPN。</li>
+<li>連線進來的裝置預設<b>只能看</b>；要編輯需要管理密碼（見「管理密碼與檢視連結」）。</li>
+<li>連不上時，先檢查服務主機的服務有在執行，以及 Windows 防火牆有沒有開放這個埠。</li>
+<li>手機、平板上右鍵改成<b>長按</b>，其他對應的操作見下一節。</li></ul>
+<div class="note"><b>⚠️</b>網頁版（<a href="./">GitHub Pages</a>）本身沒有資料，資料存在你自己的瀏覽器裡。要在平板上看到公司的圖，請連到服務主機，不是打開網頁版首頁。</div>
+
+
+<h3 id="m-map">電腦和手機的操作對照</h3>
+<p>電腦上靠滑鼠右鍵和鍵盤的操作，在手機上都有對應的方式：</p>
+<div class="tw"><table>
+<tr><th>想做的事</th><th>電腦</th><th>手機／平板</th></tr>
+<tr><td>移動畫面</td><td>拖曳空白處</td><td>單指拖曳</td></tr>
+<tr><td>放大縮小</td><td>滾輪、<kbd>+</kbd>／<kbd>−</kbd></td><td>雙指縮放，或右下 <b>−／＋</b></td></tr>
+<tr><td>回到整張圖</td><td><kbd>0</kbd></td><td>右下 <b>⌂</b></td></tr>
+<tr><td>叫出選單（連線到其他設備、拔線…）</td><td>右鍵</td><td><b>長按</b>設備、埠或線</td></tr>
+<tr><td>看一條線的資料、改線號</td><td>點線，屬性列出現在線旁</td><td>點線，屬性列固定在<b>頂部工具列下方</b></td></tr>
+<tr><td>接線</td><td>從埠拖曳到另一個埠</td><td>長按埠 ▸ <b>連線到其他設備…</b></td></tr>
+<tr><td>點很小的埠</td><td>直接點</td><td>點一下會跳出<b>放大的選埠框</b></td></tr>
+<tr><td>選好幾台設備</td><td><kbd>Shift</kbd>＋拖曳</td><td>右下 <b>框選</b> 按鈕，再拖曳</td></tr>
+<tr><td>看設備詳細資料</td><td>點設備，右側面板</td><td>點設備，下方提示卡<b>往上拉</b></td></tr>
+<tr><td>搜尋</td><td>點搜尋列，按 <kbd>Enter</kbd> 跳到結果</td><td>點搜尋列（工具列收起時先展開）</td></tr>
+</table></div>
+
+<h3 id="m-screen">畫面導覽</h3>
+<figure class="narrow"><img src="manual/mobile-map.jpg" alt="手機畫面導覽" loading="lazy"><figcaption>手機畫面（示範資料）。</figcaption></figure>
+<div class="tw"><table>
+<tr><th></th><th>區域</th><th>做什麼</th></tr>
+<tr><td>①</td><td>頂部工具列</td><td>專案、拓樸／機櫃／線路表／排障切換；最右邊的「︿」可以<b>收合</b>，只留這一排，畫面大很多。</td></tr>
+<tr><td>②</td><td>搜尋與按鈕</td><td>搜尋設備、IP、線號；即時燈號、設定、復原、編輯／唯讀。收合工具列時會藏起來。</td></tr>
+<tr><td>③</td><td>左側元件列</td><td>加設備、框選、查線（故障查線）。可以按 <b>–</b> 收成一條。</td></tr>
+<tr><td>④</td><td>畫布工具</td><td>線色、走線、選埠框、框選、顯示圖層。</td></tr>
+<tr><td>⑤</td><td>縮放</td><td><b>−／＋</b>、<b>⌂</b> 回到整張圖、屬性列開關、<b>?</b> 說明。</td></tr>
+</table></div>
+<figure class="narrow"><img src="manual/mobile-bar.jpg" alt="收合工具列與屬性列" loading="lazy"><figcaption>收合上方工具列後點一條線：屬性列固定在工具列下方，可以改線號、線材、速率、顏色或拔線。</figcaption></figure>
+
+<h3 id="m-cases">現場三個常見情境</h3>
+<h4>找一條線接到哪</h4>
+<ol class="steps">
+<li>看線上貼的線號（例如 <code>C41</code>），在搜尋列輸入。</li>
+<li>畫面會跳到那條線並標亮；點那條線，屬性列會顯示線號、線材，按「詳細」看兩端的設備與埠。</li>
+<li>要看整條路徑（穿過配線架、資訊座），點線的任一端的埠。</li>
+</ol>
+<h4>使用者說不能上網</h4>
+<ol class="steps">
+<li>搜尋他的電腦名稱或 IP，看名稱前的燈號：綠＝通、紅＝斷線、灰色「離線」＝手機離開或休眠。</li>
+<li>點左側 <b>查線</b>，再點那台電腦，照清單一段一段檢查，標「正常」或「有問題」。</li>
+<li>找到故障點後按 <b>轉成維修單</b>，回辦公室再補處理經過。</li>
+</ol>
+<h4>改了線，要更新圖</h4>
+<ol class="steps">
+<li>先確認是<b>編輯</b>模式（需要管理密碼時先登入）。</li>
+<li>長按要改的埠 ▸ <b>連線到其他設備…</b>，選對方設備與埠；原本的線要拿掉就長按線 ▸ <b>拔線</b>。</li>
+<li>點新的線，在屬性列填線號。</li>
+</ol>
+<div class="tip"><b>💡</b>只是要看、不想誤觸時，切到<b>唯讀</b>：拖曳、長按都不會改到圖。</div>
+
+<h3 id="m-set">建議設定</h3>
+<ul>
+<li><b>收合頂部工具列</b>：手機畫面小，平常收起來，要搜尋時再展開。設定會記住。</li>
+<li><b>選埠框</b>：48 埠交換器在手機上很小，選埠框可以避免點錯；如果你習慣先放大再點，可以在「畫布工具 ▸ 選埠框」關掉，或在跳出的框按「不再跳出」。</li>
+<li><b>屬性列</b>保持開啟：點線就能直接改線號；關掉的話點線會改開右側（下方）完整面板。</li>
+<li><b>加到主畫面</b>：Safari「分享 ▸ 加入主畫面」、Chrome「⋮ ▸ 加到主畫面」，之後像 App 一樣一鍵打開監控服務的網址。</li>
+</ul>
+<h4>建議回電腦做的事</h4>
+<p>大量排版、匯入檔案（IP／MAC、JSON）、SNMP 掃描、線標列印與設定告警，在手機上可以做但很不方便，建議用電腦。掃描只能在服務主機本機操作。</p>
+
+<h3 id="m-card">現場快速卡（貼在機櫃上）</h3>
+<p>機房裡沒有人會翻開厚厚的手冊。<b>檔案 ▸ 列印現場快速卡</b> 會產生一張 A4：上面有連到這張圖的 <b>QR Code</b>、手機操作對照和「找一條線」的步驟。印出來護貝，貼在機櫃門內側或配線箱上，同事用手機一掃就能開始查線。</p>
+<ul>
+<li>從監控服務開啟時，QR Code 是服務的網址（設了檢視連結就用檢視連結，掃了直接是唯讀）；從線上版開啟時，QR Code 是唯讀分享連結。</li>
+<li>可以填地點名稱（例如「3F 機房 A 櫃」）和聯絡人，印在卡片上方。</li>
+</ul>
+<figure class="mid"><img src="manual/quickcard.jpg" alt="現場快速卡" loading="lazy"><figcaption>現場快速卡（A4，示範資料）。</figcaption></figure>
+</section>
+
+<section id="admin">
+<h2><span class="n">8</span>管理與維護</h2>
+<h3 id="save">儲存、匯出與分享</h3>
+<div class="tw"><table>
+<tr><th>功能</th><th>說明</th></tr>
+<tr><td>自動儲存</td><td>每次修改都存在這台電腦的瀏覽器（清除瀏覽器資料會不見）。</td></tr>
+<tr><td>匯出／匯入 JSON</td><td>完整備份，換電腦或交給同事時使用。</td></tr>
+<tr><td>匯出 CSV</td><td>線路表給 Excel。</td></tr>
+<tr><td>匯出 SVG／PNG</td><td>圖片，貼到報告或列印。</td></tr>
+<tr><td>匯入 LLDP</td><td>貼上 Switch 的 <code>show lldp neighbors</code> 結果，自動建立連線。</td></tr>
+<tr><td>分享連結、QR Code</td><td>把整張圖壓縮進網址，對方打開就是唯讀版，可貼在機櫃上用手機掃。</td></tr>
+<tr><td>歷史版本</td><td>改錯了可以回到之前的版本，見下方。</td></tr>
+<tr><td>線標列印</td><td>每條線兩端的標籤，A4 標籤紙或 Brother P-touch，見 <a href="#s-labels">線標列印</a>。</td></tr>
+</table></div>
+<div class="note"><b>⚠️</b>分享連結包含圖上的 IP、MAC 等資訊，請只給需要的人。</div>
+<p><b>連監控服務時暫時斷線</b>（例如筆電切到飛航模式、Wi-Fi 斷掉）：修改會先暫存在這台裝置，每 5 秒自動重試，連回來就送出，不會遺失。如果這段時間別人也改了圖，會跳出視窗讓你選「<b>留我的</b>」或「<b>用最新的</b>」。重新打開網頁時若還有沒送出的修改，也會詢問要不要送出。</p>
+
+<h3 id="s-history">歷史版本與還原</h3>
+<p><b>檔案 ▸ 歷史版本／還原</b>。改錯、刪錯、匯入蓋掉時，可以回到之前的版本。</p>
+<figure><img src="manual/history.jpg" alt="歷史版本" loading="lazy"><figcaption>監控服務的歷史版本：每一筆記下時間、誰改的、改了什麼。</figcaption></figure>
+<ul>
+<li><b>預覽</b>：先在畫布上看那個版本的圖（只能看），上方會顯示「預覽 #n」，確定再按 <b>還原這個版本</b>，或按 <b>回到目前版本</b>。</li>
+<li><b>還原</b>本身也會記成一筆，還原錯了可以再改回來。<b>下載</b>可以把那個版本存成專案檔。</li>
+<li><b>用監控服務網址開啟時</b>：每次修改都記錄在 netmap.exe 那台電腦，大家看到的是同一份紀錄。同一個人 2 分鐘內的連續修改（例如拖曳排版）合併成一筆，最多保留 500 筆。在視窗上填 <b>你的名字</b>，紀錄就會寫名字而不是電腦 IP。</li>
+<li><b>線上版</b>：存在這台電腦的瀏覽器，有修改時每 5 分鐘自動留一份，匯入專案檔或套用範本前也會先存一份，最多 40 份。換電腦或清除瀏覽器資料就不見了，重要的圖請另外下載專案檔備份。</li>
+</ul>
+
+<div class="note"><b>💾</b><b>沒有連服務時（線上版或單獨開網頁）</b>沒有歷史版本，資料只存在瀏覽器，清除瀏覽資料就會消失。超過 7 天沒有下載專案檔，畫面下方會出現提醒，可以一鍵「下載備份」，或選「7 天後再提醒」。平常也可以用 <b>檔案 ▸ 下載專案檔（JSON）</b> 手動備份，要還原用「開啟專案檔」。</div>
+
+<h3 id="e-auth">管理密碼與檢視連結</h3>
+<p>同一個設定視窗的 <b>權限與檢視連結</b> 分頁。</p>
+<figure><img src="manual/auth.jpg" alt="權限與檢視連結" loading="lazy"></figure>
+<div class="tw"><table>
+<tr><th>誰</th><th>可以做什麼</th></tr>
+<tr><td>netmap.exe 那台電腦</td><td>永遠是管理員：編輯、還原、改設定，不需要密碼。</td></tr>
+<tr><td>登入管理密碼的電腦</td><td>和管理員一樣。右上角有 <b>登入</b>／<b>登出</b>，登入 12 小時內有效（服務重開要重新登入）。</td></tr>
+<tr><td>其他內網電腦</td><td>只能看。沒設密碼又勾了「允許內網其他電腦編輯圖」時可以直接編輯。</td></tr>
+<tr><td>拿到檢視連結的人</td><td>只能看。勾了「沒有連結或密碼就不能看」時，其他人打開網址只會看到登入畫面。</td></tr>
+</table></div>
+<figure class="mid"><img src="manual/login.jpg" alt="管理員登入" loading="lazy"></figure>
+<ul>
+<li><b>檢視連結</b>可以複製或顯示 QR Code，貼在機櫃上或傳給主管。按 <b>重新產生</b> 舊連結就失效。</li>
+<li>密碼輸錯 5 次會鎖 10 分鐘。密碼只存雜湊值，忘記的話在服務主機上重新設定即可。</li>
+<li>沒有視窗的伺服器版可以用命令列：<code>python netmap_server.py --set-password</code>、<code>--view-link</code>。</li>
+</ul>
+<div class="note"><b>⚠️</b>監控服務是內網的 HTTP 連線（沒有加密），請不要直接開放到網際網路或做 Port Forwarding。要從外面看，請走公司的 VPN。也不要放在反向代理後面：所有連線都會被當成來自服務主機本身。</div>
+
+<h3 id="e-webupdate">更新網頁（不用重新安裝）</h3>
+<p>服務的網頁和 <a href="./">線上版</a>是同一份。線上版更新後，從服務主機打開首頁，上方會出現橘色的「<b>有新版網頁 vX.Y.Z，按一下更新</b>」，按下去就會下載並套用，約一秒後重新載入。只有網頁改版時不用重新安裝；程式本身（掃描、監控）有新版才需要重新下載安裝檔。</p>
+<ul>
+<li><b>自動更新網頁</b>：在設定勾選後，服務每 6 小時檢查一次，有新版網頁就自動套用，手機、平板重新整理就是新版。</li>
+<li>線上版偵測到 netmap.exe 時，有「<b>開啟並更新網頁</b>」按鈕，一鍵打開本機網頁並更新。</li>
+<li>同一台電腦同時跑著<b>背景服務</b>（安裝版，預設 8080）和 <b>netmap.exe 視窗</b>（預設 18080）時，兩邊的資料是分開的；偵測畫面會列出兩個，請固定使用同一個。</li>
+</ul>
+
+<h3 id="e-update">更新程式</h3>
+<p>netmap.exe 啟動時會檢查是否有新版本，有的話標題列會出現「<b>有新版本</b>」，點一下會下載 <b>RackTrace-Setup.exe</b>。直接執行它，安裝程式會自動停止舊版、覆蓋 <code>C:\Program Files\RackTrace</code> 裡的檔案並重新啟動服務；設定與流量紀錄都會保留（存在 <code>C:\ProgramData\netmap</code>）。免安裝版（單獨的 netmap.exe）則要自己關掉程式後取代舊檔。</p>
+
+<h3 id="e-col">收集樣本（給 log 分析與設定檔備份開發用）</h3>
+<figure class="mid"><img src="manual/app-col.jpg" alt="收集樣本分頁" loading="lazy"></figure>
+<p>這個分頁是為了開發「log 分析告警」與「設定檔自動備份」而收集真實資料。只接收與讀取，不會修改設備設定。</p>
+<ul>
+<li><b>① 收集 log 樣本</b>：勾 Syslog（UDP 514）與／或 SNMP Trap（UDP 162），按開始。把設備的 Syslog 伺服器（或 Trap 目的地）設成畫面上顯示的這台電腦 IP。收集一段時間後按「停止並存檔」，按「開啟樣本資料夾」找到檔案。</li>
+<li><b>② 設備登入紀錄</b>：填設備 IP、SSH 埠、帳號、密碼（需要時加 enable 密碼），選設備類型，按「登入並記錄」。程式會執行唯讀指令（例如 <code>show running-config</code>），自動處理 <code>--More--</code>，並<b>自動遮蔽密碼、community 與金鑰</b>。密碼不會被儲存。</li>
+</ul>
+<div class="note"><b>⚠️</b>樣本檔傳給開發者前，請再看一次內容，把不想公開的 IP、名稱改掉。<b>不要把真實密碼傳給任何人</b>。</div>
+
+</section>
+
+<section id="vendor">
+<h2><span class="n">A</span>附錄：各廠牌設定教學</h2>
+<a id="e-vendor"></a><p>netmap.exe 的「掃描」分頁（各廠牌怎麼開 SNMP？）、「誰在用流量」分頁，以及網頁開始頁的本地端分頁、流量排行，都可以打開設定教學。netmap.exe 裡會自動代入這台電腦的 IP，指令可以直接複製。</p>
 <figure><img src="manual/vendor-guide.jpg" alt="各廠牌設定教學" loading="lazy"></figure>
 <p>以下是目前收錄的廠牌（{IP} 代表 netmap.exe 那台電腦的 IP，選單位置依韌體版本可能略有不同）：</p>
 <details class="vend"><summary><b>SonicWall</b> <span style="color:var(--ink2);font-size:13px">防火牆（SonicOS 7） · 流量匯出：IPFIX（建議）／NetFlow v9／v5</span></summary><p><b>開啟 SNMP</b></p><ol><li>Device ▸ Settings ▸ SNMP：勾選 Enable SNMP，在 View 設定唯讀 community「netmap-ro」（或建立 SNMPv3 使用者）。</li><li>Network ▸ System ▸ Interfaces：編輯 LAN 介面（例如 X0），在 Management 勾選 SNMP，允許從內網查詢。</li><li>存取規則若有限制，允許 <b>{IP}</b> 連到防火牆的 UDP 161。</li></ol><p><b>流量匯出</b></p><ol><li>Device ▸ AppFlow ▸ Flow Reporting ▸ Settings：Report Connections 選 All（或 Interface-based 只報指定介面）。</li><li>External Collector 分頁：勾選「Send Flows and Real-Time Data To External Collector」（可能需要重新開機）。</li><li>External Flow Reporting Format 選 IPFIX，External Collector&#x27;s IP 填 <b>{IP}</b>，Port 填 2055。</li><li>按 Generate ALL Templates 產生範本，再按 Accept。</li></ol><p style="font-size:13px"><a href="https://www.sonicwall.com/support/technical-documentation/docs/sonicos-7-1-appflow_device/Content/appflow-d-flow-reporting-user-config-netflow-v10.htm" target="_blank" rel="noopener">原廠說明 ↗</a></p></details>
@@ -745,175 +1005,10 @@ interface ethernet 1/1/1
 sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 <div class="tip"><b>💡</b>建議所有設備用同一組唯讀 community（例如「netmap-ro」）或同一組 SNMPv3 帳密，並只允許 netmap.exe 那台電腦（<b>{IP}</b>）查詢。不要用 public，也不要開寫入權限。<br>流量匯出只要開在一台設備上就夠了（通常是防火牆，在 LAN 介面開）。同一台設備的同一份流量若在多個介面都匯出，可能會重複計算。</div>
 
-<h3 id="e-ping">心跳與事件</h3>
-<p>監控服務每 30 秒 Ping 一次圖上所有有 IP 的設備（電腦、印表機、攝影機也算），不需要 SNMP。</p>
-<figure><img src="manual/lamps.jpg" alt="Ping 燈號" loading="lazy"><figcaption>設備名稱前的燈號：綠＝正常、黃＝延遲偏高、紅（閃爍）＝斷線。斷線的設備外框變紅並標「斷線」；SNMP 沒回應但 Ping 得到的標「SNMP 無回應」。</figcaption></figure>
-<div class="grid2" style="align-items:start">
-<figure class="narrow" style="margin:6px 0"><img src="manual/ping-panel.jpg" alt="設備的心跳卡片" loading="lazy"><figcaption>設備屬性的「網路流量」分頁：心跳狀態、延遲、平均與遺失率，以及最近一小時的延遲曲線（畫面中的位址已遮蔽）。</figcaption></figure>
-<ul>
-<li>點設備 ▸「網路流量」分頁：目前延遲、平均、最近一小時的遺失率、延遲曲線（紅色直條＝那次沒回應），以及這台的最近事件。</li>
-<li>連續失敗 2 次才算斷線，避免一次掉包就誤報。次數、間隔、延遲門檻可以在設定裡改。</li>
-<li>設備擋 ICMP 時，會改試幾個常用的 TCP 埠（對方回「拒絕連線」也代表它在線）。</li>
-<li>類型是<b>手機</b>的設備斷線只標灰色「離線」，不算故障、不發通知。會休眠的筆電可以勾「這台不要 Ping」，避免下班後一直顯示斷線。</li>
-</ul></div>
-<p>右上角的<b>鈴鐺</b>是事件紀錄：設備斷線與恢復（附斷了多久）、主幹埠離線、SNMP 沒回應、新設備加入、IP 變更都會記下來，保留 180 天，可以下載 CSV。有新事件時鈴鐺會顯示數字，發生異常時畫面上也會跳提示。</p>
-<figure><img src="manual/events.jpg" alt="事件紀錄" loading="lazy"></figure>
-<p><b>主幹埠</b>是指透過 SNMP／SSH 讀得到狀態、而且線（穿過配線架）另一端是 Switch、AP、路由器、防火牆、伺服器、NAS、NVR 的埠。接電腦的埠下班關機就會離線，所以不會算進來。個別的埠可以在「埠設定 ▸ 離線告警」改成一定通知或不通知。</p>
-
-<h3 id="e-alert">告警通知（Telegram、Discord、Slack、Teams、LINE、Email）</h3>
-<p>netmap.exe「監控服務」分頁按 <b>告警、密碼與檢視連結</b>（或在監控網頁按 <b>檔案 ▸ 告警、心跳與權限設定</b>），切到 <b>告警通知</b>。</p>
-<figure><img src="manual/alert.jpg" alt="告警通知設定" loading="lazy"></figure>
-<ol class="steps">
-<li>勾 <b>開啟告警通知</b>，選要通知哪些事件。預設是設備斷線、主幹埠離線，以及恢復。</li>
-<li>選管道類型 ▸ <b>新增通知管道</b>，填 Token 或 Webhook 網址，按 <b>新增</b>。</li>
-<li>按 <b>測試</b>，確認手機或頻道收得到。</li>
-<li>按 <b>儲存</b>。</li>
-</ol>
-<div class="tw"><table>
-<tr><th>管道</th><th>要準備什麼</th></tr>
-<tr><td>Telegram</td><td>找 <code>@BotFather</code> 建立機器人取得 Bot Token；把機器人加進群組，用 <code>@userinfobot</code> 或 getUpdates 查 Chat ID（群組是負數）。</td></tr>
-<tr><td>Discord</td><td>頻道設定 ▸ 整合 ▸ Webhook ▸ 新增，複製 Webhook 網址。</td></tr>
-<tr><td>Slack</td><td>建立 Slack App，開啟 Incoming Webhooks，選頻道後複製網址。</td></tr>
-<tr><td>Microsoft Teams</td><td>在頻道用 Workflows 建立「收到 Webhook 要求時張貼到頻道」，複製網址（舊的 Office 365 連接器已停用）。</td></tr>
-<tr><td>LINE</td><td>LINE Notify 已在 2025 年 3 月 31 日停止服務。請在 LINE Developers 建立 <b>Messaging API</b> 頻道，發行 Channel access token；收件者是使用者 ID（U 開頭）或群組 ID（C 開頭）。免費方案每月有則數上限。</td></tr>
-<tr><td>Email</td><td>SMTP 主機、連接埠、帳號密碼、收件者。Gmail 請用「應用程式密碼」，主機 smtp.gmail.com、587、STARTTLS。</td></tr>
-<tr><td>自訂 Webhook</td><td>送出 JSON <code>{source, title, text, events:[…]}</code>，可以接自己的系統或 n8n、Make。</td></tr>
-</table></div>
-<ul>
-<li>20 秒內發生的事件合併成一則訊息，整台 Switch 斷線時不會連續洗版。</li>
-<li><b>地點名稱</b>會出現在訊息開頭，例如「[RackTrace 台北總公司] 🔴 SW-CORE 斷線」，幫好幾個地方顧網路時分得出來。</li>
-<li>Token、密碼只存在 netmap.exe 那台電腦（Windows 用 DPAPI 加密），網頁上只會顯示「已設定」。</li>
-<li>告警要靠 netmap.exe 持續執行。要 24 小時監控的話，勾「Windows 開機時自動執行」，並把電源設定成不睡眠。</li>
-</ul>
-
-<h3 id="e-auth">管理密碼與檢視連結</h3>
-<p>同一個設定視窗的 <b>權限與檢視連結</b> 分頁。</p>
-<figure><img src="manual/auth.jpg" alt="權限與檢視連結" loading="lazy"></figure>
-<div class="tw"><table>
-<tr><th>誰</th><th>可以做什麼</th></tr>
-<tr><td>netmap.exe 那台電腦</td><td>永遠是管理員：編輯、還原、改設定，不需要密碼。</td></tr>
-<tr><td>登入管理密碼的電腦</td><td>和管理員一樣。右上角有 <b>登入</b>／<b>登出</b>，登入 12 小時內有效（服務重開要重新登入）。</td></tr>
-<tr><td>其他內網電腦</td><td>只能看。沒設密碼又勾了「允許內網其他電腦編輯圖」時可以直接編輯。</td></tr>
-<tr><td>拿到檢視連結的人</td><td>只能看。勾了「沒有連結或密碼就不能看」時，其他人打開網址只會看到登入畫面。</td></tr>
-</table></div>
-<figure class="mid"><img src="manual/login.jpg" alt="管理員登入" loading="lazy"></figure>
-<ul>
-<li><b>檢視連結</b>可以複製或顯示 QR Code，貼在機櫃上或傳給主管。按 <b>重新產生</b> 舊連結就失效。</li>
-<li>密碼輸錯 5 次會鎖 10 分鐘。密碼只存雜湊值，忘記的話在服務主機上重新設定即可。</li>
-<li>沒有視窗的伺服器版可以用命令列：<code>python netmap_server.py --set-password</code>、<code>--view-link</code>。</li>
-</ul>
-<div class="note"><b>⚠️</b>監控服務是內網的 HTTP 連線（沒有加密），請不要直接開放到網際網路或做 Port Forwarding。要從外面看，請走公司的 VPN。也不要放在反向代理後面：所有連線都會被當成來自服務主機本身。</div>
-
-<h3 id="e-seen">網路上的設備（新加入／很久沒出現）</h3>
-<p>監控網頁 <b>檔案 ▸ 網路上的設備</b>。監控服務會整理網路上出現過的每個 MAC 位址：</p>
-<figure><img src="manual/seen.jpg" alt="網路上的設備" loading="lazy"></figure>
-<ul>
-<li>資料來源：路由器、防火牆、L3 Switch 的 ARP 表（有 SNMP 的話，每 10 分鐘讀一次）、SSH 監控路由器的用戶端清單，以及 netmap.exe 那台電腦自己的 ARP 表。</li>
-<li>每個來源（每台路由器、Switch）第一次讀到的那批當作原本就在；之後出現的才算 <b>新加入</b>，同一台 IP 改變會記成 <b>IP 變更</b>。要收到通知，在告警設定勾「新設備加入網路」。</li>
-<li><b>不在圖上</b>：圖上沒有這個 MAC 或 IP 的設備，按 <b>加到圖上</b> 會建一台終端設備（名稱、廠牌、IP、MAC 自動帶入），再接線或設成無線即可。</li>
-<li><b>很久沒出現</b>：超過設定的時數（預設 24 小時）沒看到。圖上有填 MAC 的設備很久沒出現時可以發通知，適合盤點壞掉或被搬走的設備。</li>
-<li>手機常用「隨機 MAC」（廠牌顯示「隨機 MAC」），換個 Wi-Fi 或過一段時間 MAC 就會變，可能被當成新設備。</li>
-</ul>
-<figure><img src="manual/app-svc.jpg" alt="netmap.exe 監控服務分頁" loading="lazy"><figcaption>netmap.exe 監控服務分頁：網址旁的按鈕打開告警設定與事件紀錄；設備清單的狀態欄會顯示 Ping 延遲。</figcaption></figure>
-
-<h3 id="e-audit">圖面比對（和實際網路對帳）</h3>
-<p>圖是人畫的，機房改了線卻沒更新圖，之後大家照著錯的圖查線，比沒有圖還糟。所以監控服務會定期（預設每 6 小時）讀每台有 SNMP 的網路設備的 <b>LLDP／CDP 鄰居</b>與 <b>MAC 表</b>，和圖上的線比對。右上角的 <b>✓ 按鈕</b>（或 <b>檔案 ▸ 圖面比對</b>）可以看結果，也可以按「現在比對」。</p>
-<figure><img src="manual/audit.jpg" alt="圖面比對" loading="lazy"></figure>
-<div class="tw"><table>
-<tr><th>差異</th><th>意思</th><th>可以怎麼處理</th></tr>
-<tr><td>接錯設備</td><td>圖上這個埠接到 A，但 LLDP／CDP 看到的是 B</td><td>到現場確認後手動改圖</td></tr>
-<tr><td>埠號不同</td><td>接的設備對，但對端的埠號不一樣</td><td>「改成實際的接法」一鍵改</td></tr>
-<tr><td>圖上沒畫</td><td>實際有連線，圖上沒有這條線</td><td>「在圖上補這條線」</td></tr>
-<tr><td>改線沒更新</td><td>終端設備（圖上有填 MAC）的 MAC 出現在別的 Switch 埠</td><td>「改成實際的接法」：把 Switch 那一端移到實際的埠</td></tr>
-<tr><td>終端沒接線</td><td>圖上沒接線，但 MAC 表看得到它接在哪</td><td>「在圖上補這條線」</td></tr>
-<tr><td>有線但沒連線</td><td>圖上兩台網路設備之間有線，那個埠卻沒有連線</td><td>線拔了、對端關機，或圖面過時</td></tr>
-<tr><td>不在圖上的鄰居</td><td>埠上接著一台圖上沒有的設備</td><td>把它加到圖上</td></tr>
-</table></div>
-<ul>
-<li><b>點設備上的「圖面不符」標籤</b>：直接打開這台的設備資訊，列出每一項差異的<b>原因</b>與<b>建議怎麼調整</b>，並可以就地按「改成實際的接法」「在圖上看」或略過。</li>
-<li>兩台設備在現場對調了接孔時（實際的埠已經接著另一條線），「改成實際的接法」會把兩條線的端點一起對調。</li>
-<li>確定圖是對的（例如 LLDP 資訊本身有誤），按 <b>圖是對的，略過</b>；同樣的差異以後不會再提醒。</li>
-<li>接在<b>不受管交換器</b>（例如 D-Link 傻瓜 Switch）後面的電腦，上層 Switch 只看得到它們都在同一個埠，「改線沒更新」可能是誤判，請先到現場確認。</li>
-<li>每條線會記下最後一次被實際資料確認的時間。查線時路徑上每一段線都有標記：<span class="c-ok">✓</span> 實際確認過、<span class="c-warn">✓</span> 超過 7 天沒再確認、<span class="c-bad">!</span> 和實際不符、<b>?</b> 手動資料。勾選「在圖上標出驗證狀態」後，畫布上沒確認過的線畫成虛線、不符的畫成紅色；有差異的設備標「圖面不符」。</li>
-<li>穿過配線架的線也算：只要兩端的 Switch 和終端設備對得上，沿路每一段跳線都算確認過。</li>
-<li>只有<b>開了 SNMP 的網路設備</b>才讀得到 LLDP 與 MAC 表；傻瓜 Switch、沒填 MAC 的終端設備，就只能維持手動資料（標「?」），查線時請以現場為準。</li>
-<li>新的差異可以發告警（告警設定勾「圖面比對發現新的差異」）；比對間隔在 <b>設定 ▸ 心跳與設備偵測</b> 調整，0 代表不自動比對。</li>
-<li><b>IP 衝突</b>：同一個 IP 在 30 分鐘內出現兩個不同的 MAC（例如有人手動設了重複的固定 IP），會記一筆事件並告警（預設開啟）。</li>
-</ul>
-
-<figure class="mid"><img src="manual/audit-why.jpg" alt="點圖面不符看原因與建議" loading="lazy"><figcaption>點「圖面不符」：每一項列出原因與建議，可就地改圖或略過。</figcaption></figure>
-
-<h3 id="e-hub">沒有管理功能的設備（HUB、傻瓜 Switch、數據機）</h3>
-<p>很多現場的線路亂，是因為中間有不能登入的設備。這些設備不需要 SNMP，也一樣能畫進圖裡：</p>
-<table>
-<tr><th>情況</th><th>怎麼處理</th></tr>
-<tr><td>HUB、傻瓜 Switch</td><td>手動新增為一般設備（類型選 Hub），把線連到它的埠。路徑追蹤會穿過它。上游有管理功能的 Switch 會在 MAC 表看到「這個埠後面有哪些設備」，所以能知道終端掛在哪個 HUB 之後。</td></tr>
-<tr><td>ISP 數據機（光世代）</td><td>業者管理，通常沒有 SNMP。手動新增，用 Ping 心跳看它有沒有斷線。流量看自己路由器接它的 WAN 埠。</td></tr>
-<tr><td>家用路由器</td><td>多半沒有 SNMP。有開 SSH 的可以用「SSH 監控」；其他用網段探索（ping＋ARP）找出在線設備。</td></tr>
-</table>
-<ul>
-<li><b>掃描到不受管交換器時</b>：MAC 表只能看出「這些設備在這個埠後面」，看不出接第幾孔，所以掃描<b>不會替它們自動接線</b>。名稱（DNS）和 IP 對得上的設備會加到圖上並標橘色「<b>待接線</b>」，其他的列在交換器的備註裡。確認現場後再手動接線，標籤就會消失。</li>
-<li><b>看不出的部分</b>：設備接在 HUB 的第幾個埠，系統無法自動判斷，需要到現場確認後手動連線。</li>
-<li><b>建議順序</b>：先掃有管理功能的核心 Switch 與防火牆，讓主幹和 MAC 表自動建立；再用網段探索補齊終端；最後一個樓層一個機櫃地手動補 HUB 與接線，不要一次整理全部。</li>
-<li><b>現場配合</b>：查出一條線就貼上編號（「線標列印」可產生 A4 或標籤機貼紙），並記在系統裡，下次不用重查。查不出來時可用查線器（音頻探測器）或看設備燈號輔助。</li>
-</ul>
-<h3 id="e-ipmac">匯入 IP／MAC 對照表（防火牆 DHCP、ARP）</h3>
-<p>圖上只有 MAC、沒有 IP 的設備，可以用防火牆匯出的表格補上。<b>檔案 ▸ 匯入 IP／MAC 對照</b>，貼上內容或選檔案（CSV、TSV、文字都可以；SonicWall、Fortinet 等匯出的 DHCP 租約、ARP 表直接可用，UTF-16、Big5 編碼也會自動辨識）。</p>
-<ul>
-<li>依標題列找出 IP、MAC、名稱、廠商欄位；有廠商欄時會順便判斷設備類型。</li>
-<li>同一個 MAC 對到好幾個 IP（例如防火牆自己的介面、Proxy ARP）的列會略過，避免填錯。</li>
-<li>你<b>手動改過 IP</b> 的設備會保留你的設定，不會被表格覆蓋；手動改 IP 時如果這個 MAC 在表格裡對到別的 IP，也會提醒你。</li>
-<li>名稱還是 MAC 的終端設備，填上 IP 後會改用 IP 當名稱。</li>
-<li><b>圖上沒有的設備也加進來</b>（預設勾選，只加內網 IP）：知道在哪台不受管交換器後面的放在它旁邊，其他的放在圖下方的「待接線」區，都標橘色「待接線」。</li>
-</ul>
-
-<h3 id="e-col">收集樣本（給 log 分析與設定檔備份開發用）</h3>
-<figure class="mid"><img src="manual/app-col.jpg" alt="收集樣本分頁" loading="lazy"></figure>
-<p>這個分頁是為了開發「log 分析告警」與「設定檔自動備份」而收集真實資料。只接收與讀取，不會修改設備設定。</p>
-<ul>
-<li><b>① 收集 log 樣本</b>：勾 Syslog（UDP 514）與／或 SNMP Trap（UDP 162），按開始。把設備的 Syslog 伺服器（或 Trap 目的地）設成畫面上顯示的這台電腦 IP。收集一段時間後按「停止並存檔」，按「開啟樣本資料夾」找到檔案。</li>
-<li><b>② 設備登入紀錄</b>：填設備 IP、SSH 埠、帳號、密碼（需要時加 enable 密碼），選設備類型，按「登入並記錄」。程式會執行唯讀指令（例如 <code>show running-config</code>），自動處理 <code>--More--</code>，並<b>自動遮蔽密碼、community 與金鑰</b>。密碼不會被儲存。</li>
-</ul>
-<div class="note"><b>⚠️</b>樣本檔傳給開發者前，請再看一次內容，把不想公開的 IP、名稱改掉。<b>不要把真實密碼傳給任何人</b>。</div>
-
-<h3 id="e-home">在家測試（例如 ASUS 路由器）</h3>
-<ol class="steps">
-<li><b>網段探索</b>：輸入家裡的網段（例如 <code>192.168.1.0/24</code>），可以看到手機、電視、NAS 等。</li>
-<li><b>流量圖</b>：路由器開啟 SSH（只限 LAN）後，在「監控服務」按「加入 SSH 設備…」，就能看到 WAN、LAN、Wi-Fi 的即時流量與 MRTG 流量圖。</li>
-<li><b>Syslog</b>：在 ASUS 路由器管理頁「系統記錄 → 遠端記錄伺服器」填這台電腦的 IP，回到 netmap.exe 開始收集，重開 Wi-Fi 或拔插網路線就會有 log 進來。也可以按「傳送測試訊息」確認接收正常。</li>
-<li><b>SSH</b>：在「系統管理 → 系統設定」把 SSH 設為<b>只限 LAN</b> 開啟，用路由器帳號登入並記錄。<b>測完請記得關閉 SSH</b>。</li>
-</ol>
-
-<h3 id="e-webupdate">更新網頁（不用重新安裝）</h3>
-<p>服務的網頁和 <a href="./">線上版</a>是同一份。線上版更新後，從服務主機打開首頁，上方會出現橘色的「<b>有新版網頁 vX.Y.Z，按一下更新</b>」，按下去就會下載並套用，約一秒後重新載入。只有網頁改版時不用重新安裝；程式本身（掃描、監控）有新版才需要重新下載安裝檔。</p>
-<ul>
-<li><b>自動更新網頁</b>：在設定勾選後，服務每 6 小時檢查一次，有新版網頁就自動套用，手機、平板重新整理就是新版。</li>
-<li>線上版偵測到 netmap.exe 時，有「<b>開啟並更新網頁</b>」按鈕，一鍵打開本機網頁並更新。</li>
-<li>同一台電腦同時跑著<b>背景服務</b>（安裝版，預設 8080）和 <b>netmap.exe 視窗</b>（預設 18080）時，兩邊的資料是分開的；偵測畫面會列出兩個，請固定使用同一個。</li>
-</ul>
-<h3 id="e-update">更新程式</h3>
-<p>netmap.exe 啟動時會檢查是否有新版本，有的話標題列會出現「<b>有新版本</b>」，點一下會下載 <b>RackTrace-Setup.exe</b>。直接執行它，安裝程式會自動停止舊版、覆蓋 <code>C:\Program Files\RackTrace</code> 裡的檔案並重新啟動服務；設定與流量紀錄都會保留（存在 <code>C:\ProgramData\netmap</code>）。免安裝版（單獨的 netmap.exe）則要自己關掉程式後取代舊檔。</p>
-</section>
-
-<section id="mobile">
-<h2><span class="n">11</span>手機操作</h2>
-<figure class="narrow"><img src="manual/mobile-bar.jpg" alt="收合工具列與屬性列" loading="lazy"><figcaption>收合上方工具列後點線：屬性列固定在工具列下方。</figcaption></figure>
-<div class="grid2" style="align-items:start">
-<figure class="narrow" style="margin:6px 0"><img src="manual/mobile.jpg" alt="手機畫面" loading="lazy"></figure>
-<ul>
-<li><b>單指拖曳</b>平移，<b>雙指</b>縮放。</li>
-<li>點設備時，下方出現<b>提示卡</b>顯示名稱與 IP，不會擋住畫面；<b>往上拉</b>才展開完整的設定。</li>
-<li><b>收合上方工具列</b>：第一排最右邊的「︿」按一下，只留 Logo、專案和視圖切換一排，畫面大很多；再按一次展開。</li>
-<li><b>點線</b>：屬性列固定出現在頂部工具列下方，可以改線號、線材、速率、顏色或拔線；按「詳細」開啟完整的線路屬性。手機上線的感應範圍比電腦寬，縮小畫面也點得到。</li>
-<li><b>長按</b>設備、埠或線，等同電腦上的右鍵選單（連線到其他設備、開啟線路屬性、拔線…）。</li>
-<li>埠太小時點一下會跳出放大的選埠框；不需要的話按框上的「不再跳出」，或在「畫布工具 ▸ 選埠框」關掉。</li>
-<li>適合現場查線：把分享連結或 QR Code 貼在機櫃上，手機掃了就能看（唯讀）。</li>
-</ul>
-</div>
 </section>
 
 <section id="keys">
-<h2><span class="n">12</span>快捷鍵</h2>
+<h2><span class="n">B</span>附錄：快捷鍵</h2>
 <div class="tw"><table>
 <tr><th>按鍵／動作</th><th>功能</th></tr>
 <tr><td>拖曳埠 → 埠</td><td>接線</td></tr>
@@ -938,7 +1033,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 </section>
 
 <section id="faq">
-<h2><span class="n">13</span>常見問題</h2>
+<h2><span class="n">C</span>附錄：常見問題</h2>
 <h3>以前用 LINE Notify 收通知，現在不能用了？</h3>
 <p>LINE Notify 已在 2025 年 3 月 31 日停止服務。改用 Telegram、Discord（免費、設定最簡單），或 LINE 官方帳號的 Messaging API，見 <a href="#e-alert">告警通知</a>。</p>
 <h3>告警一直沒收到？</h3>
@@ -964,8 +1059,9 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 </section>
 
 <section id="changelog">
-<h2><span class="n">14</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v3.21.45　手機可以收合上方工具列</b><span class="tag new">最新 · 2026-11-17</span><span class="tag">netmap.exe 1.20.19</span></div><ul><li>手機和平板上，上方工具列最右邊多了一個「︿」按鈕：按一下只留下 Logo、專案和視圖切換一排，畫面空間大很多；再按一次展開搜尋、即時、設定等按鈕。會記住你的選擇。</li></ul></div>
+<h2><span class="n">D</span>版本紀錄</h2>
+<div class="clog"><div class="v"><b>v3.21.46　列印現場快速卡、使用手冊改版</b><span class="tag new">最新 · 2026-11-17</span><span class="tag">netmap.exe 1.20.19</span></div><ul><li>檔案選單新增「列印現場快速卡（貼機櫃）」：A4 一張，有連到線路圖的 QR Code、手機操作對照、找線和故障排查的步驟，可以填地點名稱與聯絡人。用監控服務時 QR Code 指向服務（有檢視連結就用檢視連結），線上版則是唯讀分享連結。</li><li>使用手冊依「要做什麼」重新分章：開始使用、畫圖、自動建圖、查線與檢視、監控、出問題時、手機與平板、管理與維護，另附各廠牌設定、快捷鍵、常見問題；新增「手機與平板」一章。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.21.45　手機可以收合上方工具列</b><span class="tag">2026-11-17</span><span class="tag">netmap.exe 1.20.19</span></div><ul><li>手機和平板上，上方工具列最右邊多了一個「︿」按鈕：按一下只留下 Logo、專案和視圖切換一排，畫面空間大很多；再按一次展開搜尋、即時、設定等按鈕。會記住你的選擇。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.21.44　修正手機屬性列被頂部工具列蓋住</b><span class="tag">2026-11-17</span><span class="tag">netmap.exe 1.20.19</span></div><ul><li>部分手機瀏覽器上，屬性列會躲在頂部工具列後面，只露出最後一個「×」。現在每次顯示都會實際量工具列的位置並放在它下方，也一定疊在工具列上面。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.21.43　手機上的屬性列固定在頂部</b><span class="tag">2026-11-17</span><span class="tag">netmap.exe 1.20.19</span></div><ul><li>手機上點線或設備時，屬性列改成固定顯示在頂部工具列下方。原本它會跟著線的中點走，線很長、中點在畫面外或被工具列擋住時就看不到。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.21.42　手機點線更容易點中</b><span class="tag">2026-11-17</span><span class="tag">netmap.exe 1.20.19</span></div><ul><li>手機、平板上線路的感應範圍加寬約一倍，縮小畫面時也比較容易點到線，點中後會打開線路屬性（線號、線材、顏色等）。</li></ul></div>
@@ -1135,7 +1231,8 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 <div class="clog"><div class="v"><b>v1.0　第一版</b><span class="tag">2026-11-06</span></div><ul><li>防火牆、Switch、配線架、資訊座埠對埠接線，點埠追蹤整條路徑</li><li>產業範例與自動排版</li></ul></div>
 </section>
 
-<p class="foot">RackTrace · 網頁 v3.21.45 · netmap.exe v1.20.13 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+
+<p class="foot">RackTrace · 網頁 v3.21.46 · netmap.exe v1.20.13 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>

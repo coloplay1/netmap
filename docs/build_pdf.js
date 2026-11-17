@@ -6,7 +6,7 @@ const logo=fs.readFileSync(ROOT+'/racktrace-logo.svg','utf8').replace(/width="\d
 const CSS=`@page{size:A4;margin:15mm 15mm 17mm}
 *{box-shadow:none!important;text-shadow:none!important;filter:none!important;backdrop-filter:none!important}
 html{scroll-padding-top:0}body{background:#fff!important;font-size:10.4pt;line-height:1.7}
-header.top,nav.toc,#tocBtn,.hero,.toTop,#toTop,.foot{display:none!important}
+header.top,nav.toc,#tocBtn,.hero,.toTop,#toTop,.foot,section#changelog{display:none!important}
 .wrap{display:block!important;max-width:none!important;padding:0!important}main{max-width:none!important;padding:0!important;margin:0!important}
 section{break-before:page;padding-top:0!important;margin-top:0!important;border:0!important}
 h2{margin-top:0!important;font-size:19pt!important}h2,h3,h4{break-after:avoid}
@@ -40,9 +40,9 @@ async function render(pages){const b=await chromium.launch();const p=await b.new
   const heads=await p.evaluate(({css,logo,ver,pages})=>{document.documentElement.setAttribute('data-theme','light');
     const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
     document.querySelectorAll('img').forEach(i=>i.loading='eager');document.querySelectorAll('details').forEach(d=>d.open=true);
-    const heads=[];document.querySelectorAll('main section').forEach(s=>{const h=s.querySelector('h2');if(!h||s.id==='changelog'&&false)return;const nn=h.querySelector('.n');const nt=nn?nn.textContent:'';heads.push({id:s.id,t:h.textContent.replace(nt,'').trim(),n:nt,lv:1});s.querySelectorAll('h3[id]').forEach(h3=>heads.push({id:h3.id,t:h3.textContent.trim(),lv:2}))});
+    const heads=[];document.querySelectorAll('main section').forEach(s=>{const h=s.querySelector('h2');if(!h||s.id==='changelog')return;const nn=h.querySelector('.n');const nt=nn?nn.textContent:'';heads.push({id:s.id,t:h.textContent.replace(nt,'').trim(),n:nt,lv:1});s.querySelectorAll('h3[id]').forEach(h3=>heads.push({id:h3.id,t:h3.textContent.trim(),lv:2}))});
     const d=new Date();const cover=document.createElement('div');cover.id='cover';
-    cover.innerHTML=`<div class="chero"><div class="card"><div class="lg">${logo.replace(/viewBox="[^"]*"/,'viewBox="110 100 560 360"')}</div></div><div class="ht"><div class="n">RackTrace</div><div class="s">DATA CENTER NETWORK CABLE MAPPING</div><div class="z">機房線路對應圖</div><div class="u">使 用 手 冊</div></div></div><div class="info"><b>點一個埠，整條線路亮起來。</b><br>手動畫圖、查線、故障查線；搭配本地端 netmap.exe 可自動掃描、即時監控與流量排行。<div class="v">網頁版 v${ver.web}　·　netmap.exe v${ver.exe}<br>${d.getFullYear()} 年 ${d.getMonth()+1} 月<br>https://coloplay1.github.io/netmap/</div></div>`;
+    cover.innerHTML=`<div class="chero"><div class="card"><div class="lg">${logo.replace(/viewBox="[^"]*"/,'viewBox="110 100 560 360"')}</div></div><div class="ht"><div class="n">RackTrace</div><div class="s">DATA CENTER NETWORK CABLE MAPPING</div><div class="z">機房線路對應圖</div><div class="u">使 用 手 冊</div></div></div><div class="info"><b>點一個埠，整條線路亮起來。</b><br>手動畫圖、查線、故障查線；搭配本地端 netmap.exe 可自動掃描、即時監控與流量排行。<div class="v">網頁版 v${ver.web}　·　netmap.exe v${ver.exe}<br>${d.getFullYear()} 年 ${d.getMonth()+1} 月<br>https://coloplay1.github.io/netmap/<br>各版本的更新內容請見線上手冊的「版本紀錄」</div></div>`;
     const toc=document.createElement('div');toc.id='tocp';toc.innerHTML='<h2>目錄</h2><ol>'+heads.map(h=>`<li class="${h.lv===2?'sub':''}"><span>${h.n?h.n+'　':''}${h.t.replace(/</g,'&lt;')}</span><span class="dots"></span><span class="pg">${pages&&pages[h.id]?pages[h.id]:''}</span></li>`).join('')+'</ol>';
     const main=document.querySelector('main');main.prepend(toc);main.prepend(cover);return heads},{css:CSS,logo,ver,pages});
   await p.waitForFunction(()=>[...document.images].every(i=>i.complete),null,{timeout:30000}).catch(()=>{});await p.evaluate(async()=>{document.body.offsetHeight;await document.fonts.ready});await p.waitForTimeout(600);
