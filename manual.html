@@ -100,7 +100,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="0 0 256 256" aria-hidden="true"><rect width="256" height="256" rx="56" fill="#fff"/><rect x="42" y="38" width="86" height="180" rx="4" fill="none" stroke="#111" stroke-width="13"/><path d="M66 82H104M66 116H104M66 150H104M66 184H104" stroke="#111" stroke-width="11" stroke-linecap="round"/><path d="M128 96C168 96 170 70 200 70" fill="none" stroke="#F2C230" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="70" r="13" fill="#F2C230"/><path d="M128 130C168 130 170 150 200 150" fill="none" stroke="#1E9BEA" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="150" r="13" fill="#1E9BEA"/><path d="M128 178C162 178 172 206 196 206" fill="none" stroke="#5B6472" stroke-width="11" stroke-linecap="round" stroke-dasharray="1 18"/><circle cx="210" cy="206" r="11" fill="none" stroke="#5B6472" stroke-width="7"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v3.21.34 · netmap.exe v1.20.13</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v3.21.35 · netmap.exe v1.20.13</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -139,7 +139,7 @@ code,td,li,p{overflow-wrap:anywhere}
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
     <a class="btn ghost" href="RackTrace-manual.pdf" download>下載 PDF 版手冊</a>
-    <a class="btn ghost" href="#changelog">最新更新：v3.21.34</a>
+    <a class="btn ghost" href="#changelog">最新更新：v3.21.35</a>
   </div>
 </div>
 
@@ -927,7 +927,8 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 
 <section id="changelog">
 <h2><span class="n">14</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v3.21.34　選取設備時，上游和下游的埠用不同顏色</b><span class="tag new">最新 · 2026-11-17</span><span class="tag">netmap.exe 1.20.17</span></div><ul><li>點選設備時，往上游（到網路入口）那條路經過的埠框成綠色，這台自己的連線與往下的埠框成藍色，不再全部都是橘色。只點選單一埠或線時仍是橘色。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.21.35　選取設備的顏色分得更清楚</b><span class="tag new">最新 · 2026-11-17</span><span class="tag">netmap.exe 1.20.17</span></div><ul><li>這台設備自己接出去的線（兩端的埠）一律藍色；綠色只標在更往上游、到網路入口的那段路上。原本選電腦時，它唯一的那條線也算上游，結果整條都是綠色。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.21.34　選取設備時，上游和下游的埠用不同顏色</b><span class="tag">2026-11-17</span><span class="tag">netmap.exe 1.20.17</span></div><ul><li>點選設備時，往上游（到網路入口）那條路經過的埠框成綠色，這台自己的連線與往下的埠框成藍色，不再全部都是橘色。只點選單一埠或線時仍是橘色。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.21.33　連線時不再重複問已選好的埠</b><span class="tag">2026-11-17</span><span class="tag">netmap.exe 1.20.17</span></div><ul><li>在某個埠上按右鍵（或先點選一個埠）再選「連線到其他設備…」，就直接用那個埠，不會再跳出「要用哪個埠」；對方是只有一個網路埠的設備（電腦、手機等）時也直接接上，不用再選。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.21.32　下排的埠從下方出線</b><span class="tag">2026-11-17</span><span class="tag">netmap.exe 1.20.17</span></div><ul><li>兩排埠的交換器：線的出口改成依埠實際畫在上排或下排決定，下排的埠從下方出線、上排從上方。原本只看埠的順序，自訂埠排列（例如 Gi1～Gi9 加上 10～24）時會判斷錯，下排的埠也從上面繞出去。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.21.31　設備屬性可以直接改設備類型</b><span class="tag">2026-11-17</span><span class="tag">netmap.exe 1.20.17</span></div><ul><li>設備屬性多了「設備類型」：終端、Hub、Switch、AP、路由器、防火牆可以直接互換，不用刪掉重建。名稱、IP、MAC、位置和原本接好的線都保留；埠數會補到新類型的預設值，可以再自己調整。</li></ul></div>
@@ -1086,7 +1087,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 <div class="clog"><div class="v"><b>v1.0　第一版</b><span class="tag">2026-11-06</span></div><ul><li>防火牆、Switch、配線架、資訊座埠對埠接線，點埠追蹤整條路徑</li><li>產業範例與自動排版</li></ul></div>
 </section>
 
-<p class="foot">RackTrace · 網頁 v3.21.34 · netmap.exe v1.20.13 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">RackTrace · 網頁 v3.21.35 · netmap.exe v1.20.13 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>
