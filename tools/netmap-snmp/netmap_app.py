@@ -7,7 +7,7 @@ RackTrace（機房線路對應圖）Windows 程式（netmap.exe）
 執行：netmap.exe            開啟視窗
       netmap.exe --start    開啟視窗並啟動監控服務（開機自動啟動用，視窗會縮到工作列）
 """
-import json, os, queue, re, sys, threading, time, webbrowser
+import json, os, queue, re, sys, threading, time, webbrowser, urllib.parse
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from tkinter.scrolledtext import ScrolledText
@@ -486,8 +486,10 @@ class App:
         fr = s.nb.nametowidget(s.nb.tabs()[1])
         box = ttk.LabelFrame(fr, text="這台電腦已經有背景服務在執行", padding=10)
         box.pack(fill="x", before=fr.winfo_children()[0], pady=(0, 10))
-        ttk.Label(box, text=f"背景服務：{s.bg_url}\n為了避免兩份資料，這個視窗不再自己啟動服務；在這裡掃描的結果會直接送到背景服務。"
-                  "手機、平板和其他電腦請一律開背景服務的網址。", wraplength=820).pack(anchor="w")
+        port = urllib.parse.urlparse(s.bg_url).port or 8080
+        lan = [f"http://{ip}:{port}/" for ip in srv.local_ips() if not ip.startswith("127.")]
+        ttk.Label(box, text=f"這台電腦開：{s.bg_url}" + (f"\n手機、平板、其他電腦開：{'、'.join(lan[:3])}" if lan else "") +
+                  "\n所有裝置都用這個服務（同一個埠），看到的就是同一張圖。這個視窗不會再另外開服務；在這裡掃描的結果會直接送到背景服務。", wraplength=820).pack(anchor="w")
         row = ttk.Frame(box); row.pack(fill="x", pady=(8, 0))
         ttk.Button(row, text="開啟背景服務的網頁", style="Accent.TButton", command=lambda: webbrowser.open(s.bg_url)).pack(side="left")
         n = sum(1 for x in s.store.projects()["list"] if x.get("devices"))
