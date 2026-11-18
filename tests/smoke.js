@@ -25,6 +25,7 @@ async function page(b,opt){const ctx=await b.newContext(opt);const p=await ctx.n
   ok(await p.evaluate(()=>{const s=addDev('seat',{name:'CI座位',x:0,y:0});s.plan={id:curPlan().id,x:900,y:900};const pc=addDev('end',{name:'CI-PC',x:0,y:0});const ok1=planSeatLink(s,pc);normalize(S);I=idx();const ok2=planInfo(s).pcs.includes(pc);S.devices=S.devices.filter(d=>d!==s&&d!==pc);S.cables=S.cables.filter(c=>I.owner[c.a]&&I.owner[c.b]&&I.owner[c.a]!==s&&I.owner[c.b]!==s);I=idx();renderAll();return ok1&&ok2}),'座位直接加入設備');
   ok(await p.evaluate(()=>{const cv=document.createElement('canvas');cv.width=800;cv.height=600;const g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,800,600);g.fillStyle='#000';g.fillRect(50,50,600,10);g.fillStyle='#bfe3ee';g.fillRect(200,200,50,50);g.fillRect(300,200,50,50);const D={cv,g,W:800,H:600,d:g.getImageData(0,0,800,600).data};const R=planDetectImg(D);return R.boxes.length===2&&R.walls.some(w=>w.y===w.y2&&w.x2-w.x>500)}),'平面圖底圖自動辨識（方框與牆）');
   ok(await p.evaluate(()=>planKeyN('c03')===planKeyN('C3')&&planFixTok('bo4')==='B04'),'座位配置編號比對');
+  ok(await p.evaluate(()=>planFixTok('BS19')==='BS19'&&planLayoutOut(curPlan()).space==='plan'),'平面圖配置匯出');
   await p.evaluate(()=>setView('map'));
   ok(await p.evaluate(()=>{const n=S.cables.length;snap();S.cables.pop();renderAll();undo();return S.cables.length===n}),'復原');
   ok(!p.errs.length,'沒有 JavaScript 錯誤'+(p.errs.length?'：'+p.errs.slice(0,3).join(' | '):''));
