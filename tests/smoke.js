@@ -18,6 +18,7 @@ async function page(b,opt){const ctx=await b.newContext(opt);const p=await ctx.n
   await p.evaluate(()=>{S.plans=[{id:'pl1',name:'3F',w:1200,h:800,shapes:[{id:'s1',k:'rect',x:40,y:40,w:200,h:120,t:'會議室'}]}];S.devices.filter(d=>d.type==='seat').forEach((d,i)=>d.plan={id:'pl1',x:300+i*150,y:300});setView('plan')});await p.waitForTimeout(300);
   ok(await p.evaluate(()=>document.querySelectorAll('#planView .plcard').length>0&&document.querySelector('#planView .plcard .pj i')),'平面圖顯示座位與線號');
   ok(await p.evaluate(()=>JSON.stringify(projData()).includes('"plans"')),'平面圖會存進專案');
+  ok(await p.evaluate(()=>{S.racks=S.racks.length?S.racks:[{name:'R1',size:42}];planRackModal(S.racks[0].name);const open=!!document.querySelector('#planView .plbox .rkcands, #planView .plbox [data-pl=rkclose]');const c=[...document.querySelectorAll('#planView [data-pdev]')].find(e=>{const d=S.devices.find(x=>x.id===e.dataset.pdev);return d&&d.rack!==ui.plRack});if(!c)return open;c.click();return open&&ui.plRackMin===true&&!!document.querySelector('#planView .plbox.plmin')}),'點其他設備時機櫃面板自動收合');
   await p.evaluate(()=>setView('map'));
   ok(await p.evaluate(()=>{const n=S.cables.length;snap();S.cables.pop();renderAll();undo();return S.cables.length===n}),'復原');
   ok(!p.errs.length,'沒有 JavaScript 錯誤'+(p.errs.length?'：'+p.errs.slice(0,3).join(' | '):''));
