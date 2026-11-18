@@ -100,7 +100,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="0 0 256 256" aria-hidden="true"><rect width="256" height="256" rx="56" fill="#fff"/><rect x="42" y="38" width="86" height="180" rx="4" fill="none" stroke="#111" stroke-width="13"/><path d="M66 82H104M66 116H104M66 150H104M66 184H104" stroke="#111" stroke-width="11" stroke-linecap="round"/><path d="M128 96C168 96 170 70 200 70" fill="none" stroke="#F2C230" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="70" r="13" fill="#F2C230"/><path d="M128 130C168 130 170 150 200 150" fill="none" stroke="#1E9BEA" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="150" r="13" fill="#1E9BEA"/><path d="M128 178C162 178 172 206 196 206" fill="none" stroke="#5B6472" stroke-width="11" stroke-linecap="round" stroke-dasharray="1 18"/><circle cx="210" cy="206" r="11" fill="none" stroke="#5B6472" stroke-width="7"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v3.25.1 · netmap.exe v1.20.20</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v3.25.2 · netmap.exe v1.20.20</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -140,7 +140,7 @@ code,td,li,p{overflow-wrap:anywhere}
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
     <a class="btn ghost" href="RackTrace-manual.pdf" download>下載 PDF 版手冊</a>
-    <a class="btn ghost" href="#changelog">最新更新：v3.25.1</a>
+    <a class="btn ghost" href="#changelog">最新更新：v3.25.2</a>
   </div>
 </div>
 
@@ -465,6 +465,9 @@ code,td,li,p{overflow-wrap:anywhere}
 <li><b>設備工具</b>（左側中間）：和拓樸圖一樣的設備類型（防火牆、路由器、Switch、Hub、AP、配線架、資訊座、電腦、光纖收容箱、伺服器、印表機、IP Phone、IP Cam、NAS、筆電、數據機）。點平面圖放上去，會同時加進拓樸圖，下方可以直接改名稱和 IP；之後到拓樸接線。</li>
 <li><b>放設備</b>：左側下方是還沒放上的設備，可以搜尋名稱、IP、MAC，或依資訊座、電腦、印表機、AP 篩選。點一台，再點平面圖上的位置；數量多可以按「剩下的全部先排在右邊」，再一台台拖到正確的位置。圖上的設備選取後按 Delete，就從平面圖拿掉（不會刪除設備）。</li>
 <li><b>還沒畫進拓樸的座位</b>：按 <b>＋ 新增座位／設備…</b>，填名稱、牆上的線號（兩個孔用逗號分開）、接在這裡的電腦和 IP。會同時加進拓樸圖下方；之後從這個孔接線時，線號自動帶入。</li>
+<li><b>把設備放進房間、機房或桌子</b>：選取那個框，右側會列出還沒放上的設備，點一下就自動排進框裡；已在框裡的設備也列在下面，可以拿掉。</li>
+<li>放置中（選了工具或設備）上方會顯示「放置中」，在平面圖上按<b>右鍵</b>、Esc 或「取消」就能取消。</li>
+<li><b>縮放與移動</b>：Ctrl＋滾輪（觸控板捏合）以游標為中心縮放，也可以按上方的 −／＋；手機、平板用兩指縮放。拖曳空白處可以移動畫面。</li>
 <li>排好按 <b>完成編輯</b>。之後點座位只會看資料，不會不小心拖動。</li>
 </ol>
 <ul>
@@ -1096,7 +1099,8 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 
 <section id="changelog">
 <h2><span class="n">D</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v3.25.1　平面圖的機櫃可以放設備、畫布邊界更清楚</b><span class="tag new">最新 · 2026-11-18</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>平面圖上的機櫃標註會列出裡面的設備（含燈號）。點機櫃可以看完整清單，並把現有的設備或新設備放進這個機櫃（自動找空的 U 位），和機櫃視圖是同一份資料。</li><li>畫布改成深灰色並加上邊框，和外面的背景分得出來；淺色模式是白底。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.25.2　平面圖：右鍵取消、選框加設備、縮放</b><span class="tag new">最新 · 2026-11-18</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>放置設備或工具時，上方會顯示「放置中」，在平面圖上按右鍵、按 Esc 或「取消」就能取消。</li><li>編輯時點選房間、機房或桌子，右側會列出可以放進來的設備，點一下就自動排進框裡；已在框裡的設備也列在下面，可以拿掉。</li><li>平面圖可以縮放：Ctrl＋滾輪（觸控板捏合）以游標為中心縮放，手機、平板用兩指縮放；拖曳空白處可以移動畫面。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.25.1　平面圖的機櫃可以放設備、畫布邊界更清楚</b><span class="tag">2026-11-18</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>平面圖上的機櫃標註會列出裡面的設備（含燈號）。點機櫃可以看完整清單，並把現有的設備或新設備放進這個機櫃（自動找空的 U 位），和機櫃視圖是同一份資料。</li><li>畫布改成深灰色並加上邊框，和外面的背景分得出來；淺色模式是白底。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.25.0　平面圖：設備工具、機房與機櫃標註</b><span class="tag">2026-11-18</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>平面圖編輯的左側分成「版面」和「設備工具」。設備工具就是拓樸圖的設備類型（防火牆、路由器、Switch、Hub、AP、配線架、資訊座、電腦、光纖收容箱、伺服器、印表機、IP Phone、IP Cam、NAS、筆電、數據機），點平面圖放上去會同時加進拓樸圖，名稱和 IP 可以在下方直接改。</li><li>版面新增「機房」（斜線底的房間）和「機櫃」標註：機櫃會對應到機櫃視圖的機櫃，顯示裡面有幾台設備，點一下切到機櫃視圖。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.24.1　平面圖跟著深淺色、改名和刪除分開</b><span class="tag">2026-11-18</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>平面圖的畫布、座位方塊、房間、牆和圖示改成跟著網頁的深色／淺色主題（列印仍是白底）。</li><li>「改名」和「刪除這張」分成兩個按鈕；刪除前會說明設備不會被刪掉，刪錯可以按「復原」。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.24.0　平面圖：裝潢工具與左側設備清單</b><span class="tag">2026-11-18</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>編輯平面圖時，左側多了「裝潢工具」：房間、桌子、牆（拖曳畫，會自動拉直）、文字，以及門、樓梯、印表機、AP、UPS、防火牆、數據機、攝影機、植物等圖示。點物件可以選取、拖曳、改名、調大小、複製，按 Delete 刪除。</li><li>還沒放上的設備移到左側清單，可以搜尋名稱、IP、MAC，也能依資訊座、電腦、印表機、AP 篩選，不會再塞滿上方。</li><li>移除底圖後畫布會恢復成一般大小；放上平面圖的設備也可以選取後按 Delete 從平面圖拿掉。</li></ul></div>
@@ -1279,7 +1283,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 </section>
 
 
-<p class="foot">RackTrace · 網頁 v3.25.1 · netmap.exe v1.20.20 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">RackTrace · 網頁 v3.25.2 · netmap.exe v1.20.20 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>
