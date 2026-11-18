@@ -100,7 +100,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="0 0 256 256" aria-hidden="true"><rect width="256" height="256" rx="56" fill="#fff"/><rect x="42" y="38" width="86" height="180" rx="4" fill="none" stroke="#111" stroke-width="13"/><path d="M66 82H104M66 116H104M66 150H104M66 184H104" stroke="#111" stroke-width="11" stroke-linecap="round"/><path d="M128 96C168 96 170 70 200 70" fill="none" stroke="#F2C230" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="70" r="13" fill="#F2C230"/><path d="M128 130C168 130 170 150 200 150" fill="none" stroke="#1E9BEA" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="150" r="13" fill="#1E9BEA"/><path d="M128 178C162 178 172 206 196 206" fill="none" stroke="#5B6472" stroke-width="11" stroke-linecap="round" stroke-dasharray="1 18"/><circle cx="210" cy="206" r="11" fill="none" stroke="#5B6472" stroke-width="7"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v3.23.1 · netmap.exe v1.20.20</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v3.24.0 · netmap.exe v1.20.20</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -140,7 +140,7 @@ code,td,li,p{overflow-wrap:anywhere}
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
     <a class="btn ghost" href="RackTrace-manual.pdf" download>下載 PDF 版手冊</a>
-    <a class="btn ghost" href="#changelog">最新更新：v3.23.1</a>
+    <a class="btn ghost" href="#changelog">最新更新：v3.24.0</a>
   </div>
 </div>
 
@@ -460,8 +460,10 @@ code,td,li,p{overflow-wrap:anywhere}
 <h4>建立平面圖</h4>
 <ol class="steps">
 <li>按 <b>新增平面圖</b>，取名稱（例如「3F 辦公室」）。一個專案可以有多張，例如每層樓一張。</li>
-<li><b>上傳底圖</b>：現有的座位圖、建築平面圖都可以（JPG、PNG；手機拍的照片也行，會自動縮小）。用滑桿調淡一點，座位方塊比較清楚。沒有圖也可以按 <b>＋ 房間方塊</b>、<b>＋ 文字</b> 自己畫，方塊拖右下角的藍點調大小，雙擊改名稱或刪除。</li>
-<li>上方會列出<b>還沒放上的設備</b>（資訊座、沒接資訊座的電腦、AP、印表機）。點一台，再點平面圖上的位置；數量多的話按 <b>全部先排在右邊</b>，再一台台拖到正確的位置。</li>
+<li><b>上傳底圖</b>：現有的座位圖、建築平面圖都可以（JPG、PNG；手機拍的照片也行，會自動縮小）。滑桿可以調淡，座位方塊比較清楚；不要了按 <b>移除底圖</b>。</li>
+<li><b>裝潢工具</b>（編輯時在左側）：房間、桌子、牆、文字，以及門、樓梯、印表機、AP、UPS、防火牆、數據機、攝影機、植物等圖示。選好工具再點平面圖上的位置；牆是按住拖曳畫出來，會自動拉成水平或垂直（按住 Alt 可以斜著畫）。點物件可以選取、拖曳、改名、調大小、<b>複製</b>（排一整排桌子很快），按 <b>Delete</b> 刪除。</li>
+<li><b>放設備</b>：左側下方是還沒放上的設備，可以搜尋名稱、IP、MAC，或依資訊座、電腦、印表機、AP 篩選。點一台，再點平面圖上的位置；數量多可以按「剩下的全部先排在右邊」，再一台台拖到正確的位置。圖上的設備選取後按 Delete，就從平面圖拿掉（不會刪除設備）。</li>
+<li><b>還沒畫進拓樸的座位</b>：按 <b>＋ 新增座位／設備…</b>，填名稱、牆上的線號（兩個孔用逗號分開）、接在這裡的電腦和 IP。會同時加進拓樸圖下方；之後從這個孔接線時，線號自動帶入。</li>
 <li>排好按 <b>完成編輯</b>。之後點座位只會看資料，不會不小心拖動。</li>
 </ol>
 <ul>
@@ -1093,7 +1095,8 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 
 <section id="changelog">
 <h2><span class="n">D</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v3.23.1　平面圖可直接新增座位、移除底圖</b><span class="tag new">最新 · 2026-11-18</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>平面圖編輯時多了「＋ 新增座位／設備…」：直接新增資訊座（可填牆上的線號、接在這裡的電腦）、電腦、印表機、AP 等，同時加進拓樸圖，之後再接線。還沒接線的線號也會先顯示在座位上，之後從這個孔接線時自動帶入。</li><li>底圖可以「移除底圖」，座位和房間方塊會留著。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.24.0　平面圖：裝潢工具與左側設備清單</b><span class="tag new">最新 · 2026-11-18</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>編輯平面圖時，左側多了「裝潢工具」：房間、桌子、牆（拖曳畫，會自動拉直）、文字，以及門、樓梯、印表機、AP、UPS、防火牆、數據機、攝影機、植物等圖示。點物件可以選取、拖曳、改名、調大小、複製，按 Delete 刪除。</li><li>還沒放上的設備移到左側清單，可以搜尋名稱、IP、MAC，也能依資訊座、電腦、印表機、AP 篩選，不會再塞滿上方。</li><li>移除底圖後畫布會恢復成一般大小；放上平面圖的設備也可以選取後按 Delete 從平面圖拿掉。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.23.1　平面圖可直接新增座位、移除底圖</b><span class="tag">2026-11-18</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>平面圖編輯時多了「＋ 新增座位／設備…」：直接新增資訊座（可填牆上的線號、接在這裡的電腦）、電腦、印表機、AP 等，同時加進拓樸圖，之後再接線。還沒接線的線號也會先顯示在座位上，之後從這個孔接線時自動帶入。</li><li>底圖可以「移除底圖」，座位和房間方塊會留著。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.23.0　新增平面圖</b><span class="tag">2026-11-18</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>新的「平面圖」頁籤：上傳座位圖或建築平面圖當底圖（也可以自己畫房間方塊、加文字），把資訊座、電腦放到實際的位置。每個座位顯示座位名稱、資訊座線號、接的電腦與燈號，以及接到哪台交換器的哪一埠；斷線的座位會變紅色。</li><li>點座位看完整路徑，可以跳到拓樸或直接從這裡查線；搜尋時符合的座位會標出來；可以列印 A4 橫式。</li><li>一個專案可以有多張平面圖（例如各樓層）。用監控服務時需要 netmap.exe 1.20.23 才會保存平面圖。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.22.4　手機滑「返回」不會直接離開</b><span class="tag">2026-11-18</span><span class="tag">netmap.exe 1.20.22</span></div><ul><li>手機、平板上用返回手勢（Android 從螢幕邊緣往內滑）或返回鍵時，會先關掉打開的視窗、選單、右側面板和選取，再切回拓樸；都沒有東西可以關時，提醒「再滑一次就會離開」，2.5 秒內再滑一次才真的離開。</li><li>還有修改沒送到監控服務（暫時斷線）時，關分頁或重新整理會先跳出確認。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.22.3　光纖束畫法更清楚</b><span class="tag">2026-11-18</span><span class="tag">netmap.exe 1.20.22</span></div><ul><li>光纖束不再從每一芯的埠拉細線繞過收容箱（24 芯會變成一團線），改成從收容箱邊緣直接畫一條粗線；每一芯的色碼仍然標在背面的埠上。查線經過這條光纖束時，才會畫出經過的那幾芯。</li></ul></div>
@@ -1272,7 +1275,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 </section>
 
 
-<p class="foot">RackTrace · 網頁 v3.23.1 · netmap.exe v1.20.20 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">RackTrace · 網頁 v3.24.0 · netmap.exe v1.20.20 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>
