@@ -100,7 +100,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="0 0 256 256" aria-hidden="true"><rect width="256" height="256" rx="56" fill="#fff"/><rect x="42" y="38" width="86" height="180" rx="4" fill="none" stroke="#111" stroke-width="13"/><path d="M66 82H104M66 116H104M66 150H104M66 184H104" stroke="#111" stroke-width="11" stroke-linecap="round"/><path d="M128 96C168 96 170 70 200 70" fill="none" stroke="#F2C230" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="70" r="13" fill="#F2C230"/><path d="M128 130C168 130 170 150 200 150" fill="none" stroke="#1E9BEA" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="150" r="13" fill="#1E9BEA"/><path d="M128 178C162 178 172 206 196 206" fill="none" stroke="#5B6472" stroke-width="11" stroke-linecap="round" stroke-dasharray="1 18"/><circle cx="210" cy="206" r="11" fill="none" stroke="#5B6472" stroke-width="7"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v3.28.0 · netmap.exe v1.20.20</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v3.28.1 · netmap.exe v1.20.20</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -140,7 +140,7 @@ code,td,li,p{overflow-wrap:anywhere}
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
     <a class="btn ghost" href="RackTrace-manual.pdf" download>下載 PDF 版手冊</a>
-    <a class="btn ghost" href="#changelog">最新更新：v3.28.0</a>
+    <a class="btn ghost" href="#changelog">最新更新：v3.28.1</a>
   </div>
 </div>
 
@@ -468,6 +468,8 @@ code,td,li,p{overflow-wrap:anywhere}
 <li><b>把設備放進房間、機房或桌子</b>：選取那個框，右側會列出還沒放上的設備，點一下就自動排進框裡；已在框裡的設備也列在下面，可以拿掉。</li>
 <li>放置中（選了工具或設備）上方會顯示「放置中」，在平面圖上按<b>右鍵</b>、Esc 或「取消」就能取消。</li>
 <li><b>和拓樸互通</b>：點平面圖上的座位、設備，或機櫃面板裡的設備名稱，右側會打開和拓樸圖相同的設備屬性，名稱、IP、型號、接線都在這裡改，兩邊同步。</li>
+<li><b>牆</b>：選取牆後兩端會出現藍點，拖曳可以調整長度和方向（自動對齊水平／垂直，按住 Alt 可以斜）；拖曳中間可以移動。粗細在左側「選取的物件」用滑桿調，或按右鍵選「加粗／變細」。</li>
+<li><b>機櫃改名與排順序</b>：右側機櫃標題旁的「改名…」可以改名稱和高度，設備和平面圖上的標註會一起更新；每台設備旁的 ▲▼ 可以和上一台／下一台交換位置，U 位自動調整。</li>
 <li><b>使用人與座位上的設備</b>：點座位或設備，右側最上面可以填「使用人／姓名」，會顯示在平面圖卡片上，也能用搜尋找到。座位還會列出「座位上的設備」和連線燈號；按「＋ 加入設備」可以新增一台電腦、印表機等（填名稱、IP），或搜尋現有的設備接上，會自動接在座位桌面那一側的孔；也可以「拔掉」。</li>
 <li><b>點埠放上平面圖</b>：在設備的「網路埠狀態」點一個已接線的埠，如果它接到的座位或電腦還沒放在平面圖上，會詢問要不要放上去；按「放上去」再點平面圖的位置即可。</li>
 <li><b>點物件看接到哪台交換器</b>：點平面圖上的座位或設備，畫面角落會跳出小視窗：線號 → 交換器名稱和<b>埠號</b>（橘色大字），下面是那台交換器的埠位圖，接到的埠用橘框標出；有即時監控時會寫「連線中」或「斷線」。平面圖上同時畫一條<b>橘色虛線</b>指到交換器所在的機櫃（機櫃裡那一台會亮起來）。點小視窗裡的任一個埠，右側會打開那個埠的屬性和整條路徑。小視窗位置固定（預設左下角），不會跟著物件跳動；拖曳它的標題列可以移到順手的位置，下次會記住。</li>
@@ -1107,7 +1109,8 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 
 <section id="changelog">
 <h2><span class="n">D</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v3.28.0　平面圖：使用人姓名、座位直接加入設備、點埠詢問是否放上平面圖</b><span class="tag new">最新 · 2026-11-18</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>在平面圖點座位或設備，右側最上面多了「使用人／姓名」欄，填了會顯示在平面圖的卡片上，也能用搜尋找到。</li><li>座位多了「座位上的設備」：列出接在這個座位的電腦等設備和連線燈號；按「＋ 加入設備」可以新增一台（填名稱、IP）或搜尋現有的設備接上，會自動接到座位桌面那一側的孔，也可以「拔掉」。</li><li>點交換器等設備的埠時，如果這個埠已經接到座位或電腦、但還沒放在平面圖上，會跳出詢問要不要放上去；按「放上去」再點平面圖的位置就好。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.28.1　平面圖：牆可以調長短粗細、機櫃可以改名和調整設備上下順序</b><span class="tag new">最新 · 2026-11-18</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>選取牆後兩端會出現藍點，拖曳可以調整長度和方向（自動對齊水平／垂直，按住 Alt 可以斜）；拖曳中間可以移動。牆比較好點了。左側「選取的物件」有粗細滑桿，右鍵也有加粗／變細。</li><li>右側機櫃多了「改名…」，可以改名稱和高度，設備、平面圖上的機櫃標註會一起更新。</li><li>機櫃裡每台設備旁有 ▲▼，可以和上一台／下一台交換位置（U 位自動調整）。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.28.0　平面圖：使用人姓名、座位直接加入設備、點埠詢問是否放上平面圖</b><span class="tag">2026-11-18</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>在平面圖點座位或設備，右側最上面多了「使用人／姓名」欄，填了會顯示在平面圖的卡片上，也能用搜尋找到。</li><li>座位多了「座位上的設備」：列出接在這個座位的電腦等設備和連線燈號；按「＋ 加入設備」可以新增一台（填名稱、IP）或搜尋現有的設備接上，會自動接到座位桌面那一側的孔，也可以「拔掉」。</li><li>點交換器等設備的埠時，如果這個埠已經接到座位或電腦、但還沒放在平面圖上，會跳出詢問要不要放上去；按「放上去」再點平面圖的位置就好。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.27.4　平面圖：再點選取的物件不會取消、編輯時右鍵可用、往左上拖不再卡住</b><span class="tag">2026-11-18</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>再點一次已選取的物件不會再取消選取（之前會關掉右側屬性），要取消請點空白處或按 Esc。</li><li>編輯版面時右鍵也有選單：座位／設備有「改名稱、設備屬性、在拓樸看、從這裡查線、從平面圖拿掉」；房間、機櫃、圖示、文字等有「放大、縮小、複製、刪除」，機櫃還能看裡面的設備。</li><li>平面圖左邊和上面一律保留一段空白，物件往左上拖或畫面往上移動時不會卡在邊界；打開平面圖或按縮放比例時會自動對準有物件的範圍。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.27.3　平面圖：右側屬性欄打開時，選到的物件不會被擋住</b><span class="tag">2026-11-18</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>點平面圖右邊的物件時，右側屬性欄打開會讓平面圖變窄；現在會自動把選到的物件捲回看得見的位置，也會避開交換器小視窗。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.27.2　平面圖：拿掉捲軸，左鍵拖曳移動畫面</b><span class="tag">2026-11-18</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>平面圖不再顯示右邊和下面的捲軸；按住滑鼠左鍵拖曳空白處就能移動畫面（編輯版面時也一樣），滾輪捲動、Ctrl＋滾輪縮放照舊。</li><li>框選改成按住 Shift 拖曳；Ctrl／Shift＋點一樣可以加選。</li></ul></div>
@@ -1302,7 +1305,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 </section>
 
 
-<p class="foot">RackTrace · 網頁 v3.28.0 · netmap.exe v1.20.20 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">RackTrace · 網頁 v3.28.1 · netmap.exe v1.20.20 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>
