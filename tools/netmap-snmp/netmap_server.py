@@ -33,7 +33,7 @@ for _st in (sys.stdout, sys.stderr):
     try: _st.reconfigure(errors="replace")
     except Exception: pass
 
-VERSION = "1.20.22"
+VERSION = "1.20.23"
 
 # ───────────────────────── paths & secrets ─────────────────────────
 MACHINE = False   # --machine：整台電腦共用的資料夾（C:\ProgramData\netmap），給「開機自動啟動、不用登入」的服務用（用 SYSTEM 執行，沒有使用者的 APPDATA）
@@ -514,7 +514,7 @@ DEFAULT_SETTINGS = {"port": 8080, "interval": 60, "retention_days": 7, "lan_edit
 
 def ndc_key(x): return "%s|%s" % (x.get("status"), x.get("name") or x.get("ip"))
 
-PROJECT_KEYS = ("devices", "cables", "racks", "faults", "repairs", "pages", "trunks", "chkign")
+PROJECT_KEYS = ("devices", "cables", "racks", "faults", "repairs", "pages", "trunks", "chkign", "plans")
 
 def norm_mac(m):
     h = re.sub(r"[^0-9a-fA-F]", "", str(m or "")).lower()

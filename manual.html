@@ -100,7 +100,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="0 0 256 256" aria-hidden="true"><rect width="256" height="256" rx="56" fill="#fff"/><rect x="42" y="38" width="86" height="180" rx="4" fill="none" stroke="#111" stroke-width="13"/><path d="M66 82H104M66 116H104M66 150H104M66 184H104" stroke="#111" stroke-width="11" stroke-linecap="round"/><path d="M128 96C168 96 170 70 200 70" fill="none" stroke="#F2C230" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="70" r="13" fill="#F2C230"/><path d="M128 130C168 130 170 150 200 150" fill="none" stroke="#1E9BEA" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="150" r="13" fill="#1E9BEA"/><path d="M128 178C162 178 172 206 196 206" fill="none" stroke="#5B6472" stroke-width="11" stroke-linecap="round" stroke-dasharray="1 18"/><circle cx="210" cy="206" r="11" fill="none" stroke="#5B6472" stroke-width="7"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v3.22.4 · netmap.exe v1.20.20</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v3.23.0 · netmap.exe v1.20.20</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -116,7 +116,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <li><a href="#auto">3. 自動建圖</a>
   <ol><li><a href="#e-setup">安裝 netmap.exe</a></li><li><a href="#e-install">免安裝版</a></li><li><a href="#e-webscan">在網頁裡掃描</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-autosnmp">自動偵測 SNMP</a></li><li><a href="#e-ipmac">匯入 IP／MAC</a></li><li><a href="#a-lldp">匯入 LLDP</a></li><li><a href="#e-hub">沒有管理功能的設備</a></li><li><a href="#e-home">在家測試</a></li></ol></li>
 <li><a href="#trace">4. 查線與檢視</a>
-  <ol><li><a href="#t-trace">查線路</a></li><li><a href="#v-rack">機櫃視圖</a></li><li><a href="#v-table">線路表</a></li><li><a href="#v-layer">圖層與線色</a></li><li><a href="#v-panel">面板與主題</a></li><li><a href="#s-labels">線標列印</a></li></ol></li>
+  <ol><li><a href="#t-trace">查線路</a></li><li><a href="#v-rack">機櫃視圖</a></li><li><a href="#v-table">線路表</a></li><li><a href="#v-plan">平面圖</a></li><li><a href="#v-layer">圖層與線色</a></li><li><a href="#v-panel">面板與主題</a></li><li><a href="#s-labels">線標列印</a></li></ol></li>
 <li><a href="#monitor">5. 監控</a>
   <ol><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-detect">從線上版切換</a></li><li><a href="#e-ping">心跳與事件</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-ssh">SSH 流量監控</a></li><li><a href="#e-flow">誰在用流量</a></li><li><a href="#e-seen">網路上的設備</a></li><li><a href="#e-alert">告警通知</a></li></ol></li>
 <li><a href="#fault">6. 出問題時</a>
@@ -140,7 +140,7 @@ code,td,li,p{overflow-wrap:anywhere}
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
     <a class="btn ghost" href="RackTrace-manual.pdf" download>下載 PDF 版手冊</a>
-    <a class="btn ghost" href="#changelog">最新更新：v3.22.4</a>
+    <a class="btn ghost" href="#changelog">最新更新：v3.23.0</a>
   </div>
 </div>
 
@@ -448,6 +448,30 @@ code,td,li,p{overflow-wrap:anywhere}
 <h3 id="v-table">線路表</h3>
 <figure><img src="manual/table.jpg" alt="線路表" loading="lazy"></figure>
 <p>列出所有線：線號、兩端設備與埠、線材、VLAN、長度。可以排序、搜尋，並匯出 CSV 給 Excel 使用。</p>
+
+<h3 id="v-plan">平面圖（座位、線號對到實際位置）</h3>
+<p>頂列 <b>平面圖</b> 把資訊座、電腦放到辦公室實際的位置，像貼在牆上的座位圖，但每個座位都會即時顯示：</p>
+<ul>
+<li><b>座位名稱</b>與<b>資訊座線號</b>（牆上那條線的線號，例如 H-3F-001；一個座位有兩個孔就顯示兩個）。</li>
+<li>接在這個座位的<b>電腦與燈號</b>：綠＝通、紅＝沒回應、灰＝沒監控；有電腦沒回應時整個方塊變紅。</li>
+<li>最下面一行是<b>接到哪台交換器的哪一埠</b>（經過配線架也會一路追到交換器）。</li>
+</ul>
+<figure><img src="manual/plan.jpg" alt="平面圖" loading="lazy"><figcaption>平面圖（示範資料）：座位 A-03 的電腦沒回應，方塊變紅；點座位 A-01，下方列出兩個線號、兩台設備和接到 SW-CORE-01 埠 2。</figcaption></figure>
+<h4>建立平面圖</h4>
+<ol class="steps">
+<li>按 <b>新增平面圖</b>，取名稱（例如「3F 辦公室」）。一個專案可以有多張，例如每層樓一張。</li>
+<li><b>上傳底圖</b>：現有的座位圖、建築平面圖都可以（JPG、PNG；手機拍的照片也行，會自動縮小）。用滑桿調淡一點，座位方塊比較清楚。沒有圖也可以按 <b>＋ 房間方塊</b>、<b>＋ 文字</b> 自己畫，方塊拖右下角的藍點調大小，雙擊改名稱或刪除。</li>
+<li>上方會列出<b>還沒放上的設備</b>（資訊座、沒接資訊座的電腦、AP、印表機）。點一台，再點平面圖上的位置；數量多的話按 <b>全部先排在右邊</b>，再一台台拖到正確的位置。</li>
+<li>排好按 <b>完成編輯</b>。之後點座位只會看資料，不會不小心拖動。</li>
+</ol>
+<ul>
+<li>點座位：下方列出完整路徑，可以按 <b>在拓樸看</b> 或 <b>從這裡查線</b>。</li>
+<li>上方搜尋列輸入名稱、IP、線號時，符合的座位會用橘框標出來。</li>
+<li><b>列印</b>：A4 橫式，可以貼在辦公室或交給搬遷廠商。</li>
+<li>平面圖的位置和拓樸的位置是分開的，在這裡移動不會影響拓樸圖的排版。</li>
+<li>用監控服務時，需要 netmap.exe 1.20.23 以上才會保存平面圖。</li>
+</ul>
+<div class="tip"><b>💡</b>座位還沒有電腦、但牆上的線已經拉好？先在拓樸畫「配線架 → 資訊座」並填好線號，資訊座就能放上平面圖，等電腦來了再接一條跳線。</div>
 
 <h3 id="v-layer">顯示圖層與線色</h3>
 <figure class="mid"><img src="manual/layers.jpg" alt="顯示圖層" loading="lazy"></figure>
@@ -1069,7 +1093,8 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 
 <section id="changelog">
 <h2><span class="n">D</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v3.22.4　手機滑「返回」不會直接離開</b><span class="tag new">最新 · 2026-11-18</span><span class="tag">netmap.exe 1.20.22</span></div><ul><li>手機、平板上用返回手勢（Android 從螢幕邊緣往內滑）或返回鍵時，會先關掉打開的視窗、選單、右側面板和選取，再切回拓樸；都沒有東西可以關時，提醒「再滑一次就會離開」，2.5 秒內再滑一次才真的離開。</li><li>還有修改沒送到監控服務（暫時斷線）時，關分頁或重新整理會先跳出確認。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.23.0　新增平面圖</b><span class="tag new">最新 · 2026-11-18</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>新的「平面圖」頁籤：上傳座位圖或建築平面圖當底圖（也可以自己畫房間方塊、加文字），把資訊座、電腦放到實際的位置。每個座位顯示座位名稱、資訊座線號、接的電腦與燈號，以及接到哪台交換器的哪一埠；斷線的座位會變紅色。</li><li>點座位看完整路徑，可以跳到拓樸或直接從這裡查線；搜尋時符合的座位會標出來；可以列印 A4 橫式。</li><li>一個專案可以有多張平面圖（例如各樓層）。用監控服務時需要 netmap.exe 1.20.23 才會保存平面圖。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.22.4　手機滑「返回」不會直接離開</b><span class="tag">2026-11-18</span><span class="tag">netmap.exe 1.20.22</span></div><ul><li>手機、平板上用返回手勢（Android 從螢幕邊緣往內滑）或返回鍵時，會先關掉打開的視窗、選單、右側面板和選取，再切回拓樸；都沒有東西可以關時，提醒「再滑一次就會離開」，2.5 秒內再滑一次才真的離開。</li><li>還有修改沒送到監控服務（暫時斷線）時，關分頁或重新整理會先跳出確認。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.22.3　光纖束畫法更清楚</b><span class="tag">2026-11-18</span><span class="tag">netmap.exe 1.20.22</span></div><ul><li>光纖束不再從每一芯的埠拉細線繞過收容箱（24 芯會變成一團線），改成從收容箱邊緣直接畫一條粗線；每一芯的色碼仍然標在背面的埠上。查線經過這條光纖束時，才會畫出經過的那幾芯。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.22.2　修正管理視窗卡死</b><span class="tag">2026-11-18</span><span class="tag">netmap.exe 1.20.22</span></div><ul><li>netmap.exe 1.20.22：修正 1.20.20／1.20.21 在「使用背景服務」時，管理視窗的狀態更新每輪加倍、開久了會卡死的問題。</li><li>有背景服務時，管理視窗不再自己接收流量紀錄（避免和背景服務搶同一個 UDP 埠）。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.22.1　管理視窗顯示手機要開的網址</b><span class="tag">2026-11-18</span><span class="tag">netmap.exe 1.20.21</span></div><ul><li>netmap.exe 1.20.21：管理視窗偵測到背景服務時，除了這台電腦用的網址，也會列出手機、平板、其他電腦要開的內網網址（例如 http://192.168.1.20:18080/）。背景服務用哪個埠，大家就都開那個埠。</li></ul></div>
@@ -1246,7 +1271,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 </section>
 
 
-<p class="foot">RackTrace · 網頁 v3.22.4 · netmap.exe v1.20.20 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">RackTrace · 網頁 v3.23.0 · netmap.exe v1.20.20 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>

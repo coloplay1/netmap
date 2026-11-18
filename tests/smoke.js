@@ -15,6 +15,10 @@ async function page(b,opt){const ctx=await b.newContext(opt);const p=await ctx.n
     await p.evaluate(f=>{closeModal();return eval(f)},fn);await p.waitForTimeout(300);ok(await p.evaluate(()=>!!document.querySelector('#mod')),n+'視窗');}
   await p.evaluate(()=>{closeModal();setView('triage')});await p.waitForTimeout(300);ok(await p.evaluate(()=>!!document.querySelector('#triageView .tri-col')),'排障視圖');
   for(const v of ['rack','table','map']){await p.evaluate(v=>setView(v),v);await p.waitForTimeout(200)}
+  await p.evaluate(()=>{S.plans=[{id:'pl1',name:'3F',w:1200,h:800,shapes:[{id:'s1',k:'rect',x:40,y:40,w:200,h:120,t:'會議室'}]}];S.devices.filter(d=>d.type==='seat').forEach((d,i)=>d.plan={id:'pl1',x:300+i*150,y:300});setView('plan')});await p.waitForTimeout(300);
+  ok(await p.evaluate(()=>document.querySelectorAll('#planView .plcard').length>0&&document.querySelector('#planView .plcard .pj i')),'平面圖顯示座位與線號');
+  ok(await p.evaluate(()=>JSON.stringify(projData()).includes('"plans"')),'平面圖會存進專案');
+  await p.evaluate(()=>setView('map'));
   ok(await p.evaluate(()=>{const n=S.cables.length;snap();S.cables.pop();renderAll();undo();return S.cables.length===n}),'復原');
   ok(!p.errs.length,'沒有 JavaScript 錯誤'+(p.errs.length?'：'+p.errs.slice(0,3).join(' | '):''));
   console.log('手機');

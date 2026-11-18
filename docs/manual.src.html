@@ -116,7 +116,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <li><a href="#auto">3. 自動建圖</a>
   <ol><li><a href="#e-setup">安裝 netmap.exe</a></li><li><a href="#e-install">免安裝版</a></li><li><a href="#e-webscan">在網頁裡掃描</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-autosnmp">自動偵測 SNMP</a></li><li><a href="#e-ipmac">匯入 IP／MAC</a></li><li><a href="#a-lldp">匯入 LLDP</a></li><li><a href="#e-hub">沒有管理功能的設備</a></li><li><a href="#e-home">在家測試</a></li></ol></li>
 <li><a href="#trace">4. 查線與檢視</a>
-  <ol><li><a href="#t-trace">查線路</a></li><li><a href="#v-rack">機櫃視圖</a></li><li><a href="#v-table">線路表</a></li><li><a href="#v-layer">圖層與線色</a></li><li><a href="#v-panel">面板與主題</a></li><li><a href="#s-labels">線標列印</a></li></ol></li>
+  <ol><li><a href="#t-trace">查線路</a></li><li><a href="#v-rack">機櫃視圖</a></li><li><a href="#v-table">線路表</a></li><li><a href="#v-plan">平面圖</a></li><li><a href="#v-layer">圖層與線色</a></li><li><a href="#v-panel">面板與主題</a></li><li><a href="#s-labels">線標列印</a></li></ol></li>
 <li><a href="#monitor">5. 監控</a>
   <ol><li><a href="#e-srv">監控服務與即時流量</a></li><li><a href="#e-detect">從線上版切換</a></li><li><a href="#e-ping">心跳與事件</a></li><li><a href="#e-mrtg">MRTG 流量圖</a></li><li><a href="#e-ssh">SSH 流量監控</a></li><li><a href="#e-flow">誰在用流量</a></li><li><a href="#e-seen">網路上的設備</a></li><li><a href="#e-alert">告警通知</a></li></ol></li>
 <li><a href="#fault">6. 出問題時</a>
@@ -448,6 +448,30 @@ code,td,li,p{overflow-wrap:anywhere}
 <h3 id="v-table">線路表</h3>
 <figure><img src="manual/table.jpg" alt="線路表" loading="lazy"></figure>
 <p>列出所有線：線號、兩端設備與埠、線材、VLAN、長度。可以排序、搜尋，並匯出 CSV 給 Excel 使用。</p>
+
+<h3 id="v-plan">平面圖（座位、線號對到實際位置）</h3>
+<p>頂列 <b>平面圖</b> 把資訊座、電腦放到辦公室實際的位置，像貼在牆上的座位圖，但每個座位都會即時顯示：</p>
+<ul>
+<li><b>座位名稱</b>與<b>資訊座線號</b>（牆上那條線的線號，例如 H-3F-001；一個座位有兩個孔就顯示兩個）。</li>
+<li>接在這個座位的<b>電腦與燈號</b>：綠＝通、紅＝沒回應、灰＝沒監控；有電腦沒回應時整個方塊變紅。</li>
+<li>最下面一行是<b>接到哪台交換器的哪一埠</b>（經過配線架也會一路追到交換器）。</li>
+</ul>
+<figure><img src="manual/plan.jpg" alt="平面圖" loading="lazy"><figcaption>平面圖（示範資料）：座位 A-03 的電腦沒回應，方塊變紅；點座位 A-01，下方列出兩個線號、兩台設備和接到 SW-CORE-01 埠 2。</figcaption></figure>
+<h4>建立平面圖</h4>
+<ol class="steps">
+<li>按 <b>新增平面圖</b>，取名稱（例如「3F 辦公室」）。一個專案可以有多張，例如每層樓一張。</li>
+<li><b>上傳底圖</b>：現有的座位圖、建築平面圖都可以（JPG、PNG；手機拍的照片也行，會自動縮小）。用滑桿調淡一點，座位方塊比較清楚。沒有圖也可以按 <b>＋ 房間方塊</b>、<b>＋ 文字</b> 自己畫，方塊拖右下角的藍點調大小，雙擊改名稱或刪除。</li>
+<li>上方會列出<b>還沒放上的設備</b>（資訊座、沒接資訊座的電腦、AP、印表機）。點一台，再點平面圖上的位置；數量多的話按 <b>全部先排在右邊</b>，再一台台拖到正確的位置。</li>
+<li>排好按 <b>完成編輯</b>。之後點座位只會看資料，不會不小心拖動。</li>
+</ol>
+<ul>
+<li>點座位：下方列出完整路徑，可以按 <b>在拓樸看</b> 或 <b>從這裡查線</b>。</li>
+<li>上方搜尋列輸入名稱、IP、線號時，符合的座位會用橘框標出來。</li>
+<li><b>列印</b>：A4 橫式，可以貼在辦公室或交給搬遷廠商。</li>
+<li>平面圖的位置和拓樸的位置是分開的，在這裡移動不會影響拓樸圖的排版。</li>
+<li>用監控服務時，需要 netmap.exe 1.20.23 以上才會保存平面圖。</li>
+</ul>
+<div class="tip"><b>💡</b>座位還沒有電腦、但牆上的線已經拉好？先在拓樸畫「配線架 → 資訊座」並填好線號，資訊座就能放上平面圖，等電腦來了再接一條跳線。</div>
 
 <h3 id="v-layer">顯示圖層與線色</h3>
 <figure class="mid"><img src="manual/layers.jpg" alt="顯示圖層" loading="lazy"></figure>
