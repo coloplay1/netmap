@@ -107,6 +107,7 @@ class App:
         keypad_fix(root)
         s.store = srv.Store(); s.service = srv.Service(s.store, log=lambda m: s.q.put(("svclog", m)))
         s.scan_thread = None; s.stop_scan = False; s.last_project = None
+        s.bg_url = installed_url() if os.name == "nt" else ""   # 這台電腦已有背景服務：視窗不再自己開服務，掃描結果直接送過去
         root.title(TITLE); root.geometry("920x700"); root.minsize(800, 600)
         s.logo = None
         png = resource("netmap.png")
@@ -145,7 +146,6 @@ class App:
         root.after(120, s.pump); root.after(1500, s.refresh_service)
         s.update_info = None
         threading.Thread(target=s.check_update, daemon=True).start()
-        s.bg_url = installed_url() if os.name == "nt" else ""   # 這台電腦已有背景服務：視窗不再自己開服務，掃描結果直接送過去
         if s.bg_url: root.after(400, s.bg_banner)
         elif autostart or s.store.settings.get("autorun"):
             root.after(300, s.start_service)
@@ -651,7 +651,7 @@ class App:
                 s.v_state.set("● 使用背景服務"); s.lbl_state.configure(style="On.TLabel")
                 for w in s.url_box.winfo_children(): w.destroy()
                 l = ttk.Label(s.url_box, text=s.bg_url, foreground="#1d6fd8", cursor="hand2"); l.pack(side="left"); l.bind("<Button-1>", lambda e: webbrowser.open(s.bg_url))
-                s.v_svcfoot.set("監控、告警與流量紀錄都在背景服務裡，請到網頁查看。"); s.root.after(5000, s.refresh_service); return
+                s.v_svcfoot.set("監控、告警與流量紀錄都在背景服務裡，請到網頁查看。"); return   # finally 會排下一次，這裡不能再排（否則每輪加倍，視窗會卡死）
             s.v_state.set("● 執行中" if on else "○ 已停止"); s.lbl_state.configure(style="On.TLabel" if on else "Off.TLabel")
             s.btn_svc.configure(text="停止服務" if on else "啟動服務")
             for w in s.url_box.winfo_children(): w.destroy()
@@ -724,7 +724,7 @@ class App:
         s.ftree.pack(fill="both", expand=True, pady=(6, 0))
         ttk.Label(fr, text="提示：流量紀錄只要從一台設備送就夠了（通常是防火牆的 LAN 介面）。需要先在「監控服務」啟動服務，才能用瀏覽器看流量排行。",
                   style="Muted.TLabel", wraplength=860).pack(anchor="w", pady=(6, 0))
-        if st.get("flow_enabled"): s.service.start_flow()
+        if st.get("flow_enabled") and not s.bg_url: s.service.start_flow()   # 有背景服務時由它接收，視窗不要搶同一個 UDP 埠
         def tick():
             try: s.refresh_flow()
             finally: s.root.after(5000, tick)
