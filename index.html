@@ -5237,7 +5237,7 @@ function planDetectImg(D){const{W,H,d}=D,N=W*H;const blue=new Uint8Array(N),dark
 function planTok(t){return String(t||'').toUpperCase().replace(/[\s_]/g,'')}
 /* 比對用：大小寫、空白不計，數字前面的 0 也不計（C3＝C03、B1＝B01） */
 function planKeyN(t){return planTok(t).replace(/^([A-Z]+-?)0+(?=\d)/,'$1')}
-function planFixTok(t){t=planTok(t).replace(/[^A-Z0-9\-]/g,'');if(/^[A-Z]{1,4}-?\d{1,4}$/.test(t))return t;const m=t.match(/^([A-Z]{1,4}?-?)([0-9OILSZ]{1,4})$/);if(m)t=m[1]+m[2].replace(/O/g,'0').replace(/[IL]/g,'1').replace(/S/g,'5').replace(/Z/g,'2');return t}
+function planFixTok(t){t=planTok(t).replace(/[^A-Z0-9\-]/g,'');if(/^[A-Z]{1,4}-?\d{1,4}$/.test(t))return t.replace(/^([A-Z]+?)([OIL]+)(\d+)$/,(_,a,b,c)=>a+b.replace(/O/g,'0').replace(/[IL]/g,'1')+c);const m=t.match(/^([A-Z]{1,4}?-?)([0-9OILSZ]{1,4})$/);if(m)t=m[1]+m[2].replace(/O/g,'0').replace(/[IL]/g,'1').replace(/S/g,'5').replace(/Z/g,'2');return t}
 function loadScript(u){return new Promise((ok,no)=>{const s=document.createElement('script');s.src=u;s.onload=ok;s.onerror=()=>no(new Error('載入失敗：'+u));document.head.appendChild(s)})}
 const TESS_BASE=()=>window.__tessBase||{lib:'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js',worker:'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js',core:'https://cdn.jsdelivr.net/npm/tesseract.js-core@5',lang:'https://cdn.jsdelivr.net/npm/@tesseract.js-data/eng@1.0.0/4.0.0_best_int'};
 async function planOcr(D,boxes,prog){const B=TESS_BASE();if(!window.Tesseract)await loadScript(B.lib);const w=await Tesseract.createWorker('eng',1,{workerPath:B.worker,corePath:B.core,langPath:B.lang});
