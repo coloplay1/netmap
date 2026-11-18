@@ -100,7 +100,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="0 0 256 256" aria-hidden="true"><rect width="256" height="256" rx="56" fill="#fff"/><rect x="42" y="38" width="86" height="180" rx="4" fill="none" stroke="#111" stroke-width="13"/><path d="M66 82H104M66 116H104M66 150H104M66 184H104" stroke="#111" stroke-width="11" stroke-linecap="round"/><path d="M128 96C168 96 170 70 200 70" fill="none" stroke="#F2C230" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="70" r="13" fill="#F2C230"/><path d="M128 130C168 130 170 150 200 150" fill="none" stroke="#1E9BEA" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="150" r="13" fill="#1E9BEA"/><path d="M128 178C162 178 172 206 196 206" fill="none" stroke="#5B6472" stroke-width="11" stroke-linecap="round" stroke-dasharray="1 18"/><circle cx="210" cy="206" r="11" fill="none" stroke="#5B6472" stroke-width="7"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v3.27.0 · netmap.exe v1.20.20</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v3.27.1 · netmap.exe v1.20.20</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -140,7 +140,7 @@ code,td,li,p{overflow-wrap:anywhere}
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
     <a class="btn ghost" href="RackTrace-manual.pdf" download>下載 PDF 版手冊</a>
-    <a class="btn ghost" href="#changelog">最新更新：v3.27.0</a>
+    <a class="btn ghost" href="#changelog">最新更新：v3.27.1</a>
   </div>
 </div>
 
@@ -468,11 +468,11 @@ code,td,li,p{overflow-wrap:anywhere}
 <li><b>把設備放進房間、機房或桌子</b>：選取那個框，右側會列出還沒放上的設備，點一下就自動排進框裡；已在框裡的設備也列在下面，可以拿掉。</li>
 <li>放置中（選了工具或設備）上方會顯示「放置中」，在平面圖上按<b>右鍵</b>、Esc 或「取消」就能取消。</li>
 <li><b>和拓樸互通</b>：點平面圖上的座位、設備，或機櫃面板裡的設備名稱，右側會打開和拓樸圖相同的設備屬性，名稱、IP、型號、接線都在這裡改，兩邊同步。</li>
-<li><b>點物件看接到哪台交換器</b>：點平面圖上的座位或設備，畫面角落會跳出小視窗：線號 → 交換器名稱和<b>埠號</b>（橘色大字），下面是那台交換器的埠位圖，接到的埠用橘框標出；有即時監控時會寫「連線中」或「斷線」。平面圖上同時畫一條<b>橘色虛線</b>指到交換器所在的機櫃（機櫃裡那一台會亮起來）。點小視窗裡的任一個埠，右側會打開那個埠的屬性和整條路徑。小視窗會自動放在不擋住物件和交換器的角落。</li>
+<li><b>點物件看接到哪台交換器</b>：點平面圖上的座位或設備，畫面角落會跳出小視窗：線號 → 交換器名稱和<b>埠號</b>（橘色大字），下面是那台交換器的埠位圖，接到的埠用橘框標出；有即時監控時會寫「連線中」或「斷線」。平面圖上同時畫一條<b>橘色虛線</b>指到交換器所在的機櫃（機櫃裡那一台會亮起來）。點小視窗裡的任一個埠，右側會打開那個埠的屬性和整條路徑。小視窗位置固定（預設左下角），不會跟著物件跳動；拖曳它的標題列可以移到順手的位置，下次會記住。</li>
 <li><b>框選與縮放</b>（編輯版面時）：在空白處拖曳可以框選多個物件，物件在房間上時按住 <b>Shift</b> 拖曳；<b>Ctrl／Shift＋點</b>可以加選或取消。選到多個時，拖曳任一個會一起移動，上方的工具列可以一起放大、縮小或刪除（設備只是從平面圖拿掉，拓樸圖還在）。選取單一座位、設備、機櫃、圖示或文字後，拖<b>右下角的藍點</b>可以縮放大小。編輯時點座位或設備，右側一樣會打開設備屬性並跳出交換器埠位。</li>
 <li><b>右鍵選單</b>：在座位或設備上按右鍵（手機長按），可以選「設備屬性」「在拓樸看」「從這裡查線」「從平面圖拿掉」。</li>
 <li><b>在平面圖找接到哪裡</b>：設備屬性最上面的「網路埠狀態」和拓樸一樣用顏色標出已接的線，有即時監控時埠上會有綠點（連線）或紅點（斷線）。剛點開時，整台設備連到的座位、設備、機櫃都會用<b>橘色框</b>標出來，設備自己是<b>藍色框</b>；點單一個埠就只標出那個埠接到的物件，再按「整台」回到全部。下方的名稱點一下會捲到那個位置並閃一下；沒放在平面圖上的設備也會列出來，方便補放。</li>
-<li><b>畫布大小</b>：編輯時畫布右邊、下邊和右下角有藍色把手，拖曳就能調整畫布大小。</li>
+<li><b>畫布沒有邊界</b>：和拓樸一樣會自動延伸，物件拖到右邊或下面畫布就跟著變大；拖到左邊或上面時，整張圖（含底圖）會自動往右下挪。拖曳到視窗邊緣會自動捲動。</li>
 <li><b>縮放與移動</b>：Ctrl＋滾輪（觸控板捏合）以游標為中心縮放，也可以按上方的 −／＋；手機、平板用兩指縮放。拖曳空白處可以移動畫面。</li>
 <li>排好按 <b>完成編輯</b>。之後點座位只會看資料，不會不小心拖動。</li>
 </ol>
@@ -1105,7 +1105,8 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 
 <section id="changelog">
 <h2><span class="n">D</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v3.27.0　平面圖：框選多個物件、物件可以縮放、編輯時也顯示設備資訊與連線</b><span class="tag new">最新 · 2026-11-18</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>編輯版面時，在空白處拖曳可以框選多個物件（在房間上按住 Shift 拖曳）；Ctrl／Shift＋點可以加選或取消。選到多個時，拖曳任一個會一起移動，上方工具列可以一起放大、縮小、刪除。</li><li>選取一個座位、設備、機櫃、圖示或文字後，拖右下角的藍點可以縮放大小，會記在平面圖裡。</li><li>編輯版面時點座位或設備，右側同樣會打開設備屬性，並跳出接到哪台交換器的哪一埠和虛線；點機櫃會在右側顯示機櫃內容。原本底部的名稱／IP 小列改用右側屬性欄。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.27.1　平面圖：交換器小視窗固定位置可拖曳、畫布自動延伸沒有邊界</b><span class="tag new">最新 · 2026-11-18</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>點物件跳出的交換器埠位小視窗改成固定位置（預設左下角），不會再跟著物件亂跳；拖曳標題列可以移到想要的位置，會記住。</li><li>畫布像拓樸一樣自動延伸：沒有邊框線，物件拖到右邊或下面畫布就跟著變大，拖到左邊或上面時整張圖（含底圖）會自動往右下挪；拖曳到視窗邊緣會自動捲動。不再需要手動拉畫布邊界。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.27.0　平面圖：框選多個物件、物件可以縮放、編輯時也顯示設備資訊與連線</b><span class="tag">2026-11-18</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>編輯版面時，在空白處拖曳可以框選多個物件（在房間上按住 Shift 拖曳）；Ctrl／Shift＋點可以加選或取消。選到多個時，拖曳任一個會一起移動，上方工具列可以一起放大、縮小、刪除。</li><li>選取一個座位、設備、機櫃、圖示或文字後，拖右下角的藍點可以縮放大小，會記在平面圖裡。</li><li>編輯版面時點座位或設備，右側同樣會打開設備屬性，並跳出接到哪台交換器的哪一埠和虛線；點機櫃會在右側顯示機櫃內容。原本底部的名稱／IP 小列改用右側屬性欄。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.26.2　平面圖：機櫃改在右側屬性欄顯示，點設備進入、可返回機櫃</b><span class="tag">2026-11-18</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>點平面圖上的機櫃，不再另開中間一欄，改在右側屬性欄顯示機櫃：設備清單（含燈號）、U 位、移出。</li><li>點機櫃裡的設備名稱，同一欄換成設備屬性，最上面有「‹ 回到機櫃」可以回去。</li><li>「放入設備」平常收起來，按了才出現搜尋框，打字後才列出符合的設備；新增設備也在這裡。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.26.1　平面圖：點物件跳出接到的交換器與埠，底部動作列改成右鍵選單</b><span class="tag">2026-11-18</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>點平面圖上的座位或設備，旁邊會跳出小視窗：線號 → 交換器名稱和埠號（大字標出），下面是那台交換器的埠位圖，接到的埠用橘框標出，有即時監控時顯示連線或斷線。</li><li>平面圖上同時畫一條橘色虛線，指到交換器所在的機櫃（機櫃清單裡那一台也會亮起來），或放在平面圖上的交換器。</li><li>點小視窗裡的任一個埠，右側會打開那個埠的屬性和整條路徑。</li><li>原本底部的「在拓樸看／從這裡查線／從平面圖拿掉」改成右鍵選單（手機長按），不再佔畫面。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.26.0　平面圖：右側設備面板顯示埠狀態，點埠或整台在平面圖標出接到的物件</b><span class="tag">2026-11-18</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>在平面圖點設備，右側設備屬性最上面多了「網路埠狀態」：和拓樸一樣用顏色標出已接的線，有即時監控時還會顯示連線（綠）或斷線（紅）。</li><li>預設標出整台設備連到的所有座位、設備和機櫃（橘色框），設備本身用藍色框；點單一個埠就只標出那個埠接到的物件。</li><li>下方列出對應的物件名稱，點一下會捲到平面圖上的位置並閃一下；沒放在平面圖上的設備也會列出來。</li></ul></div>
@@ -1295,7 +1296,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 </section>
 
 
-<p class="foot">RackTrace · 網頁 v3.27.0 · netmap.exe v1.20.20 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">RackTrace · 網頁 v3.27.1 · netmap.exe v1.20.20 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>
