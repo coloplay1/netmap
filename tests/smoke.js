@@ -27,6 +27,7 @@ async function page(b,opt){const ctx=await b.newContext(opt);const p=await ctx.n
   ok(await p.evaluate(()=>planKeyN('c03')===planKeyN('C3')&&planFixTok('bo4')==='B04'),'座位配置編號比對');
   ok(await p.evaluate(()=>planFixTok('BS19')==='BS19'&&planLayoutOut(curPlan()).space==='plan'),'平面圖配置匯出');
   ok(await p.evaluate(()=>{const st=addDev('seat',{name:'CIW',x:0,y:0});st.ports.find(p=>p.side===1).wire='Z77';normalize(S);I=idx();const sw=S.devices.find(d=>!TYPES[d.type].pass&&d.type!=='end'&&d.ports.some(p=>!I.cab[p.id]));const fp=sw.ports.find(p=>!I.cab[p.id]);portWireGo(fp.id,'z077');I=idx();const c=I.cab[fp.id];const ok=!!c&&c.label==='Z77'&&I.owner[c.b]===st;S.cables=S.cables.filter(x=>x!==c);S.devices=S.devices.filter(d=>d!==st);I=idx();renderAll();return ok}),'交換器埠填線號自動接到座位');
+  ok(await p.evaluate(()=>{const d=S.devices.find(x=>x.type==='end');const was=d.ping;setDevOff(d,true);const ok1=d.off&&d.ping===false&&devState(d)==='none'&&quietDown(d);setDevOff(d,false);return ok1&&!d.off&&d.ping===was}),'設備標示停用與恢復');
   await p.evaluate(()=>setView('map'));
   ok(await p.evaluate(()=>{const n=S.cables.length;snap();S.cables.pop();renderAll();undo();return S.cables.length===n}),'復原');
   ok(!p.errs.length,'沒有 JavaScript 錯誤'+(p.errs.length?'：'+p.errs.slice(0,3).join(' | '):''));
