@@ -391,6 +391,12 @@ code,td,li,p{overflow-wrap:anywhere}
 </ul>
 <figure class="mid"><img src="manual/lag-hint.jpg" alt="可能是聚合的提示" loading="lazy"><figcaption>點埠時看到的提示：一鍵把兩端設成同一群組，或略過。</figcaption></figure>
 
+<h3 id="e-iptype">DHCP 和固定 IP 的設備</h3>
+<p>每台設備的設備屬性裡有「<b>IP 類型</b>」：</p>
+<ul><li><b>DHCP：跟著 MAC 自動對齊 IP</b>（預設）：防火牆換發新 IP 時，背景服務會用 MAC 從防火牆、交換器的 ARP 表找到新的 IP 繼續 Ping，不會誤報斷線；開著網頁時，圖上的 IP 也會自動改成新的。<b>必須填 MAC</b>，沒填會提醒。</li>
+<li><b>固定 IP</b>：一律用圖上的 IP。手動在 IP 欄填了 IP，會自動改成這一種（避免被改回去）。</li>
+<li><b>DHCP：用電腦名稱問 DNS</b>：每 5 分鐘問一次 DNS 這個名稱現在是哪個 IP，適合有加入網域、會向 DNS 登記的電腦。</li></ul>
+<p>拓樸框選多台後，上方工具列的「設為 DHCP」「設為固定 IP」可以整批改。</p>
 <h3 id="e-ipmac">匯入 IP／MAC 對照表（防火牆 DHCP、ARP）</h3>
 <p>圖上只有 MAC、沒有 IP 的設備，可以用防火牆匯出的表格補上。<b>檔案 ▸ 匯入 IP／MAC 對照</b>，貼上內容或選檔案（CSV、TSV、文字都可以；SonicWall、Fortinet 等匯出的 DHCP 租約、ARP 表直接可用，UTF-16、Big5 編碼也會自動辨識）。</p>
 <ul>
