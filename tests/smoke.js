@@ -26,6 +26,7 @@ async function page(b,opt){const ctx=await b.newContext(opt);const p=await ctx.n
   ok(await p.evaluate(()=>{const cv=document.createElement('canvas');cv.width=800;cv.height=600;const g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,800,600);g.fillStyle='#000';g.fillRect(50,50,600,10);g.fillStyle='#bfe3ee';g.fillRect(200,200,50,50);g.fillRect(300,200,50,50);const D={cv,g,W:800,H:600,d:g.getImageData(0,0,800,600).data};const R=planDetectImg(D);return R.boxes.length===2&&R.walls.some(w=>w.y===w.y2&&w.x2-w.x>500)}),'平面圖底圖自動辨識（方框與牆）');
   ok(await p.evaluate(()=>planKeyN('c03')===planKeyN('C3')&&planFixTok('bo4')==='B04'),'座位配置編號比對');
   ok(await p.evaluate(()=>planFixTok('BS19')==='BS19'&&planLayoutOut(curPlan()).space==='plan'),'平面圖配置匯出');
+  ok(await p.evaluate(()=>{const st=addDev('seat',{name:'CIW',x:0,y:0});st.ports.find(p=>p.side===1).wire='Z77';normalize(S);I=idx();const sw=S.devices.find(d=>!TYPES[d.type].pass&&d.type!=='end'&&d.ports.some(p=>!I.cab[p.id]));const fp=sw.ports.find(p=>!I.cab[p.id]);portWireGo(fp.id,'z077');I=idx();const c=I.cab[fp.id];const ok=!!c&&c.label==='Z77'&&I.owner[c.b]===st;S.cables=S.cables.filter(x=>x!==c);S.devices=S.devices.filter(d=>d!==st);I=idx();renderAll();return ok}),'交換器埠填線號自動接到座位');
   await p.evaluate(()=>setView('map'));
   ok(await p.evaluate(()=>{const n=S.cables.length;snap();S.cables.pop();renderAll();undo();return S.cables.length===n}),'復原');
   ok(!p.errs.length,'沒有 JavaScript 錯誤'+(p.errs.length?'：'+p.errs.slice(0,3).join(' | '):''));
