@@ -100,7 +100,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <header class="top">
   <button class="btn" id="tocBtn" aria-label="目錄">☰</button>
   <svg class="mark" viewBox="0 0 256 256" aria-hidden="true"><rect width="256" height="256" rx="56" fill="#fff"/><rect x="42" y="38" width="86" height="180" rx="4" fill="none" stroke="#111" stroke-width="13"/><path d="M66 82H104M66 116H104M66 150H104M66 184H104" stroke="#111" stroke-width="11" stroke-linecap="round"/><path d="M128 96C168 96 170 70 200 70" fill="none" stroke="#F2C230" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="70" r="13" fill="#F2C230"/><path d="M128 130C168 130 170 150 200 150" fill="none" stroke="#1E9BEA" stroke-width="12" stroke-linecap="round"/><circle cx="210" cy="150" r="13" fill="#1E9BEA"/><path d="M128 178C162 178 172 206 196 206" fill="none" stroke="#5B6472" stroke-width="11" stroke-linecap="round" stroke-dasharray="1 18"/><circle cx="210" cy="206" r="11" fill="none" stroke="#5B6472" stroke-width="7"/></svg>
-  <b>使用手冊</b><span class="ver hide-s">網頁 v3.36.0 · netmap.exe v1.20.20</span>
+  <b>使用手冊</b><span class="ver hide-s">網頁 v3.37.0 · netmap.exe v1.20.20</span>
   <span class="sp"></span>
   <button class="btn" id="theme" aria-label="切換深色／淺色" title="深色／淺色"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <a class="btn pri" href="./">開啟工具</a>
@@ -140,7 +140,7 @@ code,td,li,p{overflow-wrap:anywhere}
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
     <a class="btn ghost" href="RackTrace-manual.pdf" download>下載 PDF 版手冊</a>
-    <a class="btn ghost" href="#changelog">最新更新：v3.36.0</a>
+    <a class="btn ghost" href="#changelog">最新更新：v3.37.0</a>
   </div>
 </div>
 
@@ -391,6 +391,8 @@ code,td,li,p{overflow-wrap:anywhere}
 </ul>
 <figure class="mid"><img src="manual/lag-hint.jpg" alt="可能是聚合的提示" loading="lazy"><figcaption>點埠時看到的提示：一鍵把兩端設成同一群組，或略過。</figcaption></figure>
 
+<h3 id="e-merge">合併重複的設備</h3>
+<p>同一台設備被建了兩個（例如平面圖匯入時建的「BUSINESS25」和掃描到的「business25」，或平面圖上的座位和拓樸上已經接好線的座位），燈號、IP 會分在兩邊。設備屬性上方會提示「可能和 … 是同一台」（名稱、MAC、IP 相同，或預留的線號接在另一個座位），按「<b>合併到 …</b>」；也可以在設備屬性下方按「合併到…」自己選。合併時平面圖位置、使用人、IP、MAC 等沒填的資料會帶過去，接線改接到另一台的空埠，然後刪除重複的那台；可以選合併後用哪個名稱。</p>
 <h3 id="e-iptype">DHCP 和固定 IP 的設備</h3>
 <p>每台設備的設備屬性裡有「<b>IP 類型</b>」：</p>
 <ul><li><b>DHCP：跟著 MAC 自動對齊 IP</b>（預設）：防火牆換發新 IP 時，背景服務會用 MAC 從防火牆、交換器的 ARP 表找到新的 IP 繼續 Ping，不會誤報斷線；開著網頁時，圖上的 IP 也會自動改成新的。<b>必須填 MAC</b>，沒填會提醒。</li>
@@ -1129,7 +1131,8 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 
 <section id="changelog">
 <h2><span class="n">D</span>版本紀錄</h2>
-<div class="clog"><div class="v"><b>v3.36.0　未配對設備自動整理，框跟著數量縮放</b><span class="tag new">最新 · 2026-11-20</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>未配對設備框預設「自動整理」：有設備接上線離開、或新增未配對的設備時，會自動重新排進框裡，空位補齊，框跟著台數變大變小；不用再按「再收進」。</li><li>手動把設備拖到框外很遠的地方，它就不會被自動拉回來（接上線後一切照常）。框標題上的「✓ 自動整理」可以關閉；「取消框選」會一起關閉自動整理。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.37.0　合併重複的設備</b><span class="tag new">最新 · 2026-11-20</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>同一台設備被建了兩個（例如平面圖匯入時建的 BUSINESS25 和掃描到的 business25、平面圖的座位和拓樸接好線的座位）時，設備屬性上方會提示「可能和 … 是同一台」，按「合併到 …」即可；也可以在設備屬性下方按「合併到…」自己選。</li><li>合併時：平面圖位置、使用人、IP、MAC 等沒填的資料帶過去，接線改接到另一台的空埠，預留線號一起帶過去，然後刪除重複的那台；可以選合併後要用哪個名稱。</li></ul></div>
+<div class="clog"><div class="v"><b>v3.36.0　未配對設備自動整理，框跟著數量縮放</b><span class="tag">2026-11-20</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>未配對設備框預設「自動整理」：有設備接上線離開、或新增未配對的設備時，會自動重新排進框裡，空位補齊，框跟著台數變大變小；不用再按「再收進」。</li><li>手動把設備拖到框外很遠的地方，它就不會被自動拉回來（接上線後一切照常）。框標題上的「✓ 自動整理」可以關閉；「取消框選」會一起關閉自動整理。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.35.7　修正：「接到…」選設備時帶入線號、未配對框不再亂跳</b><span class="tag">2026-11-20</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>「接到…」視窗先在上面填線號、再從下面選設備接上時，填的線號會存成這條線的線號（之前會被忽略）。</li><li>未配對設備的虛線框：接上線的設備會真正離開框，之後再拔線也不會把框撐到畫布另一頭；拖到框外很遠的設備也不再算在框裡，框不會亂跳。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.35.6　座位線號欄：狀態即時更新、顯示接到哪個埠</b><span class="tag">2026-11-19</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>座位「線號」每一格下面的說明會跟著打字即時更新：會自動接到哪個交換器埠、線號是否已被使用、按 Enter 儲存。已接線的會寫「接到 D-Link02 · 埠 11」，那條線還沒有線號時會提醒。</li><li>線號填在還沒接線的孔，但其實是另一個孔已經接好的那條線時，會出現「套用到那個孔」按鈕，一按就把線號改到正確的線上。</li></ul></div>
 <div class="clog"><div class="v"><b>v3.35.5　平面圖座位卡片顯示電腦的 IP</b><span class="tag">2026-11-19</span><span class="tag">netmap.exe 1.20.23</span></div><ul><li>平面圖的座位卡片，在每台電腦名稱下面加上 IP；拓樸新增或修改連線、IP 後，切到平面圖就會顯示最新的。IP 沒填或寫「DHCP」時，用監控從 MAC 查到的目前 IP。</li></ul></div>
@@ -1350,7 +1353,7 @@ sudo softflowd -i eth0 -n <b>{IP}</b>:2055 -v 9</pre></details>
 </section>
 
 
-<p class="foot">RackTrace · 網頁 v3.36.0 · netmap.exe v1.20.20 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
+<p class="foot">RackTrace · 網頁 v3.37.0 · netmap.exe v1.20.20 · <a href="https://github.com/coloplay1/netmap">GitHub</a></p>
 </main>
 </div>
 <div id="lb" role="dialog" aria-label="放大圖片"><img alt=""></div>
