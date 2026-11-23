@@ -1,6 +1,9 @@
 // 由 manual.html 產生 RackTrace-manual.pdf：封面（直式標誌）、目錄（含頁碼，兩階段排版）、內文。
-const {chromium}=require('playwright');const fs=require('fs');const {execFileSync}=require('child_process');
-const ROOT='/home/claude/netmap',OUT=ROOT+'/RackTrace-manual.pdf',TMP='/tmp/claude-0/t9/pdf-pass1.pdf';
+const {chromium}=require('playwright');const fs=require('fs');const path=require('path');const os=require('os');const {execFileSync}=require('child_process');
+// 用法：node docs/build_pdf.js（需要 playwright、@fontsource/noto-sans-tc、@fontsource/inter、@fontsource/jetbrains-mono、python3＋pypdf、pdftotext）
+// GitHub Actions（.github/workflows/manual-pdf.yml）每次手冊更新都會自動重做，上傳到 Release「manual-latest」。
+const ROOT=path.resolve(__dirname,'..'),OUT=process.env.PDF_OUT||ROOT+'/RackTrace-manual.pdf',TMP=path.join(os.tmpdir(),'racktrace-pdf-pass1.pdf');
+const FONTS='file://'+path.resolve(path.dirname(require.resolve('@fontsource/noto-sans-tc/package.json')),'..')+'/';
 const ver=JSON.parse(fs.readFileSync(ROOT+'/version.json','utf8'));
 const logo=fs.readFileSync(ROOT+'/racktrace-logo.svg','utf8').replace(/width="\d+" height="\d+"/,'width="100%" height="100%"').replace(/<rect width="800" height="900" fill="#FFFFFF"\/>/,'');
 const CSS=`@page{size:A4;margin:15mm 15mm 17mm}
@@ -34,7 +37,7 @@ details>summary{list-style:none}details>summary::-webkit-details-marker{display:
 #tocp li .dots{flex:1;border-bottom:1px dotted #aaa;transform:translateY(-1mm)}#tocp li .pg{min-width:8mm;text-align:right}`;
 async function render(pages){const b=await chromium.launch();const p=await b.newPage();await p.route(/fonts\.g/,r=>r.abort());
   await p.goto('file://'+ROOT+'/manual.html',{waitUntil:'load'});
-  const F='file:///tmp/claude-0/fonts/node_modules/@fontsource/';
+  const F=FONTS;
   for(const u of ['noto-sans-tc/400.css','noto-sans-tc/500.css','noto-sans-tc/700.css','inter/400.css','inter/500.css','inter/700.css','jetbrains-mono/400.css'])await p.addStyleTag({url:F+u});
   await p.addStyleTag({content:'body,button,input{font-family:"Inter","Noto Sans TC",sans-serif!important}code,pre,kbd{font-family:"JetBrains Mono","Noto Sans TC",monospace!important}'});
   const heads=await p.evaluate(({css,logo,ver,pages})=>{document.documentElement.setAttribute('data-theme','light');
@@ -52,6 +55,6 @@ async function render(pages){const b=await chromium.launch();const p=await b.new
   await b.close();return heads}
 (async()=>{const heads=await render(null);
   // 第一次排版後找出每個標題在第幾頁
-  const pages=JSON.parse(execFileSync('python3',['/tmp/claude-0/t/pdf_pages.py',TMP,JSON.stringify(heads)]).toString());
+  const pages=JSON.parse(execFileSync('python3',[path.join(ROOT,'scripts','pdf_pages.py'),TMP,JSON.stringify(heads)]).toString());
   await render(pages);console.log('pages found',Object.keys(pages).length,'/',heads.length);
   console.log(execFileSync('python3',['-c',`import pypdf;r=pypdf.PdfReader('${OUT}');print(len(r.pages),'pages')`]).toString())})();

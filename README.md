@@ -45,7 +45,7 @@ Or run from source: `python tools/netmap-snmp/netmap_server.py` (Python 3.8+).
 
 ### Documentation
 
-[Manual (HTML, Traditional Chinese)](https://coloplay1.github.io/netmap/manual.html) · [PDF](https://coloplay1.github.io/netmap/RackTrace-manual.pdf) · [Full feature list](docs/FEATURES.zh-TW.md) · [Changelog](https://coloplay1.github.io/netmap/manual.html#changelog)
+[Manual (HTML, Traditional Chinese)](https://coloplay1.github.io/netmap/manual.html) · [PDF](https://github.com/coloplay1/netmap/releases/download/manual-latest/RackTrace-manual.pdf) · [Full feature list](docs/FEATURES.zh-TW.md) · [Changelog](https://coloplay1.github.io/netmap/manual.html#changelog)
 
 ### License
 
@@ -89,7 +89,7 @@ Or run from source: `python tools/netmap-snmp/netmap_server.py` (Python 3.8+).
 
 ### 文件
 
-[使用手冊（網頁）](https://coloplay1.github.io/netmap/manual.html) · [PDF](https://coloplay1.github.io/netmap/RackTrace-manual.pdf) · [完整功能清單](docs/FEATURES.zh-TW.md) · [版本紀錄](https://coloplay1.github.io/netmap/manual.html#changelog)
+[使用手冊（網頁）](https://coloplay1.github.io/netmap/manual.html) · [PDF](https://github.com/coloplay1/netmap/releases/download/manual-latest/RackTrace-manual.pdf) · [完整功能清單](docs/FEATURES.zh-TW.md) · [版本紀錄](https://coloplay1.github.io/netmap/manual.html#changelog)
 
 ### 授權
 

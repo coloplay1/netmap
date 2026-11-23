@@ -114,7 +114,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <li><a href="#build">2. 畫圖</a>
   <ol><li><a href="#b-dev">設備與型號</a></li><li><a href="#b-cable">接線</a></li><li><a href="#b-wifi">無線連線</a></li><li><a href="#b-patch">配線架與資訊座</a></li><li><a href="#b-fiber">光纖</a></li><li><a href="#port">埠設定</a></li><li><a href="#b-layout">排列與走線</a></li><li><a href="#b-select">選取多台設備</a></li><li><a href="#b-pages">多張圖與全部總覽</a></li></ol></li>
 <li><a href="#auto">3. 自動建圖</a>
-  <ol><li><a href="#e-setup">安裝 netmap.exe</a></li><li><a href="#e-install">免安裝版</a></li><li><a href="#e-webscan">在網頁裡掃描</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-autosnmp">自動偵測 SNMP</a></li><li><a href="#e-ipmac">匯入 IP／MAC</a></li><li><a href="#a-lldp">匯入 LLDP</a></li><li><a href="#e-hub">沒有管理功能的設備</a></li><li><a href="#e-home">在家測試</a></li></ol></li>
+  <ol><li><a href="#e-setup">安裝 netmap.exe</a></li><li><a href="#e-install">免安裝版</a></li><li><a href="#e-webscan">在網頁裡掃描</a></li><li><a href="#e-scan">SNMP 掃描</a></li><li><a href="#e-disc">網段探索</a></li><li><a href="#e-autosnmp">自動偵測 SNMP</a></li><li><a href="#e-ipmac">匯入 IP／MAC</a></li><li><a href="#e-wimport">匯入配線表／弱電清冊</a></li><li><a href="#a-lldp">匯入 LLDP</a></li><li><a href="#e-hub">沒有管理功能的設備</a></li><li><a href="#e-home">在家測試</a></li></ol></li>
 <li><a href="#trace">4. 查線與檢視</a>
   <ol><li><a href="#t-trace">查線路</a></li><li><a href="#v-rack">機櫃視圖</a></li><li><a href="#v-table">線路表</a></li><li><a href="#v-plan">平面圖</a></li><li><a href="#v-layer">圖層與線色</a></li><li><a href="#v-panel">面板與主題</a></li><li><a href="#s-labels">線標列印</a></li></ol></li>
 <li><a href="#monitor">5. 監控</a>
@@ -139,7 +139,7 @@ code,td,li,p{overflow-wrap:anywhere}
   <div class="row">
     <a class="btn" href="./">開啟網頁版</a>
     <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/latest/download/netmap.exe">下載 netmap.exe（Windows）</a>
-    <a class="btn ghost" href="RackTrace-manual.pdf" download>下載 PDF 版手冊</a>
+    <a class="btn ghost" href="https://github.com/coloplay1/netmap/releases/download/manual-latest/RackTrace-manual.pdf">下載 PDF 版手冊</a>
     <a class="btn ghost" href="#changelog">最新更新：v__WEBV__</a>
   </div>
 </div>
@@ -411,6 +411,15 @@ code,td,li,p{overflow-wrap:anywhere}
 <li><b>圖上沒有的設備也加進來</b>（預設勾選，只加內網 IP）：知道在哪台不受管交換器後面的放在它旁邊，其他的放在圖下方的「待接線」區，都標橘色「待接線」。</li>
 </ul>
 
+<h3 id="e-wimport">匯入配線表／弱電清冊（CSV、Excel）</h3>
+<p>新辦公室裝潢、接手舊案場時，手上常有一份弱電商給的 Excel 清冊（配線架哪一埠對到哪個資訊座、樓層、網路或電話）。<b>檔案 ▸ 匯入配線表／弱電清冊</b>：在 Excel 選取整張表（含標題列）複製、貼上，或選存成 CSV 的檔案（UTF-8 或 Big5 都可以）。</p>
+<ul>
+<li><b>弱電清冊</b>：常見欄位是 <b>樓層、配線架、埠、線號、座位、類型（網路／電話）、使用人</b>。匯入後：沒有的配線架會自動建立（埠數依清冊最大埠號）；配線架那一埠記下線號（預留）；座位放到對應樓層的平面圖（沒有樓層欄就放到你選的平面圖），每個孔填好線號、網路或電話。之後在座位加入電腦或電話，會自動從配線架那一埠接過去。</li>
+<li><b>本工具匯出的配線表 CSV</b>（線號、A 設備、A 埠、B 設備、B 埠…）：可以原樣讀回，用來在另一個專案重建接線，或改完 Excel 再匯回來。</li>
+<li>標題會自動辨認；下方每一欄都可以手動改成代表什麼（或「不用」）。匯入前會先顯示會新增幾台設備、幾條線、幾個座位孔，以及哪些列會略過、為什麼（找不到埠、埠已經接了別的線…）。</li>
+<li>線號以 T 開頭、或類型寫「電話／分機」的，會當成電話孔、線材用「電話線」。</li>
+<li>匯入後按「復原」可以整批撤銷。</li>
+</ul>
 <h3 id="a-lldp">匯入 LLDP 指令結果（不用裝程式）</h3>
 <p>沒有裝 netmap.exe 也可以用 Switch 的指令結果建立連線：<b>檔案 ▸ 匯入 LLDP</b>，貼上 <code>show lldp neighbors</code>（或 <code>show cdp neighbors</code>）的結果，會自動建立設備與線。</p>
 
@@ -522,7 +531,7 @@ code,td,li,p{overflow-wrap:anywhere}
 <ul>
 <li><b>顯示圖層</b>：勾選要顯示在設備下方的資訊：廠牌型號、IP、MAC、Gateway、位置／機櫃、埠位 VLAN、PoE／LACP 圖示、所有線號、線路速率。</li>
 <li><b>全部收成圖示／全部展開網路埠</b>：一次切換所有設備的顯示模式。</li>
-<li><b>縮小時收合終端</b>（預設關閉）：勾選後，縮小到 50% 以下時已接線的終端會收成「終端 ×N」，大圖比較不擠。</li>
+<li><b>縮小時收合終端</b>：勾選後，縮小到 50% 以下時已接線的終端會收成「終端 ×N」，大圖比較不擠、拖曳也比較順。沒有自己設定過的話，同一頁 80 台以上預設開啟、80 台以下預設關閉；自己勾過或取消過就照你的設定。</li>
 <li><b>線色</b>：自訂、依線材（單模光纖黃、多模水藍、DAC 粗黑、Console 淺藍虛線）、依 VLAN（Trunk 為深灰虛線）。</li>
 </ul>
 
@@ -910,16 +919,18 @@ code,td,li,p{overflow-wrap:anywhere}
 <h3 id="save">儲存、匯出與分享</h3>
 <div class="tw"><table>
 <tr><th>功能</th><th>說明</th></tr>
-<tr><td>自動儲存</td><td>每次修改都存在這台電腦的瀏覽器（清除瀏覽器資料會不見）。</td></tr>
+<tr><td>自動儲存</td><td>每次修改都存在這台電腦的瀏覽器（清除瀏覽器資料會不見）。專案大時（例如好幾層樓的平面圖底圖）和歷史版本會自動改存瀏覽器的 IndexedDB，不受 localStorage 5～10MB 的上限影響。</td></tr>
 <tr><td>匯出／匯入 JSON</td><td>完整備份，換電腦或交給同事時使用。</td></tr>
 <tr><td>匯出 CSV</td><td>線路表給 Excel。</td></tr>
 <tr><td>匯出 SVG／PNG</td><td>圖片，貼到報告或列印。</td></tr>
+<tr><td>匯入配線表／弱電清冊</td><td>用 CSV 或從 Excel 複製貼上，反向建出配線架、跳線、座位與孔的線號，見 <a href="#e-wimport">匯入配線表</a>。</td></tr>
 <tr><td>匯入 LLDP</td><td>貼上 Switch 的 <code>show lldp neighbors</code> 結果，自動建立連線。</td></tr>
 <tr><td>分享連結、QR Code</td><td>把整張圖壓縮進網址，對方打開就是唯讀版，可貼在機櫃上用手機掃。</td></tr>
 <tr><td>歷史版本</td><td>改錯了可以回到之前的版本，見下方。</td></tr>
 <tr><td>線標列印</td><td>每條線兩端的標籤，A4 標籤紙或 Brother P-touch，見 <a href="#s-labels">線標列印</a>。</td></tr>
 </table></div>
 <div class="note"><b>⚠️</b>分享連結包含圖上的 IP、MAC 等資訊，請只給需要的人。</div>
+<p><b>對外交付（去識別化）</b>：要把圖交給弱電商、電信商或設備原廠時，在「分享連結」「匯出拓樸圖 SVG／PNG」「匯出平面圖（PNG／PDF／配置檔）」「列印現場快速卡」的視窗勾「<b>對外交付：遮掉</b>」，再選要遮的項目：<b>IP</b>、<b>MAC</b>、<b>備註</b>、<b>使用人</b>。用 IP 或 MAC 當名稱的設備會改成「PC 桌機 3」這類名稱；維修單、查線紀錄、SNMP 帳密一律不帶出去。只影響匯出的內容，你自己的圖不會被改。設備名稱本身（例如用人名取的電腦名稱）不會改，要交出去前請自己看一下預覽。</p>
 <p><b>連監控服務時暫時斷線</b>（例如筆電切到飛航模式、Wi-Fi 斷掉）：修改會先暫存在這台裝置，每 5 秒自動重試，連回來就送出，不會遺失。如果這段時間別人也改了圖，會跳出視窗讓你選「<b>留我的</b>」或「<b>用最新的</b>」。重新打開網頁時若還有沒送出的修改，也會詢問要不要送出。</p>
 
 <h3 id="s-history">歷史版本與還原</h3>
@@ -1025,7 +1036,13 @@ __VENDORS__
 <h3>輸入框打不出「.」或「/」？</h3>
 <p>v1.1.1 起，netmap.exe 的輸入框會自動切到英數模式，並把全形符號轉成半形。請更新到最新版。</p>
 <h3>資料存在哪裡？會上傳嗎？</h3>
-<p>網頁版存在你的瀏覽器（localStorage），不會上傳。netmap.exe 的設定、掃描結果與流量紀錄存在 <code>%APPDATA%\netmap</code>，SNMP 帳密以 Windows 帳號加密（DPAPI），只有同一個 Windows 帳號能解開。</p>
+<p>網頁版存在你的瀏覽器，不會上傳：一般大小的專案在 localStorage，專案大（例如平面圖底圖多）和歷史版本在 IndexedDB，都是自動的。要換電腦或備份，用「檔案 ▸ 下載專案檔（JSON）」。</p>
+<p>netmap.exe 的設定、專案、掃描結果與流量紀錄，依執行方式放在不同資料夾：</p>
+<div class="tw"><table><tr><th>執行方式</th><th>資料夾</th></tr>
+<tr><td><b>安裝版</b>（RackTrace-Setup.exe，開機自動啟動的背景服務）</td><td><code>C:\ProgramData\netmap</code>（所有 Windows 帳號共用）</td></tr>
+<tr><td><b>免安裝版</b>（直接執行 netmap.exe，或 Python 版 netmap_server.py）</td><td><code>%APPDATA%\netmap</code>（目前登入的 Windows 帳號，通常是 <code>C:\Users\你的帳號\AppData\Roaming\netmap</code>）</td></tr>
+</table></div>
+<p>從免安裝版改裝安裝版時，安裝程式會把 <code>%APPDATA%\netmap</code> 的資料複製到 <code>C:\ProgramData\netmap</code>。要備份或搬家，複製你正在用的那一個資料夾即可。SNMP 帳密以 Windows 加密（DPAPI），換電腦後要重新輸入。</p>
 <h3>畫面上的面板不見了？</h3>
 <p>按右上的「面板」按鈕，勾選要顯示的面板，或按「重設所有面板位置」。</p>
 <h3>圖跑到看不到的地方？</h3>

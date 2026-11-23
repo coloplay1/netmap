@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 tools/netmap-snmp/web/
 tools/netmap-snmp/oui.json.gz
+RackTrace-manual.pdf

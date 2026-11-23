@@ -1,0 +1,43 @@
+name: Manual PDF
+
+# 手冊（manual.html）或版本號更新時，自動重做 PDF 版手冊，上傳到 Release「manual-latest」。
+# PDF 不放進 repo，避免每次發版都讓 repo 多 6MB。
+on:
+  push:
+    branches: [main]
+    paths: ['manual.html', 'version.json', 'docs/build_pdf.js', 'scripts/pdf_pages.py']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: manual-pdf
+  cancel-in-progress: true
+
+jobs:
+  pdf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+          pip install pypdf
+          npm i --no-save playwright@1 @fontsource/noto-sans-tc @fontsource/inter @fontsource/jetbrains-mono
+          npx playwright install --with-deps chromium
+      - name: Build PDF
+        run: node docs/build_pdf.js
+      - name: Upload to release manual-latest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view manual-latest >/dev/null 2>&1 || gh release create manual-latest --title "使用手冊 PDF（自動產生）" --notes "每次手冊更新時由 GitHub Actions 自動重做。最新版：https://github.com/${{ github.repository }}/releases/download/manual-latest/RackTrace-manual.pdf" --latest=false
+          gh release upload manual-latest RackTrace-manual.pdf --clobber
