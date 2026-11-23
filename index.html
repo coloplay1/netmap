@@ -3829,7 +3829,7 @@ function openWireImport(){if(!canEdit()){toast('唯讀模式不能匯入');retur
     el.innerHTML=`${P.rows.length} 列 → ${st.newDev.length?`新設備 <b>${st.newDev.length}</b>（${esc(st.newDev.slice(0,6).join('、'))}${st.newDev.length>6?'…':''}）、`:''}新跳線 <b>${st.cables}</b>、埠預留線號 <b>${st.reserve}</b>、座位 <b>${st.seats}</b> 列（新座位 ${st.newSeats}、新的孔 ${st.jacks}）${st.auto?`、自動接上 ${st.auto}`:''}${st.skip.length?`<br><span style="color:var(--warn,#d97706)">略過 ${st.skip.length} 列：</span>${esc(st.skip.slice(0,5).join('；'))}${st.skip.length>5?'…':''}`:''}`;
     $('wiGo').disabled=!n};
   const load=()=>{P=wiParse($('wiTxt').value);drawMap();prev()};imeInput($('wiTxt'),load);$('wiPlan').onchange=prev;
-  $('wiFileB').onclick=()=>$('wiFile').click();$('wiFile').onchange=async()=>{const f=$('wiFile').files[0];if(!f)return;const buf=await f.arrayBuffer();let t=new TextDecoder('utf-8').decode(buf);if(t.includes('�'))try{t=new TextDecoder('big5').decode(buf)}catch(e){}$('wiTxt').value=t;load()};
+  $('wiFileB').onclick=()=>$('wiFile').click();$('wiFile').onchange=async()=>{const f=$('wiFile').files[0];if(!f)return;const buf=await f.arrayBuffer();let t=new TextDecoder('utf-8').decode(buf);if(t.includes('\uFFFD'))try{t=new TextDecoder('big5').decode(buf)}catch(e){}$('wiTxt').value=t;load()};
   $('wiGo').onclick=()=>{if(!P)return;snap();const st=wiRun(P,opt());save();closeModal();renderAll();toast(`已匯入：新設備 ${st.newDev.length}、跳線 ${st.cables}、預留線號 ${st.reserve}、座位孔 ${st.jacks}${st.skip.length?`，略過 ${st.skip.length} 列`:''}（可按復原）`,true)}}
 
 function openIpMac(){if(!canEdit()){toast('唯讀模式不能匯入');return}
